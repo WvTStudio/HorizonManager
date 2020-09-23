@@ -1,0 +1,43 @@
+[
+	{
+		"name" : "系统浏览器下载",
+		"pack_name" : [
+			"com.android.providers.downloads"
+		],
+		"path" : [
+			"%SDCARD%/Download/",
+			"%SDCARD%/下载/"
+		]
+	},
+	{
+		"name" : "QQ下载",
+		"pack_name" : [
+			"com.tencent.mobileqq",
+			"com.tencent.qqlite",
+			"com.tencent.mobileqqi",
+			"com.tencent.minihd.qq"
+		],
+		"path" : [
+			"%SDCARD%/Android/data/com.tencent.mobileqq/Tencent/QQfile_recv/",
+			"%SDCARD%/tencent/QQfile_recv/"
+		]
+	},
+	{
+		"name" : "微信下载",
+		"pack_name" : [
+			"com.tencent.mm"
+		],
+		"path" : [
+			"%SDCARD%/tencent/MicroMsg/Download/"
+		]
+	},
+	{
+		"name" : "百度网盘下载",
+		"pack_name" : [
+			"com.baidu.netdisk"
+		],
+		"path" : [
+			"%SDCARD%/BaiduNetdisk/"
+		]
+	}
+]

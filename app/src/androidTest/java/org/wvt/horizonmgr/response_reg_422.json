@@ -1,0 +1,20 @@
+{
+  "errors": [
+    {
+      "status": "422",
+      "code": "validation_error",
+      "detail": "username \u5df2\u5b58\u5728",
+      "source": {
+        "pointer": "\/data\/attributes\/username"
+      }
+    },
+    {
+      "status": "422",
+      "code": "validation_error",
+      "detail": "email \u5df2\u5b58\u5728",
+      "source": {
+        "pointer": "\/data\/attributes\/email"
+      }
+    }
+  ]
+}

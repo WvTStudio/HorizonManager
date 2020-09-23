@@ -1,0 +1,42 @@
+{
+  "data": {
+    "type": "users",
+    "id": "2058",
+    "attributes": {
+      "username": "apitest5",
+      "displayName": "apitest5",
+      "avatarUrl": null,
+      "joinTime": "2020-08-26T19:30:32+00:00",
+      "discussionCount": 0,
+      "commentCount": 0,
+      "canEdit": false,
+      "canDelete": false,
+      "lastSeenAt": null,
+      "isEmailConfirmed": false,
+      "email": "apitest5@xxxapitestxxx.com",
+      "markedAllAsReadAt": null,
+      "unreadNotificationCount": 0,
+      "newNotificationCount": 0,
+      "preferences": {
+        "notify_discussionRenamed_alert": true,
+        "notify_postLiked_alert": true,
+        "notify_discussionLocked_alert": true,
+        "notify_postMentioned_alert": true,
+        "notify_postMentioned_email": false,
+        "notify_userMentioned_alert": true,
+        "notify_userMentioned_email": false,
+        "notify_newPost_alert": true,
+        "notify_newPost_email": true,
+        "notify_userSuspended_alert": true,
+        "notify_userUnsuspended_alert": true,
+        "followAfterReply": false,
+        "discloseOnline": true,
+        "indexProfile": true,
+        "locale": null
+      },
+      "newFlagCount": 0,
+      "canSuspend": false,
+      "socialButtons": null
+    }
+  }
+}
