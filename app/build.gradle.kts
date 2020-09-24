@@ -54,6 +54,7 @@ android {
 dependencies {
     val composeVersion = "1.0.0-alpha03"
     implementation(kotlin("stdlib"))
+    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.1.0")
 
     implementation("androidx.core:core-ktx:1.3.1")
     implementation("androidx.appcompat:appcompat:1.2.0")

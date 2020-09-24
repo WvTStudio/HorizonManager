@@ -1,0 +1,41 @@
+package org.wvt.horizonmgr.service.webapi2.modmodule
+
+import kotlinx.coroutines.channels.ReceiveChannel
+import org.wvt.horizonmgr.service.webapi2.usermodule.User
+import java.net.URL
+
+/**
+ * 这是以后需要做的仓库
+ */
+interface OfficialRepository: ModRepository {
+    override suspend fun getRecommendMods(): ReceiveChannel<Mod>
+    suspend fun search(text: String): ReceiveChannel<OfficialMod>
+}
+
+interface OfficialMod: Mod {
+    override suspend fun getName(): String
+    override suspend fun getDescription(): String
+
+    suspend fun getDeveloper(): User
+    suspend fun getVersionCode(): Int
+    suspend fun getVersionName(): String
+
+    suspend fun heat(): Long
+
+    suspend fun getIcon(): URL
+    suspend fun getPreviewImages(): List<URL>
+
+    suspend fun getDownloadLink(): URL
+
+    suspend fun getComment(id: String): ModComment
+    suspend fun getComments(): ReceiveChannel<ModComment>
+
+    suspend fun sendComment(content: String)
+    suspend fun reply(comment: ModComment, content: String)
+}
+
+interface ModComment {
+    suspend fun getSender(): User
+    suspend fun getContent(): String
+    suspend fun getReplies(): ReceiveChannel<ModComment>
+}

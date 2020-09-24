@@ -17,22 +17,3 @@ import java.net.URL
    情况 3 和 4 都属于未解析的模组
 本地安装的 Mod 可以尝试解析成 ICCNMod
  */
-
-/**
- * 代表一个从 ICCN 上下载下来的 MOD
- */
-class ICCNMod private constructor() {
-    suspend fun getDetails() {
-
-    }
-
-    suspend fun getDownloadUrl() {
-    }
-}
-
-class UnInstalledICCNMod
-
-/**
- * 代表本地安装的 MOD
- */
-class CustomMod
