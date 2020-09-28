@@ -67,6 +67,7 @@ object CoroutineZip {
                 }
                 it.send(index / totalCount)
             }
+            zip.close()
             it.close()
         }
     }
