@@ -33,9 +33,9 @@ private enum class Screen(
     val icon: VectorAsset
 ) {
     PACKAGE_MANAGE("分包管理", Icons.Filled.Extension),
-    LOCAL_MANAGE("本地管理", Icons.Filled.Nature),
-    ONLINE_DOWNLOAD("在线下载", Icons.Filled.GetApp),
-    DOWNLOADED_MOD("已下载", Icons.Filled.Cached)
+    LOCAL_MANAGE("模组管理", Icons.Filled.Nature),
+    ONLINE_DOWNLOAD("在线资源", Icons.Filled.GetApp),
+    DOWNLOADED_MOD("本地资源", Icons.Filled.Cached)
 }
 
 @Composable

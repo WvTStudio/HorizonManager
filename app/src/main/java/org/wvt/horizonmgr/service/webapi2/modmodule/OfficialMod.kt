@@ -1,6 +1,7 @@
 package org.wvt.horizonmgr.service.webapi2.modmodule
 
 import kotlinx.coroutines.channels.ReceiveChannel
+import kotlinx.datetime.Instant
 import org.wvt.horizonmgr.service.webapi2.usermodule.User
 import java.net.URL
 
@@ -20,7 +21,9 @@ interface OfficialMod: Mod {
     suspend fun getVersionCode(): Int
     suspend fun getVersionName(): String
 
-    suspend fun heat(): Long
+    suspend fun getCreateTime(): Instant
+    suspend fun getUpdateTime(): Instant
+    suspend fun getHeat(): Long
 
     suspend fun getIcon(): URL
     suspend fun getPreviewImages(): List<URL>
@@ -35,7 +38,8 @@ interface OfficialMod: Mod {
 }
 
 interface ModComment {
-    suspend fun getSender(): User
+    suspend fun getCreator(): User
+    suspend fun getCreateTime(): Instant
     suspend fun getContent(): String
     suspend fun getReplies(): ReceiveChannel<ModComment>
 }
