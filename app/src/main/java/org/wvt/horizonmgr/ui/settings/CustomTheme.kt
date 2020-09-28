@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.drawLayer
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.ui.tooling.preview.Preview
 import org.wvt.horizonmgr.ui.theme.*
@@ -230,7 +231,9 @@ private fun SelectColorItem(
 ) {
     val scale = animate(if (selected) 1.1f else 1f)
     Column(modifier) {
-        Text(text = text)
+        ProvideEmphasis(emphasis = EmphasisAmbient.current.medium) {
+            Text(text = text)
+        }
         Surface(
             modifier = Modifier.size(128.dp, 96.dp).padding(top = 8.dp)
                 .clickable(onClick = onSelect, indication = null)
@@ -265,7 +268,10 @@ private fun MaterialColorPalette(
                             modifier = Modifier.padding(1.dp).height(42.dp).width(72.dp),
                             gravity = ContentGravity.Center
                         ) {
-                            Text(text = i.key)
+                            Text(
+                                text = i.key,
+                                textAlign = TextAlign.Center
+                            )
                         }
                     }
                 }
