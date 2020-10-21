@@ -2,7 +2,6 @@ package org.wvt.horizonmgr.ui.main
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
@@ -19,29 +18,32 @@ import androidx.compose.material.TextButton
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.ContextAmbient
 import androidx.compose.ui.platform.setContent
-import androidx.core.content.edit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
+import org.wvt.horizonmgr.HorizonManagerApplication
 import org.wvt.horizonmgr.R
 import org.wvt.horizonmgr.service.LocalCache
-import org.wvt.horizonmgr.service.WebAPI
-import org.wvt.horizonmgr.ui.*
+import org.wvt.horizonmgr.ui.AndroidDependenciesProvider
+import org.wvt.horizonmgr.ui.HorizonManagerAmbient
 import org.wvt.horizonmgr.ui.community.CommunityActivity
 import org.wvt.horizonmgr.ui.donate.DonateActivity
 import org.wvt.horizonmgr.ui.joingroup.JoinGroupActivity
 import org.wvt.horizonmgr.ui.login.LoginActivity
 import org.wvt.horizonmgr.ui.settings.SettingsActivity
+import org.wvt.horizonmgr.ui.startActivity
 import org.wvt.horizonmgr.ui.theme.AndroidHorizonManagerTheme
 import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 
 class MainActivity : AppCompatActivity() {
+    private val dependencies = HorizonManagerApplication.container
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme(R.style.Theme_HorizonManagerCompose_NoActionBar) // cancel the slash theme
         setContent { // Platform-Specified content
-            var userInfo by remember { mutableStateOf<WebAPI.UserInfo?>(null) }
+            var userInfo by remember { mutableStateOf<LocalCache.CachedUserInfo?>(null) }
             var selectedPackage by remember { mutableStateOf<String?>(null) }
             val context = ContextAmbient.current
             val scope = rememberCoroutineScope()
@@ -51,12 +53,11 @@ class MainActivity : AppCompatActivity() {
             AndroidDependenciesProvider {
                 val mgrInstance = HorizonManagerAmbient.current
 
-                launchInComposition {
+                LaunchedTask {
                     if (!hasPermission()) {
                         showPermissionDialog = true
                     }
-
-                    userInfo = getUserInfo()
+                    userInfo = dependencies.localCache.getCachedUserInfo()
                     val s = getSelectedPackageUUID()
                     selectedPackage =
                         if (s != null && mgrInstance.getPackageInfo(s) != null) s
@@ -83,15 +84,22 @@ class MainActivity : AppCompatActivity() {
 
                     Surface(color = MaterialTheme.colors.background) {
                         App(
+                            dependencies = dependencies,
                             userInfo = userInfo,
                             requestLogin = {
-                                scope.launch(Dispatchers.Main) {
-                                    userInfo = try {
+                                scope.launch {
+                                    val r = try {
                                         startLoginActivity()
                                     } catch (e: Throwable) {
                                         // TODO 添加提示信息
                                         return@launch
                                     }
+                                    r?.let {
+                                        dependencies.localCache.cacheUserInfo(
+                                            it.id, it.name, it.account, it.avatarUrl
+                                        )
+                                    }
+                                    userInfo = r
                                 }
                             },
                             requestLogout = {
@@ -115,7 +123,7 @@ class MainActivity : AppCompatActivity() {
                                 }
                             },
                             openGame = {
-                                scope.launch(Dispatchers.Main) {
+                                scope.launch {
                                     try {
                                         openGame()
                                     } catch (e: Throwable) {
@@ -124,17 +132,17 @@ class MainActivity : AppCompatActivity() {
                                 }
                             },
                             community = {
-                                scope.launch(Dispatchers.Main) { context.startActivity<CommunityActivity>() }
+                                scope.launch { context.startActivity<CommunityActivity>() }
                             },
                             joinGroup = {
-                                scope.launch(Dispatchers.Main) { context.startActivity<JoinGroupActivity>() }
+                                scope.launch { context.startActivity<JoinGroupActivity>() }
                             },
                             donate = {
-                                scope.launch(Dispatchers.Main) { context.startActivity<DonateActivity>() }
+                                scope.launch { context.startActivity<DonateActivity>() }
                             },
                             settings = {
-                                scope.launch(Dispatchers.Main) { context.startActivity<SettingsActivity>() }
-                            }
+                                scope.launch { context.startActivity<SettingsActivity>() }
+                            },
                         )
                     }
                 }
@@ -143,10 +151,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private suspend fun hasPermission(): Boolean {
-        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.Q && Build.VERSION.PREVIEW_SDK_INT != 0) {
-            @SuppressLint("NewApi")
-            if (Environment.isExternalStorageManager()) return true else return false
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             return Environment.isExternalStorageManager()
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             listOf<String>(
@@ -162,6 +167,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private suspend fun requestPermission(): Boolean {
+        // TODO: 2020/10/13 支持挂起，在用户完成操作后恢复
         if (Build.VERSION.SDK_INT == Build.VERSION_CODES.Q && Build.VERSION.PREVIEW_SDK_INT != 0) {
             // R Preview
             @SuppressLint("NewApi")
@@ -181,40 +187,39 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
-    private suspend fun getSelectedPackageUUID(): String? = withContext(Dispatchers.IO) {
-        getSharedPreferences("selected_package", Context.MODE_PRIVATE).getString("uuid", null)
-    }
+    private suspend fun getSelectedPackageUUID(): String? =
+        dependencies.localCache.getSelectedPackageUUID()
 
-    private suspend fun saveSelectedPackageUUID(uuid: String?) = withContext(Dispatchers.IO) {
-        getSharedPreferences("selected_package", Context.MODE_PRIVATE).edit {
-            if (uuid == null) remove("uuid")
-            else putString("uuid", uuid)
-        }
-    }
+    private suspend fun saveSelectedPackageUUID(uuid: String?) =
+        dependencies.localCache.setSelectedPackageUUID(uuid)
 
     private suspend fun openGame(): Boolean = withContext(Dispatchers.Main) {
-        val horizonIntent =
-            Intent(packageManager.getLaunchIntentForPackage("com.zheka.horizon"))
         try {
+            val horizonIntent =
+                Intent(packageManager.getLaunchIntentForPackage("com.zheka.horizon"))
             startActivity(horizonIntent)
             return@withContext true
         } catch (e: Exception) {
         }
-        val innerCoreIntent =
-            Intent(packageManager.getLaunchIntentForPackage("com.zheka.horizon"))
+
         try {
+            val innerCoreIntent =
+                Intent(packageManager.getLaunchIntentForPackage("com.zheka.horizon"))
             startActivity(innerCoreIntent)
             return@withContext true
         } catch (e: Exception) {
         }
+
         return@withContext false
     }
 
-    private suspend fun startLoginActivity(): WebAPI.UserInfo? {
-        return suspendCoroutine<WebAPI.UserInfo?> { cont ->
+    private suspend fun startLoginActivity(): LocalCache.CachedUserInfo? {
+        return suspendCancellableCoroutine { cont ->
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
                 if (it.resultCode == LoginActivity.LOGIN_SUCCESS) {
-                    cont.resume(getUserInfo())
+                    val data = it.data ?: return@registerForActivityResult cont.resume(null)
+                    val result = with(LoginActivity) { data.getResult() }
+                    cont.resume(result)
                 } else {
                     cont.resume(null)
                 }
@@ -222,8 +227,9 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+
     private suspend fun logout() {
-        clearUserInfo()
+        dependencies.localCache.clearCachedUserInfo()
     }
 }
 

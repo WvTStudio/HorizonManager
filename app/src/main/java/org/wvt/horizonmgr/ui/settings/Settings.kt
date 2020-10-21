@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Brush
 import androidx.compose.material.icons.filled.FormatPaint
 import androidx.compose.material.icons.filled.Timelapse
 import androidx.compose.runtime.*
@@ -17,6 +16,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ContextAmbient
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
+import androidx.ui.tooling.preview.Preview
 import org.wvt.horizonmgr.BuildConfig
 import org.wvt.horizonmgr.R
 import org.wvt.horizonmgr.ui.components.AnimateLogo
@@ -53,7 +53,7 @@ fun Settings(
                         )
                     )
                 }
-                val emphasis = EmphasisAmbient.current
+                val emphasis = AmbientEmphasisLevels.current
                 ProvideEmphasis(emphasis = emphasis.medium) {
                     Text(
                         modifier = Modifier.padding(top = 4.dp),
@@ -119,3 +119,12 @@ fun Settings(
     }
 }
 
+@Preview
+@Composable
+fun SettingsPreview() {
+    MaterialTheme {
+        Surface(color = MaterialTheme.colors.background) {
+            Settings(requestCustomTheme = {})
+        }
+    }
+}

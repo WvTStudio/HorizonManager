@@ -74,7 +74,7 @@ fun PackageInfo(pkgId: String) {
                     manifest?.let {
                         ManifestSection(manifest = it)
                     }
-                    pkgInfo?.let {
+                    pkgInfo.let {
                         FileSection(pkgInfo = it)
                     }
                 }

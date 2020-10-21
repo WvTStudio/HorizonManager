@@ -75,7 +75,7 @@ private fun GroupItem(
     onClicked: () -> Unit,
     avatarUrl: String, groupName: String, description: String, status: String
 ) {
-    val emphasis = EmphasisAmbient.current
+    val emphasis = AmbientEmphasisLevels.current
     Row(Modifier.clickable(onClick = onClicked).padding(vertical = 16.dp)) {
         NetworkImage(
             modifier = Modifier.padding(start = 16.dp, end = 24.dp)

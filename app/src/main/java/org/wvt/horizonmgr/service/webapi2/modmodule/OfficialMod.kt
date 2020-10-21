@@ -8,12 +8,12 @@ import java.net.URL
 /**
  * 这是以后需要做的仓库
  */
-interface OfficialRepository: ModRepository {
+interface OfficialRepository : ModRepository {
     override suspend fun getRecommendMods(): ReceiveChannel<Mod>
     suspend fun search(text: String): ReceiveChannel<OfficialMod>
 }
 
-interface OfficialMod: Mod {
+interface OfficialMod : Mod {
     override suspend fun getName(): String
     override suspend fun getDescription(): String
 

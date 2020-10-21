@@ -46,7 +46,7 @@ fun LoginPage(
             Text(
                 text = "登录", color = MaterialTheme.colors.primary, fontSize = 64.sp
             )
-            ProvideEmphasis(emphasis = EmphasisAmbient.current.medium) {
+            ProvideEmphasis(emphasis = AmbientEmphasisLevels.current.medium) {
                 Text(
                     modifier = Modifier.padding(top = 16.dp),
                     text = "使用 InnerCore 中文社区账号登录",

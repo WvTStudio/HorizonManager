@@ -16,3 +16,10 @@ inline fun <T> JSONArray.forEach(action: (item: T) -> Unit) {
         action(get(i) as T)
     }
 }
+
+inline fun <T> JSONArray.forEachIndexed(action: (index: Int, item: T) -> Unit) {
+    for (i in 0 until length()) {
+        @Suppress("UNCHECKED_CAST")
+        action(i, get(i) as T)
+    }
+}

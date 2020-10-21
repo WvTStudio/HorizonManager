@@ -1,8 +1,5 @@
 package org.wvt.horizonmgr.service
 
-import kotlinx.coroutines.channels.ReceiveChannel
-import java.net.URL
-
 /* Mod 存在好几种情况
    1. 在管理器内从汉化组源下载的模组
    2. 在管理器内从官方源下载的模组

@@ -1,28 +1,22 @@
 package org.wvt.horizonmgr.ui.community
 
-import android.app.DownloadManager
-import android.content.Context
-import android.graphics.Bitmap
-import android.net.Uri
 import android.os.Bundle
-import android.os.Environment
-import android.util.Log
-import android.view.KeyEvent
-import android.webkit.*
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.ComposeView
-import org.wvt.horizonmgr.R
-import org.wvt.horizonmgr.ui.theme.AndroidHorizonManagerTheme
-import org.wvt.horizonmgr.ui.theme.HorizonManagerTheme
+import androidx.compose.ui.platform.setContent
 
 class CommunityActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // TODO 现在是临时解决方案
+        setContent {
+            MaterialTheme {
+                Surface(color = MaterialTheme.colors.background) {
+                    Community(onClose = ::close)
+                }
+            }
+        }
+        /*// TODO 现在是临时解决方案
         setContentView(R.layout.community_layout)
         findViewById<ComposeView>(R.id.compose_view).setContent {
             AndroidHorizonManagerTheme {
@@ -85,7 +79,7 @@ class CommunityActivity : AppCompatActivity() {
                 dm.openDownloadedFile(dm.enqueue(request))
             }
             loadUrl("https://forum.adodoz.cn")
-        }
+        }*/
     }
 
     private fun close() {

@@ -1,16 +1,9 @@
 package org.wvt.horizonmgr.ui.login
 
-import androidx.compose.animation.Crossfade
-import androidx.compose.foundation.Box
-import androidx.compose.foundation.Icon
 import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowForward
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Clear
 import androidx.compose.runtime.*
 import androidx.compose.runtime.savedinstancestate.savedInstanceState
 import androidx.compose.ui.Alignment
@@ -98,7 +91,7 @@ fun RegisterPage(onSuccess: (uid: String, email: String, password: String) -> Un
             verticalArrangement = Arrangement.Center
         ) {
             Text("注册", color = MaterialTheme.colors.primary, fontSize = 64.sp)
-            ProvideEmphasis(emphasis = EmphasisAmbient.current.medium) {
+            ProvideEmphasis(emphasis = AmbientEmphasisLevels.current.medium) {
                 Text(
                     modifier = Modifier.padding(top = 16.dp),
                     text = "注册到 InnerCore 中文社区 ",
@@ -169,7 +162,8 @@ fun RegisterPage(onSuccess: (uid: String, email: String, password: String) -> Un
                 )
                 StateFab(
                     modifier = Modifier.padding(top = 16.dp),
-                    state = fabState, onClicked = ::register)
+                    state = fabState, onClicked = ::register
+                )
             }
         }
         SnackbarHost(

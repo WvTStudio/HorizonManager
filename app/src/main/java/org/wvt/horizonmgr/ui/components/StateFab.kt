@@ -1,8 +1,6 @@
 package org.wvt.horizonmgr.ui.components
 
 import androidx.compose.foundation.Icon
-import androidx.compose.foundation.layout.Stack
-import androidx.compose.foundation.layout.size
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.MaterialTheme
@@ -15,7 +13,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Layout
 import androidx.compose.ui.Measurable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.drawLayer
 import androidx.compose.ui.unit.dp
 
 enum class FabState {
@@ -65,5 +62,4 @@ fun StateFab(
             }
         )
     }
-
 }

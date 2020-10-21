@@ -9,7 +9,6 @@ import androidx.compose.material.Surface
 import androidx.compose.ui.platform.setContent
 import kotlinx.coroutines.suspendCancellableCoroutine
 import org.wvt.horizonmgr.ui.theme.AndroidHorizonManagerTheme
-import org.wvt.horizonmgr.ui.theme.HorizonManagerTheme
 import kotlin.coroutines.resume
 
 class SelectFileActivity : AppCompatActivity() {

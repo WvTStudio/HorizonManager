@@ -3,7 +3,7 @@ package org.wvt.horizonmgr.ui.onlinemod
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.animate
-import androidx.compose.foundation.ContentColorAmbient
+import androidx.compose.foundation.AmbientContentColor
 import androidx.compose.foundation.Icon
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.*
@@ -19,24 +19,20 @@ import androidx.compose.ui.draw.drawOpacity
 import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.id
+import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
 import androidx.ui.tooling.preview.Preview
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import org.wvt.horizonmgr.service.WebAPI
-import org.wvt.horizonmgr.ui.HorizonManagerAmbient
-import org.wvt.horizonmgr.ui.WebAPIAmbient
+import org.wvt.horizonmgr.dependenciesViewModel
 import org.wvt.horizonmgr.ui.components.DropDownSelector
 import org.wvt.horizonmgr.ui.components.NetworkImage
 import org.wvt.horizonmgr.ui.components.ProgressDialog
-import org.wvt.horizonmgr.ui.components.ProgressDialogState
-import org.wvt.horizonmgr.ui.main.DrawerStateAmbient
 import org.wvt.horizonmgr.ui.main.SelectedPackageUUIDAmbient
-import org.wvt.horizonmgr.ui.main.UserInfoAmbient
 import org.wvt.horizonmgr.ui.theme.HorizonManagerTheme
 
+/*@Deprecated(level = DeprecationLevel.ERROR)
 private fun List<WebAPI.OnlineModInfo>.sorted(mode: SortMode): List<WebAPI.OnlineModInfo> {
     return when (mode) {
         SortMode.DEFAULT -> sortedBy { it.index } // 服务端没有支持推荐排序，默认为最新模组
@@ -47,50 +43,58 @@ private fun List<WebAPI.OnlineModInfo>.sorted(mode: SortMode): List<WebAPI.Onlin
     }
 }
 
+@Deprecated(level = DeprecationLevel.ERROR)
 private enum class SortMode(val label: String) {
     DEFAULT("推荐排序"), TIME_ASC("最新发布"), TIME_DSC("最先发布"),
     NAME_ASC("名称排序"), NAME_DSC("名称倒序")
 }
 
+@Deprecated(level = DeprecationLevel.ERROR)
 private sealed class DownloadState {
     object NotLogin : DownloadState()
     object Loading : DownloadState()
     class Error(val message: String) : DownloadState()
     class OK(val items: List<WebAPI.OnlineModInfo>) : DownloadState()
-}
+}*/
 
 @Composable
-fun Online(onDownloadClick: (WebAPI.OnlineModInfo) -> Unit) {
-    val horizonMgr = HorizonManagerAmbient.current
-    val webApi = WebAPIAmbient.current
-
-    val scope = rememberCoroutineScope()
-    val userInfo = UserInfoAmbient.current
-
-    // 该 List用于存储从服务器上获取的列表，提供给过滤器
-    var list by remember { mutableStateOf<List<WebAPI.OnlineModInfo>>(emptyList()) }
-
-    var state by remember {
-        mutableStateOf<DownloadState>(
-            if (userInfo == null) DownloadState.NotLogin
-            else DownloadState.Loading
-        )
-    }
-
-    // TODO 解耦
-    val sources = remember { listOf("官方源", "汉化组源") }
-    var selectedSource by remember { mutableStateOf(0) }
-
-    val sortModes = remember { SortMode.values() }
-    var selectedSortMode by remember { mutableStateOf(0) }
-
+fun Online(
+    enable: Boolean,
+    onNavClicked: () -> Unit
+) {
+    val vm = dependenciesViewModel<OnlineViewModel>()
+    val vmState by vm.listState.collectAsState()
+    val vmOptions by vm.options.collectAsState()
+    val vmDownloadState by vm.downloadState.collectAsState()
+    val vmInstallState by vm.installState.collectAsState()
     val selectedPackageUUID = SelectedPackageUUIDAmbient.current
 
-    var progressDialogState by remember { mutableStateOf<ProgressDialogState?>(null) }
+    onCommit(vm) {
+        vm.setSelectedUUID(selectedPackageUUID)
+    }
 
-    var filterValue by remember { mutableStateOf<String>("") }
+    /*// 该 List用于存储从服务器上获取的列表，提供给过滤器
+    var list by remember { mutableStateOf<List<WebAPI.OnlineModInfo>>(emptyList()) }
+*/
+    /*var state by remember {
+        mutableStateOf(
+            if (enable) DownloadState.Loading
+            else DownloadState.NotLogin
+        )
+    }*/
 
-    fun load() {
+
+    // TODO 解耦
+/*
+    var selectedSource by remember { mutableStateOf(0) }
+
+    val sortModes = remember { OnlineViewModel.SortMode.values().toList() }
+    var selectedSortMode by remember { mutableStateOf(0) }
+*/
+
+    var filterValue by remember { mutableStateOf("") }
+
+/*    fun load() {
         scope.launch {
             state = DownloadState.Loading
             val mods = try {
@@ -107,21 +111,15 @@ fun Online(onDownloadClick: (WebAPI.OnlineModInfo) -> Unit) {
         }
     }
 
-    onCommit(userInfo) {
-        if (userInfo != null) {
-            load()
-        } else {
-            state = DownloadState.NotLogin
-        }
+    onCommit(enable) {
+        if (enable) load()
+        else state = DownloadState.NotLogin
     }
 
     onCommit(selectedSource) {
         if (state !is DownloadState.OK) return@onCommit
-        if (userInfo != null) {
-            load()
-        } else {
-            state = DownloadState.NotLogin
-        }
+        if (enable) load()
+        else state = DownloadState.NotLogin
     }
 
     onCommit(selectedSortMode, filterValue) {
@@ -139,22 +137,29 @@ fun Online(onDownloadClick: (WebAPI.OnlineModInfo) -> Unit) {
             delay(200)
             state = DownloadState.OK(sorted)
         }
-    }
+    }*/
 
     Column(Modifier.fillMaxSize()) {
-        progressDialogState?.let {
-            ProgressDialog(onCloseRequest = { progressDialogState = null }, state = it)
+        vmDownloadState?.let {
+            ProgressDialog(onCloseRequest = { vm.downloadFinish() }, state = it)
+        }
+        vmInstallState?.let {
+            ProgressDialog(onCloseRequest = { vm.installFinish() }, state = it)
         }
         TuneAppBar(
-            onFilterValueConfirm = { filterValue = it },
-            sources, selectedSource, { selectedSource = it },
-            sortModes, selectedSortMode, { selectedSortMode = it }
+            onNavClicked = onNavClicked,
+            onFilterValueConfirm = { vm.setFilterValue(it) },
+            vm.sources, vmOptions.selectedSource, vm::setSelectedSource,
+            vm.sortModes, vmOptions.selectedSortMode, vm::setSelectedSortMode
         )
-        Crossfade(current = state) {
+        Crossfade(
+            modifier = Modifier.fillMaxSize(),
+            current = vmState
+        ) {
             when (it) {
-                DownloadState.NotLogin -> {
-                    Stack(Modifier.fillMaxSize()) {
-                        ProvideEmphasis(emphasis = EmphasisAmbient.current.medium) {
+                OnlineViewModel.ListState.NotLogin -> {
+                    Box(Modifier.fillMaxSize()) {
+                        ProvideEmphasis(emphasis = AmbientEmphasisLevels.current.medium) {
                             Text(
                                 modifier = Modifier.align(Alignment.Center),
                                 text = "此功能仅在登录后可用",
@@ -163,64 +168,28 @@ fun Online(onDownloadClick: (WebAPI.OnlineModInfo) -> Unit) {
                         }
                     }
                 }
-                DownloadState.Loading -> {
-                    Stack(Modifier.fillMaxSize()) {
+                OnlineViewModel.ListState.Loading -> {
+                    Box(Modifier.fillMaxSize()) {
                         CircularProgressIndicator(Modifier.align(Alignment.Center))
                     }
                 }
-                is DownloadState.OK -> {
+                is OnlineViewModel.ListState.OK -> {
                     LazyColumnForIndexed(
                         modifier = Modifier.fillMaxSize(),
                         contentPadding = PaddingValues(top = 16.dp, bottom = 64.dp),
-                        items = it.items
+                        items = it.modList
                     ) { index, item ->
                         Item(
                             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
                             title = item.name,
                             text = item.description,
                             imageUrl = item.iconUrl,
-                            onDownloadClick = {
-                                // TODO 解耦并增加反馈
-                                scope.launch {
-                                    progressDialogState = ProgressDialogState.Loading("正在下载")
-                                    try {
-                                        webApi.downloadMod(item).await()
-                                    } catch (e: Exception) {
-                                        e.printStackTrace()
-                                        progressDialogState =
-                                            ProgressDialogState.Failed(
-                                                "下载失败",
-                                                e.localizedMessage ?: ""
-                                            )
-                                        return@launch
-                                    }
-                                    progressDialogState = ProgressDialogState.Finished("下载完成")
-                                }
-                            },
-                            onInstallClick = {
-                                // TODO 解耦并增加反馈
-                                scope.launch {
-                                    selectedPackageUUID?.let {
-                                        progressDialogState = ProgressDialogState.Loading("正在下载安装")
-                                        try {
-                                            val mod = webApi.downloadMod(item).await()
-                                            horizonMgr.installMod(it, mod)
-                                        } catch (e: Exception) {
-                                            e.printStackTrace()
-                                            progressDialogState = ProgressDialogState.Failed(
-                                                "安装失败",
-                                                e.localizedMessage ?: ""
-                                            )
-                                            return@launch
-                                        }
-                                        progressDialogState = ProgressDialogState.Finished("安装成功")
-                                    }
-                                }
-                            }
+                            onDownloadClick = { vm.download(item) },
+                            onInstallClick = { vm.install(item) }
                         )
                     }
                 }
-                is DownloadState.Error -> {
+                is OnlineViewModel.ListState.Error -> {
                     Column(
                         modifier = Modifier.fillMaxSize(),
                         verticalArrangement = Arrangement.Center,
@@ -228,7 +197,7 @@ fun Online(onDownloadClick: (WebAPI.OnlineModInfo) -> Unit) {
                     ) {
                         Text(it.message)
                         Spacer(modifier = Modifier.height(16.dp))
-                        Button(onClick = ::load) {
+                        Button(onClick = vm::refresh) {
                             Text("重试")
                         }
                     }
@@ -241,135 +210,149 @@ fun Online(onDownloadClick: (WebAPI.OnlineModInfo) -> Unit) {
 @OptIn(ExperimentalFocus::class)
 @Composable
 private fun TuneAppBar(
+    onNavClicked: () -> Unit,
     onFilterValueConfirm: (value: String) -> Unit,
-    sources: List<String>, selectedSource: Int, onSourceSelect: (index: Int) -> Unit,
-    sortModes: Array<SortMode>, selectedSortMode: Int, onSortModeSelect: (index: Int) -> Unit
+    sources: List<OnlineViewModel.Source>,
+    selectedSource: OnlineViewModel.Source,
+    onSourceSelect: (index: OnlineViewModel.Source) -> Unit,
+    sortModes: List<OnlineViewModel.SortMode>,
+    selectedSortMode: OnlineViewModel.SortMode,
+    onSortModeSelect: (index: OnlineViewModel.SortMode) -> Unit
 ) {
     var filterValue by remember { mutableStateOf(TextFieldValue()) }
-    val drawerState = DrawerStateAmbient.current
     var expand by remember { mutableStateOf(false) }
-    val emphasis = EmphasisAmbient.current
-    val focus: FocusRequester = remember { FocusRequester() }
+    val emphasis = AmbientEmphasisLevels.current
+    val focus = remember { FocusRequester() }
 
+    ExpandableAppBarLayout(
+        onNavClicked = onNavClicked,
+        onActionClick = { expand = !expand },
+        expand = expand,
+        title = { Text(text = "在线下载") }
+    ) {
+        ProvideEmphasis(emphasis = emphasis.medium) {
+            Column(
+                Modifier.padding(
+                    top = 8.dp,
+                    start = 32.dp,
+                    end = 16.dp,
+                    bottom = 16.dp
+                )
+            ) {
+                // 搜索框
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(asset = Icons.Filled.Search)
+                    TextField(
+                        modifier = Modifier.padding(start = 16.dp, end = 16.dp)
+                            .weight(1f)
+                            .focusRequester(focus)
+                            .focusObserver { onFilterValueConfirm(filterValue.text) },
+                        value = filterValue, onValueChange = { filterValue = it },
+                        label = { Text("搜索") }
+                    )
+                }
+                Row(
+                    modifier = Modifier.padding(top = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(asset = Icons.Filled.Language)
+                    DropDownSelector(
+                        modifier = Modifier.padding(start = 16.dp),
+                        items = sources.map { it.label },
+                        selectedIndex = sources.indexOf(selectedSource),
+                        onSelected = { onSourceSelect(sources[it]) }
+                    )
+                }
+                Row(
+                    modifier = Modifier.padding(top = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(asset = Icons.Filled.Sort)
+                    DropDownSelector(
+                        modifier = Modifier.padding(start = 16.dp),
+                        items = sortModes.map { it.label },
+                        selectedIndex = sortModes.indexOf(selectedSortMode),
+                        onSelected = { onSortModeSelect(sortModes[it]) }
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun ExpandableAppBarLayout(
+    onNavClicked: () -> Unit,
+    onActionClick: () -> Unit,
+    expand: Boolean,
+    title: @Composable () -> Unit,
+    content: @Composable () -> Unit
+) {
     val progress = animate(if (expand) 1f else 0f)
-
     Surface(
         elevation = 4.dp,
         color = MaterialTheme.colors.surface
     ) {
-        Layout(
-            children = {
-                TopAppBar(
-                    navigationIcon = {
-                        IconButton(onClick = { drawerState.open() }) {
-                            Icon(asset = Icons.Filled.Menu)
+        Layout(children = {
+            TopAppBar(
+                modifier = Modifier.layoutId("appbar"),
+                navigationIcon = {
+                    IconButton(onClick = onNavClicked) {
+                        Icon(asset = Icons.Filled.Menu)
+                    }
+                },
+                title = title,
+                actions = {
+                    IconButton(onClick = onActionClick) {
+                        Crossfade(current = expand) {
+                            if (it) Icon(asset = Icons.Filled.Close)
+                            else Icon(asset = Icons.Filled.FilterAlt)
                         }
-                    },
-                    title = {
-                        Text(text = "在线下载")
-                    },
-                    actions = {
-                        IconButton(onClick = {
-                            expand = !expand
-                        }) {
-                            Crossfade(current = expand) {
-                                if (it) Icon(Icons.Filled.Close)
-                                else Icon(asset = Icons.Filled.FilterAlt)
-                            }
-                        }
-                    },
-                    backgroundColor = Color.Transparent,
-                    elevation = 0.dp
-                )
-                Surface(
-                    modifier = Modifier.fillMaxWidth().drawOpacity(progress),
-                    color = Color.Transparent
+                    }
+                },
+                backgroundColor = Color.Transparent,
+                elevation = 0.dp
+            )
+            Surface(
+                modifier = Modifier.fillMaxWidth().drawOpacity(progress).layoutId("content"),
+                color = Color.Transparent,
+                content = content
+            )
+        }, measureBlock = { measurables, constraints ->
+            if (measurables.size != 2) error("Need 2 children")
+
+            if (progress == 0f) { // Not expand
+                val appbar = measurables.first { it.id == "appbar" }.measure(constraints)
+                val appbarHeight = appbar.height
+                layout(
+                    constraints.maxWidth,
+                    appbarHeight
                 ) {
-                    ProvideEmphasis(emphasis = emphasis.medium) {
-                        Column(
-                            Modifier.padding(
-                                top = 8.dp,
-                                start = 32.dp,
-                                end = 16.dp,
-                                bottom = 16.dp
-                            )
-                        ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Icon(asset = Icons.Filled.Search)
-                                TextField(
-                                    modifier = Modifier.padding(start = 16.dp, end = 16.dp)
-                                        .weight(1f)
-                                        .focusRequester(focus).focusObserver {
-                                            onFilterValueConfirm(filterValue.text)
-                                        },
-                                    value = filterValue, onValueChange = { filterValue = it },
-                                    label = { Text("搜索") }
-                                )
-                            }
-                            Row(
-                                modifier = Modifier.padding(top = 8.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Icon(asset = Icons.Filled.Language)
-                                DropDownSelector(
-                                    modifier = Modifier.padding(start = 16.dp),
-                                    items = sources,
-                                    selectedIndex = selectedSource,
-                                    onSelected = onSourceSelect
-                                )
-                            }
-                            Row(
-                                modifier = Modifier.padding(top = 8.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Icon(asset = Icons.Filled.Sort)
-                                DropDownSelector(
-                                    modifier = Modifier.padding(start = 16.dp),
-                                    items = sortModes.map { it.label },
-                                    selectedIndex = selectedSortMode,
-                                    onSelected = onSortModeSelect
-                                )
-                            }
-                        }
-                    }
+                    appbar.placeRelative(0, 0) // TopAppBar
                 }
-            }, measureBlock = { measurables, constraints ->
-                if (measurables.size != 2) error("Need 2 children")
+            } else { // Expanding | Expanded
+                val appbar = measurables.first { it.id == "appbar" }.measure(constraints)
+                val appbarHeight = appbar.height
 
-                if (progress == 0f) { // Not expanded
-                    val appbar = measurables[0].measure(constraints)
-                    val appbarHeight = appbar.height
+                val mContent = measurables.first { it.id == "content" }.measure(constraints)
+                val mContentHeight = mContent.height
 
-                    layout(
-                        constraints.maxWidth,
-                        appbarHeight
-                    ) {
-                        appbar.placeRelative(0, 0) // TopAppBar
-                    }
-                } else { // Expanded
-                    val appbar = measurables[0].measure(constraints)
-                    val appbarHeight = appbar.height
+                // 在 appbarHeight 和 appbarHeight + mContentHeight 之间变换
+                val height = lerp(appbarHeight, appbarHeight + mContentHeight, progress)
 
-                    val tune = measurables[1].measure(constraints)
-                    val tuneHeight = tune.height
-
-                    val height = lerp(appbarHeight, appbarHeight + tuneHeight, progress)
-
-                    layout(
-                        constraints.maxWidth,
-                        height
-                    ) {
-                        appbar.placeRelative(0, 0) // TopAppBar
-                        tune.placeRelative(0, appbarHeight) // Content
-                    }
+                layout(
+                    constraints.maxWidth,
+                    height
+                ) {
+                    appbar.placeRelative(0, 0) // TopAppBar
+                    mContent.placeRelative(0, appbarHeight) // Content
                 }
             }
-        )
+        })
     }
 }
-
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
@@ -403,7 +386,7 @@ private fun Item(
                 modifier = Modifier.padding(top = 8.dp).fillMaxWidth(),
                 horizontalArrangement = Arrangement.End
             ) {
-                Providers(ContentColorAmbient provides MaterialTheme.colors.primary) {
+                Providers(AmbientContentColor provides MaterialTheme.colors.primary) {
                     IconButton(onClick = onInstallClick) {
                         Icon(Icons.Filled.Extension)
                     }

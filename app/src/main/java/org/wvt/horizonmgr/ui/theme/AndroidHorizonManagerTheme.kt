@@ -1,7 +1,6 @@
 package org.wvt.horizonmgr.ui.theme
 
 import android.content.Context
-import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.material.Colors
 import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
@@ -52,7 +51,9 @@ private class ControllerImpl(context: Context) : ThemeController {
                     secondaryVariant = getString("secondary_variant", null)!!.toColor(),
                     onSecondary = getString("on_secondary", null)!!.toColor()
                 )
-            } catch (e: Exception) { LightColorPalette }
+            } catch (e: Exception) {
+                LightColorPalette
+            }
         }
         val darkColor = with(darkThemePreference) {
             try {
@@ -63,7 +64,9 @@ private class ControllerImpl(context: Context) : ThemeController {
                     secondary = getString("secondary", null)!!.toColor(),
                     onSecondary = getString("on_secondary", null)!!.toColor()
                 )
-            } catch (e: Exception) { DarkColorPalette }
+            } catch (e: Exception) {
+                DarkColorPalette
+            }
         }
         config.value = config.value.copy(
             followSystemDarkTheme = themePreference.getBoolean(

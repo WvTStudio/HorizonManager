@@ -5,7 +5,7 @@ interface PackageModule {
     suspend fun getOfficialRepository(): OfficialPackageRepository
 }
 
-interface PackageRepository {}
+interface PackageRepository
 
 interface Package {
     suspend fun getName(): String

@@ -280,10 +280,11 @@ fun PathTab(
         Spacer(modifier = Modifier.width(72.dp))
         data.paths.forEachIndexed { index, pathName ->
             Box(
-                Modifier.clickable(
+                modifier = Modifier.clickable(
                     onClick = { onSelectDepth(index) },
                     indication = null
-                ).onPositioned { sizes.add(index, it.size.width) }
+                ).onPositioned { sizes.add(index, it.size.width) },
+                alignment = Alignment.Center
             ) {
                 Text(
                     modifier = Modifier.padding(top = 16.dp, bottom = 16.dp),

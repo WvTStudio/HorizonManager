@@ -1,5 +1,13 @@
 package org.wvt.horizonmgr.ui.community
 
+import android.app.DownloadManager
+import android.content.Context
+import android.graphics.Bitmap
+import android.net.Uri
+import android.os.Environment
+import android.util.Log
+import android.view.KeyEvent
+import android.webkit.*
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animate
 import androidx.compose.foundation.Icon
@@ -15,9 +23,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.key.ExperimentalKeyInput
 import androidx.compose.ui.platform.ContextAmbient
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
 
 @OptIn(ExperimentalKeyInput::class)
 @Composable
@@ -26,6 +36,61 @@ fun Community(onClose: () -> Unit) {
     var loading by remember { mutableStateOf(true) }
     var progress by remember { mutableStateOf<Float>(0f) }
     val context = ContextAmbient.current
+
+    val webView = remember {
+        WebView(context).apply {
+            Log.d("Community", "WebView apply")
+            settings.apply {
+                javaScriptEnabled = true
+                setSupportZoom(false)
+                javaScriptCanOpenWindowsAutomatically = true
+                domStorageEnabled = true
+            }
+            webChromeClient = object : WebChromeClient() {
+                override fun onProgressChanged(view: WebView?, newProgress: Int) {
+                    progress = newProgress / 100f
+                }
+            }
+            webViewClient = object : WebViewClient() {
+                override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
+                    loading = true
+                }
+
+                override fun onPageFinished(view: WebView?, url: String?) {
+                    loading = false
+                }
+            }
+            setOnKeyListener { v, keyCode, event ->
+                val webview = v as WebView
+                if (event.action == KeyEvent.ACTION_DOWN) {
+                    if (keyCode == KeyEvent.KEYCODE_BACK && webview.canGoBack()) {
+                        webview.goBack()
+                        return@setOnKeyListener true
+                    }
+                }
+                return@setOnKeyListener false
+            }
+            setDownloadListener { url, userAgent, contentDisposition, mimetype, contentLength ->
+                val request = DownloadManager.Request(Uri.parse(url)).apply {
+                    setMimeType(mimetype)
+                    val cookies = CookieManager.getInstance().getCookie(url)
+                    addRequestHeader("cookie", cookies)
+                    addRequestHeader("User-Agent", userAgent)
+                    setDescription("正在下载...")
+                    setTitle(URLUtil.guessFileName(url, contentDisposition, mimetype))
+                    setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+                    setDestinationInExternalPublicDir(
+                        Environment.DIRECTORY_DOWNLOADS,
+                        URLUtil.guessFileName(url, contentDisposition, mimetype)
+                    )
+                }
+                val dm =
+                    context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+                dm.openDownloadedFile(dm.enqueue(request))
+            }
+            loadUrl("https://forum.adodoz.cn")
+        }
+    }
 
     Column(Modifier.fillMaxSize()) {
         TopAppBar(title = {
@@ -42,52 +107,12 @@ fun Community(onClose: () -> Unit) {
                 )
             }
         })
-        /*AndroidView(
+        AndroidView(
             modifier = Modifier.fillMaxSize(),
-            viewBlock = {
-                WebView(it).apply {
-                    settings.apply {
-                        javaScriptEnabled = true
-                        setSupportZoom(false)
-                        javaScriptCanOpenWindowsAutomatically = true
-                        domStorageEnabled = true
-                        setBackgroundColor(backgroundColor.value.toInt())
-                    }
-                    webChromeClient = object : WebChromeClient() {
-                        override fun onProgressChanged(view: WebView?, newProgress: Int) {
-                            progress = newProgress / 100f
-                        }
-                    }
-                    webViewClient = object : WebViewClient() {
-                        override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
-                            loading = true
-                        }
-
-                        override fun onPageFinished(view: WebView?, url: String?) {
-                            loading = false
-                        }
-                    }
-                    setDownloadListener { url, userAgent, contentDisposition, mimetype, contentLength ->
-                        val request = DownloadManager.Request(Uri.parse(url)).apply {
-                            setMimeType(mimetype)
-                            val cookies = CookieManager.getInstance().getCookie(url)
-                            addRequestHeader("cookie", cookies)
-                            addRequestHeader("User-Agent", userAgent)
-                            setDescription("正在下载...")
-                            setTitle(URLUtil.guessFileName(url, contentDisposition, mimetype))
-                            setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
-                            setDestinationInExternalPublicDir(
-                                Environment.DIRECTORY_DOWNLOADS,
-                                URLUtil.guessFileName(url, contentDisposition, mimetype)
-                            )
-                        }
-                        val dm =
-                            context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
-                        dm.enqueue(request)
-                    }
-                    loadUrl("https://forum.adodoz.cn")
-                }
+            viewBlock = { webView },
+            update = {
+                it.setBackgroundColor(backgroundColor.toArgb())
             }
-        )*/
+        )
     }
 }

@@ -14,6 +14,7 @@ import org.json.JSONObject
 import org.wvt.horizonmgr.utils.CoroutineDownloader
 import org.wvt.horizonmgr.utils.ProgressDeferred
 import org.wvt.horizonmgr.utils.forEach
+import org.wvt.horizonmgr.utils.forEachIndexed
 import java.io.File
 import java.lang.ref.WeakReference
 import java.net.HttpURLConnection
@@ -220,27 +221,28 @@ class WebAPI private constructor(context: Context) {
         val result = mutableListOf<OnlineModInfo>()
         parseJson {
             val jsonArray = JSONArray(response)
-            for (i in 0 until jsonArray.length()) {
-                val item = jsonArray.getJSONObject(i)
-                val id = item.getInt("id")
-                if (id < 0) continue // 脏数据
-                val title = item.getString("title")
-                val description = item.getString("description")
-                val icon = item.getString("icon")
-                val versionName = item.getString("version_name")
-                val lastUpdate = item.getString("last_update")
-                result.add(
-                    OnlineModInfo(
-                        index = i,
-                        id = id,
-                        name = title,
-                        description = description,
-                        iconUrl = "https://adodoz.cn/mods/img/$icon",
-                        version = versionName,
-                        updateTime = lastUpdate,
-                        downloadUrl = { "https://adodoz.cn/mods/$id.zip" }
+            jsonArray.forEachIndexed<JSONObject> { index, item ->
+                with(item) {
+                    val id = getInt("id")
+                    if (id < 0) return@forEachIndexed // 脏数据
+                    val title = getString("title")
+                    val description = getString("description")
+                    val icon = getString("icon")
+                    val versionName = getString("version_name")
+                    val lastUpdate = getString("last_update")
+                    result.add(
+                        OnlineModInfo(
+                            index = index,
+                            id = id,
+                            name = title,
+                            description = description,
+                            iconUrl = "https://adodoz.cn/mods/img/$icon",
+                            version = versionName,
+                            updateTime = lastUpdate,
+                            downloadUrl = { "https://adodoz.cn/mods/$id.zip" }
+                        )
                     )
-                )
+                }
             }
         }
         return result
@@ -427,9 +429,9 @@ class WebAPI private constructor(context: Context) {
     open class NetworkException(message: String? = null, cause: Throwable? = null) :
         WebAPIException(message ?: "网络错误，请稍后重试", cause)
 
-    class RequestTimeoutException() : NetworkException("请求超时")
-    class NoInternetException() : NetworkException("无互联网连接")
-    class BadRequestException() : NetworkException("请求错误")
+    class RequestTimeoutException : NetworkException("请求超时")
+    class NoInternetException : NetworkException("无互联网连接")
+    class BadRequestException : NetworkException("请求错误")
 
     /**
      * 代表服务器出错，例如服务器拒绝返回数据、返回了其他状态码

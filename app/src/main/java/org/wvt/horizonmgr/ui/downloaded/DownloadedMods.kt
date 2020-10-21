@@ -1,40 +1,46 @@
 package org.wvt.horizonmgr.ui.downloaded
 
-import android.graphics.BlendMode
 import androidx.compose.foundation.Icon
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumnFor
 import androidx.compose.material.Card
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Extension
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.util.fastForEach
 import androidx.ui.tooling.preview.Preview
 import org.wvt.horizonmgr.service.HorizonManager
 import org.wvt.horizonmgr.ui.HorizonManagerAmbient
 import org.wvt.horizonmgr.ui.theme.HorizonManagerTheme
 
 @Composable
-fun DownloadedMods() {
+fun DownloadedMods(onNavClicked: () -> Unit) {
     val horizonMgr = HorizonManagerAmbient.current
 
     var mods by remember {
         mutableStateOf(emptyList<HorizonManager.UninstalledModInfo>())
     }
 
-    launchInComposition {
+    LaunchedTask {
         mods = horizonMgr.getDownloadedMods()
     }
 
-    ScrollableColumn {
-        mods.fastForEach {
+    Column(Modifier.fillMaxSize()) {
+        TopAppBar(title = {
+            Text("本地资源")
+        }, navigationIcon = {
+            IconButton(onClick = onNavClicked, icon = {
+                Icon(Icons.Filled.Menu)
+            })
+        }, backgroundColor = MaterialTheme.colors.surface)
+
+        LazyColumnFor(items = mods) {
             ModItem(
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
                 name = it.name,

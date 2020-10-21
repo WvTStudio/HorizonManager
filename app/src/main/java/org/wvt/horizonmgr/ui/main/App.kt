@@ -1,5 +1,6 @@
 package org.wvt.horizonmgr.ui.main
 
+import androidx.activity.ComponentActivity
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animate
 import androidx.compose.foundation.*
@@ -9,38 +10,32 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.savedinstancestate.savedInstanceState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.VectorAsset
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.ContextAmbient
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import org.wvt.horizonmgr.service.WebAPI
+import androidx.compose.ui.viewinterop.viewModel
+import org.wvt.horizonmgr.DependenciesContainer
+import org.wvt.horizonmgr.service.LocalCache
 import org.wvt.horizonmgr.ui.`package`.PackageManager
 import org.wvt.horizonmgr.ui.components.NetworkImage
 import org.wvt.horizonmgr.ui.downloaded.DownloadedMods
+import org.wvt.horizonmgr.ui.fileselector.SelectFileActivity
 import org.wvt.horizonmgr.ui.locale.LocalManager
 import org.wvt.horizonmgr.ui.onlinemod.Online
 
-val UserInfoAmbient = staticAmbientOf<WebAPI.UserInfo?>()
+val UserInfoAmbient = staticAmbientOf<LocalCache.CachedUserInfo?>()
 val SelectedPackageUUIDAmbient = staticAmbientOf<String?>()
 val DrawerStateAmbient = staticAmbientOf<DrawerState>()
 
-private enum class Screen(
-    val label: String,
-    val icon: VectorAsset
-) {
-    PACKAGE_MANAGE("分包管理", Icons.Filled.Extension),
-    LOCAL_MANAGE("模组管理", Icons.Filled.Nature),
-    ONLINE_DOWNLOAD("在线资源", Icons.Filled.GetApp),
-    DOWNLOADED_MOD("本地资源", Icons.Filled.Cached)
-}
-
 @Composable
 fun App(
-    userInfo: WebAPI.UserInfo?,
+    dependencies: DependenciesContainer,
+    userInfo: LocalCache.CachedUserInfo?,
     requestLogin: () -> Unit,
     requestLogout: () -> Unit,
     selectedPackageUUID: String?,
@@ -51,42 +46,34 @@ fun App(
     donate: () -> Unit,
     settings: () -> Unit
 ) {
+    val context = ContextAmbient.current as ComponentActivity
+    val vm = viewModel<AppViewModel>()
+    val cs by vm.currentScreen.collectAsState()
+
     val drawerState = rememberDrawerState(DrawerValue.Closed)
-    val screens by remember { mutableStateOf(Screen.values()) }
-    var currentScreen by savedInstanceState { Screen.LOCAL_MANAGE }
+    val screens by remember { mutableStateOf(AppViewModel.Screen.values()) }
 
     Drawer(
-        state = drawerState, header =  {DrawerHeader(
-            userInfo = userInfo,
-            requestLogin = requestLogin,
-            requestLogout = requestLogout
-        )},
+        state = drawerState,
+        header = {
+            DrawerHeader(
+                userInfo = userInfo,
+                requestLogin = requestLogin,
+                requestLogout = requestLogout
+            )
+        },
         tabs = {
-            screens.forEach {
-                NavigationItem(
-                    checked = currentScreen == it, onCheckedChange = { checked ->
-                        if (checked) currentScreen = it
-                        drawerState.close()
-                    }, text = it.label, icon = it.icon
-                )
-            }
+            DrawerTabs(screens = screens, currentScreen = cs, onChange = {
+                vm.navigate(it)
+                drawerState.close()
+            })
         },
         items = {
-            NavigationItem(
-                checked = false, onCheckedChange = { community() },
-                text = "中文社区", icon = Icons.Filled.Forum
-            )
-            NavigationItem(
-                checked = false, onCheckedChange = { openGame() },
-                text = "进入游戏", icon = Icons.Filled.Gamepad
-            )
-            NavigationItem(
-                checked = false, onCheckedChange = { joinGroup() },
-                text = "加入群组", icon = Icons.Filled.Group
-            )
-            NavigationItem(
-                checked = false, onCheckedChange = { donate() },
-                text = "捐赠作者", icon = Icons.Filled.AttachMoney
+            DrawerItems(
+                community = community,
+                openGame = openGame,
+                joinGroup = joinGroup,
+                donate = donate
             )
         },
         setting = {
@@ -101,19 +88,68 @@ fun App(
             UserInfoAmbient provides userInfo,
             SelectedPackageUUIDAmbient provides selectedPackageUUID
         ) {
-            Crossfade(current = currentScreen, modifier = Modifier.fillMaxSize()) {
-                when (it) {
-                    Screen.LOCAL_MANAGE -> LocalManager(selectedPackageUUID = selectedPackageUUID)
-                    Screen.PACKAGE_MANAGE -> PackageManager(
-                        selectedPackageUUID = selectedPackageUUID,
-                        onPackageSelect = selectedPackageChange
-                    )
-                    Screen.ONLINE_DOWNLOAD -> Online(onDownloadClick = {})
-                    Screen.DOWNLOADED_MOD -> DownloadedMods()
-                }
+            when (cs) {
+                AppViewModel.Screen.LOCAL_MANAGE -> LocalManager(
+                    horizonMgr = dependencies.horizonManager,
+                    onNavClicked = { drawerState.open() },
+                    requestSelectFile = {
+                        SelectFileActivity.startForResult(context)
+                    }
+                )
+                AppViewModel.Screen.PACKAGE_MANAGE -> PackageManager(
+                    selectedPackageUUID = selectedPackageUUID,
+                    onPackageSelect = selectedPackageChange
+                )
+                AppViewModel.Screen.ONLINE_DOWNLOAD -> Online(
+                    enable = true,
+                    onNavClicked = { drawerState.open() }
+                )
+                AppViewModel.Screen.DOWNLOADED_MOD -> DownloadedMods(
+                    onNavClicked = {drawerState.open()}
+                )
             }
         }
     }
+}
+
+@Composable
+private fun DrawerTabs(
+    screens: Array<AppViewModel.Screen>,
+    currentScreen: AppViewModel.Screen,
+    onChange: (AppViewModel.Screen) -> Unit,
+) {
+    screens.forEach {
+        NavigationItem(
+            checked = currentScreen == it,
+            onCheckedChange = { checked -> if (checked) onChange(it) },
+            text = it.label, icon = it.icon
+        )
+    }
+}
+
+@Composable
+private fun DrawerItems(
+    community: () -> Unit,
+    openGame: () -> Unit,
+    joinGroup: () -> Unit,
+    donate: () -> Unit
+) {
+    NavigationItem(
+        checked = false, onCheckedChange = { community() },
+        text = "中文社区", icon = Icons.Filled.Forum
+    )
+    NavigationItem(
+        checked = false, onCheckedChange = { openGame() },
+        text = "进入游戏", icon = Icons.Filled.Gamepad
+    )
+    NavigationItem(
+        checked = false, onCheckedChange = { joinGroup() },
+        text = "加入群组", icon = Icons.Filled.Group
+    )
+    NavigationItem(
+        checked = false, onCheckedChange = { donate() },
+        text = "捐赠作者", icon = Icons.Filled.AttachMoney
+    )
 }
 
 @Composable
@@ -147,7 +183,7 @@ private fun Drawer(
 
 @Composable
 private fun DrawerHeader(
-    userInfo: WebAPI.UserInfo?,
+    userInfo: LocalCache.CachedUserInfo?,
     requestLogin: () -> Unit,
     requestLogout: () -> Unit
 ) {
@@ -168,7 +204,8 @@ private fun DrawerHeader(
                 Text("是否注销登录？")
             }, text = {
                 Text("注销后需要重新登录才能使用在线下载功能")
-            })
+            }
+        )
     }
     // Avatar
     Column(Modifier.padding(16.dp)) {
@@ -191,9 +228,8 @@ private fun DrawerHeader(
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.indication(
                         interactionState,
-                        IndicationAmbient.current()
-                    )
-                        .fillMaxSize()
+                        AmbientIndication.current()
+                    ).fillMaxSize()
                 )
             }
         }
@@ -219,7 +255,7 @@ private fun NavigationItem(
     icon: VectorAsset
 ) {
     val interactionState = remember { InteractionState() }
-    val emphasis = EmphasisAmbient.current
+    val emphasis = AmbientEmphasisLevels.current
     Surface(
         shape = RoundedCornerShape(4.dp),
         color = animate(if (checked) MaterialTheme.colors.primary.copy(alpha = 0.12f) else Color.Transparent),
@@ -233,7 +269,7 @@ private fun NavigationItem(
         ProvideEmphasis(emphasis = emphasis.high) {
             Row(
                 Modifier.fillMaxSize()
-                    .indication(interactionState, IndicationAmbient.current()),
+                    .indication(interactionState, AmbientIndication.current()),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(asset = icon, modifier = Modifier.padding(start = 8.dp))

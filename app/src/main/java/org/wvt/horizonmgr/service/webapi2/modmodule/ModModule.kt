@@ -15,6 +15,7 @@ interface ModRepository {
 
 interface Mod {
     suspend fun getName(): String
+
     /**
      * 返回的不一定是纯文本
      */

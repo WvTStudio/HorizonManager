@@ -4,7 +4,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.ContentColorAmbient
+import androidx.compose.foundation.AmbientContentColor
 import androidx.compose.foundation.Icon
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.clickable
@@ -253,7 +253,7 @@ fun PackageItem(
     onCloneClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val emphasis = EmphasisAmbient.current
+    val emphasis = AmbientEmphasisLevels.current
     Card(modifier = modifier.clickable(onClick = onClick), elevation = 2.dp) {
         Column {
             Row {
@@ -302,7 +302,7 @@ fun PackageItem(
                     .fillMaxWidth().heightIn(min = 32.dp),
                 verticalAlignment = Alignment.Bottom
             ) {
-                Providers(ContentColorAmbient provides MaterialTheme.colors.primary) {
+                Providers(AmbientContentColor provides MaterialTheme.colors.primary) {
                     AnimatedVisibility(
                         visible = selected,
                         enter = fadeIn(),

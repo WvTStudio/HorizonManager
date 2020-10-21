@@ -30,7 +30,6 @@ import androidx.compose.ui.util.fastForEach
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.wvt.horizonmgr.R
-import org.wvt.horizonmgr.service.WebAPI
 import org.wvt.horizonmgr.ui.WebAPIAmbient
 import kotlin.math.log
 import kotlin.random.Random

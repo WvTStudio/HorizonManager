@@ -5,10 +5,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.animation.Crossfade
 import androidx.compose.material.Surface
 import androidx.compose.runtime.*
-import androidx.compose.ui.platform.ContextAmbient
 import androidx.compose.ui.platform.setContent
 import kotlinx.coroutines.launch
-import org.wvt.horizonmgr.service.HorizonManager
 import org.wvt.horizonmgr.service.WebAPI
 import org.wvt.horizonmgr.ui.AndroidDependenciesProvider
 import org.wvt.horizonmgr.ui.HorizonManagerAmbient

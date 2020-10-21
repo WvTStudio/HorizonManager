@@ -7,18 +7,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
-import androidx.compose.runtime.Providers
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.ContextAmbient
 import androidx.compose.ui.platform.setContent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.wvt.horizonmgr.service.WebAPI
 import org.wvt.horizonmgr.ui.AndroidDependenciesProvider
-import org.wvt.horizonmgr.ui.WebAPIAmbient
 import org.wvt.horizonmgr.ui.theme.AndroidHorizonManagerTheme
 
 class JoinGroupActivity : AppCompatActivity() {

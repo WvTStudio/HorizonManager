@@ -30,29 +30,31 @@ import org.wvt.horizonmgr.ui.theme.HorizonManagerTheme
 internal fun ModTab() {
     val selectedPackageUUID = SelectedPackageUUIDAmbient.current!!
 
-    var items by remember {
-        mutableStateOf(mutableStateListOf<HorizonManager.InstalledModInfo>())
+    val items = remember {
+        mutableStateListOf<HorizonManager.InstalledModInfo>()
     }
 
     val scope = rememberCoroutineScope()
     val horizonMgr = HorizonManagerAmbient.current
     var progressDialogState by remember { mutableStateOf<ProgressDialogState?>(null) }
 
-    fun load() {
-        scope.launch {
-            try {
-                items = mutableStateListOf<HorizonManager.InstalledModInfo>().apply {
-                    addAll(horizonMgr.getMods(selectedPackageUUID))
-                }
-            } catch (e: HorizonManager.PackageNotFoundException) {
-                // TODO
-            } catch (e: Exception) {
-                // TODO
-            }
+    suspend fun load() {
+        try {
+            items.clear()
+            items.addAll(horizonMgr.getMods(selectedPackageUUID))
+            /*items = mutableStateListOf<HorizonManager.InstalledModInfo>().apply {
+                addAll(horizonMgr.getMods(selectedPackageUUID))
+            }*/
+        } catch (e: HorizonManager.PackageNotFoundException) {
+            // TODO
+        } catch (e: Exception) {
+            // TODO
         }
     }
 
-    onActive { load() }
+    launchInComposition {
+        load()
+    }
 
     Crossfade(current = items) { items ->
         LazyColumnForIndexed(items = items) { index, item ->

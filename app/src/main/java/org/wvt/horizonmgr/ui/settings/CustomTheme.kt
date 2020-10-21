@@ -8,7 +8,6 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Restore
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -17,7 +16,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.ui.tooling.preview.Preview
-import org.wvt.horizonmgr.ui.theme.*
+import org.wvt.horizonmgr.ui.theme.HorizonManagerTheme
+import org.wvt.horizonmgr.ui.theme.MaterialColors
+import org.wvt.horizonmgr.ui.theme.ThemeConfigAmbient
+import org.wvt.horizonmgr.ui.theme.ThemeControllerAmbient
 
 private enum class CheckedColorType {
     LIGHT_PRIMARY, LIGHT_PRIMARY_VARIANT,
@@ -35,7 +37,7 @@ data class CustomColor(
 
 @Composable
 fun CustomTheme(requestClose: () -> Unit) {
-    val emphasis = EmphasisAmbient.current
+    val emphasis = AmbientEmphasisLevels.current
     val colors = remember { MaterialColors.series }
     var checkedColorType by remember { mutableStateOf(CheckedColorType.LIGHT_PRIMARY) }
     val themeConfig = ThemeConfigAmbient.current
@@ -231,7 +233,7 @@ private fun SelectColorItem(
 ) {
     val scale = animate(if (selected) 1.1f else 1f)
     Column(modifier) {
-        ProvideEmphasis(emphasis = EmphasisAmbient.current.medium) {
+        ProvideEmphasis(emphasis = AmbientEmphasisLevels.current.medium) {
             Text(text = text)
         }
         Surface(
@@ -262,7 +264,7 @@ private fun MaterialColorPalette(
         ScrollableRow {
             Column {
                 Spacer(Modifier.padding(1.dp).height(42.dp))
-                ProvideEmphasis(emphasis = EmphasisAmbient.current.medium) {
+                ProvideEmphasis(emphasis = AmbientEmphasisLevels.current.medium) {
                     for (i in colors) {
                         Box(
                             modifier = Modifier.padding(1.dp).height(42.dp).width(72.dp),
@@ -278,7 +280,7 @@ private fun MaterialColorPalette(
             }
             Column {
                 Row {
-                    ProvideEmphasis(emphasis = EmphasisAmbient.current.medium) {
+                    ProvideEmphasis(emphasis = AmbientEmphasisLevels.current.medium) {
                         tags.forEach {
                             Box(
                                 modifier = Modifier.padding(1.dp).size(42.dp),
