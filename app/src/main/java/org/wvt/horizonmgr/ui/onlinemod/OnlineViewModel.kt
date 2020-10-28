@@ -1,28 +1,28 @@
 package org.wvt.horizonmgr.ui.onlinemod
 
 import androidx.lifecycle.ViewModel
-import kotlinx.coroutines.*
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import org.wvt.horizonmgr.DependenciesContainer
 import org.wvt.horizonmgr.service.WebAPI
 import org.wvt.horizonmgr.ui.components.ProgressDialogState
-import kotlin.coroutines.EmptyCoroutineContext
 
 class OnlineViewModel(
     dependencies: DependenciesContainer
 ) : ViewModel() {
     private val webApi = dependencies.webapi
     private val horizonMgr = dependencies.horizonManager
-    private val scope = CoroutineScope(EmptyCoroutineContext)
     private var selectedUUID: String? = null
 
-    sealed class ListState {
-        object NotLogin : ListState()
-        object Loading : ListState()
-        class Error(val message: String) : ListState()
+    sealed class State {
+        object Loading : State()
+        data class Error(val message: String) : State()
         data class OK(
             val modList: List<WebAPI.OnlineModInfo>
-        ) : ListState()
+        ) : State()
     }
 
     data class Options(
@@ -31,14 +31,13 @@ class OnlineViewModel(
         val filterValue: String
     )
 
-    private val _listState: MutableStateFlow<ListState> = MutableStateFlow(ListState.Loading)
-    val listState: StateFlow<ListState> = _listState
+    private val _state: MutableStateFlow<State> = MutableStateFlow(State.Loading)
+    val state: StateFlow<State> = _state
 
     private val _options = MutableStateFlow(
         Options(Source.OFFICIAL, SortMode.DEFAULT, "")
     )
     val options: StateFlow<Options> = _options
-
 
     val downloadState: MutableStateFlow<ProgressDialogState?> = MutableStateFlow(null)
     val installState: MutableStateFlow<ProgressDialogState?> = MutableStateFlow(null)
@@ -46,14 +45,7 @@ class OnlineViewModel(
     val sources = Source.values().toList()
     val sortModes = SortMode.values().toList()
 
-    /*
-    var selectedSource = MutableStateFlow(Source.OFFICIAL)
-    var sortMode = MutableStateFlow(SortMode.DEFAULT)
-    var filterValue = MutableStateFlow("")*/
-
-    init {
-        refresh()
-    }
+    private var loadJob : Job? = null
 
     enum class Source(val label: String) {
         OFFICIAL("官方源"), CN("汉化组源")
@@ -69,7 +61,6 @@ class OnlineViewModel(
     fun setSelectedSource(source: Source) {
         _options.value = _options.value.copy(selectedSource = source)
         refresh()
-        loadFilter()
     }
 
     fun setSelectedSortMode(sortMode: SortMode) {
@@ -83,35 +74,39 @@ class OnlineViewModel(
     }
 
     fun refresh() {
-        scope.launch(Dispatchers.IO) {
-            _listState.value = ListState.Loading
+        if (loadJob != null) {
+            loadJob?.cancel()
+            loadJob = null
+        }
+        _state.value = State.Loading
+        viewModelScope.launch {
             val mods = try {
-                (if (options.value.selectedSource == Source.OFFICIAL) {
+                (if (_options.value.selectedSource == Source.OFFICIAL) {
                     webApi.getModsFromOfficial()
                 } else webApi.getModsFromCN())
             } catch (e: WebAPI.WebAPIException) {
                 return@launch
             }
             unfilteredList = mods
-            val sorted = mods.sorted(options.value.selectedSortMode)
-            _listState.value = ListState.OK(sorted)
+            loadFilter()
         }
     }
 
     private fun loadFilter() {
-        scope.launch {
-            val filtered = unfilteredList.sorted(options.value.selectedSortMode).let {
+        _state.value = State.Loading
+        viewModelScope.launch {
+            val filtered = unfilteredList.sorted(_options.value.selectedSortMode).let {
                 val filterValue = _options.value.filterValue
                 if (filterValue.isNotBlank()) it.filter {
                     it.name.contains(filterValue) || it.description.contains(filterValue)
                 } else it
             }
-            _listState.value = ListState.OK(filtered)
+            _state.value = State.OK(filtered)
         }
     }
 
     fun download(mod: WebAPI.OnlineModInfo) {
-        scope.launch {
+        viewModelScope.launch {
             downloadState.value = ProgressDialogState.ProgressLoading("正在下载", 0f)
             try {
                 val task = webApi.downloadMod(mod)
@@ -127,10 +122,7 @@ class OnlineViewModel(
             } catch (e: Exception) {
                 e.printStackTrace()
                 downloadState.value =
-                    ProgressDialogState.Failed(
-                        "下载失败",
-                        e.localizedMessage ?: ""
-                    )
+                    ProgressDialogState.Failed("下载失败", e.localizedMessage ?: "")
                 return@launch
             }
         }
@@ -145,7 +137,7 @@ class OnlineViewModel(
     }
 
     fun install(mod: WebAPI.OnlineModInfo) {
-        scope.launch {
+        viewModelScope.launch {
             try {
                 installState.value = ProgressDialogState.ProgressLoading("正在下载", 0f)
                 val task = webApi.downloadMod(mod)
@@ -185,10 +177,5 @@ class OnlineViewModel(
             SortMode.NAME_ASC -> sortedBy { it.name }
             SortMode.NAME_DSC -> sortedByDescending { it.name }
         }
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        scope.cancel()
     }
 }

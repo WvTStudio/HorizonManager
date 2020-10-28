@@ -1,10 +1,16 @@
 package org.wvt.horizonmgr.ui
 
-import androidx.lifecycle.SavedStateHandle
+import android.content.Context
 import androidx.lifecycle.ViewModel
 
 class NavigatorViewModel(
-    private val savedStateHandle: SavedStateHandle
-): ViewModel() {
+    private val context: Context
+) : ViewModel() {
+    fun waitForLogin() {
 
+    }
+
+    fun login() {
+
+    }
 }

@@ -38,7 +38,7 @@ fun LoginPage(
         TextFieldValue()
     }
 
-    Stack(Modifier.fillMaxSize()) {
+    Box(Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier.wrapContentSize().align(Alignment.Center),
             verticalArrangement = Arrangement.Center,
@@ -89,34 +89,6 @@ fun LoginPage(
                 StateFab(state = fabState, onClicked = {
                     onLoginClicked(account.text, password.text)
                 })
-/*                Crossfade(current = fabState) { state ->
-                    Box(
-                        modifier = Modifier.size(78.dp),
-                        gravity = Alignment.Center
-                    ) {
-                        when (state) {
-                            "loading" -> CircularProgressIndicator()
-                            "todo" -> FloatingActionButton(
-                                onClick = {
-                                    onLoginClicked(account.text, password.text)
-                                },
-                                contentColor = MaterialTheme.colors.onSecondary
-                            ) { Icon(Icons.Filled.ArrowForward) }
-                            "success" -> {
-                                Icon(
-                                    asset = Icons.Filled.Check,
-                                    tint = MaterialTheme.colors.secondary
-                                )
-                            }
-                            "failed" -> {
-                                Icon(
-                                    asset = Icons.Filled.Clear,
-                                    tint = MaterialTheme.colors.error
-                                )
-                            }
-                        }
-                    }
-                }*/
                 TextButton(
                     modifier = Modifier.padding(top = 16.dp),
                     onClick = onRegisterRequested

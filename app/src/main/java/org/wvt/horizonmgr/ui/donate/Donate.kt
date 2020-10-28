@@ -44,7 +44,10 @@ private data class DonateItem(
 
 @OptIn(ExperimentalLayout::class, ExperimentalAnimationApi::class)
 @Composable
-fun Donate(onAlipayClicked: () -> Unit, onWechatPayClicked: () -> Unit) {
+fun Donate(
+    onAlipayClicked: () -> Unit,
+    onWechatPayClicked: () -> Unit
+) {
     val context = ContextAmbient.current as AppCompatActivity
     val light = !isSystemInDarkTheme()
     var displayDialog by remember { mutableStateOf(false) }

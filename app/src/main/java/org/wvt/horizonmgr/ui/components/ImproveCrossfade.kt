@@ -13,7 +13,7 @@ import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.fastMaxBy
 
 @Composable
-fun <T> ImproveCrossfade(
+fun <T> ImprovedCrossfade(
     current: T,
     modifier: Modifier = Modifier,
     animation: AnimationSpec<Float> = tween(),

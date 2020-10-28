@@ -6,8 +6,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticAmbientOf
-import androidx.compose.ui.platform.ContextAmbient
-import androidx.core.content.edit
 import org.wvt.horizonmgr.HorizonManagerApplication
 import org.wvt.horizonmgr.service.HorizonManager
 import org.wvt.horizonmgr.service.LocalCache

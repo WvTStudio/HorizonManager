@@ -57,6 +57,8 @@ private val rotateFore = transitionDefinition<Int> {
     }
 }
 
+private val shrinkTween = tween<Float>(250, 40, LinearOutSlowInEasing)
+private val expandTween = tween<Float>(250, 0, LinearOutSlowInEasing)
 
 @Composable
 fun AnimateLogo(modifier: Modifier = Modifier) {
@@ -65,15 +67,16 @@ fun AnimateLogo(modifier: Modifier = Modifier) {
     val anim = transition(definition = shake, initState = 1, toState = 2)
     val animFore = transition(definition = rotateFore, initState = 1, toState = 2)
 
-    var scale by remember { mutableStateOf(1f) }
-    val scaleAnim = animate(scale)
+    var pressed by remember { mutableStateOf(false) }
+
+    val scaleAnim = animate(if (pressed) 1.4f else 1f, if (pressed) expandTween else shrinkTween)
 
     Surface(
         modifier = modifier.size(64.dp)
             .pressIndicatorGestureFilter(
-                onStart = { scale = 1.4f },
-                onCancel = { scale = 1f },
-                onStop = { scale = 1f }
+                onStart = { pressed = true },
+                onCancel = { pressed = false },
+                onStop = { pressed = false }
             ),
         elevation = 16.dp,
         shape = RoundedCornerShape(50)

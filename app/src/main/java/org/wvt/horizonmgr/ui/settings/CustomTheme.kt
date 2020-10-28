@@ -1,6 +1,8 @@
 package org.wvt.horizonmgr.ui.settings
 
 import androidx.compose.animation.*
+import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -12,6 +14,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.drawLayer
+import androidx.compose.ui.gesture.pressIndicatorGestureFilter
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -223,6 +226,9 @@ fun CustomTheme(requestClose: () -> Unit) {
     }
 }
 
+private val shrinkTween = tween<Float>(250, 0, LinearOutSlowInEasing)
+private val expandTween = tween<Float>(250, 40,  LinearOutSlowInEasing)
+
 @Composable
 private fun SelectColorItem(
     modifier: Modifier = Modifier,
@@ -231,14 +237,30 @@ private fun SelectColorItem(
     selected: Boolean,
     onSelect: () -> Unit
 ) {
-    val scale = animate(if (selected) 1.1f else 1f)
+    var pressed by remember { mutableStateOf(false) }
+    val scale = animate(
+        target = if (selected) {
+            if (pressed) 1f
+            else 1.1f
+        } else {
+            if (pressed) 0.9f
+            else 1f
+        }, animSpec = if (pressed) shrinkTween else expandTween
+    )
     Column(modifier) {
         ProvideEmphasis(emphasis = AmbientEmphasisLevels.current.medium) {
             Text(text = text)
         }
         Surface(
             modifier = Modifier.size(128.dp, 96.dp).padding(top = 8.dp)
-                .clickable(onClick = onSelect, indication = null)
+//                .clickable(onClick = onSelect, indication = null)
+                .pressIndicatorGestureFilter(
+                    onStart = { pressed = true },
+                    onStop = {
+                        pressed = false
+                        onSelect()
+                    },
+                    onCancel = { pressed = false })
                 .drawLayer(scaleX = scale, scaleY = scale),
             color = animate(color),
             elevation = animate(if (selected) 8.dp else 0.dp),

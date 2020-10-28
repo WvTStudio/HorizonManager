@@ -39,7 +39,6 @@ fun HorizonManagerTheme(
         else config.customDarkTheme
 
     val colors = if (darkTheme) config.darkColor else config.lightColor
-
     Providers(
         ThemeControllerAmbient provides controller,
         ThemeConfigAmbient provides config
@@ -53,13 +52,9 @@ fun HorizonManagerTheme(
 
 object DefaultThemeController : ThemeController {
     override fun setFollowSystemDarkTheme(enable: Boolean) {}
-
     override fun setCustomDarkTheme(enable: Boolean) {}
-
     override fun setLightColor(color: Colors) {}
-
     override fun setDarkColor(color: Colors) {}
-
     override fun setAppbarAccent(enable: Boolean) {}
 }
 

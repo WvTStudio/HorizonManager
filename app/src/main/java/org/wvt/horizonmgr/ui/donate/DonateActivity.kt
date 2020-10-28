@@ -5,7 +5,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.foundation.layout.Stack
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.SnackbarHost
@@ -39,7 +39,7 @@ class DonateActivity : AppCompatActivity() {
 
             AndroidDependenciesProvider {
                 AndroidHorizonManagerTheme {
-                    Stack(Modifier.fillMaxSize()) {
+                    Box(Modifier.fillMaxSize()) {
                         Surface {
                             Donate(onAlipayClicked = {
                                 if (job?.isActive == true) return@Donate

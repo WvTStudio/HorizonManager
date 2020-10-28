@@ -3,7 +3,6 @@ package org.wvt.horizonmgr.ui.login
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.animation.core.AnimationConstants.Infinite
-import androidx.compose.foundation.Box
 import androidx.compose.foundation.Icon
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
@@ -63,11 +62,7 @@ private val reverseRotationDefinition = transitionDefinition<Int> {
     }
 }
 
-@OptIn(
-    ExperimentalAnimationApi::class,
-    ExperimentalMaterialApi::class,
-    ExperimentalFocus::class
-)
+@OptIn(ExperimentalAnimationApi::class, ExperimentalMaterialApi::class, ExperimentalFocus::class)
 @Composable
 fun Login(
     onLoginSuccess: (WebAPI.UserInfo) -> Unit,
@@ -113,7 +108,7 @@ fun Login(
         }
     }
 
-    Stack(Modifier.fillMaxSize()) {
+    Box(Modifier.fillMaxSize()) {
         gearResource?.let {
             Box(
                 Modifier.size(256.dp)
@@ -134,7 +129,6 @@ fun Login(
                     )
                 ) {}
             }
-
             Box(
                 Modifier.size(256.dp)
                     .offset(x = (-128).dp)
@@ -170,7 +164,7 @@ fun Login(
                 elevation = 0.dp
             )
 
-            Stack(Modifier.fillMaxSize()) {
+            Box(Modifier.fillMaxSize()) {
                 androidx.compose.animation.AnimatedVisibility(
                     visible = screen == 0,
                     enter = fadeIn() + slideInHorizontally({ -40 }),

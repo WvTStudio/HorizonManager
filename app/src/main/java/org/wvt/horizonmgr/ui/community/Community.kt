@@ -1,13 +1,5 @@
 package org.wvt.horizonmgr.ui.community
 
-import android.app.DownloadManager
-import android.content.Context
-import android.graphics.Bitmap
-import android.net.Uri
-import android.os.Environment
-import android.util.Log
-import android.view.KeyEvent
-import android.webkit.*
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animate
 import androidx.compose.foundation.Icon
@@ -23,11 +15,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.key.ExperimentalKeyInput
 import androidx.compose.ui.platform.ContextAmbient
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.AndroidView
 
 @OptIn(ExperimentalKeyInput::class)
 @Composable
@@ -37,7 +27,7 @@ fun Community(onClose: () -> Unit) {
     var progress by remember { mutableStateOf<Float>(0f) }
     val context = ContextAmbient.current
 
-    val webView = remember {
+    /*val webView = remember {
         WebView(context).apply {
             Log.d("Community", "WebView apply")
             settings.apply {
@@ -90,7 +80,7 @@ fun Community(onClose: () -> Unit) {
             }
             loadUrl("https://forum.adodoz.cn")
         }
-    }
+    }*/
 
     Column(Modifier.fillMaxSize()) {
         TopAppBar(title = {
@@ -107,12 +97,12 @@ fun Community(onClose: () -> Unit) {
                 )
             }
         })
-        AndroidView(
-            modifier = Modifier.fillMaxSize(),
+/*        AndroidView(
+            modifier = Modifier.fillMaxSize().keyInputFilter { true },
             viewBlock = { webView },
             update = {
                 it.setBackgroundColor(backgroundColor.toArgb())
             }
-        )
+        )*/
     }
 }

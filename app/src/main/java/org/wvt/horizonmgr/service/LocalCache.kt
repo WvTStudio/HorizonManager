@@ -57,7 +57,7 @@ class LocalCache private constructor(context: Context) {
         }
     }
 
-    suspend fun cacheUserInfo(id: Int, name: String, account: String, avatarUrl: String) =
+    suspend fun cacheUserInfo(id: Int, name: String, account: String, avatarUrl: String) {
         withContext(Dispatchers.IO) {
             userInfoPref.edit {
                 putInt("id", id)
@@ -66,6 +66,18 @@ class LocalCache private constructor(context: Context) {
                 putString("name", name)
             }
         }
+    }
+
+    suspend fun cacheUserInfo(userInfo: CachedUserInfo) {
+        withContext(Dispatchers.IO) {
+            userInfoPref.edit {
+                putInt("id", userInfo.id)
+                putString("account", userInfo.account)
+                putString("avatar_url", userInfo.avatarUrl)
+                putString("name", userInfo.name)
+            }
+        }
+    }
 
     suspend fun getSelectedPackageUUID(): String? = withContext(Dispatchers.IO) {
         selectedPackagePref.getString("uuid", null)

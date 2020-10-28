@@ -1,5 +1,6 @@
 plugins {
     id("com.android.application")
+    id("com.google.gms.google-services")
     id("kotlin-android")
     id("kotlin-android-extensions")
 }
@@ -7,12 +8,13 @@ plugins {
 android {
     compileSdkVersion(30)
     buildToolsVersion = "30.0.2"
+
     defaultConfig {
         applicationId = "org.wvt.horizonmgr"
         minSdkVersion(21)
         targetSdkVersion(30)
         versionCode = 2
-        versionName = "2.0-alpha3"
+        versionName = "2.0-alpha4"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -22,8 +24,11 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 file("proguard-rules.pro")
             )
-            minifyEnabled(true)
-            setUseProguard(true)
+            isShrinkResources = true
+            isMinifyEnabled = true
+            isUseProguard = true
+//            minifyEnabled(true)
+//            setUseProguard(true)
         }
     }
     compileOptions {
@@ -51,11 +56,16 @@ android {
 
 dependencies {
     val composeVersion = "1.0.0-alpha05"
+
+    implementation(platform("com.google.firebase:firebase-bom:26.0.0"))
+    implementation("com.google.firebase:firebase-analytics-ktx")
+
     implementation(kotlin("stdlib"))
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.1.0")
 
     implementation("androidx.core:core-ktx:1.3.2")
     implementation("androidx.appcompat:appcompat:1.2.0")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0")
     implementation("com.google.android.material:material:1.2.1")
 
     implementation("com.github.bumptech.glide:glide:4.11.0")

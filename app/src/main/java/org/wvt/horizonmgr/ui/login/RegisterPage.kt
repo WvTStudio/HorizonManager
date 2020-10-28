@@ -85,7 +85,7 @@ fun RegisterPage(onSuccess: (uid: String, email: String, password: String) -> Un
             }
         }
     }
-    Stack(Modifier.fillMaxSize()) {
+    Box(Modifier.fillMaxSize()) {
         ScrollableColumn(
             modifier = Modifier.wrapContentWidth().fillMaxHeight().align(Alignment.Center),
             verticalArrangement = Arrangement.Center

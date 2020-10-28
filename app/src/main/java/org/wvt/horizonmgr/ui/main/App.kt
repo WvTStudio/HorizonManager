@@ -1,7 +1,6 @@
 package org.wvt.horizonmgr.ui.main
 
 import androidx.activity.ComponentActivity
-import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animate
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -18,17 +17,17 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.ContextAmbient
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.viewModel
 import org.wvt.horizonmgr.DependenciesContainer
+import org.wvt.horizonmgr.dependenciesViewModel
 import org.wvt.horizonmgr.service.LocalCache
 import org.wvt.horizonmgr.ui.`package`.PackageManager
 import org.wvt.horizonmgr.ui.components.NetworkImage
 import org.wvt.horizonmgr.ui.downloaded.DownloadedMods
 import org.wvt.horizonmgr.ui.fileselector.SelectFileActivity
+import org.wvt.horizonmgr.ui.home.Home
 import org.wvt.horizonmgr.ui.locale.LocalManager
 import org.wvt.horizonmgr.ui.onlinemod.Online
 
-val UserInfoAmbient = staticAmbientOf<LocalCache.CachedUserInfo?>()
 val SelectedPackageUUIDAmbient = staticAmbientOf<String?>()
 val DrawerStateAmbient = staticAmbientOf<DrawerState>()
 
@@ -47,7 +46,7 @@ fun App(
     settings: () -> Unit
 ) {
     val context = ContextAmbient.current as ComponentActivity
-    val vm = viewModel<AppViewModel>()
+    val vm = dependenciesViewModel<AppViewModel>()
     val cs by vm.currentScreen.collectAsState()
 
     val drawerState = rememberDrawerState(DrawerValue.Closed)
@@ -85,27 +84,28 @@ fun App(
     ) {
         Providers(
             DrawerStateAmbient provides drawerState,
-            UserInfoAmbient provides userInfo,
             SelectedPackageUUIDAmbient provides selectedPackageUUID
         ) {
             when (cs) {
+                AppViewModel.Screen.HOME -> Home(
+                    onNavClick = {drawerState.open()}
+                )
                 AppViewModel.Screen.LOCAL_MANAGE -> LocalManager(
-                    horizonMgr = dependencies.horizonManager,
                     onNavClicked = { drawerState.open() },
                     requestSelectFile = {
                         SelectFileActivity.startForResult(context)
                     }
                 )
                 AppViewModel.Screen.PACKAGE_MANAGE -> PackageManager(
-                    selectedPackageUUID = selectedPackageUUID,
-                    onPackageSelect = selectedPackageChange
+                    onPackageSelect = selectedPackageChange,
+                    onNavClick = { drawerState.open() }
                 )
                 AppViewModel.Screen.ONLINE_DOWNLOAD -> Online(
-                    enable = true,
+                    enable = userInfo != null,
                     onNavClicked = { drawerState.open() }
                 )
                 AppViewModel.Screen.DOWNLOADED_MOD -> DownloadedMods(
-                    onNavClicked = {drawerState.open()}
+                    onNavClicked = { drawerState.open() }
                 )
             }
         }

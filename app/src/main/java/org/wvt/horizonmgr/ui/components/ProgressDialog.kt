@@ -5,6 +5,7 @@ import androidx.compose.foundation.Icon
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Card
 import androidx.compose.material.CircularProgressIndicator
@@ -42,22 +43,22 @@ fun ProgressDialog(
     }) {
         Card(Modifier.fillMaxWidth()) {
             Row(
-                modifier = Modifier.fillMaxWidth().padding(32.dp),
+                modifier = Modifier.fillMaxWidth().height(96.dp).padding(32.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 when (state) {
                     is ProgressDialogState.Loading -> {
                         CircularProgressIndicator()
                         Text(
-                            modifier = Modifier.padding(start = 24.dp, end = 16.dp)
-                                .fillMaxWidth(), text = state.message
+                            modifier = Modifier.padding(start = 24.dp, end = 16.dp),
+                            text = state.message
                         )
                     }
                     is ProgressDialogState.ProgressLoading -> {
                         CircularProgressIndicator(animate(state.progress))
                         Text(
-                            modifier = Modifier.padding(start = 24.dp, end = 16.dp)
-                                .fillMaxWidth(), text = state.message
+                            modifier = Modifier.padding(start = 24.dp, end = 16.dp),
+                            text = state.message
                         )
                     }
                     is ProgressDialogState.Failed -> {

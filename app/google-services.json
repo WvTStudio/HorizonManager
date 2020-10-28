@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "616749977583",
+    "firebase_url": "https://horizonmanager-5fa85.firebaseio.com",
+    "project_id": "horizonmanager-5fa85",
+    "storage_bucket": "horizonmanager-5fa85.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:616749977583:android:88cd7da0c9791e9095301a",
+        "android_client_info": {
+          "package_name": "org.wvt.horizonmgr"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "616749977583-lepsmt5afobcsvq2hirtvgcq91pluelb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDs3-R5XgLf1m5NmeKKij9fqm6MKgIkFZk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "616749977583-lepsmt5afobcsvq2hirtvgcq91pluelb.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
