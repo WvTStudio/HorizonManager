@@ -27,8 +27,6 @@ android {
             isShrinkResources = true
             isMinifyEnabled = true
             isUseProguard = true
-//            minifyEnabled(true)
-//            setUseProguard(true)
         }
     }
     compileOptions {
@@ -40,7 +38,7 @@ android {
     }
     composeOptions {
         kotlinCompilerVersion = "1.4.0"
-        kotlinCompilerExtensionVersion = "1.0.0-alpha05"
+        kotlinCompilerExtensionVersion = "1.0.0-alpha06"
     }
     lintOptions {
         disable("InvalidFragmentVersionForActivityResult")
@@ -55,7 +53,7 @@ android {
 }
 
 dependencies {
-    val composeVersion = "1.0.0-alpha05"
+    val composeVersion = "1.0.0-alpha06"
 
     implementation(platform("com.google.firebase:firebase-bom:26.0.0"))
     implementation("com.google.firebase:firebase-analytics-ktx")

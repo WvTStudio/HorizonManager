@@ -2,7 +2,10 @@ package org.wvt.horizonmgr.ui.settings
 
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.animation.Crossfade
-import androidx.compose.foundation.*
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.Text
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -74,7 +77,6 @@ fun Settings(
             icon = { Icon(asset = Icons.Filled.Description) },
             text = { Text("固定文件夹") }
         )*/
-        // FIXME 支持关闭跟随系统
         var dropdownMenuExpanded by remember { mutableStateOf(false) }
 
         DropdownMenu(toggle = {

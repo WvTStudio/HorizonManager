@@ -6,7 +6,6 @@ import androidx.compose.animation.core.FastOutLinearInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BaseTextField
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Icon
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -59,7 +58,6 @@ internal fun TuneAppBar2(
         elevation = 4.dp
     ) {
         AppBarLayout(expand = expand) {
-
             // SearchBox Background
             Surface(
                 modifier = Modifier.layoutId("searchbox_bg")
