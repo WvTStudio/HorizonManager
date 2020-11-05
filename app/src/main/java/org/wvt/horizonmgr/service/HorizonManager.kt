@@ -82,13 +82,11 @@ class HorizonManager private constructor(context: Context) {
                     try {
                         parsePackageManifest(str)
                         return@withContext FileType.Package
-                    } catch (e: Exception) {
-                    }
+                    } catch (e: Exception) { }
                     try {
                         parseResourceManifest(str)
                         return@withContext FileType.Resource
-                    } catch (e: Exception) {
-                    }
+                    } catch (e: Exception) { }
                 }
             }
         }

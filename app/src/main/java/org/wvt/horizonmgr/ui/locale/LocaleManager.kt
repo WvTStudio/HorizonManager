@@ -2,7 +2,6 @@ package org.wvt.horizonmgr.ui.locale
 
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animate
-import androidx.compose.foundation.Icon
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.selection.selectable
@@ -18,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEachIndexed
+import androidx.compose.ui.zIndex
 import org.wvt.horizonmgr.dependenciesViewModel
 import org.wvt.horizonmgr.ui.components.HorizonDivider
 import org.wvt.horizonmgr.ui.components.ProgressDialog
@@ -80,32 +80,38 @@ private fun CustomAppBar(
     onTabSelected: (index: LocaleManagerViewModel.Tabs) -> Unit,
     onNavClicked: () -> Unit
 ) {
-    TopAppBar(title = {
-        Row(modifier = Modifier.fillMaxHeight(), verticalAlignment = Alignment.CenterVertically) {
-            HorizonDivider(Modifier.height(32.dp))
-            ScrollableTabRow(
+    TopAppBar(
+        modifier = Modifier.zIndex(4.dp.value),
+        title = {
+            Row(
                 modifier = Modifier.fillMaxHeight(),
-                selectedTabIndex = tabs.indexOf(selectedTab),
-                edgePadding = 0.dp,
-                backgroundColor = Color.Transparent,
-                indicator = {},
-                divider = {}
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                tabs.fastForEachIndexed { index, tab ->
-                    val selected = tab == selectedTab
-                    TabItem(label = tab.label,
-                        selected = selected, onTabSelected = {
-                            onTabSelected(tab)
-                        }
-                    )
+                HorizonDivider(Modifier.height(32.dp))
+                ScrollableTabRow(
+                    modifier = Modifier.fillMaxHeight(),
+                    selectedTabIndex = tabs.indexOf(selectedTab),
+                    edgePadding = 0.dp,
+                    backgroundColor = Color.Transparent,
+                    indicator = {},
+                    divider = {}
+                ) {
+                    tabs.fastForEachIndexed { index, tab ->
+                        val selected = tab == selectedTab
+                        TabItem(label = tab.label,
+                            selected = selected, onTabSelected = {
+                                onTabSelected(tab)
+                            }
+                        )
+                    }
                 }
             }
-        }
-    }, navigationIcon = {
-        IconButton(onClick = onNavClicked, icon = {
-            Icon(Icons.Filled.Menu)
-        })
-    }, backgroundColor = MaterialTheme.colors.surface)
+        }, navigationIcon = {
+            IconButton(onClick = onNavClicked, icon = {
+                Icon(Icons.Filled.Menu)
+            })
+        }, backgroundColor = MaterialTheme.colors.surface
+    )
 }
 
 @Composable

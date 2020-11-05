@@ -1,8 +1,14 @@
 package org.wvt.horizonmgr.ui.community
 
+import android.app.DownloadManager
+import android.content.Context
+import android.graphics.Bitmap
+import android.net.Uri
+import android.os.Environment
+import android.util.Log
+import android.webkit.*
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animate
-import androidx.compose.foundation.Icon
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,14 +16,18 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Icon
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.key.ExperimentalKeyInput
+import androidx.compose.ui.input.key.keyInputFilter
 import androidx.compose.ui.platform.ContextAmbient
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
 
 @OptIn(ExperimentalKeyInput::class)
 @Composable
@@ -27,7 +37,7 @@ fun Community(onClose: () -> Unit) {
     var progress by remember { mutableStateOf<Float>(0f) }
     val context = ContextAmbient.current
 
-    /*val webView = remember {
+    val webView = remember {
         WebView(context).apply {
             Log.d("Community", "WebView apply")
             settings.apply {
@@ -52,8 +62,8 @@ fun Community(onClose: () -> Unit) {
             }
             setOnKeyListener { v, keyCode, event ->
                 val webview = v as WebView
-                if (event.action == KeyEvent.ACTION_DOWN) {
-                    if (keyCode == KeyEvent.KEYCODE_BACK && webview.canGoBack()) {
+                if (event.action == android.view.KeyEvent.ACTION_DOWN) {
+                    if (keyCode == android.view.KeyEvent.KEYCODE_BACK && webview.canGoBack()) {
                         webview.goBack()
                         return@setOnKeyListener true
                     }
@@ -80,7 +90,7 @@ fun Community(onClose: () -> Unit) {
             }
             loadUrl("https://forum.adodoz.cn")
         }
-    }*/
+    }
 
     Column(Modifier.fillMaxSize()) {
         TopAppBar(title = {
@@ -97,12 +107,12 @@ fun Community(onClose: () -> Unit) {
                 )
             }
         })
-/*        AndroidView(
+        AndroidView(
             modifier = Modifier.fillMaxSize().keyInputFilter { true },
             viewBlock = { webView },
             update = {
                 it.setBackgroundColor(backgroundColor.toArgb())
             }
-        )*/
+        )
     }
 }

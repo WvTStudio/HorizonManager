@@ -1,15 +1,15 @@
-package org.wvt.horizonmgr.ui.onlinemod
+package org.wvt.horizonmgr.ui.onlineresources
 
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.AmbientContentColor
-import androidx.compose.foundation.Icon
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumnFor
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
+import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Extension
 import androidx.compose.material.icons.filled.GetApp
@@ -35,15 +35,9 @@ fun Online(
     val installState by vm.installState.collectAsState()
     val selectedPackageUUID = SelectedPackageUUIDAmbient.current
 
-    onCommit(enable) {
-        if (enable) {
-            vm.refresh()
-        }
-    }
+    onCommit(enable) { vm.setEnable(enable) }
 
-    onCommit(selectedPackageUUID) {
-        vm.setSelectedUUID(selectedPackageUUID)
-    }
+    onCommit(selectedPackageUUID) { vm.setSelectedUUID(selectedPackageUUID) }
 
     downloadState?.let { ProgressDialog(onCloseRequest = { vm.downloadFinish() }, state = it) }
     installState?.let { ProgressDialog(onCloseRequest = { vm.installFinish() }, state = it) }
@@ -53,8 +47,12 @@ fun Online(
         TuneAppBar2(
             onNavClicked = onNavClicked,
             onFilterValueConfirm = { vm.setFilterValue(it) },
-            vm.sources, options.selectedSource, vm::setSelectedSource,
-            vm.sortModes, options.selectedSortMode, vm::setSelectedSortMode
+            vm.sources,
+            options.selectedSource,
+            vm::setSelectedSource,
+            vm.sortModes,
+            options.selectedSortMode,
+            vm::setSelectedSortMode
         )
         // Content
         if (!enable) {
@@ -80,7 +78,7 @@ fun Online(
                             items = state.modList,
                             state = lazyListState
                         ) { item ->
-                            Item(
+                            ModItem(
                                 modifier = Modifier.padding(
                                     horizontal = 16.dp,
                                     vertical = 8.dp
@@ -110,7 +108,6 @@ fun Online(
 
 @Composable
 private fun NotLoginTip() {
-    // Tip if didn't login
     Box(Modifier.fillMaxSize()) {
         ProvideEmphasis(emphasis = AmbientEmphasisLevels.current.medium) {
             Text(
@@ -124,12 +121,13 @@ private fun NotLoginTip() {
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-private fun Item(
-    title: String, text: String, imageUrl: String, modifier: Modifier = Modifier,
+private fun ModItem(
+    modifier: Modifier = Modifier,
+    title: String, text: String, imageUrl: String,
     onDownloadClick: () -> Unit,
     onInstallClick: () -> Unit
 ) {
-    Card(modifier = modifier, elevation = 2.dp) {
+    Card(modifier = modifier, elevation = 1.dp) {
         Column(
             Modifier.padding(top = 16.dp, bottom = 4.dp, start = 16.dp, end = 16.dp)
         ) {

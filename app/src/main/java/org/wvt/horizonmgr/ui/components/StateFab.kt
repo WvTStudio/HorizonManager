@@ -1,9 +1,9 @@
 package org.wvt.horizonmgr.ui.components
 
-import androidx.compose.foundation.Icon
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.Icon
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.icons.Icons

@@ -1,12 +1,13 @@
 package org.wvt.horizonmgr.ui.joingroup
 
 import androidx.compose.animation.Crossfade
-import androidx.compose.foundation.*
+import androidx.compose.foundation.ScrollableColumn
+import androidx.compose.foundation.Text
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowForward
@@ -19,13 +20,15 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEach
-import org.wvt.horizonmgr.dependenciesViewModel
 import org.wvt.horizonmgr.service.WebAPI
 import org.wvt.horizonmgr.ui.components.NetworkImage
 
 @Composable
-fun JoinGroup(onClose: () -> Unit, onGroupSelect: (url: WebAPI.QQGroupEntry) -> Unit) {
-    val vm = dependenciesViewModel<JoinGroupViewModel>()
+fun JoinGroup(
+    vm: JoinGroupViewModel,
+    onClose: () -> Unit,
+    onGroupSelect: (url: WebAPI.QQGroupEntry) -> Unit
+) {
     val vmGroupList by vm.groups.collectAsState()
 
     // TODO: 2020/10/27 添加网络错误时的提示

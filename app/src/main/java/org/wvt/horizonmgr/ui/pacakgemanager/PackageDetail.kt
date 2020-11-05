@@ -1,4 +1,4 @@
-package org.wvt.horizonmgr.ui.`package`
+package org.wvt.horizonmgr.ui.pacakgemanager
 
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.animation.Crossfade

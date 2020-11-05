@@ -1,12 +1,12 @@
-package org.wvt.horizonmgr.ui.`package`
+package org.wvt.horizonmgr.ui.pacakgemanager
 
 import androidx.compose.animation.*
-import androidx.compose.foundation.Icon
 import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.contentColor
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
+import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.CloudDownload

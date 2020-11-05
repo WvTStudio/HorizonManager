@@ -1,11 +1,10 @@
-package org.wvt.horizonmgr.ui.`package`
+package org.wvt.horizonmgr.ui.pacakgemanager
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.AmbientContentColor
-import androidx.compose.foundation.Icon
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -18,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ContextAmbient
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.sync.Mutex
@@ -61,50 +61,59 @@ fun PackageManager(
         ProgressDialog(onCloseRequest = vm::dismiss, state = it)
     }
 
-    Column {
-        // Top App Bar
-        TopAppBar(title = {
-            Text("分包管理")
-        }, navigationIcon = {
-            IconButton(onClick = onNavClick) { Icon(Icons.Filled.Menu) }
-        }, actions = {
-            // Online Install Button
-            IconButton(onClick = { vm.startInstallPackageActivity(context) }) {
-                Icon(Icons.Filled.GetApp)
-            }
-        }, backgroundColor = MaterialTheme.colors.surface)
-
-        if (vmPackages.isNullOrEmpty()) {
-            // Tips when there was no packages installed.
-            Box(Modifier.fillMaxSize()) {
-                Row(Modifier.align(Alignment.Center)) {
-                    Text("您还未安装分包，请点击")
-                    Icon(Icons.Filled.GetApp)
-                    Text("按钮在线安装")
-                }
-            }
-        } else LazyColumnForIndexed(
-            modifier = Modifier.fillMaxSize(),
-            items = vmPackages,
-            contentPadding = PaddingValues(top = 8.dp, bottom = 64.dp)
-        ) { index, item ->
-            PackageItem(
-                modifier = Modifier.padding(16.dp, 8.dp),
-                title = item.name,
-                description = item.description,
-                installTime = item.timeStr,
-                selected = item.uuid == selectedPackageUUID,
-                onClick = { onPackageSelect(item.uuid) },
-                onInfoClick = { vm.showInfo(context, item.uuid) },
-                onDeleteClick = { vm.deletePackage(item.uuid, confirmDeleteDialogHostState) },
-                onRenameClick = { vm.renamePackage(item.uuid, inputDialogHostState) },
-                onCloneClick = { vm.clonePackage(item.uuid, inputDialogHostState) }
+    Box {
+        Column {
+            // Top App Bar
+            TopAppBar(
+                modifier = Modifier.zIndex(4.dp.value),
+                title = {
+                    Text("分包管理")
+                }, navigationIcon = {
+                    IconButton(onClick = onNavClick) { Icon(Icons.Filled.Menu) }
+                }, backgroundColor = MaterialTheme.colors.surface
             )
+
+            if (vmPackages.isNullOrEmpty()) {
+                // Tips when there was no packages installed.
+                Box(Modifier.fillMaxSize()) {
+                    Row(Modifier.align(Alignment.Center)) {
+                        Text("您还未安装分包，请点击")
+                        Icon(Icons.Filled.GetApp)
+                        Text("按钮在线安装")
+                    }
+                }
+            } else LazyColumnForIndexed(
+                modifier = Modifier.fillMaxSize(),
+                items = vmPackages,
+                contentPadding = PaddingValues(top = 8.dp, bottom = 64.dp)
+            ) { index, item ->
+                PackageItem(
+                    modifier = Modifier.padding(16.dp, 8.dp),
+                    title = item.name,
+                    description = item.description,
+                    installTime = item.timeStr,
+                    selected = item.uuid == selectedPackageUUID,
+                    onClick = { onPackageSelect(item.uuid) },
+                    onInfoClick = { vm.showInfo(context, item.uuid) },
+                    onDeleteClick = { vm.deletePackage(item.uuid, confirmDeleteDialogHostState) },
+                    onRenameClick = { vm.renamePackage(item.uuid, inputDialogHostState) },
+                    onCloneClick = { vm.clonePackage(item.uuid, inputDialogHostState) }
+                )
+            }
         }
+        SnackbarHost(hostState = snackbarHostState)
+        ConfirmDeleteDialogHost(state = confirmDeleteDialogHostState)
+        InputDialogHost(state = inputDialogHostState)
+
+        // Online Install Button
+        ExtendedFloatingActionButton(
+            modifier = Modifier.align(Alignment.BottomEnd).padding(16.dp),
+            onClick = { vm.startInstallPackageActivity(context) },
+            text = { Text("添加") },
+            icon = { Icon(Icons.Filled.Add) }
+        )
     }
-    SnackbarHost(hostState = snackbarHostState)
-    ConfirmDeleteDialogHost(state = confirmDeleteDialogHostState)
-    InputDialogHost(state = inputDialogHostState)
+
 }
 
 @OptIn(ExperimentalAnimationApi::class)

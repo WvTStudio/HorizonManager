@@ -1,4 +1,4 @@
-package org.wvt.horizonmgr.ui.`package`
+package org.wvt.horizonmgr.ui.pacakgemanager
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity

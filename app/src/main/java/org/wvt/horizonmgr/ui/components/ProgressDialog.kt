@@ -1,16 +1,9 @@
 package org.wvt.horizonmgr.ui.components
 
 import androidx.compose.animation.animate
-import androidx.compose.foundation.Icon
 import androidx.compose.foundation.Text
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Card
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
@@ -25,11 +18,11 @@ import androidx.compose.ui.window.Dialog
 import androidx.ui.tooling.preview.Preview
 import org.wvt.horizonmgr.ui.theme.HorizonManagerTheme
 
-sealed class ProgressDialogState {
-    class Loading(val message: String) : ProgressDialogState()
-    class ProgressLoading(val message: String, val progress: Float) : ProgressDialogState()
-    class Failed(val title: String, val message: String) : ProgressDialogState()
-    class Finished(val message: String) : ProgressDialogState()
+sealed class ProgressDialogState(val message: String) {
+    class Loading(message: String) : ProgressDialogState(message)
+    class ProgressLoading(message: String, val progress: Float) : ProgressDialogState(message)
+    class Failed(val title: String, message: String) : ProgressDialogState(message)
+    class Finished(message: String) : ProgressDialogState(message)
 }
 
 @Composable
@@ -37,6 +30,7 @@ fun ProgressDialog(
     onCloseRequest: () -> Unit,
     state: ProgressDialogState
 ) {
+
     Dialog(onDismissRequest = {
         // 加载过程中不可关闭
         if (state is ProgressDialogState.Failed || state is ProgressDialogState.Finished) onCloseRequest()
@@ -49,31 +43,26 @@ fun ProgressDialog(
                 when (state) {
                     is ProgressDialogState.Loading -> {
                         CircularProgressIndicator()
-                        Text(
-                            modifier = Modifier.padding(start = 24.dp, end = 16.dp),
-                            text = state.message
-                        )
+                        Content(state.message)
                     }
                     is ProgressDialogState.ProgressLoading -> {
                         CircularProgressIndicator(animate(state.progress))
-                        Text(
-                            modifier = Modifier.padding(start = 24.dp, end = 16.dp),
-                            text = state.message
-                        )
+                        Content(state.message)
                     }
                     is ProgressDialogState.Failed -> {
-                        Icon(asset = Icons.Filled.Close, tint = MaterialTheme.colors.error)
-                        Text(
-                            text = state.message,
-                            modifier = Modifier.padding(start = 24.dp, end = 16.dp)
-                        )
+                        Box(Modifier.size(40.dp), Alignment.Center) {
+                            Icon(asset = Icons.Filled.Close, tint = MaterialTheme.colors.error)
+                        }
+                        Content(state.message)
                     }
                     is ProgressDialogState.Finished -> {
-                        Icon(asset = Icons.Filled.Check, tint = MaterialTheme.colors.secondary)
-                        Text(
-                            text = state.message,
-                            modifier = Modifier.padding(start = 24.dp, end = 16.dp)
-                        )
+                        Box(Modifier.size(40.dp), Alignment.Center) {
+                            Icon(
+                                asset = Icons.Filled.Check,
+                                tint = MaterialTheme.colors.secondary
+                            )
+                        }
+                        Content(state.message)
                     }
                 }
             }
@@ -81,15 +70,13 @@ fun ProgressDialog(
     }
 }
 
-@Preview
 @Composable
-private fun ProgressDialogPreview() {
-    val state by remember {
-        mutableStateOf<ProgressDialogState>(ProgressDialogState.Loading("正在加载"))
-    }
-    HorizonManagerTheme {
-        Surface {
-            ProgressDialog(onCloseRequest = {}, state = state)
-        }
+private fun Content(content: String) {
+    val emphasis = AmbientEmphasisLevels.current
+    ProvideEmphasis(emphasis = emphasis.high) {
+        Text(
+            modifier = Modifier.padding(start = 32.dp, end = 16.dp),
+            text = content
+        )
     }
 }

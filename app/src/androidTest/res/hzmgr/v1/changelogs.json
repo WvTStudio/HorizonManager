@@ -1,0 +1,32 @@
+[
+  {
+    "versionCode": 7,
+    "channel": "alpha",
+    "versionName": "2.0-alpha6-updatetest",
+    "changelog": "该消息用于测试更新消息是否正常显示，您可以点击 \"忽略该版本\""
+  },
+  {
+    "versionCode": 6,
+    "channel": "alpha",
+    "versionName": "2.0-alpha6",
+    "changelog": "- 添加了更新检测\n- 实装了资讯页面\n- Bug 修复\n- 性能优化"
+  },
+  {
+    "versionCode": 5,
+    "channel": "debug",
+    "versionName": "2.0-alpha5-debug",
+    "changelog": "测试测试测试"
+  },
+  {
+    "versionCode": 4,
+    "channel": "alpha",
+    "versionName": "2.0-alpha5",
+    "changelog": "添加了新版本检测功能"
+  },
+  {
+    "versionCode": 3,
+    "channel": "release",
+    "versionName": "2.0-alpha4",
+    "changelog": "什么都没有"
+  }
+]

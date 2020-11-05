@@ -8,6 +8,7 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Environment
 import android.provider.Settings
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.ViewModel
@@ -17,6 +18,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
+import org.wvt.horizonmgr.BuildConfig
 import org.wvt.horizonmgr.DependenciesContainer
 import org.wvt.horizonmgr.service.LocalCache
 import org.wvt.horizonmgr.ui.login.LoginActivity
@@ -29,10 +31,68 @@ class MainActivityViewModel(
     val selectedPackage: MutableStateFlow<String?> = MutableStateFlow(null)
     val showPermissionDialog: MutableStateFlow<Boolean> = MutableStateFlow(false)
 
+    data class NewVersion(
+        val versionName: String,
+        val versionCode: Int,
+        val changelog: String
+    )
+
+    val newVersion: MutableStateFlow<NewVersion?> = MutableStateFlow(null)
+
+    private var ignoreVersion: Int? = null
+
     init {
         viewModelScope.launch {
             userInfo.value = dependencies.localCache.getCachedUserInfo()
             selectedPackage.value = dependencies.localCache.getSelectedPackageUUID()
+        }
+        getUpdate()
+    }
+
+    fun getUpdate() {
+        viewModelScope.launch {
+            Log.d(
+                "MainVM",
+                "build_type: " + BuildConfig.BUILD_TYPE + ", version_code: " + BuildConfig.VERSION_CODE
+            )
+
+            // 获取本地忽略的最新版本号
+            ignoreVersion = dependencies.localCache.getIgnoreVersion()
+            val ig = ignoreVersion
+
+            // 查找当前 Channel 的最新版本
+            val l = try {
+                dependencies.webapi.getLatestVersions().find {
+                    it.channel == BuildConfig.BUILD_TYPE
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                return@launch
+            } ?: return@launch
+
+            Log.d("MainVM", "latestversion: $l")
+
+            // 如果最新版本不比当前版本大则退出
+            if (l.latestVersionCode <= BuildConfig.VERSION_CODE) return@launch
+
+            // 如果最新版本不比忽略的版本大，则退出
+            if (ig != null && l.latestVersionCode <= ig) return@launch
+
+            // 获取最新版本的信息
+            val v = try {
+                dependencies.webapi.getChangelogs().find {
+                    it.versionCode == l.latestVersionCode
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                return@launch
+            } ?: return@launch
+
+            newVersion.value = NewVersion(
+                versionName = v.versionName,
+                versionCode = v.versionCode,
+                changelog = v.changelog
+            )
         }
     }
 
@@ -130,6 +190,12 @@ class MainActivityViewModel(
         viewModelScope.launch {
             val userInfo = withContext(Dispatchers.Main) { startLoginActivity(context) }
             setUserInfo(userInfo)
+        }
+    }
+
+    fun ignoreVersion(versionCode: Int) {
+        viewModelScope.launch {
+            dependencies.localCache.setIgnoreVersion(versionCode)
         }
     }
 

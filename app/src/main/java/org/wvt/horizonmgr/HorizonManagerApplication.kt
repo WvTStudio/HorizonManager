@@ -7,7 +7,6 @@ import androidx.compose.ui.viewinterop.viewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import org.wvt.horizonmgr.service.HorizonManager
-import org.wvt.horizonmgr.service.HorizonManager2
 import org.wvt.horizonmgr.service.LocalCache
 import org.wvt.horizonmgr.service.WebAPI
 import org.wvt.horizonmgr.service.webapi2.WebAPI2
@@ -44,11 +43,6 @@ private class DependenciesVMFactory(
 private class DependenciesContainerImpl(private val context: Context) : DependenciesContainer {
     override val horizonManager: HorizonManager by lazy {
         HorizonManager.getOrCreateInstance(context)
-    }
-
-    override val horizonManager2: HorizonManager2 by lazy {
-        HorizonManager2.init(context)
-        HorizonManager2.getInstance()
     }
 
     override val localCache: LocalCache by lazy {

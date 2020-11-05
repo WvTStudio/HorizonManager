@@ -7,9 +7,8 @@ import androidx.compose.material.AlertDialog
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.TextButton
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.onActive
+import androidx.compose.runtime.*
+import androidx.compose.runtime.savedinstancestate.savedInstanceState
 import androidx.compose.ui.platform.setContent
 import org.wvt.horizonmgr.HorizonManagerApplication
 import org.wvt.horizonmgr.R
@@ -33,6 +32,15 @@ class MainActivity : AppCompatActivity() {
             val userInfo by vm.userInfo.collectAsState()
             val selectedPackage by vm.selectedPackage.collectAsState()
             val showPermissionDialog by vm.showPermissionDialog.collectAsState()
+
+            val newVersion by vm.newVersion.collectAsState()
+            var displayNewVersionDialog by savedInstanceState { false }
+
+            onCommit(newVersion) {
+                if (newVersion != null) {
+                    displayNewVersionDialog = true
+                }
+            }
 
             onActive {
                 vm.checkPermission(this@MainActivity)
@@ -69,6 +77,36 @@ class MainActivity : AppCompatActivity() {
                                     Text("本应用需要拥有网络权限及对内置存储的完全访问权限。\n如果您的系统版本为 Android R 及以上，您需要在弹出的系统设置中授予完全访问权限")
                                 }
                             )
+                        }
+
+                        val theNewVersion = newVersion
+
+                        if (theNewVersion != null && displayNewVersionDialog) {
+                            AlertDialog(
+                                title = { Text("发现新版本") },
+                                text = {
+                                    Text(
+                                        "版本名：${theNewVersion.versionName}\n" +
+                                                "版本号：${theNewVersion.versionCode}\n" +
+                                                "更新日志：${theNewVersion.changelog}"
+                                    )
+                                },
+                                onDismissRequest = {
+                                    displayNewVersionDialog = false
+                                },
+                                confirmButton = {
+                                    TextButton(onClick = { displayNewVersionDialog = false }) {
+                                        Text("确定")
+                                    }
+                                },
+                            dismissButton = {
+                                TextButton(onClick = {
+                                    vm.ignoreVersion(theNewVersion.versionCode)
+                                    displayNewVersionDialog = false
+                                }){
+                                    Text("忽略该版本")
+                                }
+                            })
                         }
                     }
                 }

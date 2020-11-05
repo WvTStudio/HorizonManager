@@ -12,10 +12,19 @@ import org.wvt.horizonmgr.service.LocalCache
 import org.wvt.horizonmgr.service.WebAPI
 import org.wvt.horizonmgr.utils.CoroutineDownloader
 
+@Deprecated("Deprecated")
 val HorizonManagerAmbient = staticAmbientOf<HorizonManager>()
+
+@Deprecated("Deprecated")
 val CoroutineDownloaderAmbient = staticAmbientOf<CoroutineDownloader>()
+
+@Deprecated("Deprecated")
 val WebAPIAmbient = staticAmbientOf<WebAPI>()
+
+@Deprecated("Deprecated")
 val LocalCacheAmbient = staticAmbientOf<LocalCache>()
+
+@Deprecated("Deprecated")
 val NavigatorAmbient = staticAmbientOf<NavigatorViewModel>()
 
 // 用 Ambient 解决依赖前没有发现问题

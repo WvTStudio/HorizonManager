@@ -1,8 +1,10 @@
 plugins {
     id("com.android.application")
-    id("com.google.gms.google-services")
     id("kotlin-android")
     id("kotlin-android-extensions")
+
+    id("com.google.gms.google-services")
+    id("com.google.firebase.crashlytics")
 }
 
 android {
@@ -13,8 +15,8 @@ android {
         applicationId = "org.wvt.horizonmgr"
         minSdkVersion(21)
         targetSdkVersion(30)
-        versionCode = 2
-        versionName = "2.0-alpha4"
+        versionCode = 6
+        versionName = "2.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -27,6 +29,20 @@ android {
             isShrinkResources = true
             isMinifyEnabled = true
             isUseProguard = true
+        }
+        getByName("debug") {
+            versionNameSuffix = "-debug"
+        }
+        create("alpha") {
+            proguardFiles = mutableListOf(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                file("proguard-rules.pro")
+            )
+            isShrinkResources = true
+            isMinifyEnabled = true
+            isUseProguard = true
+
+            versionNameSuffix = "-alpha6"
         }
     }
     compileOptions {
@@ -57,6 +73,7 @@ dependencies {
 
     implementation(platform("com.google.firebase:firebase-bom:26.0.0"))
     implementation("com.google.firebase:firebase-analytics-ktx")
+    implementation("com.google.firebase:firebase-crashlytics-ktx")
 
     implementation(kotlin("stdlib"))
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.1.0")

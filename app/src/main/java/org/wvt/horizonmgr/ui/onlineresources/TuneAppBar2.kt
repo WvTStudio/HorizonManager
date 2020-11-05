@@ -1,4 +1,4 @@
-package org.wvt.horizonmgr.ui.onlinemod
+package org.wvt.horizonmgr.ui.onlineresources
 
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animate
@@ -28,7 +28,6 @@ import org.wvt.horizonmgr.ui.components.DropDownSelector
 
 private val fastDuration = tween<Float>(durationMillis = 100, easing = FastOutLinearInEasing)
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 internal fun TuneAppBar2(
     onNavClicked: () -> Unit,
@@ -41,20 +40,22 @@ internal fun TuneAppBar2(
     onSortModeSelect: (index: OnlineViewModel.SortMode) -> Unit
 ) {
     var expand by remember { mutableStateOf(false) }
-    val searchBoxScale = animate(if (expand) 1f else 1.5f)
-    val searchBoxOpacity = animate(if (expand) 1f else 0f)
+//    val searchBoxScale = animate(if (expand) 1f else 1.5f)
+//    val searchBoxOpacity = animate(if (expand) 1f else 0f)
 
     var filterValue by remember { mutableStateOf(TextFieldValue()) }
 
     val actionOpacity = animate(if (expand) 0.72f else 1f)
-    val leftOffset = animate(if (expand) 16.dp else 0.dp)
-    val rightOffset = animate(if (expand) 16.dp else 0.dp)
-    val topOffset = animate(if (expand) 16.dp else 0.dp)
+
+    val offset = animate(if (expand) 16.dp else 0.dp)
+//    val leftOffset = animate(if (expand) 16.dp else 0.dp)
+//    val rightOffset = animate(if (expand) 16.dp else 0.dp)
+//    val topOffset = animate(if (expand) 16.dp else 0.dp)
 
     val emphasis = AmbientEmphasisLevels.current
 
     Surface(
-        modifier = Modifier.fillMaxWidth().wrapContentHeight(),
+        modifier = Modifier.fillMaxWidth().wrapContentHeight().zIndex(4.dp.value),
         elevation = 4.dp
     ) {
         AppBarLayout(expand = expand) {
@@ -62,21 +63,17 @@ internal fun TuneAppBar2(
             Surface(
                 modifier = Modifier.layoutId("searchbox_bg")
                     .fillMaxWidth()
-                    .padding(
-                        top = topOffset,
-                        start = leftOffset,
-                        end = rightOffset
-                    )
+                    .padding(top = offset, start = offset, end = offset)
                     .height(56.dp),
                 shape = RoundedCornerShape(4.dp),
                 elevation = 4.dp,
                 content = emptyContent()
             )
 
-            // AppBar
+            // AppBar & SearchBox
             Box(
                 Modifier.layoutId("appbar")
-                    .padding(top = topOffset)
+                    .padding(top = offset)
                     .height(56.dp)
                     .fillMaxWidth()
                     .zIndex(4.dp.value)
@@ -84,7 +81,7 @@ internal fun TuneAppBar2(
                 // Nav Button
                 IconButton(
                     modifier = Modifier.align(Alignment.CenterStart)
-                        .padding(start = 8.dp + leftOffset)
+                        .padding(start = 4.dp + offset)
                         .drawLayer(alpha = actionOpacity),
                     onClick = {
                         if (expand) expand = false
@@ -98,7 +95,7 @@ internal fun TuneAppBar2(
                 Crossfade(current = expand, animation = fastDuration) {
                     Box(
                         modifier = Modifier.align(Alignment.CenterStart)
-                            .padding(start = 72.dp + leftOffset, end = 24.dp + rightOffset)
+                            .padding(start = 72.dp + offset, end = 24.dp + offset)
                             .fillMaxSize(),
                         alignment = Alignment.CenterStart
                     ) {
@@ -114,15 +111,10 @@ internal fun TuneAppBar2(
                                 ),
                             )
                             // TextField
-                            BaseTextField(
-                                modifier = Modifier.align(Alignment.CenterStart).zIndex(16.dp.value),
-                                value = filterValue,
+                            SearchBoxTextField(
+                                modifier = Modifier.align(Alignment.CenterStart),
+                                filterValue = filterValue,
                                 onValueChange = { filterValue = it },
-                                textStyle = TextStyle(
-                                    color = MaterialTheme.colors.onSurface.copy(0.72f),
-                                    fontSize = 18.sp
-                                ),
-                                imeAction = ImeAction.Search,
                                 onImeActionPerformed = { onFilterValueConfirm(filterValue.text) }
                             )
                         } else { // Title
@@ -136,7 +128,7 @@ internal fun TuneAppBar2(
                 }
                 // Tune Button
                 IconButton(modifier = Modifier.align(Alignment.CenterEnd)
-                    .padding(end = 8.dp + rightOffset)
+                    .padding(end = 4.dp + offset)
                     .drawLayer(alpha = actionOpacity),
                     onClick = {
                         if (expand) onFilterValueConfirm(filterValue.text)
@@ -187,8 +179,37 @@ internal fun TuneAppBar2(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun AppBarLayout(expand: Boolean, children: @Composable () -> Unit) {
+private fun SearchBoxTextField(
+    modifier: Modifier = Modifier,
+    filterValue: TextFieldValue,
+    onValueChange: (TextFieldValue) -> Unit,
+    onImeActionPerformed: (ImeAction) -> Unit
+) {
+    BaseTextField(
+        modifier = modifier,
+        value = filterValue,
+        onValueChange = {
+            if (!it.text.contains('\n')) {
+                onValueChange(it)
+            }
+        },
+        textStyle = TextStyle(
+            color = MaterialTheme.colors.onSurface.copy(0.72f),
+            fontSize = 18.sp
+        ),
+        imeAction = ImeAction.Search,
+        onImeActionPerformed = onImeActionPerformed,
+        onTextInputStarted = { it.showSoftwareKeyboard() }
+    )
+}
+
+@Composable
+private fun AppBarLayout(
+    expand: Boolean,
+    children: @Composable () -> Unit
+) {
     val progress = animate(if (expand) 1f else 0f)
     Layout(children) { m: List<Measurable>, c: Constraints ->
         check(m.size == 3)

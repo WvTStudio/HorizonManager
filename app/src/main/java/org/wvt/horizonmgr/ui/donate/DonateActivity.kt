@@ -7,10 +7,7 @@ import android.os.Environment
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.SnackbarHost
-import androidx.compose.material.SnackbarHostState
-import androidx.compose.material.Surface
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -20,7 +17,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.wvt.horizonmgr.R
-import org.wvt.horizonmgr.ui.AndroidDependenciesProvider
+import org.wvt.horizonmgr.dependenciesViewModel
 import org.wvt.horizonmgr.ui.theme.AndroidHorizonManagerTheme
 
 class DonateActivity : AppCompatActivity() {
@@ -37,11 +34,22 @@ class DonateActivity : AppCompatActivity() {
             val scope = rememberCoroutineScope()
             var job by remember { mutableStateOf<Job?>(null) }
 
-            AndroidDependenciesProvider {
-                AndroidHorizonManagerTheme {
-                    Box(Modifier.fillMaxSize()) {
-                        Surface {
-                            Donate(onAlipayClicked = {
+            val vm = dependenciesViewModel<DonateViewModel>()
+            val mDonates by vm.donates.collectAsState()
+
+
+            onCommit(vm) {
+                vm.refresh()
+            }
+
+            AndroidHorizonManagerTheme {
+                Box(Modifier.fillMaxSize()) {
+                    Surface(
+                        color = MaterialTheme.colors.background
+                    ) {
+                        Donate(
+                            donates = mDonates,
+                            onAlipayClicked = {
                                 if (job?.isActive == true) return@Donate
                                 job = scope.launch {
                                     try {
@@ -68,10 +76,11 @@ class DonateActivity : AppCompatActivity() {
                                         return@launch
                                     }
                                 }
+                            }, onClose = {
+                                finish()
                             })
-                        }
-                        SnackbarHost(hostState = hostState, Modifier.align(Alignment.BottomCenter))
                     }
+                    SnackbarHost(hostState = hostState, Modifier.align(Alignment.BottomCenter))
                 }
             }
         }

@@ -10,36 +10,48 @@ import android.util.Log
 import android.view.KeyEvent
 import android.webkit.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.Text
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
+import androidx.compose.material.TopAppBar
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import org.wvt.horizonmgr.R
+import org.wvt.horizonmgr.ui.components.Background
 import org.wvt.horizonmgr.ui.theme.AndroidHorizonManagerTheme
 
 class CommunityActivity : AppCompatActivity() {
+    private lateinit var dm: DownloadManager
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        /*setContent {
-            AndroidHorizonManagerTheme {
-                Surface(color = MaterialTheme.colors.background) {
-                    Community(onClose = ::close)
-                }
-            }
-        }*/
-        // TODO 现在是临时解决方案
+
+        // TODO 使用纯 Compose 方案
         setContentView(R.layout.community_layout)
+
         findViewById<ComposeView>(R.id.compose_view).setContent {
             AndroidHorizonManagerTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colors.background
-                ) {
-                    Community(onClose = ::close)
+                Background {
+                    Column(Modifier.fillMaxSize()) {
+                        TopAppBar(
+                            title = { Text("Inner Core 中文社区") },
+                            navigationIcon = {
+                                IconButton(onClick = ::close) {
+                                    Icon(Icons.Filled.Close)
+                                }
+                            },
+                            backgroundColor = MaterialTheme.colors.surface
+                        )
+                    }
                 }
             }
         }
+
         findViewById<WebView>(R.id.webview).apply {
             Log.d("Community", "WebView apply")
             settings.apply {
@@ -78,20 +90,17 @@ class CommunityActivity : AppCompatActivity() {
                     val cookies = CookieManager.getInstance().getCookie(url)
                     addRequestHeader("cookie", cookies)
                     addRequestHeader("User-Agent", userAgent)
-                    setDescription("正在下载...")
                     setTitle(URLUtil.guessFileName(url, contentDisposition, mimetype))
-                    setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
-                    setDestinationInExternalPublicDir(
-                        Environment.DIRECTORY_DOWNLOADS,
-                        URLUtil.guessFileName(url, contentDisposition, mimetype)
-                    )
+                    setDescription("正在下载...")
+                    setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE)
+                    setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, null)
                 }
-                val dm =
-                    context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
                 dm.openDownloadedFile(dm.enqueue(request))
             }
             loadUrl("https://forum.adodoz.cn")
         }
+
+        dm = getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
     }
 
     private fun close() {

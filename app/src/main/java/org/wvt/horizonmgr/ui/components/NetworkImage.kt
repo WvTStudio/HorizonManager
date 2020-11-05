@@ -17,8 +17,6 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 
-// TODO 与 Glide 解耦
-//  似乎不可能了，还是算了吧
 @Composable
 fun NetworkImage(
     url: String,

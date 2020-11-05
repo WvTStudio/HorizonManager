@@ -1,4 +1,4 @@
-package org.wvt.horizonmgr.ui.`package`
+package org.wvt.horizonmgr.ui.pacakgemanager
 
 import androidx.compose.foundation.Icon
 import androidx.compose.foundation.Text

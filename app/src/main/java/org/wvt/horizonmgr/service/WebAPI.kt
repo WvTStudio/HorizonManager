@@ -134,25 +134,17 @@ class WebAPI private constructor(context: Context) {
     data class DonateEntry(val name: String, val money: String)
 
     suspend fun getDonates(): List<DonateEntry> {
-        val response = post("https://adodoz.cn/ICMODManagerAPI.php", "order" to "donate")
-        return parseJson {
-            val result = mutableListOf<DonateEntry>()
-            JSONArray(response).forEach<JSONObject> {
+        val response = request("https://adodoz.cn/hzmgr/v1/donates.json")
+        val result = mutableListOf<DonateEntry>()
+        parseJson {
+            JSONArray(response.content).forEach<JSONObject> {
                 val name = it.getString("name")
                 val money = it.getString("money")
                 if (money.isBlank()) return@forEach
                 result.add(DonateEntry(name, money))
             }
-            result
         }
-    }
-
-    suspend fun getLatestAppVersion(): Int {
-        val response = post("https://adodoz.cn/ICMODManagerAPI.php", "order" to "getupdate")
-        return parseJson {
-            val json = JSONObject(response)
-            json.getInt("versioncode")
-        }
+        return result
     }
 
     data class QQGroupEntry(
@@ -167,10 +159,10 @@ class WebAPI private constructor(context: Context) {
      * @return GroupName to intentUrl
      */
     suspend fun getQQGroupList(): List<QQGroupEntry> {
-        val response = get("https://adodoz.cn/new_qqgroup.json")
+        val response = request("https://adodoz.cn/hzmgr/v1/qqgroups.json")
         val result = mutableListOf<QQGroupEntry>()
         parseJson {
-            JSONArray(response).forEach<JSONObject> {
+            JSONArray(response.content).forEach<JSONObject> {
                 result.add(
                     QQGroupEntry(
                         name = it.getString("name"),
@@ -410,6 +402,138 @@ class WebAPI private constructor(context: Context) {
             override suspend fun progressChannel(): ReceiveChannel<Float> = channel
         }
 
+    fun multiDownloadPackage() {
+        // TODO: 2020/11/3
+        object : MultiThreadDownloadTask {
+
+            override suspend fun await(): Long {
+                TODO("Not yet implemented")
+            }
+
+            override suspend fun getState(): ReceiveChannel<MultiThreadDownloadTask.State> {
+                TODO("Not yet implemented")
+            }
+
+            override suspend fun getChunks(): MultiThreadDownloadTask.Chunks {
+                TODO("Not yet implemented")
+            }
+
+            override suspend fun cancel() {
+                TODO("Not yet implemented")
+            }
+        }
+    }
+
+    data class News(
+        val id: Int,
+        val title: String,
+        val brief: String,
+        val coverUrl: String
+    )
+
+    data class NewsContent(
+        val id: Int,
+        val title: String,
+        val brief: String,
+        val coverUrl: String,
+        val content: String
+    )
+
+    /**
+     * see news.json
+     */
+    suspend fun getNews(): List<News> {
+        val response = request("https://adodoz.cn/hzmgr/v1/news.json")
+        val result = mutableListOf<News>()
+
+        parseJson {
+            val json = JSONArray(response.content)
+            json.forEachIndexed<JSONObject> { index, item ->
+                val id = item.getInt("id")
+                val title = item.getString("title")
+                val cover = item.getString("cover")
+                val brief = item.getString("brief")
+                result.add(News(id, title, brief, cover))
+            }
+        }
+
+        return result
+    }
+
+    /**
+     * see news-1.json
+     */
+    suspend fun getNewsContent(id: Int): NewsContent? {
+        val response = request("https://adodoz.cn/hzmgr/v1/news/${id}.json")
+        if (response.resultCode != 200) return null
+
+        return parseJson {
+            val json = JSONObject(response.content)
+            return@parseJson NewsContent(
+                id = json.getInt("id"),
+                content = json.getString("content"),
+                title = json.getString("title"),
+                brief = json.getString("brief"),
+                coverUrl = json.getString("coverUrl")
+            )
+        }
+    }
+
+
+    data class LatestVersion(
+        val channel: String,
+        val latestVersionCode: Int
+    )
+
+    data class Changelog(
+        val versionCode: Int,
+        val versionName: String,
+        val changelog: String
+    )
+
+    /**
+     * see versioninfo.json
+     */
+    suspend fun getLatestVersions(): List<LatestVersion> {
+        val response = request("https://adodoz.cn/hzmgr/v1/versioninfo.json")
+        val result = mutableListOf<LatestVersion>()
+
+        parseJson {
+            JSONArray(response.content).forEach<JSONObject> {
+                result.add(
+                    LatestVersion(
+                        channel = it.getString("channel"),
+                        latestVersionCode = it.getInt("latestVersionCode")
+                    )
+                )
+            }
+        }
+
+        return result
+    }
+
+    /**
+     * see changelogs.json
+     */
+    suspend fun getChangelogs(): List<Changelog> {
+        val response = request("https://adodoz.cn/hzmgr/v1/changelogs.json")
+        val result = mutableListOf<Changelog>()
+
+        parseJson {
+            JSONArray(response.content).forEach<JSONObject> {
+                result.add(
+                    Changelog(
+                        versionCode = it.getInt("versionCode"),
+                        versionName = it.getString("versionName"),
+                        changelog = it.getString("changelog")
+                    )
+                )
+            }
+        }
+
+        return result
+    }
+
     private suspend fun parseChangelog(changelogUrl: String): String {
         return get(changelogUrl)
     }
@@ -476,8 +600,8 @@ class WebAPI private constructor(context: Context) {
 
     private suspend fun request(
         url: String,
-        body: String?,
-        method: HttpRequestMethod,
+        body: String? = null,
+        method: HttpRequestMethod = HttpRequestMethod.GET,
         headers: Map<String, List<String>> = emptyMap()
     ): HttpResponse = coroutineScope {
         withContext(Dispatchers.IO) {

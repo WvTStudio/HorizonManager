@@ -4,10 +4,6 @@ import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.ui.graphics.Color
 
-object InnerThemes {
-    // TODO
-}
-
 val DarkColorPalette = darkColors(
     primary = Color(MaterialColors.purple[200]!!),
     primaryVariant = Color(MaterialColors.purple[500]!!),
@@ -51,6 +47,7 @@ object MaterialColors {
         return null
     }
 
+    @Deprecated("Not implemented yet")
     operator fun get(series: String, bright: String): Long {
         val series = when (series) {
             "red" -> red

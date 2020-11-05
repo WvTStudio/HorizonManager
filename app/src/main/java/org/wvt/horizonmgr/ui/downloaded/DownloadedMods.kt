@@ -1,6 +1,5 @@
 package org.wvt.horizonmgr.ui.downloaded
 
-import androidx.compose.foundation.Icon
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumnFor
@@ -12,6 +11,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import org.wvt.horizonmgr.dependenciesViewModel
 import org.wvt.horizonmgr.ui.components.ProgressDialog
 import org.wvt.horizonmgr.ui.main.SelectedPackageUUIDAmbient
@@ -29,13 +29,15 @@ fun DownloadedMods(onNavClicked: () -> Unit) {
     }
 
     Column(Modifier.fillMaxSize()) {
-        TopAppBar(title = {
-            Text("本地资源")
-        }, navigationIcon = {
-            IconButton(onClick = onNavClicked, icon = {
-                Icon(Icons.Filled.Menu)
-            })
-        }, backgroundColor = MaterialTheme.colors.surface)
+        TopAppBar(
+            modifier = Modifier.zIndex(4.dp.value), title = {
+                Text("本地资源")
+            }, navigationIcon = {
+                IconButton(onClick = onNavClicked, icon = {
+                    Icon(Icons.Filled.Menu)
+                })
+            }, backgroundColor = MaterialTheme.colors.surface
+        )
 
         if (mods.isEmpty()) {
             Box(Modifier.fillMaxSize().padding(16.dp), Alignment.Center) {

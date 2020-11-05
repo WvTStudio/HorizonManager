@@ -1,4 +1,4 @@
-package org.wvt.horizonmgr.ui.onlinemod
+package org.wvt.horizonmgr.ui.onlineresources
 
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animate

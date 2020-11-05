@@ -17,7 +17,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.HorizonManagerCompose.NoActionBar">
-        <activity android:name=".ui.locale.ModConfigActivity"></activity>
+        <activity android:name=".ui.news.NewsContentActivity"></activity>
+        <activity android:name=".ui.onlinemoddetail.OnlineModDetailActivity" />
+        <activity android:name=".ui.locale.ModConfigActivity" />
         <activity
             android:name=".ui.main.MainActivity"
             android:label="@string/app_name"
@@ -31,9 +33,9 @@
         <activity android:name=".ui.settings.CustomThemeActivity" />
         <activity android:name=".ui.joingroup.JoinGroupActivity" />
         <activity android:name=".ui.community.CommunityActivity" />
-        <activity android:name=".ui.package.InstallPackageActivity" />
+        <activity android:name=".ui.pacakgemanager.InstallPackageActivity" />
         <activity android:name=".ui.fileselector.SelectFileActivity" />
-        <activity android:name=".ui.package.PackageDetailActivity" />
+        <activity android:name=".ui.pacakgemanager.PackageDetailActivity" />
         <activity android:name=".ui.settings.SettingsActivity" />
         <activity android:name=".ui.login.LoginActivity" />
         <activity

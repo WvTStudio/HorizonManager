@@ -3,7 +3,6 @@ package org.wvt.horizonmgr.ui.login
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.animation.core.AnimationConstants.Infinite
-import androidx.compose.foundation.Icon
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -16,15 +15,14 @@ import androidx.compose.ui.drawLayer
 import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.vector.VectorPainter
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.loadVectorResource
 import androidx.compose.ui.unit.dp
 import androidx.ui.tooling.preview.Preview
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.wvt.horizonmgr.R
 import org.wvt.horizonmgr.service.WebAPI
 import org.wvt.horizonmgr.ui.WebAPIAmbient
@@ -101,10 +99,9 @@ fun Login(
                 return@launch
             }
             fabState = FabState.SUCCEED
-            snackbarHostState.showSnackbar("登录成功", "前往主页")
-            withContext(Dispatchers.Main) {
-                onLoginSuccess(userInfo)
-            }
+            launch { snackbarHostState.showSnackbar("登录成功") }
+            delay(800)
+            onLoginSuccess(userInfo)
         }
     }
 
@@ -119,7 +116,7 @@ fun Login(
             ) {
                 Box(
                     Modifier.fillMaxSize().paint(
-                        painter = VectorPainter(it),
+                        painter = rememberVectorPainter(it),
                         contentScale = ContentScale.Crop,
                         colorFilter = ColorFilter.tint(
                             MaterialTheme.colors.onSurface.copy(
@@ -137,7 +134,7 @@ fun Login(
             ) {
                 Box(
                     Modifier.fillMaxSize().paint(
-                        painter = VectorPainter(it),
+                        painter = rememberVectorPainter(it),
                         contentScale = ContentScale.Fit,
                         colorFilter = ColorFilter.tint(
                             MaterialTheme.colors.onSurface.copy(

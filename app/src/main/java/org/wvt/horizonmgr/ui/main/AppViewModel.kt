@@ -18,7 +18,7 @@ class AppViewModel(
         val label: String,
         val icon: VectorAsset
     ) {
-        HOME("首页资讯", Icons.Filled.Home),
+        HOME("推荐资讯", Icons.Filled.Home),
         PACKAGE_MANAGE("分包管理", Icons.Filled.Dashboard),
         LOCAL_MANAGE("模组管理", Icons.Filled.Extension),
         ONLINE_DOWNLOAD("在线资源", Icons.Filled.Store),

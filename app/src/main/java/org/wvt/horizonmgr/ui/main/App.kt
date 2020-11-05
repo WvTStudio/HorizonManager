@@ -1,7 +1,10 @@
 package org.wvt.horizonmgr.ui.main
 
 import androidx.activity.ComponentActivity
+import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animate
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -21,16 +24,18 @@ import androidx.compose.ui.unit.dp
 import org.wvt.horizonmgr.DependenciesContainer
 import org.wvt.horizonmgr.dependenciesViewModel
 import org.wvt.horizonmgr.service.LocalCache
-import org.wvt.horizonmgr.ui.`package`.PackageManager
 import org.wvt.horizonmgr.ui.components.NetworkImage
 import org.wvt.horizonmgr.ui.downloaded.DownloadedMods
 import org.wvt.horizonmgr.ui.fileselector.SelectFileActivity
-import org.wvt.horizonmgr.ui.home.Home
+import org.wvt.horizonmgr.ui.news.News
 import org.wvt.horizonmgr.ui.locale.LocalManager
-import org.wvt.horizonmgr.ui.onlinemod.Online
+import org.wvt.horizonmgr.ui.onlineresources.Online
+import org.wvt.horizonmgr.ui.pacakgemanager.PackageManager
 
 val SelectedPackageUUIDAmbient = staticAmbientOf<String?>()
 val DrawerStateAmbient = staticAmbientOf<DrawerState>()
+
+private val anim = tween<Float>(600, 0, FastOutSlowInEasing)
 
 @Composable
 fun App(
@@ -87,27 +92,29 @@ fun App(
             DrawerStateAmbient provides drawerState,
             SelectedPackageUUIDAmbient provides selectedPackageUUID
         ) {
-            when (cs) {
-                AppViewModel.Screen.HOME -> Home(
-                    onNavClick = {drawerState.open()}
-                )
-                AppViewModel.Screen.LOCAL_MANAGE -> LocalManager(
-                    onNavClicked = { drawerState.open() },
-                    requestSelectFile = {
-                        SelectFileActivity.startForResult(context)
-                    }
-                )
-                AppViewModel.Screen.PACKAGE_MANAGE -> PackageManager(
-                    onPackageSelect = selectedPackageChange,
-                    onNavClick = { drawerState.open() }
-                )
-                AppViewModel.Screen.ONLINE_DOWNLOAD -> Online(
-                    enable = userInfo != null,
-                    onNavClicked = { drawerState.open() }
-                )
-                AppViewModel.Screen.DOWNLOADED_MOD -> DownloadedMods(
-                    onNavClicked = { drawerState.open() }
-                )
+            Crossfade(current = cs, animation = anim) { cs ->
+                when (cs) {
+                    AppViewModel.Screen.HOME -> News(
+                        onNavClick = { drawerState.open() }
+                    )
+                    AppViewModel.Screen.LOCAL_MANAGE -> LocalManager(
+                        onNavClicked = { drawerState.open() },
+                        requestSelectFile = {
+                            SelectFileActivity.startForResult(context)
+                        }
+                    )
+                    AppViewModel.Screen.PACKAGE_MANAGE -> PackageManager(
+                        onPackageSelect = selectedPackageChange,
+                        onNavClick = { drawerState.open() }
+                    )
+                    AppViewModel.Screen.ONLINE_DOWNLOAD -> Online(
+                        enable = userInfo != null,
+                        onNavClicked = { drawerState.open() }
+                    )
+                    AppViewModel.Screen.DOWNLOADED_MOD -> DownloadedMods(
+                        onNavClicked = { drawerState.open() }
+                    )
+                }
             }
         }
     }

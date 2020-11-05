@@ -1,4 +1,4 @@
-package org.wvt.horizonmgr.ui.onlinemod
+package org.wvt.horizonmgr.ui.onlineresources
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -57,6 +57,17 @@ class OnlineViewModel(
     }
 
     private var unfilteredList: List<WebAPI.OnlineModInfo> = emptyList()
+
+    // 默认是禁用的
+    private var enable = false
+
+    // 懒加载模式，只有第一次 enable 时才加载
+    fun setEnable(enable: Boolean) {
+        if(this.enable == false && enable == true) {
+            this.enable = true
+            refresh()
+        }
+    }
 
     fun setSelectedSource(source: Source) {
         _options.value = _options.value.copy(selectedSource = source)
@@ -128,13 +139,9 @@ class OnlineViewModel(
         }
     }
 
-    fun downloadFinish() {
-        downloadState.value = null
-    }
+    fun downloadFinish() { downloadState.value = null }
 
-    fun setSelectedUUID(str: String?) {
-        selectedUUID = str
-    }
+    fun setSelectedUUID(str: String?) { selectedUUID = str }
 
     fun install(mod: WebAPI.OnlineModInfo) {
         viewModelScope.launch {
@@ -164,10 +171,7 @@ class OnlineViewModel(
         }
     }
 
-    fun installFinish() {
-        installState.value = null
-    }
-
+    fun installFinish() { installState.value = null }
 
     private fun List<WebAPI.OnlineModInfo>.sorted(mode: SortMode): List<WebAPI.OnlineModInfo> {
         return when (mode) {

@@ -1,11 +1,9 @@
 package org.wvt.horizonmgr.ui.donate
 
-import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.Icon
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -20,18 +18,12 @@ import androidx.compose.ui.Measurable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.node.ExperimentalLayoutNodeApi
-import androidx.compose.ui.platform.ContextAmbient
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.util.fastForEach
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import org.wvt.horizonmgr.R
-import org.wvt.horizonmgr.ui.WebAPIAmbient
-import kotlin.math.log
 import kotlin.random.Random
 
 private val alipayColor = Color(0xFF1678FF)
@@ -45,33 +37,15 @@ private data class DonateItem(
 @OptIn(ExperimentalLayout::class, ExperimentalAnimationApi::class)
 @Composable
 fun Donate(
+    donates: Set<DonateViewModel.DonateItem>,
+    onClose: () -> Unit,
     onAlipayClicked: () -> Unit,
     onWechatPayClicked: () -> Unit
 ) {
-    val context = ContextAmbient.current as AppCompatActivity
-    val light = !isSystemInDarkTheme()
     var displayDialog by remember { mutableStateOf(false) }
-    var donates by remember { mutableStateOf<List<DonateItem>>(emptyList()) }
-    val scope = rememberCoroutineScope()
-    val webApi = WebAPIAmbient.current
+    val light = !isSystemInDarkTheme()
 
-    // TODO 转移到形参
-    onActive {
-        scope.launch(Dispatchers.Default) {
-            try {
-                donates = webApi.getDonates().map {
-                    DonateItem(
-                        name = it.name,
-                        size = it.money.toFloatOrNull()?.let {
-                            TextUnit.Sp(log(it + 1f, 1.5f) * 2)
-                        } ?: 2.sp)
-                }
-            } catch (e: Exception) {
-            }
-        }
-    }
-
-    Stack(Modifier.fillMaxSize()) {
+    Box(Modifier.fillMaxSize()) {
         Column(Modifier.fillMaxSize()) {
             // Alipay
             Surface(
@@ -79,7 +53,7 @@ fun Donate(
                 modifier = Modifier.weight(1f).fillMaxWidth()
                     .clickable(onClick = onAlipayClicked, indication = null)
             ) {
-                Stack(Modifier.fillMaxSize()) {
+                Box(Modifier.fillMaxSize()) {
                     Icon(
                         modifier = Modifier.align(Alignment.Center),
                         asset = vectorResource(id = R.drawable.ic_alipay),
@@ -95,7 +69,7 @@ fun Donate(
                     indication = null
                 )
             ) {
-                Stack(Modifier.fillMaxSize()) {
+                Box(Modifier.fillMaxSize()) {
                     Icon(
                         modifier = Modifier.align(Alignment.Center),
                         asset = vectorResource(id = R.drawable.ic_wechatpay),
@@ -108,7 +82,7 @@ fun Donate(
             TopAppBar(
                 title = { Text("选择捐赠方式") },
                 navigationIcon = {
-                    IconButton(onClick = { context.finish() }) { Icon(asset = Icons.Filled.ArrowBack) }
+                    IconButton(onClick = onClose) { Icon(asset = Icons.Filled.ArrowBack) }
                 },
                 elevation = 0.dp,
                 backgroundColor = Color.Transparent,
@@ -120,7 +94,7 @@ fun Donate(
                 exit = fadeOut()
             ) {
                 RandomPlaceLayout(modifier = Modifier.fillMaxSize().padding(top = 16.dp)) {
-                    donates.fastForEach {
+                    donates.forEach {
                         Text(
                             fontSize = it.size,
                             text = it.name,
@@ -139,6 +113,7 @@ fun Donate(
                 )
             }
         }
+
         if (displayDialog) {
             AlertDialog(
                 onDismissRequest = { displayDialog = false },

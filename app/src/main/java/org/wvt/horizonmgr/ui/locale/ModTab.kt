@@ -60,7 +60,7 @@ internal fun ModTab() {
                     selected = false,
                     onLongClick = {},
                     onEnabledChange = { if (it) vm.enableMod(item) else vm.disableMod(item) },
-                    onClick = {/* TODO */ },
+                    onClick = {/* TODO 显示 Mod 详情 */ },
                     onDeleteClick = { vm.deleteMod(item) }
                 )
             }

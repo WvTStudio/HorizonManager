@@ -10,11 +10,13 @@ class LocalCache private constructor(context: Context) {
     private val fixedFoldersPref: SharedPreferences
     private val userInfoPref: SharedPreferences
     private val selectedPackagePref: SharedPreferences
+    private val optionsPref: SharedPreferences
 
     companion object {
         private const val USER_INFO = "user_info"
         private const val FIXED_FOLDERS = "fixed_folders"
         private const val SELECTED_PACKAGE = "selected_package"
+        private const val OPTIONS = "options"
 
         private var instance: LocalCache? = null
 
@@ -32,6 +34,7 @@ class LocalCache private constructor(context: Context) {
         fixedFoldersPref = context.getSharedPreferences(FIXED_FOLDERS, Context.MODE_PRIVATE)
         userInfoPref = context.getSharedPreferences(USER_INFO, Context.MODE_PRIVATE)
         selectedPackagePref = context.getSharedPreferences(SELECTED_PACKAGE, Context.MODE_PRIVATE)
+        optionsPref = context.getSharedPreferences(OPTIONS, Context.MODE_PRIVATE)
     }
 
     data class CachedUserInfo(
@@ -111,6 +114,22 @@ class LocalCache private constructor(context: Context) {
                 }
                 break
             }
+        }
+    }
+
+    fun getIgnoreVersion(): Int? {
+        return optionsPref.getInt("ignore_version", -1).takeIf { it != -1 }
+    }
+
+    fun setIgnoreVersion(versionCode: Int) {
+        optionsPref.edit {
+            putInt("ignore_version", versionCode)
+        }
+    }
+
+    fun clearIgnoreVersion() {
+        optionsPref.edit {
+            remove("ignore_version")
         }
     }
 }

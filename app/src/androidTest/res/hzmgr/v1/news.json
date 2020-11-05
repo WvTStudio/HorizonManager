@@ -1,0 +1,15 @@
+[
+  {
+    "id": 1,
+    "cover": "https://wvt-blog-images.oss-cn-shanghai.aliyuncs.com/411eb7b0eadf3d1ead983a20de7482bc.jpg", // 替换成宣传 URL
+    "title": "[Test] Horizon 管理器 2.0 版本正式发布！", // 宣传标题
+    "brief": "该版本完全推翻重写，设计了新的 UI，并添加了大量新的功能", // 宣传副标题
+    "updateTime": "2020-10-20"
+  },
+  {
+    "id": 2,
+    "cover": "https://static01.nyt.com/images/2020/11/03/us/03virus-briefing-stateofvirusus/03virus-briefing-stateofvirusus-superJumbo-v2.jpg?quality=20",
+    "title": "Covid-19 Live Updates: Battleground States Where Virus Is Raging Could Decide the Election",
+    "brief": "More than 93,000 cases were announced across the country on Monday, the second-highest total of the pandemic. Dr. Deborah Birx, the White House coronavirus coordinator, urged officials in a private memo to pursue a more aggressive approach, contradicting President Trump."
+  }
+]
