@@ -65,7 +65,7 @@ class MainActivity : AppCompatActivity() {
 
                         if (showPermissionDialog) {
                             AlertDialog(
-                                onDismissRequest = vm::dismiss,
+                                onDismissRequest = { },
                                 confirmButton = {
                                     TextButton(onClick = {
                                         vm.dismiss()
@@ -91,22 +91,21 @@ class MainActivity : AppCompatActivity() {
                                                 "更新日志：${theNewVersion.changelog}"
                                     )
                                 },
-                                onDismissRequest = {
-                                    displayNewVersionDialog = false
-                                },
+                                onDismissRequest = {},
                                 confirmButton = {
                                     TextButton(onClick = { displayNewVersionDialog = false }) {
                                         Text("确定")
                                     }
                                 },
-                            dismissButton = {
-                                TextButton(onClick = {
-                                    vm.ignoreVersion(theNewVersion.versionCode)
-                                    displayNewVersionDialog = false
-                                }){
-                                    Text("忽略该版本")
+                                dismissButton = {
+                                    TextButton(onClick = {
+                                        vm.ignoreVersion(theNewVersion.versionCode)
+                                        displayNewVersionDialog = false
+                                    }) {
+                                        Text("忽略该版本")
+                                    }
                                 }
-                            })
+                            )
                         }
                     }
                 }

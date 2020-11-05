@@ -15,7 +15,7 @@ android {
         applicationId = "org.wvt.horizonmgr"
         minSdkVersion(21)
         targetSdkVersion(30)
-        versionCode = 6
+        versionCode = 7
         versionName = "2.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -42,7 +42,7 @@ android {
             isMinifyEnabled = true
             isUseProguard = true
 
-            versionNameSuffix = "-alpha6"
+            versionNameSuffix = "-alpha7"
         }
     }
     compileOptions {
