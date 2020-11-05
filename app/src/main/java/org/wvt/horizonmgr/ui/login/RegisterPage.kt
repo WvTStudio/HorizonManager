@@ -25,8 +25,10 @@ import org.wvt.horizonmgr.ui.components.StateFab
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalFocus::class)
 @Composable
-fun RegisterPage(onSuccess: (uid: String, email: String, password: String) -> Unit) {
-    val scope = rememberCoroutineScope()
+fun RegisterPage(
+    fabState: FabState,
+    onRegisterRequest: (username: String, email: String, password: String, confirmPassword: String)->Unit
+) {
     var username by savedInstanceState(saver = TextFieldValue.Saver) {
         TextFieldValue()
     }
@@ -43,48 +45,7 @@ fun RegisterPage(onSuccess: (uid: String, email: String, password: String) -> Un
         TextFieldValue()
     }
     val confirmFocus = remember { FocusRequester() }
-    var fabState by remember { mutableStateOf(FabState.TODO) }
 
-    val snackbarHostState = remember { SnackbarHostState() }
-    val webApi = WebAPIAmbient.current
-
-    fun register() {
-        scope.launch {
-            fabState = FabState.LOADING
-            val usernameStr = username.text
-            val emailStr = email.text
-            val passStr = password.text
-            val confirmStr = confirmPassword.text
-
-            if (passStr != confirmStr) {
-                fabState = FabState.FAILED
-                snackbarHostState.showSnackbar("重复密码不一致", "确认")
-                fabState = FabState.TODO
-            } else {
-                val uid = try {
-                    webApi.register(usernameStr, emailStr, passStr)
-                } catch (e: WebAPI.RegisterException) {
-                    fabState = FabState.FAILED
-                    snackbarHostState.showSnackbar(e.errors.first().detail, "确认")
-                    fabState = FabState.TODO
-                    return@launch
-                } catch (e: WebAPI.NetworkException) {
-                    fabState = FabState.FAILED
-                    snackbarHostState.showSnackbar(e.message, "确认")
-                    fabState = FabState.TODO
-                    return@launch
-                } catch (e: Exception) {
-                    fabState = FabState.FAILED
-                    snackbarHostState.showSnackbar("未知错误，请稍后重试", "确认")
-                    fabState = FabState.TODO
-                    return@launch
-                }
-                fabState = FabState.SUCCEED
-                snackbarHostState.showSnackbar("注册成功，注意查收验证邮件", "确认")
-                onSuccess(uid, usernameStr, passStr)
-            }
-        }
-    }
     Box(Modifier.fillMaxSize()) {
         ScrollableColumn(
             modifier = Modifier.wrapContentWidth().fillMaxHeight().align(Alignment.Center),
@@ -157,18 +118,26 @@ fun RegisterPage(onSuccess: (uid: String, email: String, password: String) -> Un
                     onImeActionPerformed = { imeAction, softwareKeyboardController ->
                         softwareKeyboardController?.hideSoftwareKeyboard()
                         confirmFocus.freeFocus()
-                        register()
+                        onRegisterRequest(
+                            username.text,
+                            email.text,
+                            password.text,
+                            confirmPassword.text
+                        )
                     }
                 )
                 StateFab(
                     modifier = Modifier.padding(top = 16.dp),
-                    state = fabState, onClicked = ::register
+                    state = fabState, onClicked = {
+                        onRegisterRequest(
+                            username.text,
+                            email.text,
+                            password.text,
+                            confirmPassword.text
+                        )
+                    }
                 )
             }
         }
-        SnackbarHost(
-            hostState = snackbarHostState,
-            modifier = Modifier.align(Alignment.BottomCenter).padding(16.dp)
-        )
     }
 }

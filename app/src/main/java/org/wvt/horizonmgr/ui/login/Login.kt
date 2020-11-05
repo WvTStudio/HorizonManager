@@ -13,13 +13,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.paint
 import androidx.compose.ui.drawLayer
 import androidx.compose.ui.focus.ExperimentalFocus
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.loadVectorResource
 import androidx.compose.ui.unit.dp
-import androidx.ui.tooling.preview.Preview
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -27,7 +25,6 @@ import org.wvt.horizonmgr.R
 import org.wvt.horizonmgr.service.WebAPI
 import org.wvt.horizonmgr.ui.WebAPIAmbient
 import org.wvt.horizonmgr.ui.components.FabState
-import org.wvt.horizonmgr.ui.theme.HorizonManagerTheme
 
 private val rotation = FloatPropKey()
 private val rotationDefinition = transitionDefinition<Int> {
@@ -63,11 +60,11 @@ private val reverseRotationDefinition = transitionDefinition<Int> {
 @OptIn(ExperimentalAnimationApi::class, ExperimentalMaterialApi::class, ExperimentalFocus::class)
 @Composable
 fun Login(
+    vm: LoginViewModel,
     onLoginSuccess: (WebAPI.UserInfo) -> Unit,
     onCancel: () -> Unit
 ) {
-    val scope = rememberCoroutineScope()
-    var fabState by remember { mutableStateOf(FabState.TODO) }
+    val fabState by vm.fabState.collectAsState()
 
     val snackbarHostState = remember { SnackbarHostState() }
     var screen by remember { mutableStateOf(0) }
@@ -75,56 +72,22 @@ fun Login(
 
     val rotateGear = transition(definition = rotationDefinition, initState = 0, toState = 1)
 
-    val webApi = WebAPIAmbient.current
-
-    fun login(scope: CoroutineScope, account: String, password: String) {
-        scope.launch {
-            fabState = FabState.LOADING
-            val userInfo = try {
-                webApi.login(account, password)
-            } catch (e: WebAPI.WebAPIException) {
-                fabState = FabState.FAILED
-                launch {
-                    snackbarHostState.showSnackbar(e.message, "确定")
-                    fabState = FabState.TODO
-                }
-                return@launch
-            } catch (e: Exception) {
-                e.printStackTrace()
-                fabState = FabState.FAILED
-                launch {
-                    snackbarHostState.showSnackbar("未知错误，请稍后重试", "确定")
-                    fabState = FabState.TODO
-                }
-                return@launch
-            }
-            fabState = FabState.SUCCEED
-            launch { snackbarHostState.showSnackbar("登录成功") }
-            delay(800)
-            onLoginSuccess(userInfo)
-        }
-    }
-
     Box(Modifier.fillMaxSize()) {
+        // Gear Animations
         gearResource?.let {
             Box(
                 Modifier.size(256.dp)
-                    //                    .background(Color.Red)
                     .offset(x = 128.dp)
                     .drawLayer(rotationZ = rotateGear[rotation])
                     .align(Alignment.TopEnd)
             ) {
                 Box(
-                    Modifier.fillMaxSize().paint(
+                    modifier = Modifier.fillMaxSize().paint(
                         painter = rememberVectorPainter(it),
                         contentScale = ContentScale.Crop,
-                        colorFilter = ColorFilter.tint(
-                            MaterialTheme.colors.onSurface.copy(
-                                0.12f
-                            )
-                        )
+                        colorFilter = ColorFilter.tint(MaterialTheme.colors.onSurface.copy(0.12f))
                     )
-                ) {}
+                )
             }
             Box(
                 Modifier.size(256.dp)
@@ -136,70 +99,57 @@ fun Login(
                     Modifier.fillMaxSize().paint(
                         painter = rememberVectorPainter(it),
                         contentScale = ContentScale.Fit,
-                        colorFilter = ColorFilter.tint(
-                            MaterialTheme.colors.onSurface.copy(
-                                0.12f
-                            )
-                        )
+                        colorFilter = ColorFilter.tint(MaterialTheme.colors.onSurface.copy(0.12f))
                     )
-                ) {}
+                )
             }
         }
-        Column(Modifier.fillMaxSize()) {
-            TopAppBar(
-                navigationIcon = {
-                    IconButton(onClick = {
-                        if (screen == 1) {
-                            screen = 0
-                        } else if (screen == 0) onCancel()
-                    }) {
-                        Icon(Icons.Filled.ArrowBack)
+
+        // Back button
+        IconButton(
+            modifier = Modifier.align(Alignment.TopStart).padding(4.dp),
+            onClick = {
+                if (screen == 1)
+                    screen = 0
+                else if (screen == 0)
+                    onCancel()
+            }) {
+            Icon(Icons.Filled.ArrowBack)
+        }
+
+        // Login Page
+        AnimatedVisibility(
+            visible = screen == 0,
+            enter = fadeIn() + slideInHorizontally({ -40 }),
+            exit = fadeOut() + slideOutHorizontally({ -40 })
+        ) {
+            LoginPage(onLoginClicked = { account, password ->
+                vm.login(account, password, snackbarHostState, onLoginSuccess)
+//                login(scope, account, password)
+            }, onRegisterRequested = {
+                screen = 1
+            }, fabState = fabState)
+        }
+
+        // RegisterPage
+        AnimatedVisibility(
+            visible = screen == 1,
+            enter = fadeIn() + slideInHorizontally({ 40 }),
+            exit = fadeOut() + slideOutHorizontally({ 40 })
+        ) {
+            RegisterPage(
+                fabState = fabState,
+                onRegisterRequest = { u, e, p, c ->
+                    vm.register(u, e, p, c, snackbarHostState) { _, _, _ ->
+                        screen = 0
                     }
                 },
-                title = {},
-                backgroundColor = Color.Transparent,
-                elevation = 0.dp
             )
-
-            Box(Modifier.fillMaxSize()) {
-                androidx.compose.animation.AnimatedVisibility(
-                    visible = screen == 0,
-                    enter = fadeIn() + slideInHorizontally({ -40 }),
-                    exit = fadeOut() + slideOutHorizontally({ -40 })
-                ) {
-                    LoginPage(onLoginClicked = { account, password ->
-                        login(scope, account, password)
-                    }, onRegisterRequested = {
-                        fabState = FabState.TODO
-                        screen = 1
-                    }, fabState = fabState)
-                }
-                androidx.compose.animation.AnimatedVisibility(
-                    visible = screen == 1,
-                    enter = fadeIn() + slideInHorizontally({ 40 }),
-                    exit = fadeOut() + slideOutHorizontally({ 40 })
-                ) {
-                    RegisterPage(onSuccess = { uid, e, p ->
-                        fabState = FabState.TODO
-                        screen = 0
-                    })
-                }
-            }
         }
+
         SnackbarHost(
             modifier = Modifier.align(Alignment.BottomCenter).padding(16.dp),
             hostState = snackbarHostState
         )
-    }
-}
-
-
-@Preview
-@Composable
-private fun LoginPreview() {
-    HorizonManagerTheme {
-        Surface {
-            Login(onLoginSuccess = {}, onCancel = {})
-        }
     }
 }

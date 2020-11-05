@@ -5,6 +5,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.material.Surface
 import androidx.compose.ui.platform.setContent
+import org.wvt.horizonmgr.dependenciesViewModel
 import org.wvt.horizonmgr.service.LocalCache
 import org.wvt.horizonmgr.service.WebAPI
 import org.wvt.horizonmgr.ui.AndroidDependenciesProvider
@@ -28,10 +29,12 @@ class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
+            val vm = dependenciesViewModel<LoginViewModel>()
+
             AndroidDependenciesProvider {
                 AndroidHorizonManagerTheme {
                     Surface {
-                        Login(::onLoginSuccess, ::onCancel)
+                        Login(vm, ::onLoginSuccess, ::onCancel)
                     }
                 }
             }
