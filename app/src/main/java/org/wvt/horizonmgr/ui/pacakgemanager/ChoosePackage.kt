@@ -1,7 +1,5 @@
 package org.wvt.horizonmgr.ui.pacakgemanager
 
-import androidx.compose.foundation.Icon
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
@@ -21,7 +19,7 @@ data class ChoosePackageItem(val name: String, val version: String, val recommen
 fun ChoosePackage(
     items: List<ChoosePackageItem>,
     onCancel: () -> Unit,
-    onChosen: (index: Int) -> Unit
+    onChoose: (index: Int) -> Unit
 ) {
     Column(Modifier.fillMaxSize()) {
         TopAppBar(
@@ -29,13 +27,13 @@ fun ChoosePackage(
             title = { Text("在线安装分包") }, backgroundColor = MaterialTheme.colors.surface
         )
         if (items.isEmpty()) {
-            Stack(Modifier.fillMaxSize()) {
+            Box(Modifier.fillMaxSize()) {
                 CircularProgressIndicator(Modifier.align(Alignment.Center))
             }
         } else {
             items.forEachIndexed { index, it ->
                 ListItem(
-                    modifier = Modifier.clickable(onClick = { onChosen(index) }),
+                    modifier = Modifier.clickable(onClick = { onChoose(index) }),
                     icon = { Icon(asset = Icons.Filled.Extension) },
                     text = { Text(if (it.recommended) "${it.name}（推荐）" else it.name) },
                     secondaryText = { Text(it.version) },
@@ -47,7 +45,11 @@ fun ChoosePackage(
 }
 
 @Composable
-fun EditName(item: ChoosePackageItem, onCancel: () -> Unit, onConfirm: (name: String) -> Unit) {
+fun EditName(
+    item: ChoosePackageItem,
+    onCancel: () -> Unit,
+    onConfirm: (name: String) -> Unit
+) {
     var name by remember { mutableStateOf(TextFieldValue(text = "Inner Core")) }
     Column(Modifier.fillMaxSize()) {
         TopAppBar(

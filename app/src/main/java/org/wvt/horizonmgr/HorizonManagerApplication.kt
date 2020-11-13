@@ -27,7 +27,7 @@ class HorizonManagerApplication : Application() {
 }
 
 @Composable
-inline fun <reified T: ViewModel> dependenciesViewModel(): T {
+inline fun <reified T : ViewModel> dependenciesViewModel(): T {
     return viewModel(factory = HorizonManagerApplication.dependenciesVMFactory)
 }
 

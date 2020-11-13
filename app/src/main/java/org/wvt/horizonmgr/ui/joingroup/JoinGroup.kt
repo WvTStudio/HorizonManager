@@ -2,7 +2,6 @@ package org.wvt.horizonmgr.ui.joingroup
 
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.ScrollableColumn
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -12,6 +11,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Providers
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -91,7 +91,7 @@ private fun GroupItem(
         // Information
         Column(Modifier.weight(1f)) {
             // GroupName
-            ProvideEmphasis(emphasis = emphasis.high) {
+            Providers(AmbientContentAlpha provides ContentAlpha.high) {
                 Box(Modifier.fillMaxWidth()) {
                     // GroupName
                     Text(
@@ -102,7 +102,7 @@ private fun GroupItem(
                 }
             }
             // Description
-            ProvideEmphasis(emphasis = emphasis.medium) {
+            Providers(AmbientContentAlpha provides ContentAlpha.medium) {
                 Text(
                     modifier = Modifier.padding(top = 8.dp),
                     text = description, style = MaterialTheme.typography.body2

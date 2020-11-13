@@ -2,11 +2,8 @@ package org.wvt.horizonmgr.ui.pacakgemanager
 
 import androidx.compose.animation.*
 import androidx.compose.foundation.ScrollableColumn
-import androidx.compose.foundation.Text
-import androidx.compose.foundation.contentColor
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
-import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.CloudDownload
@@ -36,6 +33,7 @@ private data class Step(
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun InstallPackage(packInfo: WebAPI.ICPackage, name: String, onFinished: () -> Unit) {
+    // TODO: 2020/11/5 使用 ViewModel 重写 
     var totalProgress by remember { mutableStateOf(0f) }
     val scope = rememberCoroutineScope()
     val horizonMgr = HorizonManagerAmbient.current
@@ -84,7 +82,7 @@ fun InstallPackage(packInfo: WebAPI.ICPackage, name: String, onFinished: () -> U
         }
     }
 
-    Stack(Modifier.fillMaxSize()) {
+    Box(Modifier.fillMaxSize()) {
         Column(Modifier.fillMaxSize()) {
             TopAppBar(title = {
                 Crossfade(if (totalProgress >= 1f) "安装完成" else "正在安装") {
@@ -107,16 +105,15 @@ fun InstallPackage(packInfo: WebAPI.ICPackage, name: String, onFinished: () -> U
             }
             ScrollableColumn(Modifier.fillMaxSize()) {
                 steps.forEachIndexed { index, step ->
-                    val state =
-                        when {
-                            index == currentStep && currentStepState == 2 -> -1
-                            index < currentStep -> 0 // finished
-                            index == currentStep -> 1 // doing
-                            index > currentStep -> 2 // todoit
-                            else -> -1
-                        }
+                    val state = when {
+                        index == currentStep && currentStepState == 2 -> -1
+                        index < currentStep -> 0 // finished
+                        index == currentStep -> 1 // doing
+                        index > currentStep -> 2 // todoit
+                        else -> -1
+                    }
                     val contentColor = animate(
-                        if (state == 2) contentColor().copy(alpha = 0.5f)
+                        if (state == 2) AmbientContentColor.current.copy(alpha = 0.5f)
                         else MaterialTheme.colors.onSurface
                     )
                     ListItem(
@@ -129,7 +126,7 @@ fun InstallPackage(packInfo: WebAPI.ICPackage, name: String, onFinished: () -> U
                                 color = contentColor
                             )
                         }, trailing = {
-                            Stack(Modifier.width(48.dp)) {
+                            Box(Modifier.width(48.dp)) {
                                 Crossfade(
                                     current = state,
                                     modifier = Modifier.align(Alignment.Center)

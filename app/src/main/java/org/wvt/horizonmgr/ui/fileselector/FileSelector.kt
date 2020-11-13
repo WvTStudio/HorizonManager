@@ -3,12 +3,12 @@ package org.wvt.horizonmgr.ui.fileselector
 import android.os.Environment
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animate
-import androidx.compose.foundation.*
+import androidx.compose.foundation.ScrollableRow
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.ExperimentalLazyDsl
 import androidx.compose.foundation.lazy.LazyColumnForIndexed
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.*
-import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ChevronRight
@@ -18,7 +18,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.onPositioned
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEachIndexed
 import androidx.compose.ui.util.fastMap
@@ -29,6 +29,8 @@ import kotlinx.coroutines.withContext
 import org.wvt.horizonmgr.ui.theme.HorizonManagerTheme
 import java.io.File
 import java.util.*
+
+// TODO: 2020/11/13 重做该组件
 
 private suspend fun getRootStorage(): FileItem {
     return withContext(Dispatchers.IO) {
@@ -94,7 +96,6 @@ private data class FileItem(
     val depth: Int
 )
 
-@OptIn(ExperimentalLazyDsl::class)
 @Composable
 fun FileSelector(onCancel: () -> Unit, onSelect: (String) -> Unit) {
     val scope = rememberCoroutineScope()
@@ -284,7 +285,7 @@ fun PathTab(
                 modifier = Modifier.clickable(
                     onClick = { onSelectDepth(index) },
                     indication = null
-                ).onPositioned { sizes.add(index, it.size.width) },
+                ).onGloballyPositioned { sizes.add(index, it.size.width) },
                 alignment = Alignment.Center
             ) {
                 Text(
@@ -346,7 +347,7 @@ private fun PathList(
                 FolderEntry(entry = folder, onClick = { onPinnedFolderSelect(index) })
             }
             Divider(Modifier.padding(top = 8.dp, bottom = 8.dp))
-            Stack(Modifier.fillMaxSize()) {
+            Box(Modifier.fillMaxSize()) {
                 Text(
                     modifier = Modifier.align(Alignment.Center),
                     text = "空文件夹"

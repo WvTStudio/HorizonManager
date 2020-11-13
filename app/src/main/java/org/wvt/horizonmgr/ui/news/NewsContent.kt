@@ -2,7 +2,6 @@ package org.wvt.horizonmgr.ui.news
 
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.ScrollableColumn
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -77,7 +76,10 @@ fun NewsContent(
                     text = "正文"
                 )*/
 
-                Divider(Modifier.padding(top = 24.dp).fillMaxWidth(0.8f).align(Alignment.CenterHorizontally))
+                Divider(
+                    Modifier.padding(top = 24.dp).fillMaxWidth(0.8f)
+                        .align(Alignment.CenterHorizontally)
+                )
 
                 // Content
                 Text(

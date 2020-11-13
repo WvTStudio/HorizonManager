@@ -1,22 +1,17 @@
 package org.wvt.horizonmgr.ui.components
 
 import androidx.compose.animation.animate
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.Providers
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import androidx.ui.tooling.preview.Preview
-import org.wvt.horizonmgr.ui.theme.HorizonManagerTheme
 
 sealed class ProgressDialogState(val message: String) {
     class Loading(message: String) : ProgressDialogState(message)
@@ -72,8 +67,7 @@ fun ProgressDialog(
 
 @Composable
 private fun Content(content: String) {
-    val emphasis = AmbientEmphasisLevels.current
-    ProvideEmphasis(emphasis = emphasis.high) {
+    Providers(AmbientContentAlpha provides ContentAlpha.high) {
         Text(
             modifier = Modifier.padding(start = 32.dp, end = 16.dp),
             text = content

@@ -69,7 +69,7 @@ android {
 }
 
 dependencies {
-    val composeVersion = "1.0.0-alpha06"
+    val composeVersion = "1.0.0-alpha07"
 
     implementation(platform("com.google.firebase:firebase-bom:26.0.0"))
     implementation("com.google.firebase:firebase-analytics-ktx")

@@ -57,7 +57,7 @@ class InstallPackageActivity : AppCompatActivity() {
                         Crossfade(current = screen) { it ->
                             when (it) {
                                 0 -> ChoosePackage(
-                                    onChosen = {
+                                    onChoose = {
                                         chosenIndex = it
                                         screen = 1
                                     },

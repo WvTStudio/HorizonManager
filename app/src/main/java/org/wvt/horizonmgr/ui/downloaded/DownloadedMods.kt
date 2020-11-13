@@ -1,6 +1,5 @@
 package org.wvt.horizonmgr.ui.downloaded
 
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumnFor
 import androidx.compose.material.*

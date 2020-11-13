@@ -1,15 +1,12 @@
-package org.wvt.horizonmgr.ui.onlineresources
+package org.wvt.horizonmgr.ui.onlinemods
 
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.foundation.AmbientContentColor
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumnFor
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Extension
 import androidx.compose.material.icons.filled.GetApp
@@ -109,7 +106,7 @@ fun Online(
 @Composable
 private fun NotLoginTip() {
     Box(Modifier.fillMaxSize()) {
-        ProvideEmphasis(emphasis = AmbientEmphasisLevels.current.medium) {
+        Providers(AmbientContentAlpha provides ContentAlpha.medium) {
             Text(
                 modifier = Modifier.align(Alignment.Center),
                 text = "此功能仅在登录后可用",

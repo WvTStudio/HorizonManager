@@ -4,7 +4,6 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
-import androidx.compose.runtime.onActive
 import androidx.compose.runtime.onCommit
 import androidx.compose.ui.platform.setContent
 import org.wvt.horizonmgr.dependenciesViewModel

@@ -5,11 +5,9 @@ import android.content.Intent
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.wvt.horizonmgr.DependenciesContainer
 import org.wvt.horizonmgr.service.WebAPI
 
@@ -25,7 +23,7 @@ class JoinGroupViewModel(
         }
     }
 
-    fun joinGroup(intentUrl: String, context: Context)  {
+    fun joinGroup(intentUrl: String, context: Context) {
         viewModelScope.launch {
             val intent = Intent()
             intent.data = Uri.parse(intentUrl)

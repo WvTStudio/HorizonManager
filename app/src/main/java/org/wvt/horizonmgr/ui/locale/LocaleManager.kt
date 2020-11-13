@@ -2,7 +2,6 @@ package org.wvt.horizonmgr.ui.locale
 
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animate
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.material.*
@@ -10,6 +9,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Providers
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -51,7 +51,7 @@ fun LocalManager(
                     }
                 } else {
                     Box(Modifier.fillMaxSize()) {
-                        ProvideEmphasis(emphasis = AmbientEmphasisLevels.current.medium) {
+                        Providers(AmbientContentAlpha provides ContentAlpha.medium) {
                             Text(
                                 modifier = Modifier.align(Alignment.Center),
                                 text = "请选择分包后再操作", style = MaterialTheme.typography.h6

@@ -10,6 +10,7 @@ class OnlineModDetailActivity : AppCompatActivity() {
     companion object {
         const val INTENT_MOD_ID = "mod_id"
     }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val intent = intent

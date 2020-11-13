@@ -1,8 +1,8 @@
 package org.wvt.horizonmgr.ui.login
 
 import androidx.compose.foundation.ScrollableColumn
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.savedinstancestate.savedInstanceState
@@ -17,9 +17,6 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import kotlinx.coroutines.launch
-import org.wvt.horizonmgr.service.WebAPI
-import org.wvt.horizonmgr.ui.WebAPIAmbient
 import org.wvt.horizonmgr.ui.components.FabState
 import org.wvt.horizonmgr.ui.components.StateFab
 
@@ -27,7 +24,7 @@ import org.wvt.horizonmgr.ui.components.StateFab
 @Composable
 fun RegisterPage(
     fabState: FabState,
-    onRegisterRequest: (username: String, email: String, password: String, confirmPassword: String)->Unit
+    onRegisterRequest: (username: String, email: String, password: String, confirmPassword: String) -> Unit
 ) {
     var username by savedInstanceState(saver = TextFieldValue.Saver) {
         TextFieldValue()
@@ -52,7 +49,7 @@ fun RegisterPage(
             verticalArrangement = Arrangement.Center
         ) {
             Text("注册", color = MaterialTheme.colors.primary, fontSize = 64.sp)
-            ProvideEmphasis(emphasis = AmbientEmphasisLevels.current.medium) {
+            Providers(AmbientContentAlpha provides ContentAlpha.medium) {
                 Text(
                     modifier = Modifier.padding(top = 16.dp),
                     text = "注册到 InnerCore 中文社区 ",
@@ -69,8 +66,10 @@ fun RegisterPage(
                     value = username,
                     onValueChange = { username = it },
                     label = { Text("用户名") },
-                    keyboardType = KeyboardType.Text,
-                    imeAction = ImeAction.Next,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Text,
+                        imeAction = ImeAction.Next
+                    ),
                     onImeActionPerformed = { imeAction, softwareKeyboardController ->
                         softwareKeyboardController?.hideSoftwareKeyboard()
                         usernameFocus.freeFocus()
@@ -83,8 +82,10 @@ fun RegisterPage(
                     value = email,
                     onValueChange = { email = it },
                     label = { Text("邮箱") },
-                    keyboardType = KeyboardType.Ascii,
-                    imeAction = ImeAction.Next,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Ascii,
+                        imeAction = ImeAction.Next
+                    ),
                     onImeActionPerformed = { imeAction, softwareKeyboardController ->
                         softwareKeyboardController?.hideSoftwareKeyboard()
                         emailFocus.freeFocus()
@@ -97,9 +98,11 @@ fun RegisterPage(
                     value = password,
                     onValueChange = { password = it },
                     label = { Text("密码") },
-                    keyboardType = KeyboardType.Password,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Password,
+                        imeAction = ImeAction.Next
+                    ),
                     visualTransformation = PasswordVisualTransformation(),
-                    imeAction = ImeAction.Next,
                     onImeActionPerformed = { imeAction, softwareKeyboardController ->
                         softwareKeyboardController?.hideSoftwareKeyboard()
                         passwordFocus.freeFocus()
@@ -112,9 +115,11 @@ fun RegisterPage(
                     value = confirmPassword,
                     onValueChange = { confirmPassword = it },
                     label = { Text("重复密码") },
-                    keyboardType = KeyboardType.Password,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Text,
+                        imeAction = ImeAction.Done
+                    ),
                     visualTransformation = PasswordVisualTransformation(),
-                    imeAction = ImeAction.Done,
                     onImeActionPerformed = { imeAction, softwareKeyboardController ->
                         softwareKeyboardController?.hideSoftwareKeyboard()
                         confirmFocus.freeFocus()

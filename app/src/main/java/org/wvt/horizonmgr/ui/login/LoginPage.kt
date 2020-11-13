@@ -1,13 +1,10 @@
 package org.wvt.horizonmgr.ui.login
 
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.runtime.savedinstancestate.savedInstanceState
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.ExperimentalFocus
@@ -46,7 +43,7 @@ fun LoginPage(
             Text(
                 text = "登录", color = MaterialTheme.colors.primary, fontSize = 64.sp
             )
-            ProvideEmphasis(emphasis = AmbientEmphasisLevels.current.medium) {
+            Providers(AmbientContentAlpha provides ContentAlpha.medium) {
                 Text(
                     modifier = Modifier.padding(top = 16.dp),
                     text = "使用 InnerCore 中文社区账号登录",
@@ -62,8 +59,10 @@ fun LoginPage(
                     value = account,
                     onValueChange = { account = it },
                     label = { Text("用户名/邮箱") },
-                    keyboardType = KeyboardType.Ascii,
-                    imeAction = ImeAction.Next,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Text,
+                        imeAction = ImeAction.Next
+                    ),
                     onImeActionPerformed = { imeAction, softwareKeyboardController ->
                         accountFocus.freeFocus()
                         passwordFocus.requestFocus()
@@ -76,9 +75,11 @@ fun LoginPage(
                     value = password,
                     onValueChange = { password = it },
                     label = { Text("密码") },
-                    keyboardType = KeyboardType.Password,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Password,
+                        imeAction = ImeAction.Done
+                    ),
                     visualTransformation = PasswordVisualTransformation(),
-                    imeAction = ImeAction.Done,
                     onImeActionPerformed = { imeAction, softwareKeyboardController ->
                         softwareKeyboardController?.hideSoftwareKeyboard()
                         passwordFocus.freeFocus()

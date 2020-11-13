@@ -63,7 +63,6 @@ class LocalPackage constructor(
     }
 
 
-
     /**
      * 获取分包的安装路径
      */
@@ -73,6 +72,7 @@ class LocalPackage constructor(
      * 获取分包的名称
      */
     fun getName(): String = pack
+
     /**
      * 获取分包的描述
      */

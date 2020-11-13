@@ -6,9 +6,9 @@ import androidx.compose.animation.core.AnimationEndReason
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.tween
 import androidx.compose.runtime.*
-import androidx.compose.ui.Layout
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.drawLayer
+import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.fastMaxBy
 

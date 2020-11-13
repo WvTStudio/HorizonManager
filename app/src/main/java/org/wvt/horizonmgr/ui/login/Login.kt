@@ -18,13 +18,8 @@ import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.loadVectorResource
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import org.wvt.horizonmgr.R
 import org.wvt.horizonmgr.service.WebAPI
-import org.wvt.horizonmgr.ui.WebAPIAmbient
-import org.wvt.horizonmgr.ui.components.FabState
 
 private val rotation = FloatPropKey()
 private val rotationDefinition = transitionDefinition<Int> {

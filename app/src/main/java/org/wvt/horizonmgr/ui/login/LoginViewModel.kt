@@ -22,6 +22,7 @@ class LoginViewModel(private val dependencies: DependenciesContainer) : ViewMode
         snackbarHostState: SnackbarHostState,
         onLoginSuccess: (WebAPI.UserInfo) -> Unit
     ) {
+        // TODO: 2020/11/13 要不要解耦啊？我也不知道
         viewModelScope.launch {
             fabState.value = FabState.LOADING
             val userInfo = try {

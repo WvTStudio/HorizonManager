@@ -3,11 +3,12 @@ package org.wvt.horizonmgr.ui.settings
 import androidx.compose.animation.*
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.*
+import androidx.compose.foundation.ScrollableColumn
+import androidx.compose.foundation.ScrollableRow
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
@@ -41,7 +42,6 @@ data class CustomColor(
 
 @Composable
 fun CustomTheme(requestClose: () -> Unit) {
-    val emphasis = AmbientEmphasisLevels.current
     val colors = remember { MaterialColors.series }
     var checkedColorType by remember { mutableStateOf(CheckedColorType.LIGHT_PRIMARY) }
     val themeConfig = ThemeConfigAmbient.current
@@ -80,7 +80,7 @@ fun CustomTheme(requestClose: () -> Unit) {
         return Color(colors[color.first]!![color.second]!!)
     }
 
-    Stack(Modifier.fillMaxSize()) {
+    Box(Modifier.fillMaxSize()) {
         Column(Modifier.fillMaxSize()) {
             TopAppBar(navigationIcon = {
                 IconButton(onClick = requestClose) {
@@ -228,7 +228,7 @@ fun CustomTheme(requestClose: () -> Unit) {
 }
 
 private val shrinkTween = tween<Float>(250, 0, LinearOutSlowInEasing)
-private val expandTween = tween<Float>(250, 40,  LinearOutSlowInEasing)
+private val expandTween = tween<Float>(250, 40, LinearOutSlowInEasing)
 
 @Composable
 private fun SelectColorItem(
@@ -249,7 +249,7 @@ private fun SelectColorItem(
         }, animSpec = if (pressed) shrinkTween else expandTween
     )
     Column(modifier) {
-        ProvideEmphasis(emphasis = AmbientEmphasisLevels.current.medium) {
+        Providers(AmbientContentAlpha provides ContentAlpha.medium) {
             Text(text = text)
         }
         Surface(
@@ -287,11 +287,11 @@ private fun MaterialColorPalette(
         ScrollableRow {
             Column {
                 Spacer(Modifier.padding(1.dp).height(42.dp))
-                ProvideEmphasis(emphasis = AmbientEmphasisLevels.current.medium) {
+                Providers(AmbientContentAlpha provides ContentAlpha.medium) {
                     for (i in colors) {
                         Box(
                             modifier = Modifier.padding(1.dp).height(42.dp).width(72.dp),
-                            gravity = ContentGravity.Center
+                            alignment = Alignment.Center
                         ) {
                             Text(
                                 text = i.key,
@@ -303,11 +303,11 @@ private fun MaterialColorPalette(
             }
             Column {
                 Row {
-                    ProvideEmphasis(emphasis = AmbientEmphasisLevels.current.medium) {
+                    Providers(AmbientContentAlpha provides ContentAlpha.medium) {
                         tags.forEach {
                             Box(
                                 modifier = Modifier.padding(1.dp).size(42.dp),
-                                gravity = Alignment.Center
+                                alignment = Alignment.Center
                             ) { Text(text = it) }
                         }
                     }
@@ -353,7 +353,7 @@ private fun ColorItem(
         AnimatedVisibility(
             visible = selected, enter = fadeIn(), exit = fadeOut()
         ) {
-            Box(modifier = Modifier.fillMaxSize(), gravity = ContentGravity.Center) {
+            Box(modifier = Modifier.fillMaxSize(), alignment = Alignment.Center) {
                 Text(text = "T", color = contentColor)
             }
         }

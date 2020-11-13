@@ -1,12 +1,11 @@
 package org.wvt.horizonmgr.ui.components
 
 import androidx.compose.animation.Crossfade
-import androidx.compose.foundation.*
+import androidx.compose.foundation.InteractionState
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.indication
 import androidx.compose.foundation.layout.Row
-import androidx.compose.material.DropdownMenu
-import androidx.compose.material.DropdownMenuItem
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.ripple.RippleIndication
@@ -28,9 +27,7 @@ fun DropDownSelector(
     Crossfade(current = items[selectedIndex]) {
         Row(
             modifier = modifier.clickable(
-                onClick = {
-                    dropDown = true
-                },
+                onClick = { dropDown = true },
                 interactionState = sourceInteractionState,
                 indication = null
             ),
@@ -46,12 +43,8 @@ fun DropDownSelector(
                             sourceInteractionState,
                             RippleIndication(bounded = false, radius = 24.dp)
                         ),
-                        onClick = {
-                            dropDown = true
-                        }
-                    ) {
-                        Icon(Icons.Filled.ArrowDropDown)
-                    }
+                        onClick = { dropDown = true }
+                    ) { Icon(Icons.Filled.ArrowDropDown) }
                 }, dropdownContent = {
                     items.forEachIndexed { index, item ->
                         DropdownMenuItem(onClick = {

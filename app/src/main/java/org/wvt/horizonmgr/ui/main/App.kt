@@ -8,8 +8,11 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.Icon
+import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
@@ -19,17 +22,21 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.VectorAsset
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.ContextAmbient
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import org.wvt.horizonmgr.DependenciesContainer
 import org.wvt.horizonmgr.dependenciesViewModel
 import org.wvt.horizonmgr.service.LocalCache
 import org.wvt.horizonmgr.ui.components.NetworkImage
 import org.wvt.horizonmgr.ui.downloaded.DownloadedMods
 import org.wvt.horizonmgr.ui.fileselector.SelectFileActivity
-import org.wvt.horizonmgr.ui.news.News
 import org.wvt.horizonmgr.ui.locale.LocalManager
-import org.wvt.horizonmgr.ui.onlineresources.Online
+import org.wvt.horizonmgr.ui.news.News
+import org.wvt.horizonmgr.ui.onlinemods.Online
 import org.wvt.horizonmgr.ui.pacakgemanager.PackageManager
 
 val SelectedPackageUUIDAmbient = staticAmbientOf<String?>()
@@ -263,7 +270,6 @@ private fun NavigationItem(
     icon: VectorAsset
 ) {
     val interactionState = remember { InteractionState() }
-    val emphasis = AmbientEmphasisLevels.current
     Surface(
         shape = RoundedCornerShape(4.dp),
         color = animate(if (checked) MaterialTheme.colors.primary.copy(alpha = 0.12f) else Color.Transparent),
@@ -274,7 +280,7 @@ private fun NavigationItem(
             indication = null
         ).height(48.dp).fillMaxWidth().padding(horizontal = 8.dp, vertical = 2.dp)
     ) {
-        ProvideEmphasis(emphasis = emphasis.high) {
+        Providers(AmbientContentAlpha provides ContentAlpha.high) {
             Row(
                 Modifier.fillMaxSize()
                     .indication(interactionState, AmbientIndication.current()),

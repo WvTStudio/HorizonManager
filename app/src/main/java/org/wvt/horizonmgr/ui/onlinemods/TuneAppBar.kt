@@ -1,19 +1,25 @@
-package org.wvt.horizonmgr.ui.onlineresources
+package org.wvt.horizonmgr.ui.onlinemods
 
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animate
 import androidx.compose.animation.core.FastOutLinearInEasing
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.BaseTextField
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.drawLayer
+import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.id
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.text.TextStyle
@@ -21,12 +27,23 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.util.lerp
+import androidx.compose.ui.zIndex
 import org.wvt.horizonmgr.ui.components.DropDownSelector
 
 private val fastDuration = tween<Float>(durationMillis = 100, easing = FastOutLinearInEasing)
+
+private val searchBoxEnter = tween<Dp>(250, 50, FastOutSlowInEasing)
+private val searchBoxExit = tween<Dp>(200, 50, FastOutSlowInEasing)
+
+private val contentAppear = tween<Float>(250, 80, LinearOutSlowInEasing)
+private val contentDisappear = tween<Float>(200, 0, FastOutLinearInEasing)
+
+private val tuneExpand = tween<Float>(300, 0, FastOutSlowInEasing)
+private val tuneShrink = tween<Float>(250, 0, FastOutSlowInEasing)
 
 @Composable
 internal fun TuneAppBar2(
@@ -47,12 +64,18 @@ internal fun TuneAppBar2(
 
     val actionOpacity = animate(if (expand) 0.72f else 1f)
 
-    val offset = animate(if (expand) 16.dp else 0.dp)
+    val offset = animate(
+        if (expand) 16.dp else 0.dp,
+        animSpec = if (expand) searchBoxEnter else searchBoxExit
+    )
+
+    val contentOpacity = animate(
+        if (expand) 1f else 0f,
+        if (expand) contentAppear else contentDisappear
+    )
 //    val leftOffset = animate(if (expand) 16.dp else 0.dp)
 //    val rightOffset = animate(if (expand) 16.dp else 0.dp)
 //    val topOffset = animate(if (expand) 16.dp else 0.dp)
-
-    val emphasis = AmbientEmphasisLevels.current
 
     Surface(
         modifier = Modifier.fillMaxWidth().wrapContentHeight().zIndex(4.dp.value),
@@ -111,10 +134,15 @@ internal fun TuneAppBar2(
                                 ),
                             )
                             // TextField
-                            SearchBoxTextField(
+                            BasicTextField(
                                 modifier = Modifier.align(Alignment.CenterStart),
-                                filterValue = filterValue,
-                                onValueChange = { filterValue = it },
+                                value = filterValue,
+                                onValueChange = { if (!it.text.contains('\n')) { filterValue = it } },
+                                textStyle = TextStyle(
+                                    color = MaterialTheme.colors.onSurface.copy(0.72f),
+                                    fontSize = 18.sp
+                                ),
+                                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
                                 onImeActionPerformed = { onFilterValueConfirm(filterValue.text) }
                             )
                         } else { // Title
@@ -143,11 +171,14 @@ internal fun TuneAppBar2(
             }
 
             // Content
-            Box(Modifier.wrapContentHeight().layoutId("content")) {
-                ProvideEmphasis(emphasis = emphasis.medium) {
+            Box(
+                Modifier.wrapContentHeight().drawLayer(alpha = contentOpacity).layoutId("content")
+            ) {
+                Providers(AmbientContentAlpha provides ContentAlpha.medium) {
                     Column(
                         Modifier.padding(top = 8.dp, start = 32.dp, end = 16.dp, bottom = 16.dp)
                     ) {
+                        // Tune Option 1: Source
                         Row(
                             modifier = Modifier.padding(top = 8.dp),
                             verticalAlignment = Alignment.CenterVertically
@@ -160,6 +191,7 @@ internal fun TuneAppBar2(
                                 onSelected = { onSourceSelect(sources[it]) }
                             )
                         }
+                        // Tune Option2: Sort Mode
                         Row(
                             modifier = Modifier.padding(top = 8.dp),
                             verticalAlignment = Alignment.CenterVertically
@@ -179,38 +211,13 @@ internal fun TuneAppBar2(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
-@Composable
-private fun SearchBoxTextField(
-    modifier: Modifier = Modifier,
-    filterValue: TextFieldValue,
-    onValueChange: (TextFieldValue) -> Unit,
-    onImeActionPerformed: (ImeAction) -> Unit
-) {
-    BaseTextField(
-        modifier = modifier,
-        value = filterValue,
-        onValueChange = {
-            if (!it.text.contains('\n')) {
-                onValueChange(it)
-            }
-        },
-        textStyle = TextStyle(
-            color = MaterialTheme.colors.onSurface.copy(0.72f),
-            fontSize = 18.sp
-        ),
-        imeAction = ImeAction.Search,
-        onImeActionPerformed = onImeActionPerformed,
-        onTextInputStarted = { it.showSoftwareKeyboard() }
-    )
-}
-
 @Composable
 private fun AppBarLayout(
     expand: Boolean,
     children: @Composable () -> Unit
 ) {
-    val progress = animate(if (expand) 1f else 0f)
+    val progress =
+        animate(if (expand) 1f else 0f, if (expand) tuneExpand else tuneShrink)
     Layout(children) { m: List<Measurable>, c: Constraints ->
         check(m.size == 3)
 

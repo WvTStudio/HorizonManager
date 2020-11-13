@@ -111,6 +111,7 @@ class PackageManagerViewModel(
             }
         }
     }
+
     fun dismiss() {
         _progressState.value = null
     }

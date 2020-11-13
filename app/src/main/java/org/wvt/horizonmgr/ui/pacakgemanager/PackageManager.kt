@@ -1,11 +1,9 @@
 package org.wvt.horizonmgr.ui.pacakgemanager
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.AmbientContentColor
-import androidx.compose.foundation.Text
+import androidx.compose.animation.*
+import androidx.compose.animation.core.AnimationSpec
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumnForIndexed
@@ -13,8 +11,10 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.savedinstancestate.savedInstanceState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.drawLayer
 import androidx.compose.ui.platform.ContextAmbient
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
@@ -42,6 +42,8 @@ fun PackageManager(
     onPackageSelect: (uuid: String?) -> Unit,
     onNavClick: () -> Unit
 ) {
+    val context = ContextAmbient.current
+
     val vm = dependenciesViewModel<PackageManagerViewModel>()
     val selectedPackageUUID = SelectedPackageUUIDAmbient.current
     onCommit(selectedPackageUUID) {
@@ -54,8 +56,7 @@ fun PackageManager(
     val snackbarHostState = remember { SnackbarHostState() }
     val confirmDeleteDialogHostState = remember { ConfirmDeleteDialogHostState() }
     val inputDialogHostState = remember { InputDialogHostState() }
-
-    val context = ContextAmbient.current
+    var fabExpand by savedInstanceState { false }
 
     vmPs?.let {
         ProgressDialog(onCloseRequest = vm::dismiss, state = it)
@@ -105,15 +106,127 @@ fun PackageManager(
         ConfirmDeleteDialogHost(state = confirmDeleteDialogHostState)
         InputDialogHost(state = inputDialogHostState)
 
-        // Online Install Button
+        /*// Online Install Button
         ExtendedFloatingActionButton(
             modifier = Modifier.align(Alignment.BottomEnd).padding(16.dp),
             onClick = { vm.startInstallPackageActivity(context) },
             text = { Text("添加") },
             icon = { Icon(Icons.Filled.Add) }
         )
+*/
+        Fabs(
+            expand = fabExpand,
+            onExpandStateChange = { fabExpand = it },
+            onLocalInstallClick = {
+                // TODO: 2020/11/13
+            },
+            onOnlineInstallClick = { vm.startInstallPackageActivity(context) }
+        )
     }
+}
 
+private val fab1Enter = tween<Float>(100, 0, FastOutSlowInEasing)
+private val fab2Enter = tween<Float>(100, 40, FastOutSlowInEasing)
+
+private val fab1Exit = tween<Float>(100, 40, FastOutSlowInEasing)
+private val fab2Exit = tween<Float>(100, 0, FastOutSlowInEasing)
+
+@OptIn(ExperimentalAnimationApi::class)
+@Composable
+private fun Fabs(
+    expand: Boolean,
+    onExpandStateChange: (expand: Boolean) -> Unit,
+    onLocalInstallClick: () -> Unit,
+    onOnlineInstallClick: () -> Unit
+) {
+    var fab1Anim = animate(
+        if (expand) 1f else 0f,
+        if (expand) fab1Enter else fab1Exit
+    )
+    var fab2Anim = animate(
+        if (expand) 1f else 0f,
+        if (expand) fab2Enter else fab2Exit
+    )
+
+    Column(
+        Modifier.fillMaxSize().padding(16.dp),
+        Arrangement.Bottom,
+        Alignment.End
+    ) {
+        // TODO: 2020/11/13 Export as a complete ui component.
+        FABEntry(
+            modifier = Modifier.padding(bottom = 16.dp, end = 8.dp),
+            expand = expand,
+            enterAnim = fab2Enter,
+            exitAnim = fab2Exit,
+            text = { Text("在线安装") },
+            icon = { Icon(Icons.Filled.CloudDownload) },
+            onClick = onOnlineInstallClick
+        )
+        FABEntry(
+            modifier = Modifier.padding(bottom = 16.dp, end = 8.dp),
+            expand = expand,
+            enterAnim = fab1Enter,
+            exitAnim = fab1Exit,
+            text = { Text("本地导入") },
+            icon = { Icon(Icons.Filled.Storage) },
+            onClick = onLocalInstallClick
+        )
+        FloatingActionButton(
+            modifier = Modifier.padding(top = 16.dp),
+            onClick = { onExpandStateChange(!expand) }
+        ) {
+            val rotate = animate(if (expand) 45f else 0f)
+            // Rotate 45° to be Close Icon
+            // TODO: 2020/11/13 Use animation icon to instead this.
+            Icon(
+                modifier = Modifier.drawLayer(rotationZ = rotate),
+                asset = Icons.Filled.Add
+            )
+        }
+    }
+}
+
+@Composable
+private fun FABEntry(
+    modifier: Modifier = Modifier,
+    expand: Boolean,
+    enterAnim: AnimationSpec<Float>,
+    exitAnim: AnimationSpec<Float>,
+    text: @Composable BoxScope.() -> Unit,
+    icon: @Composable () -> Unit,
+    onClick: () -> Unit
+) {
+    // TODO: 2020/11/13 Export as a complete ui component.
+
+    val transition = animate(if (expand) 1f else 0f, animSpec = if (expand) enterAnim else exitAnim)
+
+    Row(modifier = modifier.wrapContentSize(), verticalAlignment = Alignment.CenterVertically) {
+        Box(Modifier.drawLayer(alpha = transition, scaleY = transition, scaleX = transition)) {
+            Card(
+                modifier = Modifier.height(40.dp)
+                    .padding(vertical = 4.dp, horizontal = 16.dp)
+                    .wrapContentWidth(),
+                elevation = 2.dp
+            ) {
+                Providers(AmbientContentAlpha provides ContentAlpha.medium) {
+                    Box(
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                        alignment = Alignment.Center,
+                        children = text
+                    )
+                }
+            }
+        }
+        Box(Modifier.drawLayer(alpha = transition, scaleY = transition, scaleX = transition)) {
+            FloatingActionButton(
+                modifier = Modifier.size(40.dp),
+                backgroundColor = MaterialTheme.colors.surface,
+                onClick = onClick,
+                icon = icon
+            )
+        }
+    }
 }
 
 @OptIn(ExperimentalAnimationApi::class)
@@ -130,7 +243,6 @@ fun PackageItem(
     onCloneClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val emphasis = AmbientEmphasisLevels.current
     Card(modifier = modifier.clickable(onClick = onClick), elevation = 2.dp) {
         Column {
             // Body
@@ -148,7 +260,7 @@ fun PackageItem(
                     )
                 }
                 // Actions
-                ProvideEmphasis(emphasis = emphasis.medium) {
+                Providers(AmbientContentAlpha provides ContentAlpha.medium) {
                     Row(Modifier.padding(top = 8.dp, end = 4.dp)) {
                         IconButton(onClick = onInfoClick) {
                             Icon(asset = Icons.Filled.Info)
@@ -191,7 +303,7 @@ fun PackageItem(
                     }
                 }
                 Row(Modifier.weight(1f), horizontalArrangement = Arrangement.End) {
-                    ProvideEmphasis(emphasis = emphasis.medium) {
+                    Providers(AmbientContentAlpha provides ContentAlpha.medium) {
                         Text(text = installTime, style = MaterialTheme.typography.caption)
                     }
                 }

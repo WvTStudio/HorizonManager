@@ -2,11 +2,9 @@ package org.wvt.horizonmgr.ui.pacakgemanager
 
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.animation.Crossfade
-import androidx.compose.foundation.Icon
 import androidx.compose.foundation.ScrollableColumn
-import androidx.compose.foundation.Text
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Stack
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
@@ -56,7 +54,7 @@ fun PackageInfo(pkgId: String) {
 
     Crossfade(current = pkgInfo) { pkgInfo ->
         if (pkgInfo == null) {
-            Stack(Modifier.fillMaxSize()) {
+            Box(Modifier.fillMaxSize()) {
                 CircularProgressIndicator(Modifier.align(Alignment.Center))
             }
         } else {

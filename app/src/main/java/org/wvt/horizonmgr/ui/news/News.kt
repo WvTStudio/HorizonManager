@@ -2,7 +2,6 @@ package org.wvt.horizonmgr.ui.news
 
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.ScrollableColumn
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -52,7 +51,7 @@ fun News(
                     news.forEach {
                         when (it) {
                             is NewsViewModel.News.Article -> {
-                                ArticleItem(
+                                NewsItem(
                                     modifier = Modifier.fillMaxWidth().padding(16.dp),
                                     title = it.title,
                                     brief = it.brief,
@@ -76,7 +75,7 @@ fun News(
 }
 
 @Composable
-fun ArticleItem(
+private fun NewsItem(
     modifier: Modifier = Modifier,
     title: String,
     brief: String,
@@ -84,11 +83,12 @@ fun ArticleItem(
     onClick: () -> Unit
 ) {
     val cutBrief = remember(brief) {
-        if (brief.length > 64) brief.substring(0, 64) + "..."
+        if (brief.length > 64) brief.substring(0, 160) + "..."
         else brief
     }
     Card(modifier = modifier.clickable(onClick = onClick), elevation = 2.dp) {
         Box(Modifier.fillMaxWidth().wrapContentHeight()) {
+            // Cover Image
             NetworkImage(
                 modifier = Modifier.fillMaxWidth().aspectRatio(4f / 3f),
                 url = coverUrl,
@@ -101,22 +101,19 @@ fun ArticleItem(
                     .padding(16.dp)
                     .align(Alignment.BottomStart)
             ) {
+                // Title
                 Text(
                     text = title,
-                    style = MaterialTheme.typography.h5,
+                    style = MaterialTheme.typography.h6,
                     color = Color.White
                 )
+                // Brief
                 Text(
                     text = cutBrief,
-                    style = MaterialTheme.typography.body1,
+                    style = MaterialTheme.typography.body2,
                     color = Color.White
                 )
             }
         }
     }
-}
-
-@Composable
-fun AnnouncementItem() {
-
 }

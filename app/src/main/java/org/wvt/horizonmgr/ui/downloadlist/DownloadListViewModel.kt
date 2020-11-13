@@ -7,7 +7,7 @@ import org.wvt.horizonmgr.DependenciesContainer
 
 class DownloadListViewModel(
     private val dependencies: DependenciesContainer
-): ViewModel() {
+) : ViewModel() {
     private val _downloadItems = MutableStateFlow(emptyList<String>())
     val downloadItems: StateFlow<List<String>> = _downloadItems
 

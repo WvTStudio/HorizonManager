@@ -3,7 +3,6 @@ package org.wvt.horizonmgr.ui.settings
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
@@ -56,8 +55,7 @@ fun Settings(
                         )
                     )
                 }
-                val emphasis = AmbientEmphasisLevels.current
-                ProvideEmphasis(emphasis = emphasis.medium) {
+                Providers(AmbientContentAlpha provides ContentAlpha.medium) {
                     Text(
                         modifier = Modifier.padding(top = 4.dp),
                         text = versionName,
