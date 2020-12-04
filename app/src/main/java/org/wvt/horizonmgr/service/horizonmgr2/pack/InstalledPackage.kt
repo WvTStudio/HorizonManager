@@ -1,12 +1,13 @@
-package org.wvt.horizonmgr.service.horizonmgr2
+package org.wvt.horizonmgr.service.horizonmgr2.pack
 
 import org.json.JSONObject
+import org.wvt.horizonmgr.service.horizonmgr2.mod.InstalledMod
 import java.io.File
 
 /**
  * 该类代表一个已经安装的分包
  */
-class LocalPackage constructor(
+class InstalledPackage constructor(
     private val pkgDir: File
 ) {
     // TODO: 2020/11/1 使该 Package 始终能返回最新数据
@@ -85,6 +86,16 @@ class LocalPackage constructor(
     fun getDeveloper() = developer
 
     /**
+     * 重命名
+     */
+    fun rename(newName: String) {
+        val jsonStr = installationInfoFile.readText()
+        val json = JSONObject(jsonStr)
+        json.put("customName", newName)
+        installationInfoFile.writeText(json.toString(4))
+    }
+
+    /**
      * 获取分包的 UUID
      */
     fun getPackageUUID(): String = packageUUID
@@ -117,12 +128,10 @@ class LocalPackage constructor(
     }
 
     /**
-     * 重命名
+     * 获取该分包的所有 Mod
      */
-    fun rename(newName: String) {
-        val jsonStr = installationInfoFile.readText()
-        val json = JSONObject(jsonStr)
-        json.put("customName", newName)
-        installationInfoFile.writeText(json.toString(4))
+    fun getMods(): List<InstalledMod> {
+        // TODO: 2020/11/13
+        TODO()
     }
 }

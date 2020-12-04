@@ -1,6 +1,5 @@
 package org.wvt.horizonmgr.ui.joingroup
 
-import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -12,26 +11,22 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.util.fastForEach
 import org.wvt.horizonmgr.service.WebAPI
 import org.wvt.horizonmgr.ui.components.NetworkImage
+import org.wvt.horizonmgr.ui.theme.PreviewTheme
 
 @Composable
 fun JoinGroup(
-    vm: JoinGroupViewModel,
+    groups: List<WebAPI.QQGroupEntry>,
     onClose: () -> Unit,
     onGroupSelect: (url: WebAPI.QQGroupEntry) -> Unit
 ) {
-    val vmGroupList by vm.groups.collectAsState()
-
-    // TODO: 2020/10/27 添加网络错误时的提示
     Column(Modifier.fillMaxSize()) {
         TopAppBar(title = {
             Text("加入群组")
@@ -40,26 +35,15 @@ fun JoinGroup(
                 Icon(Icons.Filled.ArrowBack)
             }
         }, backgroundColor = MaterialTheme.colors.surface)
-        Crossfade(
-            modifier = Modifier.fillMaxSize(),
-            current = vmGroupList
-        ) { groupList ->
-            if (groupList.isEmpty()) {
-                Box(Modifier.fillMaxSize()) {
-                    CircularProgressIndicator(Modifier.align(Alignment.Center))
-                }
-            } else {
-                ScrollableColumn(Modifier.fillMaxSize()) {
-                    groupList.fastForEach {
-                        GroupItem(
-                            onClicked = { onGroupSelect(it) },
-                            avatarUrl = it.avatar,
-                            groupName = it.name,
-                            description = it.description,
-                            status = it.status
-                        )
-                    }
-                }
+        ScrollableColumn(Modifier.fillMaxSize()) {
+            groups.forEach {
+                GroupItem(
+                    onClicked = { onGroupSelect(it) },
+                    avatarUrl = it.avatar,
+                    groupName = it.name,
+                    description = it.description,
+                    tag = it.status
+                )
             }
         }
     }
@@ -68,12 +52,17 @@ fun JoinGroup(
 @Composable
 private fun GroupItem(
     onClicked: () -> Unit,
-    avatarUrl: String, groupName: String, description: String, status: String
+    avatarUrl: String,
+    groupName: String,
+    description: String,
+    tag: String
 ) {
-    val emphasis = AmbientEmphasisLevels.current
-    Row(Modifier.clickable(onClick = onClicked).padding(vertical = 16.dp)) {
+    Row(
+        Modifier.clickable(onClick = onClicked).fillMaxWidth().wrapContentHeight()
+            .padding(vertical = 16.dp)
+    ) {
         Column(
-            modifier = Modifier.padding(start = 16.dp, end = 24.dp),
+            modifier = Modifier.padding(start = 16.dp, end = 24.dp).wrapContentSize(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             // Group Avatar
@@ -83,13 +72,10 @@ private fun GroupItem(
                 url = avatarUrl
             )
             // Tag
-            StatusTag(
-                modifier = Modifier.padding(top = 8.dp),
-                text = status
-            )
+            StatusTag(modifier = Modifier.padding(top = 8.dp), text = tag)
         }
         // Information
-        Column(Modifier.weight(1f)) {
+        Column(Modifier.weight(1f).wrapContentHeight()) {
             // GroupName
             Providers(AmbientContentAlpha provides ContentAlpha.high) {
                 Box(Modifier.fillMaxWidth()) {
@@ -111,7 +97,7 @@ private fun GroupItem(
         }
         // Arrow Icon
         Column(
-            Modifier.padding(start = 16.dp, end = 16.dp),
+            Modifier.padding(start = 16.dp, end = 16.dp).wrapContentSize(),
             verticalArrangement = Arrangement.Center
         ) {
             Icon(Icons.Filled.ArrowForward)
@@ -132,6 +118,20 @@ private fun StatusTag(
             text = text,
             style = MaterialTheme.typography.caption,
             color = contentColor
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun ItemPreview() {
+    PreviewTheme {
+        GroupItem(
+            onClicked = {},
+            avatarUrl = "",
+            groupName = "Example",
+            description = "Example",
+            tag = "OPEN"
         )
     }
 }

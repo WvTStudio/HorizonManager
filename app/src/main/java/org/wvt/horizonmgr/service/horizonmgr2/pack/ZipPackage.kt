@@ -1,4 +1,4 @@
-package org.wvt.horizonmgr.service.horizonmgr2
+package org.wvt.horizonmgr.service.horizonmgr2.pack
 
 import org.json.JSONObject
 import java.io.File
@@ -10,6 +10,22 @@ import java.util.zip.ZipFile
 class ZipPackage private constructor(
     private val zipFile: File
 ) {
+    companion object {
+        open class NotZipPackageException : Exception()
+        class MissingManifestException: NotZipPackageException()
+
+        fun isZipPackage(zipFile: File): Boolean {
+            // TODO: 2020/11/13
+            TODO()
+        }
+
+        fun parse(zipFile: File): ZipPackage {
+            // TODO: 2020/11/13
+            TODO()
+        }
+    }
+
+
     private lateinit var game: String
     private lateinit var gameVersion: String
     private lateinit var pack: String

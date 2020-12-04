@@ -11,9 +11,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.paint
-import androidx.compose.ui.drawLayer
 import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.loadVectorResource
@@ -73,7 +73,7 @@ fun Login(
             Box(
                 Modifier.size(256.dp)
                     .offset(x = 128.dp)
-                    .drawLayer(rotationZ = rotateGear[rotation])
+                    .graphicsLayer(rotationZ = rotateGear[rotation])
                     .align(Alignment.TopEnd)
             ) {
                 Box(
@@ -87,7 +87,7 @@ fun Login(
             Box(
                 Modifier.size(256.dp)
                     .offset(x = (-128).dp)
-                    .drawLayer(rotationZ = rotateGear[rotation])
+                    .graphicsLayer(rotationZ = rotateGear[rotation])
                     .align(Alignment.BottomStart)
             ) {
                 Box(

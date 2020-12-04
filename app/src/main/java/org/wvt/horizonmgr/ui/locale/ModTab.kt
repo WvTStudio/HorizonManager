@@ -4,12 +4,11 @@ import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animate
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.lazy.LazyColumnForIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.Text
-import androidx.compose.material.ripple.RippleIndication
+import androidx.compose.material.ripple.rememberRippleIndication
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -20,7 +19,7 @@ import androidx.compose.ui.unit.dp
 import org.wvt.horizonmgr.dependenciesViewModel
 import org.wvt.horizonmgr.ui.components.LocalImage
 import org.wvt.horizonmgr.ui.components.ProgressDialog
-import org.wvt.horizonmgr.ui.main.SelectedPackageUUIDAmbient
+import org.wvt.horizonmgr.ui.main.AmbientSelectedPackageUUID
 
 @Composable
 internal fun ModTab() {
@@ -29,7 +28,7 @@ internal fun ModTab() {
     val state by vm.state.collectAsState()
     val mods by vm.mods.collectAsState()
     val enabledMods by vm.enabledMods.collectAsState()
-    val selectedUUID = SelectedPackageUUIDAmbient.current
+    val selectedUUID = AmbientSelectedPackageUUID.current
 
     onCommit(selectedUUID) {
         vm.setSelectedUUID(selectedUUID)
@@ -99,7 +98,7 @@ private fun ModItem(
         elevation = 2.dp
     ) {
         Column(
-            Modifier.indication(interactionState, indication = RippleIndication())
+            Modifier.indication(interactionState, indication = rememberRippleIndication())
                 .background(animate(if (selected) MaterialTheme.colors.primary.copy(0.12f) else Color.Transparent))
                 .padding(top = 16.dp, bottom = 4.dp, start = 16.dp, end = 16.dp)
         ) {

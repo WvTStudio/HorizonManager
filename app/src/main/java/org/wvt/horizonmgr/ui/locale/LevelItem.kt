@@ -6,8 +6,8 @@ import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.ui.tooling.preview.Preview
 import org.wvt.horizonmgr.ui.components.LocalImage
 import org.wvt.horizonmgr.ui.theme.HorizonManagerTheme
 

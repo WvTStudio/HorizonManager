@@ -8,9 +8,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.platform.setContent
 import kotlinx.coroutines.launch
 import org.wvt.horizonmgr.service.WebAPI
+import org.wvt.horizonmgr.ui.AmbientHorizonManager
+import org.wvt.horizonmgr.ui.AmbientWebAPI
 import org.wvt.horizonmgr.ui.AndroidDependenciesProvider
-import org.wvt.horizonmgr.ui.HorizonManagerAmbient
-import org.wvt.horizonmgr.ui.WebAPIAmbient
 import org.wvt.horizonmgr.ui.theme.AndroidHorizonManagerTheme
 
 class InstallPackageActivity : AppCompatActivity() {
@@ -30,8 +30,8 @@ class InstallPackageActivity : AppCompatActivity() {
                     var customName by remember { mutableStateOf<String?>(null) }
                     val scope = rememberCoroutineScope()
 
-                    val webApi = WebAPIAmbient.current
-                    val horizonMgr = HorizonManagerAmbient.current
+                    val webApi = AmbientWebAPI.current
+                    val horizonMgr = AmbientHorizonManager.current
 
                     onActive {
                         scope.launch {

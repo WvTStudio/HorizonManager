@@ -20,7 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.key.ExperimentalKeyInput
 import androidx.compose.ui.input.key.keyInputFilter
-import androidx.compose.ui.platform.ContextAmbient
+import androidx.compose.ui.platform.AmbientContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 
@@ -30,7 +30,7 @@ fun Community(onClose: () -> Unit) {
     val backgroundColor = MaterialTheme.colors.background
     var loading by remember { mutableStateOf(true) }
     var progress by remember { mutableStateOf<Float>(0f) }
-    val context = ContextAmbient.current
+    val context = AmbientContext.current
 
     val webView = remember {
         WebView(context).apply {

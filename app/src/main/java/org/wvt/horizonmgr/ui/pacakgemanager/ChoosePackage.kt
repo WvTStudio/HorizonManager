@@ -34,10 +34,10 @@ fun ChoosePackage(
             items.forEachIndexed { index, it ->
                 ListItem(
                     modifier = Modifier.clickable(onClick = { onChoose(index) }),
-                    icon = { Icon(asset = Icons.Filled.Extension) },
+                    icon = { Icon(imageVector = Icons.Filled.Extension) },
                     text = { Text(if (it.recommended) "${it.name}（推荐）" else it.name) },
                     secondaryText = { Text(it.version) },
-                    trailing = { Icon(asset = Icons.Filled.ArrowForward) }
+                    trailing = { Icon(imageVector = Icons.Filled.ArrowForward) }
                 )
             }
         }
@@ -69,7 +69,7 @@ fun EditName(
         Row(verticalAlignment = Alignment.CenterVertically) {
             ListItem(
                 modifier = Modifier.weight(1f),
-                icon = { Icon(asset = Icons.Filled.Extension) },
+                icon = { Icon(imageVector = Icons.Filled.Extension) },
                 text = { Text(item.name) },
                 secondaryText = { Text(item.version) }
             )

@@ -15,16 +15,16 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.drawLayer
 import androidx.compose.ui.gesture.pressIndicatorGestureFilter
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.ui.tooling.preview.Preview
 import org.wvt.horizonmgr.ui.theme.HorizonManagerTheme
 import org.wvt.horizonmgr.ui.theme.MaterialColors
-import org.wvt.horizonmgr.ui.theme.ThemeConfigAmbient
-import org.wvt.horizonmgr.ui.theme.ThemeControllerAmbient
+import org.wvt.horizonmgr.ui.theme.AmbientThemeConfig
+import org.wvt.horizonmgr.ui.theme.AmbientThemeController
 
 private enum class CheckedColorType {
     LIGHT_PRIMARY, LIGHT_PRIMARY_VARIANT,
@@ -44,8 +44,8 @@ data class CustomColor(
 fun CustomTheme(requestClose: () -> Unit) {
     val colors = remember { MaterialColors.series }
     var checkedColorType by remember { mutableStateOf(CheckedColorType.LIGHT_PRIMARY) }
-    val themeConfig = ThemeConfigAmbient.current
-    val themeController = ThemeControllerAmbient.current
+    val themeConfig = AmbientThemeConfig.current
+    val themeController = AmbientThemeController.current
 
     var lightColor by remember {
         mutableStateOf(
@@ -84,7 +84,7 @@ fun CustomTheme(requestClose: () -> Unit) {
         Column(Modifier.fillMaxSize()) {
             TopAppBar(navigationIcon = {
                 IconButton(onClick = requestClose) {
-                    Icon(asset = Icons.Filled.ArrowBack)
+                    Icon(imageVector = Icons.Filled.ArrowBack)
                 }
             }, title = {
                 Text("自定义主题")
@@ -213,7 +213,7 @@ fun CustomTheme(requestClose: () -> Unit) {
                 )
             }
         ) {
-            Icon(asset = Icons.Filled.Check)
+            Icon(imageVector = Icons.Filled.Check)
             Text("保存")
         }
         /*Button(modifier = Modifier.padding(16.dp).align(Alignment.BottomStart),
@@ -262,7 +262,7 @@ private fun SelectColorItem(
                         onSelect()
                     },
                     onCancel = { pressed = false })
-                .drawLayer(scaleX = scale, scaleY = scale),
+                .graphicsLayer(scaleX = scale, scaleY = scale),
             color = animate(color),
             elevation = animate(if (selected) 8.dp else 0.dp),
             shape = RoundedCornerShape(size = 4.dp)
@@ -291,7 +291,7 @@ private fun MaterialColorPalette(
                     for (i in colors) {
                         Box(
                             modifier = Modifier.padding(1.dp).height(42.dp).width(72.dp),
-                            alignment = Alignment.Center
+                            contentAlignment = Alignment.Center
                         ) {
                             Text(
                                 text = i.key,
@@ -307,7 +307,7 @@ private fun MaterialColorPalette(
                         tags.forEach {
                             Box(
                                 modifier = Modifier.padding(1.dp).size(42.dp),
-                                alignment = Alignment.Center
+                                contentAlignment = Alignment.Center
                             ) { Text(text = it) }
                         }
                     }
@@ -353,7 +353,7 @@ private fun ColorItem(
         AnimatedVisibility(
             visible = selected, enter = fadeIn(), exit = fadeOut()
         ) {
-            Box(modifier = Modifier.fillMaxSize(), alignment = Alignment.Center) {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Text(text = "T", color = contentColor)
             }
         }

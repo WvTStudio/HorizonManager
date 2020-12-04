@@ -6,7 +6,6 @@ import androidx.compose.animation.core.FastOutLinearInEasing
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -17,10 +16,9 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.drawLayer
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.Measurable
-import androidx.compose.ui.layout.id
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -105,14 +103,14 @@ internal fun TuneAppBar2(
                 IconButton(
                     modifier = Modifier.align(Alignment.CenterStart)
                         .padding(start = 4.dp + offset)
-                        .drawLayer(alpha = actionOpacity),
+                        .graphicsLayer(alpha = actionOpacity),
                     onClick = {
                         if (expand) expand = false
                         else onNavClicked()
                     }) {
                     Crossfade(current = expand, animation = fastDuration) {
-                        if (it) Icon(asset = Icons.Filled.ArrowBack)
-                        else Icon(asset = Icons.Filled.Menu)
+                        if (it) Icon(imageVector = Icons.Filled.ArrowBack)
+                        else Icon(imageVector = Icons.Filled.Menu)
                     }
                 }
                 Crossfade(current = expand, animation = fastDuration) {
@@ -120,7 +118,7 @@ internal fun TuneAppBar2(
                         modifier = Modifier.align(Alignment.CenterStart)
                             .padding(start = 72.dp + offset, end = 24.dp + offset)
                             .fillMaxSize(),
-                        alignment = Alignment.CenterStart
+                        contentAlignment = Alignment.CenterStart
                     ) {
                         if (it) { // TextField
                             // Hint
@@ -157,22 +155,22 @@ internal fun TuneAppBar2(
                 // Tune Button
                 IconButton(modifier = Modifier.align(Alignment.CenterEnd)
                     .padding(end = 4.dp + offset)
-                    .drawLayer(alpha = actionOpacity),
+                    .graphicsLayer(alpha = actionOpacity),
                     onClick = {
                         if (expand) onFilterValueConfirm(filterValue.text)
                         else expand = true
                     }
                 ) {
                     Crossfade(current = expand, animation = fastDuration) {
-                        if (it) Icon(asset = Icons.Filled.Search)
-                        else Icon(asset = Icons.Filled.Tune)
+                        if (it) Icon(imageVector = Icons.Filled.Search)
+                        else Icon(imageVector = Icons.Filled.Tune)
                     }
                 }
             }
 
             // Content
             Box(
-                Modifier.wrapContentHeight().drawLayer(alpha = contentOpacity).layoutId("content")
+                Modifier.wrapContentHeight().graphicsLayer(alpha = contentOpacity).layoutId("content")
             ) {
                 Providers(AmbientContentAlpha provides ContentAlpha.medium) {
                     Column(
@@ -183,7 +181,7 @@ internal fun TuneAppBar2(
                             modifier = Modifier.padding(top = 8.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Icon(asset = Icons.Filled.Language)
+                            Icon(imageVector = Icons.Filled.Language)
                             DropDownSelector(
                                 modifier = Modifier.padding(start = 16.dp),
                                 items = sources.map { it.label },
@@ -196,7 +194,7 @@ internal fun TuneAppBar2(
                             modifier = Modifier.padding(top = 8.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Icon(asset = Icons.Filled.Sort)
+                            Icon(imageVector = Icons.Filled.Sort)
                             DropDownSelector(
                                 modifier = Modifier.padding(start = 16.dp),
                                 items = sortModes.map { it.label },
@@ -214,15 +212,15 @@ internal fun TuneAppBar2(
 @Composable
 private fun AppBarLayout(
     expand: Boolean,
-    children: @Composable () -> Unit
+    content: @Composable () -> Unit
 ) {
     val progress =
         animate(if (expand) 1f else 0f, if (expand) tuneExpand else tuneShrink)
-    Layout(children) { m: List<Measurable>, c: Constraints ->
+    Layout(content) { m: List<Measurable>, c: Constraints ->
         check(m.size == 3)
 
         if (progress == 0f) { // Not expand
-            val appbar = m.first { it.id == "appbar" }.measure(c)
+            val appbar = m.first { it.layoutId == "appbar" }.measure(c)
             val appbarHeight = appbar.height
             layout(
                 appbar.width,
@@ -231,13 +229,13 @@ private fun AppBarLayout(
                 appbar.placeRelative(0, 0) // TopAppBar
             }
         } else { // Expanding | Expanded
-            val appbar = m.first { it.id == "appbar" }.measure(c)
+            val appbar = m.first { it.layoutId == "appbar" }.measure(c)
             val appbarHeight = appbar.height
 
-            val mContent = m.first { it.id == "content" }.measure(c)
+            val mContent = m.first { it.layoutId == "content" }.measure(c)
             val mContentHeight = mContent.height
 
-            val searchBoxBG = m.first { it.id == "searchbox_bg" }.measure(c)
+            val searchBoxBG = m.first { it.layoutId == "searchbox_bg" }.measure(c)
 
             // 在 appbarHeight 和 appbarHeight + mContentHeight 之间变换
             val height = lerp(appbarHeight, appbarHeight + mContentHeight, progress)

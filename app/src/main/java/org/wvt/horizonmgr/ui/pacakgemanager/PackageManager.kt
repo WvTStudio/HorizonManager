@@ -14,8 +14,8 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.savedinstancestate.savedInstanceState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.drawLayer
-import androidx.compose.ui.platform.ContextAmbient
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.AmbientContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import kotlinx.coroutines.CancellableContinuation
@@ -26,7 +26,7 @@ import org.wvt.horizonmgr.dependenciesViewModel
 import org.wvt.horizonmgr.ui.components.InputDialogHost
 import org.wvt.horizonmgr.ui.components.InputDialogHostState
 import org.wvt.horizonmgr.ui.components.ProgressDialog
-import org.wvt.horizonmgr.ui.main.SelectedPackageUUIDAmbient
+import org.wvt.horizonmgr.ui.main.AmbientSelectedPackageUUID
 import kotlin.coroutines.resume
 
 data class PackageManagerItem(
@@ -42,10 +42,10 @@ fun PackageManager(
     onPackageSelect: (uuid: String?) -> Unit,
     onNavClick: () -> Unit
 ) {
-    val context = ContextAmbient.current
+    val context = AmbientContext.current
 
     val vm = dependenciesViewModel<PackageManagerViewModel>()
-    val selectedPackageUUID = SelectedPackageUUIDAmbient.current
+    val selectedPackageUUID = AmbientSelectedPackageUUID.current
     onCommit(selectedPackageUUID) {
         vm.setSelectedPackage(selectedPackageUUID)
     }
@@ -139,15 +139,6 @@ private fun Fabs(
     onLocalInstallClick: () -> Unit,
     onOnlineInstallClick: () -> Unit
 ) {
-    var fab1Anim = animate(
-        if (expand) 1f else 0f,
-        if (expand) fab1Enter else fab1Exit
-    )
-    var fab2Anim = animate(
-        if (expand) 1f else 0f,
-        if (expand) fab2Enter else fab2Exit
-    )
-
     Column(
         Modifier.fillMaxSize().padding(16.dp),
         Arrangement.Bottom,
@@ -180,8 +171,8 @@ private fun Fabs(
             // Rotate 45° to be Close Icon
             // TODO: 2020/11/13 Use animation icon to instead this.
             Icon(
-                modifier = Modifier.drawLayer(rotationZ = rotate),
-                asset = Icons.Filled.Add
+                modifier = Modifier.graphicsLayer(rotationZ = rotate),
+                imageVector = Icons.Filled.Add
             )
         }
     }
@@ -197,12 +188,11 @@ private fun FABEntry(
     icon: @Composable () -> Unit,
     onClick: () -> Unit
 ) {
-    // TODO: 2020/11/13 Export as a complete ui component.
 
     val transition = animate(if (expand) 1f else 0f, animSpec = if (expand) enterAnim else exitAnim)
 
     Row(modifier = modifier.wrapContentSize(), verticalAlignment = Alignment.CenterVertically) {
-        Box(Modifier.drawLayer(alpha = transition, scaleY = transition, scaleX = transition)) {
+        Box(Modifier.graphicsLayer(alpha = transition, scaleY = transition, scaleX = transition)) {
             Card(
                 modifier = Modifier.height(40.dp)
                     .padding(vertical = 4.dp, horizontal = 16.dp)
@@ -212,18 +202,18 @@ private fun FABEntry(
                 Providers(AmbientContentAlpha provides ContentAlpha.medium) {
                     Box(
                         modifier = Modifier.padding(horizontal = 16.dp),
-                        alignment = Alignment.Center,
-                        children = text
+                        contentAlignment = Alignment.Center,
+                        content = text
                     )
                 }
             }
         }
-        Box(Modifier.drawLayer(alpha = transition, scaleY = transition, scaleX = transition)) {
+        Box(Modifier.graphicsLayer(alpha = transition, scaleY = transition, scaleX = transition)) {
             FloatingActionButton(
                 modifier = Modifier.size(40.dp),
                 backgroundColor = MaterialTheme.colors.surface,
                 onClick = onClick,
-                icon = icon
+                content = icon
             )
         }
     }
@@ -263,12 +253,12 @@ fun PackageItem(
                 Providers(AmbientContentAlpha provides ContentAlpha.medium) {
                     Row(Modifier.padding(top = 8.dp, end = 4.dp)) {
                         IconButton(onClick = onInfoClick) {
-                            Icon(asset = Icons.Filled.Info)
+                            Icon(imageVector = Icons.Filled.Info)
                         }
                         var dropdown by remember { mutableStateOf(false) }
                         DropdownMenu(toggle = {
                             IconButton(onClick = { dropdown = true }) {
-                                Icon(asset = Icons.Filled.MoreVert)
+                                Icon(imageVector = Icons.Filled.MoreVert)
                             }
                         }, expanded = dropdown, onDismissRequest = { dropdown = false }) {
                             DropdownMenuItem(onClick = {

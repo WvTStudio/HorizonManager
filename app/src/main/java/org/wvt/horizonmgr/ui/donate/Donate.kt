@@ -16,7 +16,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.Measurable
-import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.TextUnit
@@ -55,7 +54,7 @@ fun Donate(
                 Box(Modifier.fillMaxSize()) {
                     Icon(
                         modifier = Modifier.align(Alignment.Center),
-                        asset = vectorResource(id = R.drawable.ic_alipay),
+                        imageVector = vectorResource(id = R.drawable.ic_alipay),
                         tint = if (light) Color.White else alipayColor
                     )
                 }
@@ -71,7 +70,7 @@ fun Donate(
                 Box(Modifier.fillMaxSize()) {
                     Icon(
                         modifier = Modifier.align(Alignment.Center),
-                        asset = vectorResource(id = R.drawable.ic_wechatpay),
+                        imageVector = vectorResource(id = R.drawable.ic_wechatpay),
                         tint = if (light) Color.White else wechatColor
                     )
                 }
@@ -81,7 +80,7 @@ fun Donate(
             TopAppBar(
                 title = { Text("选择捐赠方式") },
                 navigationIcon = {
-                    IconButton(onClick = onClose) { Icon(asset = Icons.Filled.ArrowBack) }
+                    IconButton(onClick = onClose) { Icon(imageVector = Icons.Filled.ArrowBack) }
                 },
                 elevation = 0.dp,
                 backgroundColor = Color.Transparent,
@@ -130,13 +129,12 @@ fun Donate(
     }
 }
 
-@OptIn(ExperimentalLayoutNodeApi::class)
 @Composable
-fun RandomPlaceLayout(modifier: Modifier, children: @Composable () -> Unit) {
+fun RandomPlaceLayout(modifier: Modifier, content: @Composable () -> Unit) {
     val random = Random
     Layout(
         modifier = modifier,
-        children = children
+        content = content
     ) { list: List<Measurable>, constraints: Constraints ->
         val childrenConstraints = constraints.copy(minWidth = 0, minHeight = 0)
         val placeables = list.map {

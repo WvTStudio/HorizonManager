@@ -1,5 +1,6 @@
 package org.wvt.horizonmgr.ui.components
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import androidx.compose.animation.Crossfade
@@ -12,10 +13,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.ContextAmbient
+import androidx.compose.ui.platform.AmbientContext
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 
 @Composable
 fun NetworkImage(
@@ -27,22 +31,16 @@ fun NetworkImage(
     alpha: Float = DefaultAlpha,
     colorFilter: ColorFilter? = null
 ) {
-    var image by remember { mutableStateOf<ImageAsset?>(null) }
-    val context = ContextAmbient.current
-    onActive {
-        val glide = Glide.with(context)
-        val target = object : CustomTarget<Bitmap>() {
-            override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-                image = resource.asImageAsset()
-            }
+    var image by remember { mutableStateOf<ImageBitmap?>(null) }
+    val context = AmbientContext.current
 
-            override fun onLoadCleared(placeholder: Drawable?) {
-                image = null
-            }
-        }
-        glide.asBitmap().load(url).into(target)
-        onDispose {
-            glide.clear(target)
+    LaunchedEffect(url) {
+        image = try {
+            loadUrlImage(context, url)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            // TODO: 2020/11/13 Error Image
+            null
         }
     }
 
@@ -57,3 +55,44 @@ fun NetworkImage(
         }
     }
 }
+
+private suspend fun loadUrlImage(context: Context, url: String): ImageBitmap =
+    suspendCancellableCoroutine { cont ->
+        try {
+            val glide = Glide.with(context)
+
+            val target = object : CustomTarget<Bitmap>() {
+                override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                    try {
+                        cont.resume(resource.asImageBitmap())
+                    } catch (e: Exception) {
+                        try {
+                            cont.resumeWithException(e)
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
+                    }
+                }
+
+                override fun onLoadCleared(placeholder: Drawable?) {
+                    try {
+                        cont.resumeWithException(IllegalStateException("Load cleared"))
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                }
+
+                override fun onLoadFailed(errorDrawable: Drawable?) {
+                    try {
+                        cont.resumeWithException(IllegalStateException("Load failed"))
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                }
+            }
+
+            glide.asBitmap().load(url).into(target)
+        } catch (e: Exception) {
+            cont.resumeWithException(e)
+        }
+    }

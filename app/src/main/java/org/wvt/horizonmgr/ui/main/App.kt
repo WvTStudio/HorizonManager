@@ -3,13 +3,11 @@ package org.wvt.horizonmgr.ui.main
 import androidx.activity.ComponentActivity
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animate
-import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
@@ -19,15 +17,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.VectorAsset
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.ContextAmbient
-import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.platform.AmbientContext
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import org.wvt.horizonmgr.DependenciesContainer
 import org.wvt.horizonmgr.dependenciesViewModel
 import org.wvt.horizonmgr.service.LocalCache
@@ -38,14 +33,16 @@ import org.wvt.horizonmgr.ui.locale.LocalManager
 import org.wvt.horizonmgr.ui.news.News
 import org.wvt.horizonmgr.ui.onlinemods.Online
 import org.wvt.horizonmgr.ui.pacakgemanager.PackageManager
+import org.wvt.horizonmgr.ui.theme.PreviewTheme
 
-val SelectedPackageUUIDAmbient = staticAmbientOf<String?>()
-val DrawerStateAmbient = staticAmbientOf<DrawerState>()
+val AmbientSelectedPackageUUID = staticAmbientOf<String?>()
+val AmbientDrawerState = staticAmbientOf<DrawerState>()
 
-private val anim = tween<Float>(600, 0, FastOutSlowInEasing)
+private val anim = tween<Float>(300, 0, LinearEasing)
 
 @Composable
 fun App(
+//    navController: NavHostController,
     dependencies: DependenciesContainer,
     userInfo: LocalCache.CachedUserInfo?,
     requestLogin: () -> Unit,
@@ -58,7 +55,7 @@ fun App(
     donate: () -> Unit,
     settings: () -> Unit
 ) {
-    val context = ContextAmbient.current as ComponentActivity
+    val context = AmbientContext.current as ComponentActivity
     val vm = dependenciesViewModel<AppViewModel>()
     val cs by vm.currentScreen.collectAsState()
 
@@ -78,6 +75,21 @@ fun App(
             DrawerTabs(screens = screens, currentScreen = cs, onChange = {
                 vm.navigate(it)
                 drawerState.close()
+                /*val route = when(it) {
+                    AppViewModel.Screen.HOME -> "news"
+                    AppViewModel.Screen.PACKAGE_MANAGE -> "package_manager"
+                    AppViewModel.Screen.LOCAL_MANAGE -> "module_manager"
+                    AppViewModel.Screen.ONLINE_DOWNLOAD -> "online_resource"
+                    AppViewModel.Screen.DOWNLOADED_MOD -> "local_resource"
+                }
+                navController.popBackStack()
+                navController.navigate(route) {
+                    launchSingleTop = true
+                    anim {
+                        enter  = android.R.anim.slide_in_left
+                        exit  = android.R.anim.slide_out_right
+                    }
+                }*/
             })
         },
         items = {
@@ -96,9 +108,42 @@ fun App(
         }
     ) {
         Providers(
-            DrawerStateAmbient provides drawerState,
-            SelectedPackageUUIDAmbient provides selectedPackageUUID
+            AmbientDrawerState provides drawerState,
+            AmbientSelectedPackageUUID provides selectedPackageUUID
         ) {
+            /*NavHost(navController = navController, startDestination = "module_manager") {
+                composable("news") {
+                    News(
+                        onNavClick = { drawerState.open() }
+                    )
+                }
+                composable("package_manager") {
+                    LocalManager(
+                        onNavClicked = { drawerState.open() },
+                        requestSelectFile = {
+                            SelectFileActivity.startForResult(context)
+                        }
+                    )
+                }
+                composable("module_manager") {
+                    PackageManager(
+                        onPackageSelect = selectedPackageChange,
+                        onNavClick = { drawerState.open() }
+                    )
+                }
+                composable("online_resource") {
+                    Online(
+                        enable = userInfo != null,
+                        onNavClicked = { drawerState.open() }
+                    )
+                }
+                composable("local_resource") {
+                    DownloadedMods(
+                        onNavClicked = { drawerState.open() }
+                    )
+                }
+            }*/
+
             Crossfade(current = cs, animation = anim) { cs ->
                 when (cs) {
                     AppViewModel.Screen.HOME -> News(
@@ -267,7 +312,7 @@ private fun NavigationItem(
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
     text: String,
-    icon: VectorAsset
+    icon: ImageVector
 ) {
     val interactionState = remember { InteractionState() }
     Surface(
@@ -286,7 +331,7 @@ private fun NavigationItem(
                     .indication(interactionState, AmbientIndication.current()),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(asset = icon, modifier = Modifier.padding(start = 8.dp))
+                Icon(imageVector = icon, modifier = Modifier.padding(start = 8.dp))
                 Text(
                     text = text,
                     modifier = Modifier.padding(start = 24.dp, end = 8.dp),
@@ -297,3 +342,21 @@ private fun NavigationItem(
     }
 }
 
+@Composable
+@Preview
+private fun DrawerPreview() {
+    PreviewTheme {
+        val state = rememberDrawerState(DrawerValue.Open)
+        Drawer(state = state, header = {
+            DrawerHeader(userInfo = null, requestLogin = {}, requestLogout = {})
+        }, tabs = {
+            DrawerTabs(
+                screens = AppViewModel.Screen.values(),
+                currentScreen = AppViewModel.Screen.HOME,
+                onChange = {}
+            )
+        }, items = {
+            DrawerItems(community = {}, openGame = {}, joinGroup = {}, donate = {})
+        }, setting = {}) {}
+    }
+}

@@ -16,10 +16,13 @@ class JoinGroupViewModel(
 ) : ViewModel() {
     private val _groups = MutableStateFlow<List<WebAPI.QQGroupEntry>>(emptyList())
     val groups: StateFlow<List<WebAPI.QQGroupEntry>> = _groups
+    val isLoading = MutableStateFlow(true)
 
     init {
         viewModelScope.launch {
+            isLoading.value = true
             _groups.value = dependencies.webapi.getQQGroupList()
+            isLoading.value = false
         }
     }
 

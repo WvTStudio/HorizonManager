@@ -7,7 +7,7 @@ import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.tween
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.drawLayer
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.fastMaxBy
@@ -41,8 +41,8 @@ fun <T> ImprovedCrossfade(
                     }
                 )
                 Layout(
-                    modifier = Modifier.drawLayer(alpha = opacity.value, clip = false),
-                    children = children,
+                    modifier = Modifier.graphicsLayer(alpha = opacity.value, clip = false),
+                    content = children,
                     measureBlock = { m, c ->
                         val p = m.map { it.measure(c) }
                         val maxHeight = p.fastMaxBy { it.height }?.height ?: 0
@@ -58,7 +58,7 @@ fun <T> ImprovedCrossfade(
     }
     Layout(
         modifier = modifier,
-        children = {
+        content = {
             state.invalidate = invalidate
             state.items.fastForEach { (item, opacity) ->
                 key(item) {

@@ -107,7 +107,7 @@ private fun CustomAppBar(
                 }
             }
         }, navigationIcon = {
-            IconButton(onClick = onNavClicked, icon = {
+            IconButton(onClick = onNavClicked, content = {
                 Icon(Icons.Filled.Menu)
             })
         }, backgroundColor = MaterialTheme.colors.surface

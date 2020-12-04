@@ -12,7 +12,7 @@ import androidx.compose.material.icons.filled.Inbox
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.VectorAsset
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
@@ -20,11 +20,11 @@ import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import org.wvt.horizonmgr.service.WebAPI
-import org.wvt.horizonmgr.ui.HorizonManagerAmbient
-import org.wvt.horizonmgr.ui.WebAPIAmbient
+import org.wvt.horizonmgr.ui.AmbientHorizonManager
+import org.wvt.horizonmgr.ui.AmbientWebAPI
 
 private data class Step(
-    val icon: VectorAsset,
+    val icon: ImageVector,
     val label: String,
     val progressable: Boolean
 )
@@ -36,8 +36,8 @@ fun InstallPackage(packInfo: WebAPI.ICPackage, name: String, onFinished: () -> U
     // TODO: 2020/11/5 使用 ViewModel 重写 
     var totalProgress by remember { mutableStateOf(0f) }
     val scope = rememberCoroutineScope()
-    val horizonMgr = HorizonManagerAmbient.current
-    val webApi = WebAPIAmbient.current
+    val horizonMgr = AmbientHorizonManager.current
+    val webApi = AmbientWebAPI.current
 
     val steps = remember {
         listOf(

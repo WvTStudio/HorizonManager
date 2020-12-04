@@ -53,8 +53,8 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerVersion = "1.4.0"
-        kotlinCompilerExtensionVersion = "1.0.0-alpha06"
+        kotlinCompilerVersion = "1.4.20"
+        kotlinCompilerExtensionVersion = "1.0.0-alpha08"
     }
     lintOptions {
         disable("InvalidFragmentVersionForActivityResult")
@@ -66,12 +66,20 @@ android {
             "-Xskip-prerelease-check"
         )
     }
+    packagingOptions {
+        resources {
+            pickFirsts.apply {
+                add("META-INF/AL2.0")
+                add("META-INF/LGPL2.1")
+            }
+        }
+    }
 }
 
 dependencies {
-    val composeVersion = "1.0.0-alpha07"
+    val composeVersion = "1.0.0-alpha08"
 
-    implementation(platform("com.google.firebase:firebase-bom:26.0.0"))
+    implementation(platform("com.google.firebase:firebase-bom:26.1.0"))
     implementation("com.google.firebase:firebase-analytics-ktx")
     implementation("com.google.firebase:firebase-crashlytics-ktx")
 
@@ -95,7 +103,10 @@ dependencies {
     implementation("androidx.compose.material:material-icons-core:$composeVersion")
     implementation("androidx.compose.material:material-icons-extended:$composeVersion")
 
-    implementation("androidx.ui:ui-tooling:$composeVersion")
+    implementation("androidx.compose.ui:ui-tooling:$composeVersion")
+    implementation("androidx.compose.ui:ui-test:$composeVersion")
+
+//    implementation("androidx.navigation:navigation-compose:1.0.0-alpha03")
 
     testImplementation("junit:junit:4.13.1")
     androidTestImplementation("androidx.test.ext:junit:1.1.2")

@@ -13,12 +13,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.ContextAmbient
+import androidx.compose.ui.platform.AmbientContext
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import org.wvt.horizonmgr.dependenciesViewModel
 import org.wvt.horizonmgr.ui.components.ErrorPage
 import org.wvt.horizonmgr.ui.components.NetworkImage
+import org.wvt.horizonmgr.ui.theme.PreviewTheme
 
 @Composable
 fun News(
@@ -27,19 +29,32 @@ fun News(
     val vm = dependenciesViewModel<NewsViewModel>()
     val news by vm.news.collectAsState()
     val state by vm.state.collectAsState()
-    val context = ContextAmbient.current
+    val context = AmbientContext.current
 
     onCommit(vm) { vm.refresh() }
 
+    NewsUI(
+        onNavClick = onNavClick,
+        state = state,
+        news = news,
+        onNewsClick = { if (it is NewsViewModel.News.Article) vm.newsDetail(context, it.id) },
+        onRefreshClick = { vm.refresh() }
+    )
+}
+
+@Composable
+private fun NewsUI(
+    onNavClick: () -> Unit,
+    state: NewsViewModel.State,
+    news: List<NewsViewModel.News>,
+    onNewsClick: (NewsViewModel.News) -> Unit,
+    onRefreshClick: () -> Unit
+) {
     Column(Modifier.fillMaxSize()) {
         TopAppBar(
             modifier = Modifier.fillMaxWidth().zIndex(4.dp.value),
             title = { Text("推荐资讯") },
-            navigationIcon = {
-                IconButton(onClick = onNavClick) {
-                    Icon(Icons.Filled.Menu)
-                }
-            },
+            navigationIcon = { IconButton(onClick = onNavClick) { Icon(Icons.Filled.Menu) } },
             backgroundColor = MaterialTheme.colors.surface
         )
         Crossfade(current = state) {
@@ -55,8 +70,13 @@ fun News(
                                     modifier = Modifier.fillMaxWidth().padding(16.dp),
                                     title = it.title,
                                     brief = it.brief,
-                                    coverUrl = it.coverUrl,
-                                    onClick = { vm.newsDetail(context, it.id) }
+                                    onClick = { onNewsClick(it) },
+                                    coverImage = {
+                                        NetworkImage(
+                                            url = it.coverUrl,
+                                            contentScale = ContentScale.Crop
+                                        )
+                                    }
                                 )
                             }
                         }
@@ -65,9 +85,7 @@ fun News(
                 is NewsViewModel.State.Error -> Box(Modifier.fillMaxSize()) {
                     ErrorPage(message = {
                         Text("加载出错")
-                    }, onRetryClick = {
-                        vm.refresh()
-                    })
+                    }, onRetryClick = onRefreshClick)
                 }
             }
         }
@@ -79,7 +97,7 @@ private fun NewsItem(
     modifier: Modifier = Modifier,
     title: String,
     brief: String,
-    coverUrl: String,
+    coverImage: @Composable () -> Unit,
     onClick: () -> Unit
 ) {
     val cutBrief = remember(brief) {
@@ -89,10 +107,9 @@ private fun NewsItem(
     Card(modifier = modifier.clickable(onClick = onClick), elevation = 2.dp) {
         Box(Modifier.fillMaxWidth().wrapContentHeight()) {
             // Cover Image
-            NetworkImage(
+            Surface(
                 modifier = Modifier.fillMaxWidth().aspectRatio(4f / 3f),
-                url = coverUrl,
-                contentScale = ContentScale.Crop
+                content = coverImage
             )
             Column(
                 modifier = Modifier.wrapContentHeight()
@@ -115,5 +132,28 @@ private fun NewsItem(
                 )
             }
         }
+    }
+}
+
+@Preview
+@Composable
+private fun NewsPreview() {
+    PreviewTheme {
+        NewsUI(
+            onNavClick = {},
+            state = NewsViewModel.State.Succeed,
+            news = remember {
+                listOf(
+                    NewsViewModel.News.Article(
+                        0,
+                        "Test article",
+                        "Test brief",
+                        "http://aaa.aaa"
+                    )
+                )
+            },
+            onNewsClick = {},
+            onRefreshClick = {}
+        )
     }
 }

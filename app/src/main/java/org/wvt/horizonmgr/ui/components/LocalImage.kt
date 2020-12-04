@@ -24,13 +24,13 @@ fun LocalImage(
     alpha: Float = DefaultAlpha,
     colorFilter: ColorFilter? = null
 ) {
-    var image by remember { mutableStateOf<ImageAsset?>(null) }
+    var image by remember { mutableStateOf<ImageBitmap?>(null) }
     val scope = rememberCoroutineScope()
 
     onCommit(path) {
         if (path == null) return@onCommit
         scope.launch(Dispatchers.IO) {
-            image = BitmapFactory.decodeFile(path).asImageAsset()
+            image = BitmapFactory.decodeFile(path).asImageBitmap()
         }
     }
 

@@ -2,7 +2,11 @@ package org.wvt.horizonmgr.service.horizonmgr2
 
 import android.content.Context
 import android.os.Environment
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.wvt.horizonmgr.service.HorizonManager
+import org.wvt.horizonmgr.service.horizonmgr2.pack.InstalledPackage
+import org.wvt.horizonmgr.service.horizonmgr2.pack.ZipPackage
 import org.wvt.horizonmgr.utils.CoroutineZip
 import org.wvt.horizonmgr.utils.translateToValidFile
 import java.io.File
@@ -28,23 +32,26 @@ class HorizonManager2 private constructor(context: Context) {
         Environment.getExternalStorageDirectory().resolve("games").resolve("horizon")
     private val packDir = horizonDir.resolve("packs")
 
-    fun getPackages(): List<LocalPackage> {
+    suspend fun getPackages(): List<InstalledPackage> = withContext(Dispatchers.IO) {
         val subDirs = packDir.listFiles() ?: emptyArray()
-        val packages = mutableListOf<LocalPackage>()
+        val packages = mutableListOf<InstalledPackage>()
 
         for (dir in subDirs) {
             val pkg = try {
-                LocalPackage(dir)
+                InstalledPackage(dir)
             } catch (e: IllegalStateException) {
                 continue
             }
             packages.add(pkg)
         }
 
-        return packages
+        return@withContext packages
     }
 
-    suspend fun installPackage(zipPackage: ZipPackage, graphicsZip: File): LocalPackage {
+    suspend fun installPackage(
+        zipPackage: ZipPackage,
+        graphicsZip: File
+    ): InstalledPackage = withContext(Dispatchers.IO) {
         if (packDir.exists().not()) packDir.mkdirs()
         // 根据指定分包名称生成目录
         val outDir =
@@ -66,6 +73,6 @@ class HorizonManager2 private constructor(context: Context) {
             it.write(jsonStr)
         }
         outDir.resolve(".installation_complete").createNewFile()
-        return LocalPackage(outDir)
+        return@withContext InstalledPackage(outDir)
     }
 }

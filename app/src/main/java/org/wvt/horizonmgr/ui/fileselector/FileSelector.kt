@@ -12,21 +12,20 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ChevronRight
-import androidx.compose.material.icons.filled.Folder
-import androidx.compose.material.icons.filled.InsertDriveFile
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEachIndexed
 import androidx.compose.ui.util.fastMap
-import androidx.ui.tooling.preview.Preview
+import androidx.compose.ui.zIndex
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.wvt.horizonmgr.ui.theme.HorizonManagerTheme
+import org.wvt.horizonmgr.ui.theme.PreviewTheme
 import java.io.File
 import java.util.*
 
@@ -222,12 +221,15 @@ fun FileSelector(onCancel: () -> Unit, onSelect: (String) -> Unit) {
 
 
 @Composable
-fun CustomAppBar(
+private fun CustomAppBar(
     onCancel: () -> Unit,
     data: PathTabData,
     onSelectDepth: (depth: Int) -> Unit
 ) {
-    Surface(elevation = 4.dp) {
+    Surface(
+        modifier = Modifier.zIndex(4.dp.value),
+        elevation = 4.dp
+    ) {
         Column {
             TopAppBar(
                 title = { Text("选择文件") },
@@ -250,7 +252,7 @@ data class PathTabData(
 )
 
 @Composable
-fun PathTab(
+private fun PathTab(
     data: PathTabData,
     onSelectDepth: (depth: Int) -> Unit
 ) {
@@ -286,7 +288,7 @@ fun PathTab(
                     onClick = { onSelectDepth(index) },
                     indication = null
                 ).onGloballyPositioned { sizes.add(index, it.size.width) },
-                alignment = Alignment.Center
+                contentAlignment = Alignment.Center
             ) {
                 Text(
                     modifier = Modifier.padding(top = 16.dp, bottom = 16.dp),
@@ -307,7 +309,7 @@ fun PathTab(
             if (index + 1 < data.paths.size) {
                 Icon(
                     modifier = Modifier.padding(start = 8.dp, end = 8.dp),
-                    asset = Icons.Filled.ChevronRight,
+                    imageVector = Icons.Filled.ChevronRight,
                     tint = MaterialTheme.colors.onSurface.copy(alpha = 0.5f)
                 )
             }
@@ -334,19 +336,27 @@ private fun PathList(
     onFileSelect: (index: Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val header = @Composable {
+        Text(
+            modifier = Modifier.padding(16.dp),
+            text = "已固定",
+            color = MaterialTheme.colors.primary,
+            style = MaterialTheme.typography.subtitle1
+        )
+        pinedPath.fastForEachIndexed { index, folder ->
+            FolderEntry(name = folder.name,
+                onClick = { onPinnedFolderSelect(index) },
+                isStared = true,
+                onStarChange = {}
+            )
+        }
+        Divider(Modifier.padding(top = 8.dp, bottom = 8.dp))
+    }
+
     if (entries.isEmpty()) {
         // 如果子文件是空的，那么 LazyColumnForIndex 不会触发，需要手动检测
         Column(modifier) {
-            Text(
-                modifier = Modifier.padding(16.dp),
-                text = "已固定",
-                color = MaterialTheme.colors.primary,
-                style = MaterialTheme.typography.subtitle1
-            )
-            pinedPath.fastForEachIndexed { index, folder ->
-                FolderEntry(entry = folder, onClick = { onPinnedFolderSelect(index) })
-            }
-            Divider(Modifier.padding(top = 8.dp, bottom = 8.dp))
+            header()
             Box(Modifier.fillMaxSize()) {
                 Text(
                     modifier = Modifier.align(Alignment.Center),
@@ -359,87 +369,45 @@ private fun PathList(
             modifier = modifier,
             items = entries
         ) { index, item ->
-            if (index == 0) {
-                Text(
-                    modifier = Modifier.padding(16.dp),
-                    text = "已固定",
-                    color = MaterialTheme.colors.primary,
-                    style = MaterialTheme.typography.subtitle1
-                )
-                pinedPath.fastForEachIndexed { index, folder ->
-                    FolderEntry(entry = folder, onClick = { onPinnedFolderSelect(index) })
-                }
-                Divider(Modifier.padding(top = 8.dp, bottom = 8.dp))
-            }
+            if (index == 0) header()
             if (item is PathListEntry.Folder) {
-                FolderEntry(entry = item, onClick = { onFolderSelect(index) })
+                FolderEntry(name = item.name, onClick = { onFolderSelect(index) },
+                    isStared = false, onStarChange = {})
             } else if (item is PathListEntry.File) {
-                FileEntry(entry = item, onClick = { onFileSelect(index) })
+                FileEntry(name = item.name, onClick = { onFileSelect(index) })
             }
         }
     }
 }
 
-@Composable
-private fun FileEntry(entry: PathListEntry.File, onClick: () -> Unit) {
-    ListItem(
-        modifier = Modifier.clickable(onClick = onClick),
-        icon = { Icon(Icons.Filled.InsertDriveFile) },
-        text = { Text(entry.name) }
-    )
-}
-
-@Composable
-private fun FolderEntry(entry: PathListEntry.Folder, onClick: () -> Unit) {
-    ListItem(
-        modifier = Modifier.clickable(onClick = onClick),
-        icon = { Icon(Icons.Filled.Folder) },
-        text = { Text(entry.name) }
-    )
-}
-
 @Preview
 @Composable
 private fun CustomAppBarPreview() {
-    HorizonManagerTheme {
-        Surface {
-            CustomAppBar(
-                onCancel = {},
-                data = PathTabData(listOf("内部存储", "Android"), 0),
-                onSelectDepth = {}
-            )
-        }
+    PreviewTheme {
+        CustomAppBar(
+            onCancel = {},
+            data = PathTabData(listOf("内部存储", "Android"), 0),
+            onSelectDepth = {}
+        )
     }
 }
 
 @Preview
 @Composable
 private fun PathListPreview() {
-    HorizonManagerTheme {
-        Surface {
-            PathList(
-                modifier = Modifier.fillMaxSize(),
-                pinedPath = listOf(PathListEntry.Folder("QQ 文件"), PathListEntry.Folder("下载文件")),
-                entries = listOf(
-                    PathListEntry.Folder("Android"),
-                    PathListEntry.Folder("Download"),
-                    PathListEntry.Folder("Tencent"),
-                    PathListEntry.File(".temp"),
-                ),
-                onPinnedFolderSelect = {},
-                onFolderSelect = {},
-                onFileSelect = {}
-            )
-        }
-    }
-}
-
-@Composable
-@Preview
-private fun FileSelectorPreview() {
-    HorizonManagerTheme {
-        Surface {
-            FileSelector(onCancel = {}, onSelect = {})
-        }
+    PreviewTheme {
+        PathList(
+            modifier = Modifier.fillMaxSize(),
+            pinedPath = listOf(PathListEntry.Folder("QQ 文件"), PathListEntry.Folder("下载文件")),
+            entries = listOf(
+                PathListEntry.Folder("Android"),
+                PathListEntry.Folder("Download"),
+                PathListEntry.Folder("Tencent"),
+                PathListEntry.File(".temp"),
+            ),
+            onPinnedFolderSelect = {},
+            onFolderSelect = {},
+            onFileSelect = {}
+        )
     }
 }

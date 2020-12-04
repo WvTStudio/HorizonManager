@@ -13,21 +13,21 @@ import org.wvt.horizonmgr.service.WebAPI
 import org.wvt.horizonmgr.utils.CoroutineDownloader
 
 @Deprecated("Deprecated")
-val HorizonManagerAmbient = staticAmbientOf<HorizonManager>()
+val AmbientHorizonManager = staticAmbientOf<HorizonManager>()
 
 @Deprecated("Deprecated")
-val CoroutineDownloaderAmbient = staticAmbientOf<CoroutineDownloader>()
+val AmbientCoroutineDownloader = staticAmbientOf<CoroutineDownloader>()
 
 @Deprecated("Deprecated")
-val WebAPIAmbient = staticAmbientOf<WebAPI>()
+val AmbientWebAPI = staticAmbientOf<WebAPI>()
 
 @Deprecated("Deprecated")
-val LocalCacheAmbient = staticAmbientOf<LocalCache>()
+val AmbientLocalCache = staticAmbientOf<LocalCache>()
 
 @Deprecated("Deprecated")
-val NavigatorAmbient = staticAmbientOf<NavigatorViewModel>()
+val AmbientNavigator = staticAmbientOf<NavigatorViewModel>()
 
-// 用 Ambient 解决依赖前没有发现问题
+// 用 Ambient 解决依赖
 @Composable
 fun AndroidDependenciesProvider(children: @Composable () -> Unit) {
     val api = remember { HorizonManagerApplication.container }
@@ -37,10 +37,10 @@ fun AndroidDependenciesProvider(children: @Composable () -> Unit) {
     val localCache = remember { api.localCache }
 
     Providers(
-        HorizonManagerAmbient provides horizonMgr,
-        WebAPIAmbient provides webApiInstance,
-        LocalCacheAmbient provides localCache,
-        children = children
+        AmbientHorizonManager provides horizonMgr,
+        AmbientWebAPI provides webApiInstance,
+        AmbientLocalCache provides localCache,
+        content = children
     )
 }
 

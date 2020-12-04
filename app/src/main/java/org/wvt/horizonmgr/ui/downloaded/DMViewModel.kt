@@ -1,6 +1,6 @@
 package org.wvt.horizonmgr.ui.downloaded
 
-import androidx.compose.ui.graphics.ImageAsset
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,7 +19,7 @@ class DMViewModel(
         internal val uuid: String,
         val name: String,
         val description: String,
-        val icon: ImageAsset?
+        val icon: ImageBitmap?
     )
 
     private val _mods = MutableStateFlow(emptyList<DownloadedMod>())

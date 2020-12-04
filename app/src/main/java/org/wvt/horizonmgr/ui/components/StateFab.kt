@@ -33,11 +33,11 @@ fun StateFab(
             ) { Icon(Icons.Filled.ArrowForward) }
             FabState.LOADING -> CircularProgressIndicator()
             FabState.SUCCEED -> Icon(
-                asset = Icons.Filled.Check,
+                imageVector = Icons.Filled.Check,
                 tint = MaterialTheme.colors.secondary
             )
             FabState.FAILED -> Icon(
-                asset = Icons.Filled.Clear,
+                imageVector = Icons.Filled.Clear,
                 tint = MaterialTheme.colors.error
             )
         }

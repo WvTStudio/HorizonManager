@@ -3,13 +3,15 @@ package org.wvt.horizonmgr.ui.theme
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.Colors
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.staticAmbientOf
+import androidx.compose.ui.Modifier
 
-val ThemeControllerAmbient = staticAmbientOf<ThemeController>()
-val ThemeConfigAmbient = staticAmbientOf<ThemeConfig>()
+val AmbientThemeController = staticAmbientOf<ThemeController>()
+val AmbientThemeConfig = staticAmbientOf<ThemeConfig>()
 
 interface ThemeController {
     fun setFollowSystemDarkTheme(enable: Boolean)
@@ -40,12 +42,25 @@ fun HorizonManagerTheme(
 
     val colors = if (darkTheme) config.darkColor else config.lightColor
     Providers(
-        ThemeControllerAmbient provides controller,
-        ThemeConfigAmbient provides config
+        AmbientThemeController provides controller,
+        AmbientThemeConfig provides config
     ) {
         MaterialTheme(
             colors = colors,
             content = content
+        )
+    }
+}
+
+@Composable
+fun PreviewTheme(
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit
+) {
+    MaterialTheme(colors = DefaultThemeConfig.lightColor) {
+        Surface(
+            modifier = modifier,
+            color = MaterialTheme.colors.background, content = content
         )
     }
 }

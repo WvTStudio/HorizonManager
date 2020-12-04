@@ -18,7 +18,7 @@ import androidx.compose.ui.unit.dp
 import org.wvt.horizonmgr.dependenciesViewModel
 import org.wvt.horizonmgr.ui.components.NetworkImage
 import org.wvt.horizonmgr.ui.components.ProgressDialog
-import org.wvt.horizonmgr.ui.main.SelectedPackageUUIDAmbient
+import org.wvt.horizonmgr.ui.main.AmbientSelectedPackageUUID
 
 @Composable
 fun Online(
@@ -30,7 +30,7 @@ fun Online(
     val options by vm.options.collectAsState()
     val downloadState by vm.downloadState.collectAsState()
     val installState by vm.installState.collectAsState()
-    val selectedPackageUUID = SelectedPackageUUIDAmbient.current
+    val selectedPackageUUID = AmbientSelectedPackageUUID.current
 
     onCommit(enable) { vm.setEnable(enable) }
 

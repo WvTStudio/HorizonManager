@@ -46,14 +46,14 @@ fun ProgressDialog(
                     }
                     is ProgressDialogState.Failed -> {
                         Box(Modifier.size(40.dp), Alignment.Center) {
-                            Icon(asset = Icons.Filled.Close, tint = MaterialTheme.colors.error)
+                            Icon(imageVector = Icons.Filled.Close, tint = MaterialTheme.colors.error)
                         }
                         Content(state.message)
                     }
                     is ProgressDialogState.Finished -> {
                         Box(Modifier.size(40.dp), Alignment.Center) {
                             Icon(
-                                asset = Icons.Filled.Check,
+                                imageVector =  Icons.Filled.Check,
                                 tint = MaterialTheme.colors.secondary
                             )
                         }

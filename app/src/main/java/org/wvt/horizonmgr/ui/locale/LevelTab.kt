@@ -9,12 +9,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import org.wvt.horizonmgr.service.HorizonManager
-import org.wvt.horizonmgr.ui.HorizonManagerAmbient
+import org.wvt.horizonmgr.ui.AmbientHorizonManager
 import org.wvt.horizonmgr.ui.components.InputDialogHost
 import org.wvt.horizonmgr.ui.components.InputDialogHostState
 import org.wvt.horizonmgr.ui.components.ProgressDialog
 import org.wvt.horizonmgr.ui.components.ProgressDialogState
-import org.wvt.horizonmgr.ui.main.SelectedPackageUUIDAmbient
+import org.wvt.horizonmgr.ui.main.AmbientSelectedPackageUUID
 
 enum class LevelTabType {
     MC, IC
@@ -22,8 +22,8 @@ enum class LevelTabType {
 
 @Composable
 internal fun LevelTab(type: LevelTabType) {
-    val pkgId = SelectedPackageUUIDAmbient.current
-    val horizonMgr = HorizonManagerAmbient.current
+    val pkgId = AmbientSelectedPackageUUID.current
+    val horizonMgr = AmbientHorizonManager.current
     var items by remember { mutableStateOf<List<HorizonManager.LevelInfo>>(emptyList()) }
     val scope = rememberCoroutineScope()
     var progressDialogState by remember { mutableStateOf<ProgressDialogState?>(null) }

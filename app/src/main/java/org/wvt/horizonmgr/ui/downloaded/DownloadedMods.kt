@@ -13,14 +13,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import org.wvt.horizonmgr.dependenciesViewModel
 import org.wvt.horizonmgr.ui.components.ProgressDialog
-import org.wvt.horizonmgr.ui.main.SelectedPackageUUIDAmbient
+import org.wvt.horizonmgr.ui.main.AmbientSelectedPackageUUID
 
 @Composable
 fun DownloadedMods(onNavClicked: () -> Unit) {
     val vm = dependenciesViewModel<DMViewModel>()
     val mods by vm.mods.collectAsState()
     val progressState by vm.progressState.collectAsState()
-    val selected = SelectedPackageUUIDAmbient.current
+    val selected = AmbientSelectedPackageUUID.current
 
     onCommit(selected) {
         vm.setSelectedPackage(selected)
@@ -32,7 +32,7 @@ fun DownloadedMods(onNavClicked: () -> Unit) {
             modifier = Modifier.zIndex(4.dp.value), title = {
                 Text("本地资源")
             }, navigationIcon = {
-                IconButton(onClick = onNavClicked, icon = {
+                IconButton(onClick = onNavClicked, content = {
                     Icon(Icons.Filled.Menu)
                 })
             }, backgroundColor = MaterialTheme.colors.surface
@@ -94,7 +94,7 @@ private fun ModItem(
                 IconButton(
                     modifier = Modifier.padding(end = 16.dp).align(Alignment.CenterEnd),
                     onClick = onInstallClicked
-                ) { Icon(asset = Icons.Filled.Extension, tint = MaterialTheme.colors.primary) }
+                ) { Icon(imageVector = Icons.Filled.Extension, tint = MaterialTheme.colors.primary) }
             }
         }
     }

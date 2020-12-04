@@ -13,17 +13,17 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.VectorAsset
-import androidx.compose.ui.platform.ContextAmbient
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.AmbientContext
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import org.wvt.horizonmgr.service.HorizonManager
-import org.wvt.horizonmgr.ui.HorizonManagerAmbient
+import org.wvt.horizonmgr.ui.AmbientHorizonManager
 import org.wvt.horizonmgr.utils.calcSize
 import java.io.File
 
 private data class Item(
-    val icon: VectorAsset,
+    val icon: ImageVector,
     val title: String,
     val content: String
 )
@@ -35,11 +35,11 @@ private data class Section(
 
 @Composable
 fun PackageInfo(pkgId: String) {
-    val context = ContextAmbient.current as AppCompatActivity
+    val context = AmbientContext.current as AppCompatActivity
     val scope = rememberCoroutineScope()
     var pkgInfo by remember { mutableStateOf<HorizonManager.LocalPackage?>(null) }
     var manifest by remember { mutableStateOf<HorizonManager.PackageManifest?>(null) }
-    val horizonMgr = HorizonManagerAmbient.current
+    val horizonMgr = AmbientHorizonManager.current
 
     onActive {
         scope.launch {

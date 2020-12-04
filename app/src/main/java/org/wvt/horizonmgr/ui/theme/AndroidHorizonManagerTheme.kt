@@ -8,7 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.ContextAmbient
+import androidx.compose.ui.platform.AmbientContext
 import androidx.core.content.edit
 
 private var config = mutableStateOf<ThemeConfig>(DefaultThemeConfig)
@@ -19,7 +19,7 @@ private var controller: ThemeController? = null
  */
 @Composable
 fun AndroidHorizonManagerTheme(content: @Composable () -> Unit) {
-    val context = ContextAmbient.current
+    val context = AmbientContext.current
 
     val theController = remember(context) {
         controller ?: ControllerImpl(context).also { controller = it }
