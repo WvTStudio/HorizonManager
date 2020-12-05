@@ -1,4 +1,4 @@
-package org.wvt.horizonmgr.service.webapi2.usermodule
+package org.wvt.horizonmgr.webapi.usermodule
 
 import kotlinx.coroutines.channels.ReceiveChannel
 

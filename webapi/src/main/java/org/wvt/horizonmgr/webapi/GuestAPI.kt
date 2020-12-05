@@ -1,4 +1,4 @@
-package org.wvt.horizonmgr.service.webapi2
+package org.wvt.horizonmgr.webapi
 
 /**
  * 为未登录游客提供的 API

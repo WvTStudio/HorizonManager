@@ -1,4 +1,4 @@
-package org.wvt.horizonmgr.service.webapi2.packagemodule
+package org.wvt.horizonmgr.webapi.packagemodule
 
 interface PackageModule {
     suspend fun getHZRepository(): HzPackageRepository

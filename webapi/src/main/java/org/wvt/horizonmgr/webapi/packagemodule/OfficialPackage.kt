@@ -1,7 +1,7 @@
-package org.wvt.horizonmgr.service.webapi2.packagemodule
+package org.wvt.horizonmgr.webapi.packagemodule
 
 import kotlinx.coroutines.channels.ReceiveChannel
-import org.wvt.horizonmgr.service.webapi2.usermodule.User
+import org.wvt.horizonmgr.webapi.usermodule.User
 import java.net.URL
 
 interface OfficialPackageRepository {

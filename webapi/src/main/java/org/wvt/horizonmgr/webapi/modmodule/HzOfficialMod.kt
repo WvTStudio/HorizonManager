@@ -1,4 +1,4 @@
-package org.wvt.horizonmgr.service.webapi2.modmodule
+package org.wvt.horizonmgr.webapi.modmodule
 
 import kotlinx.coroutines.channels.ReceiveChannel
 
