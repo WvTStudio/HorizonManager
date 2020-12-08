@@ -1,21 +1,20 @@
-package org.wvt.horizonmgr.webapi.modmodule
+package org.wvt.horizonmgr.webapi.mod
 
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.datetime.Instant
-import org.wvt.horizonmgr.webapi.usermodule.User
 import java.net.URL
 
 /**
- * 这是以后需要做的仓库
+ * TODO-Proposal 这是以后需要做的仓库
  */
-interface OfficialRepository : ModRepository {
-    override suspend fun getRecommendMods(): ReceiveChannel<Mod>
-    suspend fun search(text: String): ReceiveChannel<OfficialMod>
+interface ICCNRepository {
+    suspend fun getRecommendMods(): ReceiveChannel<ICCNMod>
+    suspend fun search(text: String): ReceiveChannel<ICCNMod>
 }
 
-interface OfficialMod : Mod {
-    override suspend fun getName(): String
-    override suspend fun getDescription(): String
+interface ICCNMod {
+    suspend fun getName(): String
+    suspend fun getDescription(): String
 
     suspend fun getDeveloper(): User
     suspend fun getVersionCode(): Int
@@ -42,4 +41,11 @@ interface ModComment {
     suspend fun getCreateTime(): Instant
     suspend fun getContent(): String
     suspend fun getReplies(): ReceiveChannel<ModComment>
+}
+
+/**
+ * TODO-Proposal 以后该类要和 ICCN 社区绑定
+ */
+interface User {
+
 }

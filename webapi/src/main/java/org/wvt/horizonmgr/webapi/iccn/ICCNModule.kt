@@ -1,4 +1,4 @@
-package org.wvt.horizonmgr.webapi.iccnmodule
+package org.wvt.horizonmgr.webapi.iccn
 
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
@@ -47,7 +47,7 @@ class ICCNModule {
      * @throws [LoginFailedException] 登录失败
      */
     suspend fun login(account: String, password: String): UserClient {
-        val result = client.submitForm<String>(
+        val jsonStr = client.submitForm<String>(
             url = "https://adodoz.cn/app_login.php",
             formParameters = Parameters.build {
                 set("username", account)
@@ -55,7 +55,7 @@ class ICCNModule {
             }
         )
 
-        val json = JSONObject(result)
+        val json = JSONObject(jsonStr)
         val status = try {
             json.getInt("status")
         } catch (e: JSONException) {
@@ -74,7 +74,7 @@ class ICCNModule {
                 avatarUrl = getString("user_avatar")
             }
         } catch (e: JSONException) {
-            throw JsonParseException(e)
+            throw JsonParseException(jsonStr, e)
         }
 
         return UserClient(id.toString(), username, avatarUrl, account)
@@ -139,7 +139,7 @@ class ICCNModule {
      * [RegisterFailedException.errors] 属性包含了服务器返回的所有导致注册失败的因素
      */
     suspend fun register(username: String, email: String, password: String): String {
-        // Step 1
+        // Step 1 - Get session and token
         val session: String
         val token: String
 
@@ -153,7 +153,7 @@ class ICCNModule {
                 ?: throw ServerException("token not found")
         }
 
-        // Step 2
+        // Step 2 - Register
         val regResponse = client.post<HttpResponse>("https://adodoz.cn/register") {
             body = TextContent(
                 JSONObject().apply {
@@ -171,7 +171,7 @@ class ICCNModule {
             }
         }
 
-        // Parse
+        // Step3 - Parse register result
         val responseContent = regResponse.readText()
         if (regResponse.status.value == 201) {
             // succeed
@@ -181,7 +181,7 @@ class ICCNModule {
                     .getString("id")
             } catch (e: JSONException) {
                 // Generally, the cause is that "id" does not exist.
-                throw JsonParseException(e)
+                throw JsonParseException(responseContent, e)
             }
             return id
         } else {
@@ -199,7 +199,7 @@ class ICCNModule {
                         errors.add(entry)
                     }
             } catch (e: JSONException) {
-                throw JsonParseException(e)
+                throw JsonParseException(responseContent, e)
             }
             throw RegisterFailedException(errors)
         }

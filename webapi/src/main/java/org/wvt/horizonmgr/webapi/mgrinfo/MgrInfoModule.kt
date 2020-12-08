@@ -1,4 +1,4 @@
-package org.wvt.horizonmgr.webapi.mgrmodule
+package org.wvt.horizonmgr.webapi.mgrinfo
 
 interface MgrModule {
     suspend fun getDonateList(): List<DonateRecord>

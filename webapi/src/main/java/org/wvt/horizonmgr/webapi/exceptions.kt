@@ -33,7 +33,10 @@ class OtherResultCodeException(val resultCode: Int, val content: String?) :
 open class ParseException(message: String? = null, cause: Throwable? = null) :
     WebAPIException(message ?: "无法解析数据", cause)
 
-class JsonParseException(cause: Throwable? = null) : WebAPIException("解析 Json 时发生错误", cause = cause)
+class JsonParseException(
+    val jsonSource: String,
+    cause: Throwable? = null
+) : WebAPIException("解析以下 Json 时发生错误：$jsonSource", cause = cause)
 
 /**
  * 代表业务逻辑上，成功数据以外的错误，例如因账号密码错误导致的登录失败、用户不存在

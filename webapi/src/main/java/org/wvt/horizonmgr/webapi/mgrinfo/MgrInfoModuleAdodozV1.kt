@@ -1,4 +1,4 @@
-package org.wvt.horizonmgr.webapi.mgrmodule
+package org.wvt.horizonmgr.webapi.mgrinfo
 
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
@@ -13,7 +13,7 @@ import org.wvt.horizonmgr.webapi.parseJson
 /**
  * 与 Adodoz 服务器通信，使用服务器的 V1 API
  */
-internal class MgrModuleAdodozV1 : MgrModule {
+internal class AdodozV1MgrInfoModule : MgrModule {
     private val client = HttpClient(CIO)
 
     internal data class DonateRecordImpl(
