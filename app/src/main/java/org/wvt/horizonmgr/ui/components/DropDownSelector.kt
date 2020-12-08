@@ -24,36 +24,36 @@ fun DropDownSelector(
     val sourceInteractionState = remember { InteractionState() }
     var dropDown by remember { mutableStateOf(false) }
 
-    Crossfade(current = items[selectedIndex]) {
-        Row(
-            modifier = modifier.clickable(
-                onClick = { dropDown = true },
-                interactionState = sourceInteractionState,
-                indication = null
-            ),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
+    Row(
+        modifier = modifier.clickable(
+            onClick = { dropDown = true },
+            interactionState = sourceInteractionState,
+            indication = null
+        ),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Crossfade(current = items[selectedIndex]) {
             Text(it, style = MaterialTheme.typography.body1)
-            DropdownMenu(
-                expanded = dropDown,
-                onDismissRequest = { dropDown = false },
-                toggle = {
-                    IconButton(
-                        modifier = Modifier.indication(
-                            sourceInteractionState,
-                            rememberRippleIndication(bounded = false, radius = 24.dp)
-                        ),
-                        onClick = { dropDown = true }
-                    ) { Icon(Icons.Filled.ArrowDropDown) }
-                }, dropdownContent = {
-                    items.forEachIndexed { index, item ->
-                        DropdownMenuItem(onClick = {
-                            dropDown = false
-                            onSelected(index)
-                        }) { Text(item) }
-                    }
-                }
-            )
         }
+        DropdownMenu(
+            expanded = dropDown,
+            onDismissRequest = { dropDown = false },
+            toggle = {
+                IconButton(
+                    modifier = Modifier.indication(
+                        sourceInteractionState,
+                        rememberRippleIndication(bounded = false, radius = 24.dp)
+                    ),
+                    onClick = { dropDown = true }
+                ) { Icon(Icons.Filled.ArrowDropDown) }
+            }, dropdownContent = {
+                items.forEachIndexed { index, item ->
+                    DropdownMenuItem(onClick = {
+                        dropDown = false
+                        onSelected(index)
+                    }) { Text(item) }
+                }
+            }
+        )
     }
 }

@@ -77,7 +77,7 @@ class WebAPI private constructor(context: Context) {
 
     data class RegisterErrorEntry(val status: String, val code: String, val detail: String)
     class RegisterException(val errors: List<RegisterErrorEntry>) :
-        ServiceException(0, "注册失败", null)
+    ServiceException(0, "注册失败", null)
 
     /**
      * @return Uid of the new user

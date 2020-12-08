@@ -7,7 +7,7 @@ import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import org.wvt.horizonmgr.utils.CoroutineZip
 import org.wvt.horizonmgr.utils.toArray
-import org.wvt.horizonmgr.utils.translateToValidFile
+import me.konyaco.horizonmgr.service.utils.translateToValidFile
 import java.io.File
 import java.lang.ref.WeakReference
 import java.util.*

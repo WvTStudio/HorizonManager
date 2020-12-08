@@ -1,4 +1,4 @@
-package org.wvt.horizonmgr.service.horizonmgr2.pack
+package me.konyaco.horizonmgr.service.pack
 
 import org.json.JSONObject
 import java.io.File

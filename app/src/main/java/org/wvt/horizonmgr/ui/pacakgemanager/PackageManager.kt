@@ -14,8 +14,10 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.savedinstancestate.savedInstanceState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.gesture.tapGestureFilter
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.AmbientContext
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import kotlinx.coroutines.CancellableContinuation
@@ -27,6 +29,7 @@ import org.wvt.horizonmgr.ui.components.InputDialogHost
 import org.wvt.horizonmgr.ui.components.InputDialogHostState
 import org.wvt.horizonmgr.ui.components.ProgressDialog
 import org.wvt.horizonmgr.ui.main.AmbientSelectedPackageUUID
+import org.wvt.horizonmgr.ui.theme.PreviewTheme
 import kotlin.coroutines.resume
 
 data class PackageManagerItem(
@@ -75,14 +78,8 @@ fun PackageManager(
             )
 
             if (vmPackages.isNullOrEmpty()) {
-                // Tips when there was no packages installed.
-                Box(Modifier.fillMaxSize()) {
-                    Row(Modifier.align(Alignment.Center)) {
-                        Text("您还未安装分包，请点击")
-                        Icon(Icons.Filled.GetApp)
-                        Text("按钮在线安装")
-                    }
-                }
+                // Tips when there was no package installed.
+                EmptyPage()
             } else LazyColumnForIndexed(
                 modifier = Modifier.fillMaxSize(),
                 items = vmPackages,
@@ -106,15 +103,8 @@ fun PackageManager(
         ConfirmDeleteDialogHost(state = confirmDeleteDialogHostState)
         InputDialogHost(state = inputDialogHostState)
 
-        /*// Online Install Button
-        ExtendedFloatingActionButton(
-            modifier = Modifier.align(Alignment.BottomEnd).padding(16.dp),
-            onClick = { vm.startInstallPackageActivity(context) },
-            text = { Text("添加") },
-            icon = { Icon(Icons.Filled.Add) }
-        )
-*/
-        Fabs(
+        FABs(
+            modifier = Modifier.fillMaxSize(),
             expand = fabExpand,
             onExpandStateChange = { fabExpand = it },
             onLocalInstallClick = {
@@ -122,6 +112,71 @@ fun PackageManager(
             },
             onOnlineInstallClick = { vm.startInstallPackageActivity(context) }
         )
+    }
+}
+
+@Composable
+private fun EmptyPage() {
+    Box(Modifier.fillMaxSize()) {
+        Row(Modifier.align(Alignment.Center)) {
+            Text("您还未安装分包，请点击")
+            Icon(Icons.Filled.GetApp)
+            Text("按钮在线安装")
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+private fun <T> PackageManagerUI(
+    onNavClick: () -> Unit,
+    packages: List<T>,
+    fabContent: @Composable () -> Unit,
+    emptyPage: @Composable () -> Unit,
+    item: @Composable (index: Int, item: T) -> Unit,
+    displayConfirmDialog: Boolean,
+    onConfirmDialogConfirm: () -> Unit,
+    onConfirmDialogCancel: () -> Unit,
+) {
+    val snackbarHostState = remember { SnackbarHostState() }
+    val confirmDeleteDialogHostState = remember { ConfirmDeleteDialogHostState() }
+    val inputDialogHostState = remember { InputDialogHostState() }
+
+    Box {
+        Column {
+            // Top App Bar
+            TopAppBar(
+                modifier = Modifier.zIndex(4.dp.value),
+                title = {
+                    Text("分包管理")
+                }, navigationIcon = {
+                    IconButton(onClick = onNavClick) { Icon(Icons.Filled.Menu) }
+                }, backgroundColor = MaterialTheme.colors.surface
+            )
+
+            if (packages.isEmpty()) {
+                Box(Modifier.fillMaxSize()) {
+                    emptyPage()
+                }
+            } else {
+                LazyColumnForIndexed(
+                    modifier = Modifier.fillMaxSize(),
+                    items = packages,
+                    contentPadding = PaddingValues(top = 8.dp, bottom = 64.dp),
+                    itemContent = { index, item ->
+                        item(index, item)
+                    }
+                )
+            }
+        }
+
+        SnackbarHost(hostState = snackbarHostState)
+        ConfirmDeleteDialogHost(state = confirmDeleteDialogHostState)
+        InputDialogHost(state = inputDialogHostState)
+
+        Box(Modifier.align(Alignment.BottomEnd)) {
+            fabContent()
+        }
     }
 }
 
@@ -133,47 +188,48 @@ private val fab2Exit = tween<Float>(100, 0, FastOutSlowInEasing)
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-private fun Fabs(
+private fun FABs(
+    modifier: Modifier = Modifier,
     expand: Boolean,
     onExpandStateChange: (expand: Boolean) -> Unit,
     onLocalInstallClick: () -> Unit,
     onOnlineInstallClick: () -> Unit
 ) {
-    Column(
-        Modifier.fillMaxSize().padding(16.dp),
-        Arrangement.Bottom,
-        Alignment.End
+    Box(
+        modifier = modifier.padding(16.dp),
+        contentAlignment = Alignment.BottomEnd
     ) {
-        // TODO: 2020/11/13 Export as a complete ui component.
-        FABEntry(
-            modifier = Modifier.padding(bottom = 16.dp, end = 8.dp),
-            expand = expand,
-            enterAnim = fab2Enter,
-            exitAnim = fab2Exit,
-            text = { Text("在线安装") },
-            icon = { Icon(Icons.Filled.CloudDownload) },
-            onClick = onOnlineInstallClick
-        )
-        FABEntry(
-            modifier = Modifier.padding(bottom = 16.dp, end = 8.dp),
-            expand = expand,
-            enterAnim = fab1Enter,
-            exitAnim = fab1Exit,
-            text = { Text("本地导入") },
-            icon = { Icon(Icons.Filled.Storage) },
-            onClick = onLocalInstallClick
-        )
-        FloatingActionButton(
-            modifier = Modifier.padding(top = 16.dp),
-            onClick = { onExpandStateChange(!expand) }
-        ) {
-            val rotate = animate(if (expand) 45f else 0f)
-            // Rotate 45° to be Close Icon
-            // TODO: 2020/11/13 Use animation icon to instead this.
-            Icon(
-                modifier = Modifier.graphicsLayer(rotationZ = rotate),
-                imageVector = Icons.Filled.Add
+        Column(horizontalAlignment = Alignment.End) {
+            FABEntry(
+                modifier = Modifier.padding(bottom = 16.dp, end = 8.dp),
+                expand = expand,
+                enterAnim = fab2Enter,
+                exitAnim = fab2Exit,
+                text = { Text("在线安装") },
+                icon = { Icon(Icons.Filled.CloudDownload) },
+                onClick = onOnlineInstallClick
             )
+            FABEntry(
+                modifier = Modifier.padding(bottom = 16.dp, end = 8.dp),
+                expand = expand,
+                enterAnim = fab1Enter,
+                exitAnim = fab1Exit,
+                text = { Text("本地导入") },
+                icon = { Icon(Icons.Filled.Storage) },
+                onClick = onLocalInstallClick
+            )
+            FloatingActionButton(
+                modifier = Modifier.padding(top = 16.dp),
+                onClick = { onExpandStateChange(!expand) }
+            ) {
+                val rotate = animate(if (expand) 45f else 0f)
+                // Rotate 45° to be Close Icon
+                // TODO: 2020/11/13 Use animation icon to instead this.
+                Icon(
+                    modifier = Modifier.graphicsLayer(rotationZ = rotate),
+                    imageVector = Icons.Filled.Add
+                )
+            }
         }
     }
 }
@@ -188,34 +244,49 @@ private fun FABEntry(
     icon: @Composable () -> Unit,
     onClick: () -> Unit
 ) {
+    val transition =
+        animate(if (expand) 1f else 0f, animSpec = if (expand) enterAnim else exitAnim)
 
-    val transition = animate(if (expand) 1f else 0f, animSpec = if (expand) enterAnim else exitAnim)
-
-    Row(modifier = modifier.wrapContentSize(), verticalAlignment = Alignment.CenterVertically) {
-        Box(Modifier.graphicsLayer(alpha = transition, scaleY = transition, scaleX = transition)) {
-            Card(
-                modifier = Modifier.height(40.dp)
-                    .padding(vertical = 4.dp, horizontal = 16.dp)
-                    .wrapContentWidth(),
-                elevation = 2.dp
+    if (transition > 0f) {
+        Row(modifier = modifier.wrapContentSize(), verticalAlignment = Alignment.CenterVertically) {
+            Box(
+                Modifier.graphicsLayer(
+                    alpha = transition,
+                    scaleY = transition,
+                    scaleX = transition
+                )
             ) {
-                Providers(AmbientContentAlpha provides ContentAlpha.medium) {
-                    Box(
-                        modifier = Modifier.padding(horizontal = 16.dp),
-                        contentAlignment = Alignment.Center,
-                        content = text
-                    )
+                Card(
+                    modifier = Modifier.height(40.dp)
+                        .padding(vertical = 4.dp, horizontal = 16.dp)
+                        .wrapContentWidth(),
+                    elevation = 2.dp
+                ) {
+                    Providers(AmbientContentAlpha provides ContentAlpha.medium) {
+                        Box(
+                            modifier = Modifier.padding(horizontal = 16.dp),
+                            contentAlignment = Alignment.Center,
+                            content = text
+                        )
+                    }
                 }
             }
+            Box(
+                Modifier.graphicsLayer(
+                    alpha = transition,
+                    scaleY = transition,
+                    scaleX = transition
+                )
+            ) {
+                FloatingActionButton(
+                    modifier = Modifier.size(40.dp),
+                    backgroundColor = MaterialTheme.colors.surface,
+                    onClick = onClick,
+                    content = icon
+                )
+            }
         }
-        Box(Modifier.graphicsLayer(alpha = transition, scaleY = transition, scaleX = transition)) {
-            FloatingActionButton(
-                modifier = Modifier.size(40.dp),
-                backgroundColor = MaterialTheme.colors.surface,
-                onClick = onClick,
-                content = icon
-            )
-        }
+
     }
 }
 
@@ -233,8 +304,8 @@ fun PackageItem(
     onCloneClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Card(modifier = modifier.clickable(onClick = onClick), elevation = 2.dp) {
-        Column {
+    Card(modifier = modifier, elevation = 2.dp) {
+        Column(Modifier.clickable(onClick = onClick)) {
             // Body
             Row {
                 Column(
@@ -279,7 +350,12 @@ fun PackageItem(
             }
             // Footer
             Row(
-                modifier = Modifier.padding(top = 4.dp, bottom = 8.dp, start = 16.dp, end = 8.dp)
+                modifier = Modifier.padding(
+                    top = 4.dp,
+                    bottom = 8.dp,
+                    start = 16.dp,
+                    end = 8.dp
+                )
                     .fillMaxWidth().heightIn(min = 32.dp),
                 verticalAlignment = Alignment.Bottom
             ) {
@@ -359,5 +435,45 @@ fun ConfirmDeleteDialogHost(state: ConfirmDeleteDialogHostState) {
                 Text("删除")
             }
         })
+    }
+}
+
+@Preview
+@Composable
+private fun Pareview() {
+    var fabExpand by remember { mutableStateOf(false) }
+    PreviewTheme {
+        PackageManagerUI(
+            onNavClick = { /*TODO*/ },
+            packages = (0..10).toList(),
+            fabContent = {
+                FABs(
+                    modifier = Modifier.fillMaxSize(),
+                    expand = fabExpand,
+                    onExpandStateChange = { fabExpand = it },
+                    onLocalInstallClick = { /*TODO*/ },
+                    onOnlineInstallClick = { /*TODO*/ }
+                )
+            },
+            emptyPage = {
+                EmptyPage()
+            },
+            item = { index, item ->
+                PackageItem(
+                    modifier = Modifier.padding(16.dp, 8.dp),
+                    title = "Example Item",
+                    description = "Example description",
+                    installTime = "unknown",
+                    selected = false,
+                    onClick = { /*TODO*/ },
+                    onInfoClick = { /*TODO*/ },
+                    onDeleteClick = { /*TODO*/ },
+                    onRenameClick = { /*TODO*/ },
+                    onCloneClick = { /*TODO*/ })
+            },
+            displayConfirmDialog = false,
+            onConfirmDialogConfirm = { /*TODO*/ },
+            onConfirmDialogCancel = { /*TODO*/ }
+        )
     }
 }

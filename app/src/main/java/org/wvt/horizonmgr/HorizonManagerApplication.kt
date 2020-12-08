@@ -9,7 +9,6 @@ import androidx.lifecycle.ViewModelProvider
 import org.wvt.horizonmgr.service.HorizonManager
 import org.wvt.horizonmgr.service.LocalCache
 import org.wvt.horizonmgr.service.WebAPI
-import org.wvt.horizonmgr.service.webapi2.WebAPI2
 
 class HorizonManagerApplication : Application() {
     companion object {
@@ -52,6 +51,4 @@ private class DependenciesContainerImpl(private val context: Context) : Dependen
     override val webapi: WebAPI by lazy {
         WebAPI.createInstance(context)
     }
-
-    override val webapi2: WebAPI2 get() = TODO("Not yet implemented")
 }

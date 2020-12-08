@@ -1,33 +1,16 @@
-package org.wvt.horizonmgr.service.horizonmgr2
+package me.konyaco.horizonmgr.service
 
 import android.content.Context
 import android.os.Environment
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.wvt.horizonmgr.service.HorizonManager
-import org.wvt.horizonmgr.service.horizonmgr2.pack.InstalledPackage
-import org.wvt.horizonmgr.service.horizonmgr2.pack.ZipPackage
-import org.wvt.horizonmgr.utils.CoroutineZip
-import org.wvt.horizonmgr.utils.translateToValidFile
+import me.konyaco.horizonmgr.service.pack.InstalledPackage
+import me.konyaco.horizonmgr.service.pack.ZipPackage
+import me.konyaco.horizonmgr.service.utils.translateToValidFile
 import java.io.File
-import java.lang.ref.WeakReference
 import java.util.*
 
-class HorizonManager2 private constructor(context: Context) {
-    companion object {
-        private var instance: WeakReference<HorizonManager2?> = WeakReference(null)
-
-        fun createInstance(context: Context): HorizonManager2 {
-            val h = HorizonManager2(context)
-            instance = WeakReference(h)
-            return h
-        }
-
-        fun getOrCreateInstance(context: Context): HorizonManager2 {
-            return instance.get() ?: createInstance(context)
-        }
-    }
-
+class HorizonManager constructor(context: Context) {
     private val horizonDir =
         Environment.getExternalStorageDirectory().resolve("games").resolve("horizon")
     private val packDir = horizonDir.resolve("packs")

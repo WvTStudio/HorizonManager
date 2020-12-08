@@ -79,12 +79,13 @@ android {
 dependencies {
     val composeVersion = "1.0.0-alpha08"
 
+    implementation(project(":service"))
     implementation(platform("com.google.firebase:firebase-bom:26.1.0"))
     implementation("com.google.firebase:firebase-analytics-ktx")
     implementation("com.google.firebase:firebase-crashlytics-ktx")
 
     implementation(kotlin("stdlib"))
-    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.1.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.1.1")
 
     implementation("androidx.core:core-ktx:1.3.2")
     implementation("androidx.appcompat:appcompat:1.2.0")

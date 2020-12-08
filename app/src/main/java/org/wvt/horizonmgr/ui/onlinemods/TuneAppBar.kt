@@ -32,16 +32,25 @@ import androidx.compose.ui.util.lerp
 import androidx.compose.ui.zIndex
 import org.wvt.horizonmgr.ui.components.DropDownSelector
 
-private val fastDuration = tween<Float>(durationMillis = 100, easing = FastOutLinearInEasing)
+private val iconFade = tween<Float>(durationMillis = 120, easing = FastOutSlowInEasing)
 
-private val searchBoxEnter = tween<Dp>(250, 50, FastOutSlowInEasing)
-private val searchBoxExit = tween<Dp>(200, 50, FastOutSlowInEasing)
+/*
+ Enter:
+ duration:250ms  |  width :  0ms transform 250ms
+ duration:250ms  |  height:      40ms transform 290ms
+ ------------
+ Exit:
+ duration:200ms  |  width :      40ms transform 240ms
+ duration:200ms  |  height:  0ms transform 200ms
+ */
+private val searchBoxEnter = tween<Dp>(275, 0, FastOutSlowInEasing) // Shrink to enter
+private val searchBoxExit = tween<Dp>(225, 40, FastOutSlowInEasing) // Expand to exit
 
-private val contentAppear = tween<Float>(250, 80, LinearOutSlowInEasing)
-private val contentDisappear = tween<Float>(200, 0, FastOutLinearInEasing)
+private val contentAppear = tween<Float>(275, 80, LinearOutSlowInEasing)
+private val contentDisappear = tween<Float>(225, 0, FastOutLinearInEasing)
 
-private val tuneExpand = tween<Float>(300, 0, FastOutSlowInEasing)
-private val tuneShrink = tween<Float>(250, 0, FastOutSlowInEasing)
+private val tuneExpand = tween<Float>(275, 40, FastOutSlowInEasing) // Expand to enter
+private val tuneShrink = tween<Float>(225, 0, FastOutSlowInEasing) // Shrink to exit
 
 @Composable
 internal fun TuneAppBar2(
@@ -108,12 +117,12 @@ internal fun TuneAppBar2(
                         if (expand) expand = false
                         else onNavClicked()
                     }) {
-                    Crossfade(current = expand, animation = fastDuration) {
+                    Crossfade(current = expand, animation = iconFade) {
                         if (it) Icon(imageVector = Icons.Filled.ArrowBack)
                         else Icon(imageVector = Icons.Filled.Menu)
                     }
                 }
-                Crossfade(current = expand, animation = fastDuration) {
+                Crossfade(current = expand, animation = iconFade) {
                     Box(
                         modifier = Modifier.align(Alignment.CenterStart)
                             .padding(start = 72.dp + offset, end = 24.dp + offset)
@@ -161,7 +170,7 @@ internal fun TuneAppBar2(
                         else expand = true
                     }
                 ) {
-                    Crossfade(current = expand, animation = fastDuration) {
+                    Crossfade(current = expand, animation = iconFade) {
                         if (it) Icon(imageVector = Icons.Filled.Search)
                         else Icon(imageVector = Icons.Filled.Tune)
                     }
@@ -183,7 +192,7 @@ internal fun TuneAppBar2(
                         ) {
                             Icon(imageVector = Icons.Filled.Language)
                             DropDownSelector(
-                                modifier = Modifier.padding(start = 16.dp),
+                                modifier = Modifier.padding(start = 16.dp).fillMaxWidth(),
                                 items = sources.map { it.label },
                                 selectedIndex = sources.indexOf(selectedSource),
                                 onSelected = { onSourceSelect(sources[it]) }
@@ -191,7 +200,7 @@ internal fun TuneAppBar2(
                         }
                         // Tune Option2: Sort Mode
                         Row(
-                            modifier = Modifier.padding(top = 8.dp),
+                            modifier = Modifier.padding(top = 8.dp).fillMaxWidth(),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Icon(imageVector = Icons.Filled.Sort)

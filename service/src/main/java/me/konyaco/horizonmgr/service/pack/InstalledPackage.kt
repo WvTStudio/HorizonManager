@@ -1,7 +1,10 @@
-package org.wvt.horizonmgr.service.horizonmgr2.pack
+package me.konyaco.horizonmgr.service.pack
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.json.JSONObject
-import org.wvt.horizonmgr.service.horizonmgr2.mod.InstalledMod
+import me.konyaco.horizonmgr.service.mod.InstalledMod
+import me.konyaco.horizonmgr.service.mod.ZipMod
 import java.io.File
 
 /**
@@ -10,6 +13,8 @@ import java.io.File
 class InstalledPackage constructor(
     private val pkgDir: File
 ) {
+    class PackageDoesNotExistsException() : Exception("Package does not exists.")
+
     // TODO: 2020/11/1 使该 Package 始终能返回最新数据
     private val manifestFile = pkgDir.resolve("manifest.json")
     private val installationInfoFile = pkgDir.resolve(".installation_info")
@@ -88,7 +93,7 @@ class InstalledPackage constructor(
     /**
      * 重命名
      */
-    fun rename(newName: String) {
+    suspend fun rename(newName: String) = withContext(Dispatchers.IO) {
         val jsonStr = installationInfoFile.readText()
         val json = JSONObject(jsonStr)
         json.put("customName", newName)
@@ -123,7 +128,7 @@ class InstalledPackage constructor(
     /**
      * 安装 Mod 到该 Package
      */
-    fun installMod() {
+    fun installMod(mod: ZipMod) {
         TODO("2020/10/29")
     }
 
@@ -132,6 +137,27 @@ class InstalledPackage constructor(
      */
     fun getMods(): List<InstalledMod> {
         // TODO: 2020/11/13
-        TODO()
+        val result = mutableListOf<InstalledMod>()
+
+        val modsDir = pkgDir.resolve("innercore").resolve("mods")
+        if (!modsDir.exists()) modsDir.mkdirs()
+
+        for (dir in modsDir.listFiles()!!) {
+            // Mod只会是文件夹
+            if (dir.isFile) continue
+            try {
+                result.add(InstalledMod(dir))
+            } catch (e: Exception) {
+                e.printStackTrace()
+                continue
+            }
+        }
+        return result
+    }
+
+    suspend fun delete() {
+        withContext(Dispatchers.IO) {
+            pkgDir.deleteRecursively()
+        }
     }
 }

@@ -1,4 +1,4 @@
-package org.wvt.horizonmgr.utils
+package me.konyaco.horizonmgr.service.utils
 
 import java.io.File
 
