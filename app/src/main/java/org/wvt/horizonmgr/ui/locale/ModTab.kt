@@ -4,11 +4,11 @@ import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animate
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumnForIndexed
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.Text
-import androidx.compose.material.ripple.rememberRippleIndication
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -47,22 +47,23 @@ internal fun ModTab() {
                     Text(modifier = Modifier.align(Alignment.Center), text = "请先选择分包")
                 }
             }
-            is ModTabViewModel.State.OK -> LazyColumnForIndexed(
-                items = mods,
+            is ModTabViewModel.State.OK -> LazyColumn(
                 contentPadding = PaddingValues(top = 8.dp, bottom = 64.dp)
-            ) { index, item ->
-                ModItem(
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                    enable = remember(enabledMods) { enabledMods.contains(item.id) },
-                    title = item.name,
-                    text = item.description,
-                    iconPath = item.iconPath,
-                    selected = false,
-                    onLongClick = {},
-                    onEnabledChange = { if (it) vm.enableMod(item) else vm.disableMod(item) },
-                    onClick = {/* TODO 显示 Mod 详情 */ },
-                    onDeleteClick = { vm.deleteMod(item) }
-                )
+            ) {
+                itemsIndexed(items = mods) { index, item ->
+                    ModItem(
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                        enable = remember(enabledMods) { enabledMods.contains(item.id) },
+                        title = item.name,
+                        text = item.description,
+                        iconPath = item.iconPath,
+                        selected = false,
+                        onLongClick = {},
+                        onEnabledChange = { if (it) vm.enableMod(item) else vm.disableMod(item) },
+                        onClick = {/* TODO 显示 Mod 详情 */ },
+                        onDeleteClick = { vm.deleteMod(item) }
+                    )
+                }
             }
         }
 
@@ -98,7 +99,7 @@ private fun ModItem(
         elevation = 2.dp
     ) {
         Column(
-            Modifier.indication(interactionState, indication = rememberRippleIndication())
+            Modifier.indication(interactionState, indication = rememberRipple())
                 .background(animate(if (selected) MaterialTheme.colors.primary.copy(0.12f) else Color.Transparent))
                 .padding(top = 16.dp, bottom = 4.dp, start = 16.dp, end = 16.dp)
         ) {

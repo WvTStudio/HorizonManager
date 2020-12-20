@@ -18,13 +18,12 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.input.key.ExperimentalKeyInput
 import androidx.compose.ui.input.key.keyInputFilter
+import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.platform.AmbientContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 
-@OptIn(ExperimentalKeyInput::class)
 @Composable
 fun Community(onClose: () -> Unit) {
     val backgroundColor = MaterialTheme.colors.background
@@ -103,7 +102,7 @@ fun Community(onClose: () -> Unit) {
             }
         })
         AndroidView(
-            modifier = Modifier.fillMaxSize().keyInputFilter { true },
+            modifier = Modifier.fillMaxSize(),
             viewBlock = { webView },
             update = {
                 it.setBackgroundColor(backgroundColor.toArgb())

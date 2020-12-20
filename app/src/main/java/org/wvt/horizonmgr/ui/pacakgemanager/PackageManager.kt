@@ -6,15 +6,15 @@ import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumnForIndexed
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.*
 import androidx.compose.runtime.savedinstancestate.savedInstanceState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.gesture.tapGestureFilter
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.AmbientContext
 import androidx.compose.ui.tooling.preview.Preview
@@ -67,6 +67,7 @@ fun PackageManager(
 
     Box {
         Column {
+            var showMenu by remember { mutableStateOf(false) }
             // Top App Bar
             TopAppBar(
                 modifier = Modifier.zIndex(4.dp.value),
@@ -74,43 +75,76 @@ fun PackageManager(
                     Text("分包管理")
                 }, navigationIcon = {
                     IconButton(onClick = onNavClick) { Icon(Icons.Filled.Menu) }
-                }, backgroundColor = MaterialTheme.colors.surface
+                }, backgroundColor = MaterialTheme.colors.surface,
+                actions = {
+                    DropdownMenu(
+                        toggle = {
+                            IconButton(onClick = { showMenu = true }) {
+                                Icon(Icons.Filled.MoreVert)
+                            }
+                        },
+                        expanded = showMenu,
+                        onDismissRequest = { showMenu = false }
+                    ) {
+                        DropdownMenuItem(onClick = {
+                            vm.loadPackages()
+                            showMenu = false
+                        }) {
+                            Text("刷新")
+                        }
+                    }
+                }
             )
 
             if (vmPackages.isNullOrEmpty()) {
                 // Tips when there was no package installed.
                 EmptyPage()
-            } else LazyColumnForIndexed(
+            } else LazyColumn(
                 modifier = Modifier.fillMaxSize(),
-                items = vmPackages,
                 contentPadding = PaddingValues(top = 8.dp, bottom = 64.dp)
-            ) { index, item ->
-                PackageItem(
-                    modifier = Modifier.padding(16.dp, 8.dp),
-                    title = item.name,
-                    description = item.description,
-                    installTime = item.timeStr,
-                    selected = item.uuid == selectedPackageUUID,
-                    onClick = { onPackageSelect(item.uuid) },
-                    onInfoClick = { vm.showInfo(context, item.uuid) },
-                    onDeleteClick = { vm.deletePackage(item.uuid, confirmDeleteDialogHostState) },
-                    onRenameClick = { vm.renamePackage(item.uuid, inputDialogHostState) },
-                    onCloneClick = { vm.clonePackage(item.uuid, inputDialogHostState) }
-                )
+            ) {
+                itemsIndexed(vmPackages) { index, item ->
+                    PackageItem(
+                        modifier = Modifier.padding(16.dp, 8.dp),
+                        title = item.name,
+                        description = item.description,
+                        installTime = item.timeStr,
+                        selected = item.uuid == selectedPackageUUID,
+                        onClick = { onPackageSelect(item.uuid) },
+                        onInfoClick = { vm.showInfo(context, item.uuid) },
+                        onDeleteClick = {
+                            vm.deletePackage(
+                                item.uuid,
+                                confirmDeleteDialogHostState
+                            )
+                        },
+                        onRenameClick = { vm.renamePackage(item.uuid, inputDialogHostState) },
+                        onCloneClick = { vm.clonePackage(item.uuid, inputDialogHostState) }
+                    )
+                }
             }
         }
         SnackbarHost(hostState = snackbarHostState)
+
+        // Displays when user is deleting a package
         ConfirmDeleteDialogHost(state = confirmDeleteDialogHostState)
+
+        // Displays when user is renaming/cloning a package
         InputDialogHost(state = inputDialogHostState)
 
+        // Floating Actions Bars
         FABs(
             modifier = Modifier.fillMaxSize(),
             expand = fabExpand,
             onExpandStateChange = { fabExpand = it },
             onLocalInstallClick = {
                 // TODO: 2020/11/13
+                fabExpand = false
             },
-            onOnlineInstallClick = { vm.startInstallPackageActivity(context) }
+            onOnlineInstallClick = {
+                vm.startInstallPackageActivity(context)
+                fabExpand = false
+            }
         )
     }
 }
@@ -159,14 +193,14 @@ private fun <T> PackageManagerUI(
                     emptyPage()
                 }
             } else {
-                LazyColumnForIndexed(
+                LazyColumn(
                     modifier = Modifier.fillMaxSize(),
-                    items = packages,
-                    contentPadding = PaddingValues(top = 8.dp, bottom = 64.dp),
-                    itemContent = { index, item ->
+                    contentPadding = PaddingValues(top = 8.dp, bottom = 64.dp)
+                ) {
+                    itemsIndexed(packages) { index, item ->
                         item(index, item)
                     }
-                )
+                }
             }
         }
 

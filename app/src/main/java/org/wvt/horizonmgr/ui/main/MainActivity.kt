@@ -100,7 +100,7 @@ private fun RequestPermissionDialog(
     onConfirm: () -> Unit
 ) {
     AlertDialog(
-        modifier = Modifier.shadow(24.dp, shape = RoundedCornerShape(4.dp)),
+        modifier = Modifier.shadow(16.dp, clip = false),
         onDismissRequest = { },
         confirmButton = { TextButton(onClick = onConfirm) { Text(text = "授权") } },
         title = { Text("需要权限") },
@@ -117,7 +117,7 @@ private fun NewVersionDialog(
     onIgnore: () -> Unit
 ) {
     AlertDialog(
-        modifier = Modifier.shadow(24.dp, shape = RoundedCornerShape(4.dp)),
+        modifier = Modifier.shadow(16.dp, clip = false),
         title = { Text("发现新版本") },
         text = {
             Text(

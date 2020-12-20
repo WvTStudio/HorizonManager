@@ -23,6 +23,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import org.wvt.horizonmgr.ui.theme.PreviewTheme
 
@@ -111,7 +112,7 @@ internal fun FolderEntry(
 
         ListItem(
             modifier = Modifier.clickable(onClick = onClick)
-                .offset(x = { state.offset.value })
+                .offset(offset = { IntOffset(x = state.offset.value.toInt(), y = 0) })
                 .background(MaterialTheme.colors.surface),
             icon = { Icon(Icons.Filled.Folder) },
             text = { Text(name) }

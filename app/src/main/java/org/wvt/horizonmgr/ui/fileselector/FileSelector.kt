@@ -6,7 +6,7 @@ import androidx.compose.animation.animate
 import androidx.compose.foundation.ScrollableRow
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumnForIndexed
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -365,16 +365,15 @@ private fun PathList(
             }
         }
     } else {
-        LazyColumnForIndexed(
-            modifier = modifier,
-            items = entries
-        ) { index, item ->
-            if (index == 0) header()
-            if (item is PathListEntry.Folder) {
-                FolderEntry(name = item.name, onClick = { onFolderSelect(index) },
-                    isStared = false, onStarChange = {})
-            } else if (item is PathListEntry.File) {
-                FileEntry(name = item.name, onClick = { onFileSelect(index) })
+        LazyColumn(modifier) {
+            itemsIndexed(entries) { index, item ->
+                if (index == 0) header()
+                if (item is PathListEntry.Folder) {
+                    FolderEntry(name = item.name, onClick = { onFolderSelect(index) },
+                        isStared = false, onStarChange = {})
+                } else if (item is PathListEntry.File) {
+                    FileEntry(name = item.name, onClick = { onFileSelect(index) })
+                }
             }
         }
     }

@@ -3,7 +3,7 @@ package org.wvt.horizonmgr.ui.onlinemods
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumnFor
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -69,23 +69,24 @@ fun Online(
                     }
                     is OnlineViewModel.State.OK -> Box(Modifier.fillMaxSize()) {
                         val lazyListState = rememberLazyListState()
-                        LazyColumnFor(
+                        LazyColumn(
                             modifier = Modifier.fillMaxSize(),
                             contentPadding = PaddingValues(top = 16.dp, bottom = 64.dp),
-                            items = state.modList,
                             state = lazyListState
-                        ) { item ->
-                            ModItem(
-                                modifier = Modifier.padding(
-                                    horizontal = 16.dp,
-                                    vertical = 8.dp
-                                ),
-                                title = item.name,
-                                text = item.description,
-                                imageUrl = item.iconUrl,
-                                onDownloadClick = { vm.download(item) },
-                                onInstallClick = { vm.install(item) }
-                            )
+                        ) {
+                            items(items = state.modList) { item ->
+                                ModItem(
+                                    modifier = Modifier.padding(
+                                        horizontal = 16.dp,
+                                        vertical = 8.dp
+                                    ),
+                                    title = item.name,
+                                    text = item.description,
+                                    imageUrl = item.iconUrl,
+                                    onDownloadClick = { vm.download(item) },
+                                    onInstallClick = { vm.install(item) }
+                                )
+                            }
                         }
                     }
                     is OnlineViewModel.State.Error -> Column(

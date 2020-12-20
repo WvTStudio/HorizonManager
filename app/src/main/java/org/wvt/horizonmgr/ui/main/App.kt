@@ -16,6 +16,7 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
@@ -249,7 +250,9 @@ private fun DrawerHeader(
 ) {
     var showDialog by remember { mutableStateOf(false) }
     if (showDialog) {
-        AlertDialog(onDismissRequest = { showDialog = false },
+        AlertDialog(
+            modifier = Modifier.shadow(16.dp, clip = false),
+            onDismissRequest = { showDialog = false },
             confirmButton = {
                 TextButton(onClick = {
                     showDialog = false

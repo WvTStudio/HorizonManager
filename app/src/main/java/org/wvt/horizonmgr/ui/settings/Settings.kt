@@ -1,17 +1,13 @@
 package org.wvt.horizonmgr.ui.settings
 
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.FormatPaint
-import androidx.compose.material.icons.filled.Storage
-import androidx.compose.material.icons.filled.Timelapse
+import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -70,56 +66,68 @@ fun Settings(
             style = MaterialTheme.typography.subtitle2,
             color = MaterialTheme.colors.primary
         )
-/*        ListItem(
-            modifier = Modifier.clickable(onClick = {}),
-            icon = { Icon(asset = Icons.Filled.Description) },
-            text = { Text("固定文件夹") }
-        )*/
+
+        var dropdownMenuExpanded by remember { mutableStateOf(false) }
+
+        ListItem(
+            modifier = Modifier.clickable(onClick = { dropdownMenuExpanded = true }),
+            icon = { Icon(imageVector = Icons.Default.Timelapse) },
+            text = { Text("夜间模式") },
+            secondaryText = {
+                DropdownMenu(
+                    toggle = {
+                        Text(if (themeConfig.followSystemDarkTheme) "跟随系统" else "自定义")
+                    },
+                    expanded = dropdownMenuExpanded,
+                    onDismissRequest = { dropdownMenuExpanded = false }) {
+                    DropdownMenuItem(onClick = {
+                        themeController.setFollowSystemDarkTheme(true)
+                        dropdownMenuExpanded = false
+                    }) { Text("跟随系统") }
+                    DropdownMenuItem(onClick = {
+                        themeController.setFollowSystemDarkTheme(false)
+                        dropdownMenuExpanded = false
+                    }) { Text("自定义") }
+                }
+            },
+            trailing = {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    HorizonDivider(Modifier.height(32.dp).padding(end = 16.dp))
+                    Switch(
+                        enabled = !themeConfig.followSystemDarkTheme, // 自定义时可以修改
+                        checked = if (themeConfig.followSystemDarkTheme) isSystemInDarkTheme()
+                        else themeConfig.customDarkTheme,
+                        onCheckedChange = {
+                            themeController.setCustomDarkTheme(it)
+                        })
+                }
+            },
+            singleLineSecondaryText = true
+        )
+
+        ListItem(
+            modifier = Modifier.clickable(onClick = requestCustomTheme),
+            icon = { Icon(imageVector = Icons.Filled.FormatPaint) },
+            text = { Text("自定义主题色") }
+        )
+
+        Text(
+            modifier = Modifier.padding(top = 24.dp, bottom = 8.dp, start = 72.dp),
+            text = "其他",
+            style = MaterialTheme.typography.subtitle2,
+            color = MaterialTheme.colors.primary
+        )
+
         ListItem(
             modifier = Modifier.clickable(onClick = {}),
             icon = { Icon(imageVector = Icons.Filled.Storage) },
             text = { Text("清除下载缓存") }
         )
-        var dropdownMenuExpanded by remember { mutableStateOf(false) }
 
-        DropdownMenu(toggle = {
-            ListItem(
-                modifier = Modifier.clickable(onClick = { dropdownMenuExpanded = true }),
-                icon = { Icon(imageVector = Icons.Default.Timelapse) },
-                text = { Text("夜间模式") },
-                secondaryText = {
-                    Crossfade(current = themeConfig.followSystemDarkTheme) {
-                        Text(if (it) "跟随系统" else "自定义")
-                    }
-                },
-                trailing = {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        HorizonDivider(Modifier.height(32.dp).padding(end = 16.dp))
-                        Switch(
-                            enabled = !themeConfig.followSystemDarkTheme, // 自定义时可以修改
-                            checked = if (themeConfig.followSystemDarkTheme) isSystemInDarkTheme()
-                            else themeConfig.customDarkTheme,
-                            onCheckedChange = {
-                                themeController.setCustomDarkTheme(it)
-                            })
-                    }
-                },
-                singleLineSecondaryText = true
-            )
-        }, expanded = dropdownMenuExpanded, onDismissRequest = { dropdownMenuExpanded = false }) {
-            DropdownMenuItem(onClick = {
-                themeController.setFollowSystemDarkTheme(true)
-                dropdownMenuExpanded = false
-            }) { Text("跟随系统") }
-            DropdownMenuItem(onClick = {
-                themeController.setFollowSystemDarkTheme(false)
-                dropdownMenuExpanded = false
-            }) { Text("自定义") }
-        }
         ListItem(
-            modifier = Modifier.clickable(onClick = requestCustomTheme),
-            icon = { Icon(imageVector = Icons.Filled.FormatPaint) },
-            text = { Text("自定义主题色") }
+            modifier = Modifier.clickable(onClick = {}),
+            icon = { Icon(Icons.Filled.PushPin) },
+            text = { Text("固定文件夹") }
         )
     }
 }

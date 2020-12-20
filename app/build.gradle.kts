@@ -53,8 +53,8 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerVersion = "1.4.20"
-        kotlinCompilerExtensionVersion = "1.0.0-alpha08"
+        kotlinCompilerVersion = "1.4.21"
+        kotlinCompilerExtensionVersion = "1.0.0-alpha09"
     }
     lintOptions {
         disable("InvalidFragmentVersionForActivityResult")
@@ -77,7 +77,7 @@ android {
 }
 
 dependencies {
-    val composeVersion = "1.0.0-alpha08"
+    val composeVersion = "1.0.0-alpha09"
 
     implementation(project(":service"))
     implementation(platform("com.google.firebase:firebase-bom:26.1.0"))

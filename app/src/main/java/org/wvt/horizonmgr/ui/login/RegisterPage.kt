@@ -8,7 +8,6 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.savedinstancestate.savedInstanceState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focusRequester
 import androidx.compose.ui.text.input.ImeAction
@@ -20,7 +19,7 @@ import androidx.compose.ui.unit.sp
 import org.wvt.horizonmgr.ui.components.FabState
 import org.wvt.horizonmgr.ui.components.StateFab
 
-@OptIn(ExperimentalMaterialApi::class, ExperimentalFocus::class)
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun RegisterPage(
     fabState: FabState,

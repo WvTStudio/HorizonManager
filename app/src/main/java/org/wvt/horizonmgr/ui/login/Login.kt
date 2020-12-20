@@ -11,7 +11,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.paint
-import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
@@ -27,12 +26,11 @@ private val rotationDefinition = transitionDefinition<Int> {
     state(1) { this[rotation] = 360f }
 
     transition(0 to 1) {
-        rotation using repeatable(
+        rotation using infiniteRepeatable(
             animation = tween(
                 durationMillis = 3000,
                 easing = LinearEasing
-            ),
-            iterations = Infinite
+            )
         )
     }
 }
@@ -42,17 +40,16 @@ private val reverseRotationDefinition = transitionDefinition<Int> {
     state(0) { this[reverseRotation] = 360f }
     state(1) { this[reverseRotation] = 0f }
     transition(0 to 1) {
-        reverseRotation using repeatable(
+        reverseRotation using infiniteRepeatable(
             animation = tween(
                 durationMillis = 3000,
                 easing = LinearEasing
-            ),
-            iterations = Infinite
+            )
         )
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class, ExperimentalMaterialApi::class, ExperimentalFocus::class)
+@OptIn(ExperimentalAnimationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun Login(
     vm: LoginViewModel,

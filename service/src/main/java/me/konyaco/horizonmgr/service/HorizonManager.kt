@@ -7,6 +7,7 @@ import kotlinx.coroutines.withContext
 import me.konyaco.horizonmgr.service.pack.InstalledPackage
 import me.konyaco.horizonmgr.service.pack.ZipPackage
 import me.konyaco.horizonmgr.service.utils.translateToValidFile
+import org.json.JSONObject
 import java.io.File
 import java.util.*
 
@@ -15,7 +16,10 @@ class HorizonManager constructor(context: Context) {
         Environment.getExternalStorageDirectory().resolve("games").resolve("horizon")
     private val packDir = horizonDir.resolve("packs")
 
-    suspend fun getPackages(): List<InstalledPackage> = withContext(Dispatchers.IO) {
+    /**
+     * 从本机中获取已安装的 Package
+     */
+    suspend fun getInstalledPackages(): List<InstalledPackage> = withContext(Dispatchers.IO) {
         val subDirs = packDir.listFiles() ?: emptyArray()
         val packages = mutableListOf<InstalledPackage>()
 
@@ -31,6 +35,9 @@ class HorizonManager constructor(context: Context) {
         return@withContext packages
     }
 
+    /**
+     * 将 ZipPackage 安装到本机
+     */
     suspend fun installPackage(
         zipPackage: ZipPackage,
         graphicsZip: File
@@ -47,7 +54,7 @@ class HorizonManager constructor(context: Context) {
         graphicsZip.copyTo(outDir.resolve(".cached_graphics"))
         val uuid = UUID.randomUUID().toString().toLowerCase(Locale.ROOT)
         outDir.resolve(".installation_info").outputStream().writer().use {
-            val jsonStr = HorizonManager.InstallationInfo(
+            val jsonStr = InstallationInfo(
                 packageId = UUID.randomUUID().toString().toLowerCase(Locale.ROOT),
                 internalId = uuid,
                 timeStamp = Date().time,
@@ -57,5 +64,21 @@ class HorizonManager constructor(context: Context) {
         }
         outDir.resolve(".installation_complete").createNewFile()
         return@withContext InstalledPackage(outDir)
+    }
+
+    data class InstallationInfo(
+        val packageId: String,
+        val timeStamp: Long,
+        val customName: String,
+        val internalId: String
+    ) {
+        fun toJson(): String {
+            return with(JSONObject()) {
+                put("uuid", packageId)
+                put("timestamp", timeStamp)
+                put("customName", customName)
+                put("internalId", internalId)
+            }.toString(4)
+        }
     }
 }

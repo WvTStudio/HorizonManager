@@ -8,7 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.ripple.rememberRippleIndication
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -42,7 +42,7 @@ fun DropDownSelector(
                 IconButton(
                     modifier = Modifier.indication(
                         sourceInteractionState,
-                        rememberRippleIndication(bounded = false, radius = 24.dp)
+                        rememberRipple(bounded = false, radius = 24.dp)
                     ),
                     onClick = { dropDown = true }
                 ) { Icon(Icons.Filled.ArrowDropDown) }
