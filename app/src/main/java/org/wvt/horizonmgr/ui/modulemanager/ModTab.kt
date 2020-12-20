@@ -1,4 +1,4 @@
-package org.wvt.horizonmgr.ui.locale
+package org.wvt.horizonmgr.ui.modulemanager
 
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animate

@@ -30,7 +30,7 @@ import org.wvt.horizonmgr.service.LocalCache
 import org.wvt.horizonmgr.ui.components.NetworkImage
 import org.wvt.horizonmgr.ui.downloaded.DownloadedMods
 import org.wvt.horizonmgr.ui.fileselector.SelectFileActivity
-import org.wvt.horizonmgr.ui.locale.LocalManager
+import org.wvt.horizonmgr.ui.modulemanager.LocalManager
 import org.wvt.horizonmgr.ui.news.News
 import org.wvt.horizonmgr.ui.onlinemods.Online
 import org.wvt.horizonmgr.ui.pacakgemanager.PackageManager

@@ -1,4 +1,4 @@
-package org.wvt.horizonmgr.ui.locale
+package org.wvt.horizonmgr.ui.modulemanager
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape

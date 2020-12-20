@@ -1,4 +1,4 @@
-package org.wvt.horizonmgr.ui.locale
+package org.wvt.horizonmgr.ui.modulemanager
 
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding

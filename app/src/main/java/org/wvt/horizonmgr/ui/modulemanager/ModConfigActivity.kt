@@ -1,4 +1,4 @@
-package org.wvt.horizonmgr.ui.locale
+package org.wvt.horizonmgr.ui.modulemanager
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity

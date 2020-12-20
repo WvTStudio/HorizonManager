@@ -1,4 +1,4 @@
-package org.wvt.horizonmgr.ui.locale
+package org.wvt.horizonmgr.ui.modulemanager
 
 import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
