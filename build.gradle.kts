@@ -1,5 +1,4 @@
 buildscript {
-    val kotlin_version by extra("1.4.21")
     repositories {
 //        maven("https://maven.aliyun.com/repository/google")
 //        maven("https://maven.aliyun.com/repository/central")

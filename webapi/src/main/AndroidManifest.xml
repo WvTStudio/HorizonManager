@@ -1,4 +1,4 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="org.wvt.horizonmgr.service">
+    package="org.wvt.horizonmgr.webapi">
 
 </manifest>

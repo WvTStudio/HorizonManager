@@ -11,14 +11,19 @@ android {
         targetSdkVersion(30)
         versionCode = 1
         versionName = "1.0"
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
+        create("alpha") {
+            isMinifyEnabled = true
+            proguardFiles = mutableListOf(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                file("proguard-rules.pro")
+            )
+        }
         getByName("release") {
             isMinifyEnabled = true
-            isUseProguard = true
             proguardFiles = mutableListOf(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 file("proguard-rules.pro")
@@ -44,5 +49,4 @@ dependencies {
 
     testImplementation("junit:junit:4.13.1")
     androidTestImplementation("androidx.test.ext:junit:1.1.2")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.3.0")
 }

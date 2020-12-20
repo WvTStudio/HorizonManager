@@ -1,7 +1,6 @@
 plugins {
     id("com.android.application")
     id("kotlin-android")
-    id("kotlin-android-extensions")
 
     id("com.google.gms.google-services")
     id("com.google.firebase.crashlytics")
@@ -15,7 +14,7 @@ android {
         applicationId = "org.wvt.horizonmgr"
         minSdkVersion(21)
         targetSdkVersion(30)
-        versionCode = 7
+        versionCode = 8
         versionName = "2.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -28,7 +27,6 @@ android {
             )
             isShrinkResources = true
             isMinifyEnabled = true
-            isUseProguard = true
         }
         getByName("debug") {
             versionNameSuffix = "-debug"
@@ -40,8 +38,6 @@ android {
             )
             isShrinkResources = true
             isMinifyEnabled = true
-            isUseProguard = true
-
             versionNameSuffix = "-alpha7"
         }
     }
@@ -79,9 +75,8 @@ android {
 dependencies {
     val composeVersion = "1.0.0-alpha09"
 
-    implementation(project(":service"))
     implementation(platform("com.google.firebase:firebase-bom:26.1.0"))
-    implementation("com.google.firebase:firebase-analytics-ktx")
+//    implementation("com.google.firebase:firebase-analytics-ktx")
     implementation("com.google.firebase:firebase-crashlytics-ktx")
 
     implementation(kotlin("stdlib"))
