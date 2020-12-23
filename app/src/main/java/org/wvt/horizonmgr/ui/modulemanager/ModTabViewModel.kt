@@ -62,10 +62,9 @@ class ModTabViewModel(
                 val enabled = mutableSetOf<String>()
                 val result = mutableListOf<ModEntry>()
                 mItems.forEachIndexed { index, item ->
-                    val uuid = UUID.randomUUID().toString()
-                    if (item.enable) enabled.add(uuid)
-                    result.add(ModEntry(uuid, item.name, item.description, item.iconPath))
-                    map[uuid] = item
+                    if (item.enable) enabled.add(item.path)
+                    result.add(ModEntry(item.path, item.name, item.description, item.iconPath))
+                    map[item.path] = item
                 }
                 modMap = map
                 _enabledMods.value = enabled
@@ -83,7 +82,11 @@ class ModTabViewModel(
             val realMod = modMap[mod.id] ?: error("没有此 Mod")
             horizonMgr.enableModByPath(realMod.path)
 
-            _enabledMods.value = _enabledMods.value.toMutableSet().also { it.add(mod.id) }
+            _enabledMods.value = _enabledMods.value.toMutableSet().also {
+                if (!it.contains(mod.id)) {
+                    it.add(mod.id)
+                }
+            }
         }
     }
 
@@ -112,19 +115,6 @@ class ModTabViewModel(
             _progressState.value = ProgressDialogState.Finished("删除成功")
             load()
         }
-        /*scope.launch {
-            progressDialogState = ProgressDialogState.Loading("正在删除")
-            try {
-                horizonMgr.deleteModByPath(item.path)
-            } catch (e: Exception) {
-                e.printStackTrace()
-                progressDialogState =
-                    ProgressDialogState.Failed("删除失败", e.localizedMessage)
-                return@launch
-            }
-            load()
-            progressDialogState = ProgressDialogState.Finished("删除成功")
-        }*/
     }
 
     fun dismiss() {

@@ -3,20 +3,18 @@ package org.wvt.horizonmgr.ui.main
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.savedinstancestate.savedInstanceState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import org.wvt.horizonmgr.HorizonManagerApplication
 import org.wvt.horizonmgr.R
 import org.wvt.horizonmgr.dependenciesViewModel
 import org.wvt.horizonmgr.ui.AndroidDependenciesProvider
 import org.wvt.horizonmgr.ui.community.CommunityActivity
+import org.wvt.horizonmgr.ui.components.MyAlertDialog
 import org.wvt.horizonmgr.ui.donate.DonateActivity
 import org.wvt.horizonmgr.ui.joingroup.JoinGroupActivity
 import org.wvt.horizonmgr.ui.settings.SettingsActivity
@@ -99,8 +97,7 @@ class MainActivity : AppCompatActivity() {
 private fun RequestPermissionDialog(
     onConfirm: () -> Unit
 ) {
-    AlertDialog(
-        modifier = Modifier.shadow(16.dp, clip = false),
+    MyAlertDialog(
         onDismissRequest = { },
         confirmButton = { TextButton(onClick = onConfirm) { Text(text = "授权") } },
         title = { Text("需要权限") },
@@ -116,8 +113,7 @@ private fun NewVersionDialog(
     onConfirm: () -> Unit,
     onIgnore: () -> Unit
 ) {
-    AlertDialog(
-        modifier = Modifier.shadow(16.dp, clip = false),
+    MyAlertDialog(
         title = { Text("发现新版本") },
         text = {
             Text(

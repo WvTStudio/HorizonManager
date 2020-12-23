@@ -27,10 +27,13 @@ fun LocalImage(
     var image by remember { mutableStateOf<ImageBitmap?>(null) }
     val scope = rememberCoroutineScope()
 
-    onCommit(path) {
-        if (path == null) return@onCommit
-        scope.launch(Dispatchers.IO) {
-            image = BitmapFactory.decodeFile(path).asImageBitmap()
+    val aPath = path
+
+    onCommit(aPath) {
+        aPath?.let {
+            scope.launch(Dispatchers.IO) {
+                image = BitmapFactory.decodeFile(path).asImageBitmap()
+            }
         }
     }
 

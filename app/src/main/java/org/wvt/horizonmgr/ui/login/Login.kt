@@ -2,7 +2,6 @@ package org.wvt.horizonmgr.ui.login
 
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
-import androidx.compose.animation.core.AnimationConstants.Infinite
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons

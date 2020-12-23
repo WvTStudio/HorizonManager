@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEach
 import org.wvt.horizonmgr.R
+import org.wvt.horizonmgr.ui.components.MyAlertDialog
 import kotlin.random.Random
 
 private val alipayColor = Color(0xFF1678FF)
@@ -113,7 +114,7 @@ fun Donate(
         }
 
         if (displayDialog) {
-            AlertDialog(
+            MyAlertDialog(
                 onDismissRequest = { displayDialog = false },
                 title = { Text("关于捐赠") },
                 text = {

@@ -9,7 +9,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Providers
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -23,11 +22,11 @@ import org.wvt.horizonmgr.ui.components.HorizonDivider
 import org.wvt.horizonmgr.ui.components.ProgressDialog
 
 @Composable
-fun LocalManager(
+fun ModuleManager(
     onNavClicked: () -> Unit,
     requestSelectFile: suspend () -> String?
 ) {
-    val vm = dependenciesViewModel<LocaleManagerViewModel>()
+    val vm = dependenciesViewModel<ModuleManagerViewModel>()
     val selectedTab by vm.selectedTab.collectAsState()
     val ps by vm.progressState.collectAsState()
     val selected by vm.selectedPackage.collectAsState()
@@ -41,23 +40,12 @@ fun LocalManager(
         )
         Box(Modifier.fillMaxSize()) {
             Crossfade(current = selectedTab) {
-                if (selected) {
-                    when (it) {
-                        LocaleManagerViewModel.Tabs.MOD -> ModTab()
-                        LocaleManagerViewModel.Tabs.IC_MAP -> LevelTab(LevelTabType.IC)
-                        LocaleManagerViewModel.Tabs.MC_MAP -> LevelTab(LevelTabType.MC)
-                        LocaleManagerViewModel.Tabs.IC_TEXTURE -> ResTab()
-                        LocaleManagerViewModel.Tabs.MC_TEXTURE -> ResTab()
-                    }
-                } else {
-                    Box(Modifier.fillMaxSize()) {
-                        Providers(AmbientContentAlpha provides ContentAlpha.medium) {
-                            Text(
-                                modifier = Modifier.align(Alignment.Center),
-                                text = "请选择分包后再操作", style = MaterialTheme.typography.h6
-                            )
-                        }
-                    }
+                when (it) {
+                    ModuleManagerViewModel.Tabs.MOD -> ModTab()
+                    ModuleManagerViewModel.Tabs.IC_MAP -> LevelTab(LevelTabType.IC)
+                    ModuleManagerViewModel.Tabs.MC_MAP -> LevelTab(LevelTabType.MC)
+                    ModuleManagerViewModel.Tabs.IC_TEXTURE -> ResTab()
+                    ModuleManagerViewModel.Tabs.MC_TEXTURE -> ResTab()
                 }
             }
             ExtendedFloatingActionButton(
@@ -75,9 +63,9 @@ fun LocalManager(
 
 @Composable
 private fun CustomAppBar(
-    tabs: List<LocaleManagerViewModel.Tabs>,
-    selectedTab: LocaleManagerViewModel.Tabs,
-    onTabSelected: (index: LocaleManagerViewModel.Tabs) -> Unit,
+    tabs: List<ModuleManagerViewModel.Tabs>,
+    selectedTab: ModuleManagerViewModel.Tabs,
+    onTabSelected: (index: ModuleManagerViewModel.Tabs) -> Unit,
     onNavClicked: () -> Unit
 ) {
     TopAppBar(

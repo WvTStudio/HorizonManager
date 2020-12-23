@@ -1,5 +1,6 @@
 package org.wvt.horizonmgr.ui.modulemanager
 
+import android.util.Log
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animate
 import androidx.compose.foundation.*
@@ -17,6 +18,7 @@ import androidx.compose.ui.gesture.longPressGestureFilter
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import org.wvt.horizonmgr.dependenciesViewModel
+import org.wvt.horizonmgr.ui.components.EmptyPage
 import org.wvt.horizonmgr.ui.components.LocalImage
 import org.wvt.horizonmgr.ui.components.ProgressDialog
 import org.wvt.horizonmgr.ui.main.AmbientSelectedPackageUUID
@@ -28,6 +30,7 @@ internal fun ModTab() {
     val state by vm.state.collectAsState()
     val mods by vm.mods.collectAsState()
     val enabledMods by vm.enabledMods.collectAsState()
+    Log.d("ModTab", enabledMods.joinToString())
     val selectedUUID = AmbientSelectedPackageUUID.current
 
     onCommit(selectedUUID) {
@@ -43,26 +46,36 @@ internal fun ModTab() {
                 }
             }
             is ModTabViewModel.State.PackageNotSelected -> {
-                Box(Modifier.fillMaxSize()) {
-                    Text(modifier = Modifier.align(Alignment.Center), text = "请先选择分包")
+                Column(
+                    Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(text = "你还没有选择分包", color = MaterialTheme.colors.onSurface.copy(ContentAlpha.medium))
                 }
             }
-            is ModTabViewModel.State.OK -> LazyColumn(
-                contentPadding = PaddingValues(top = 8.dp, bottom = 64.dp)
-            ) {
-                itemsIndexed(items = mods) { index, item ->
-                    ModItem(
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                        enable = remember(enabledMods) { enabledMods.contains(item.id) },
-                        title = item.name,
-                        text = item.description,
-                        iconPath = item.iconPath,
-                        selected = false,
-                        onLongClick = {},
-                        onEnabledChange = { if (it) vm.enableMod(item) else vm.disableMod(item) },
-                        onClick = {/* TODO 显示 Mod 详情 */ },
-                        onDeleteClick = { vm.deleteMod(item) }
-                    )
+            is ModTabViewModel.State.OK -> if (mods.isEmpty()) {
+                EmptyPage(Modifier.fillMaxSize()) {
+                    Text("当前分包内没有已安装的模组", color = MaterialTheme.colors.onSurface.copy(ContentAlpha.medium))
+                }
+            } else {
+                LazyColumn(
+                    contentPadding = PaddingValues(top = 8.dp, bottom = 64.dp)
+                ) {
+                    itemsIndexed(items = mods) { index, item ->
+                        ModItem(
+                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                            enable = enabledMods.contains(item.id),
+                            title = item.name,
+                            text = item.description,
+                            iconPath = item.iconPath,
+                            selected = false,
+                            onLongClick = {},
+                            onEnabledChange = { if (it) vm.enableMod(item) else vm.disableMod(item) },
+                            onClick = {/* TODO 显示 Mod 详情 */ },
+                            onDeleteClick = { vm.deleteMod(item) }
+                        )
+                    }
                 }
             }
         }
@@ -112,18 +125,22 @@ private fun ModItem(
                         color = MaterialTheme.colors.onSurface.copy(alpha = 0.5f)
                     )
                 }
+                // Mod Icon
                 LocalImage(
                     modifier = Modifier.size(80.dp).clip(RoundedCornerShape(4.dp)),
                     path = iconPath,
                 )
             }
+            // Footer controller buttons
             Row(
                 modifier = Modifier.fillMaxWidth().padding(top = 16.dp, bottom = 8.dp, end = 8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
+                // Delete button
                 Box(Modifier.weight(1f)) {
                     TextButton(onClick = onDeleteClick) { Text("删除") }
                 }
+                // Enable switcher
                 Switch(checked = enable, onCheckedChange = onEnabledChange)
             }
         }

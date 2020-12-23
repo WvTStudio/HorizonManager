@@ -27,10 +27,11 @@ import androidx.compose.ui.unit.dp
 import org.wvt.horizonmgr.DependenciesContainer
 import org.wvt.horizonmgr.dependenciesViewModel
 import org.wvt.horizonmgr.service.LocalCache
+import org.wvt.horizonmgr.ui.components.MyAlertDialog
 import org.wvt.horizonmgr.ui.components.NetworkImage
 import org.wvt.horizonmgr.ui.downloaded.DownloadedMods
 import org.wvt.horizonmgr.ui.fileselector.SelectFileActivity
-import org.wvt.horizonmgr.ui.modulemanager.LocalManager
+import org.wvt.horizonmgr.ui.modulemanager.ModuleManager
 import org.wvt.horizonmgr.ui.news.News
 import org.wvt.horizonmgr.ui.onlinemods.Online
 import org.wvt.horizonmgr.ui.pacakgemanager.PackageManager
@@ -150,7 +151,7 @@ fun App(
                     AppViewModel.Screen.HOME -> News(
                         onNavClick = { drawerState.open() }
                     )
-                    AppViewModel.Screen.LOCAL_MANAGE -> LocalManager(
+                    AppViewModel.Screen.LOCAL_MANAGE -> ModuleManager(
                         onNavClicked = { drawerState.open() },
                         requestSelectFile = {
                             SelectFileActivity.startForResult(context)
@@ -228,12 +229,12 @@ private fun Drawer(
             Column(modifier = Modifier.fillMaxSize()) {
                 ScrollableColumn(modifier = Modifier.weight(1f)) {
                     header()
-                    Divider(Modifier.padding(vertical = 16.dp))
-                    Column { tabs() }
-                    Divider(Modifier.padding(vertical = 16.dp))
-                    Column { items() }
+                    Divider(Modifier.padding(top = 16.dp))
+                    Column(Modifier.padding(vertical = 8.dp)) { tabs() }
+                    Divider()
+                    Column(Modifier.padding(vertical = 8.dp)) { items() }
                 }
-                Divider(Modifier.padding(top = 16.dp))
+                Divider()
                 // Settings
                 Column(Modifier.padding(vertical = 8.dp)) { setting() }
             }
@@ -250,7 +251,7 @@ private fun DrawerHeader(
 ) {
     var showDialog by remember { mutableStateOf(false) }
     if (showDialog) {
-        AlertDialog(
+        MyAlertDialog(
             modifier = Modifier.shadow(16.dp, clip = false),
             onDismissRequest = { showDialog = false },
             confirmButton = {

@@ -40,7 +40,7 @@ fun DownloadedMods(onNavClicked: () -> Unit) {
 
         if (mods.isEmpty()) {
             Box(Modifier.fillMaxSize().padding(16.dp), Alignment.Center) {
-                Text("本地资源列表为空，您可以从在线资源中下载到本地")
+                Text("本地资源列表为空，您可以从在线资源中下载到本地", color = MaterialTheme.colors.onSurface.copy(ContentAlpha.medium))
             }
         } else {
             LazyColumn(

@@ -75,6 +75,9 @@ android {
 dependencies {
     val composeVersion = "1.0.0-alpha09"
 
+    implementation(project(":webapi"))
+    implementation(project(":service"))
+
     implementation(platform("com.google.firebase:firebase-bom:26.1.0"))
 //    implementation("com.google.firebase:firebase-analytics-ktx")
     implementation("com.google.firebase:firebase-crashlytics-ktx")
@@ -96,6 +99,7 @@ dependencies {
     implementation("androidx.compose.animation:animation:$composeVersion")
     implementation("androidx.compose.ui:ui:$composeVersion")
     implementation("androidx.compose.material:material:$composeVersion")
+    implementation("androidx.compose.material:material-ripple:$composeVersion")
     implementation("androidx.compose.material:material-icons-core:$composeVersion")
     implementation("androidx.compose.material:material-icons-extended:$composeVersion")
 

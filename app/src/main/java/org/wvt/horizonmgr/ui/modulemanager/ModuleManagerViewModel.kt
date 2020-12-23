@@ -11,7 +11,7 @@ import org.wvt.horizonmgr.service.HorizonManager
 import org.wvt.horizonmgr.ui.components.ProgressDialogState
 import java.io.File
 
-class LocaleManagerViewModel(
+class ModuleManagerViewModel(
     private val dependencies: DependenciesContainer
 ) : ViewModel() {
     enum class Tabs(val label: String) {
@@ -54,7 +54,7 @@ class LocaleManagerViewModel(
                 }
             } catch (e: Exception) {
                 _progressState.value =
-                    ProgressDialogState.Failed("安装失败", "请检查您选择的文件格式是否正确")
+                    ProgressDialogState.Failed("安装失败", "文件格式不正确")
                 return@launch
             }
             _progressState.value = ProgressDialogState.Finished("安装完成")
