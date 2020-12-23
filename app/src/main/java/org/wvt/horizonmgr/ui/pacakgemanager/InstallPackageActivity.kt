@@ -1,19 +1,44 @@
 package org.wvt.horizonmgr.ui.pacakgemanager
 
+import android.content.Intent
 import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.animation.Crossfade
 import androidx.compose.material.Surface
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.setContent
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
 import org.wvt.horizonmgr.service.WebAPI
 import org.wvt.horizonmgr.ui.AmbientHorizonManager
 import org.wvt.horizonmgr.ui.AmbientWebAPI
 import org.wvt.horizonmgr.ui.AndroidDependenciesProvider
 import org.wvt.horizonmgr.ui.theme.AndroidHorizonManagerTheme
+import kotlin.coroutines.resume
 
 class InstallPackageActivity : AppCompatActivity() {
+    companion object {
+        const val CANCEL = 0
+        const val SUCCEED = 1
+
+        suspend fun startForResult(context: ComponentActivity): Boolean {
+            return suspendCancellableCoroutine<Boolean> { cont ->
+                context.registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+                    when (it.resultCode) {
+                        SUCCEED -> {
+                            if (cont.isActive) cont.resume(true)
+                        }
+                        CANCEL -> {
+                            if (cont.isActive) cont.resume(false)
+                        }
+                    }
+                }.launch(Intent(context, InstallPackageActivity::class.java))
+            }
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {

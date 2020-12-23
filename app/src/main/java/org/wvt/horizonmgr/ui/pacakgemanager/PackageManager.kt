@@ -1,5 +1,6 @@
 package org.wvt.horizonmgr.ui.pacakgemanager
 
+import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.animation.*
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -10,7 +11,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
-import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.*
 import androidx.compose.runtime.savedinstancestate.savedInstanceState
 import androidx.compose.ui.Alignment
@@ -27,6 +27,7 @@ import kotlinx.coroutines.sync.withLock
 import org.wvt.horizonmgr.dependenciesViewModel
 import org.wvt.horizonmgr.ui.components.InputDialogHost
 import org.wvt.horizonmgr.ui.components.InputDialogHostState
+import org.wvt.horizonmgr.ui.components.MyAlertDialog
 import org.wvt.horizonmgr.ui.components.ProgressDialog
 import org.wvt.horizonmgr.ui.main.AmbientSelectedPackageUUID
 import org.wvt.horizonmgr.ui.theme.PreviewTheme
@@ -45,7 +46,7 @@ fun PackageManager(
     onPackageSelect: (uuid: String?) -> Unit,
     onNavClick: () -> Unit
 ) {
-    val context = AmbientContext.current
+    val context = AmbientContext.current as AppCompatActivity
 
     val vm = dependenciesViewModel<PackageManagerViewModel>()
     val selectedPackageUUID = AmbientSelectedPackageUUID.current
@@ -153,9 +154,7 @@ fun PackageManager(
 private fun EmptyPage() {
     Box(Modifier.fillMaxSize()) {
         Row(Modifier.align(Alignment.Center)) {
-            Text("您还未安装分包，请点击")
-            Icon(Icons.Filled.GetApp)
-            Text("按钮在线安装")
+            Text("你还没有安装分包")
         }
     }
 }
@@ -357,9 +356,6 @@ fun PackageItem(
                 // Actions
                 Providers(AmbientContentAlpha provides ContentAlpha.medium) {
                     Row(Modifier.padding(top = 8.dp, end = 4.dp)) {
-                        IconButton(onClick = onInfoClick) {
-                            Icon(imageVector = Icons.Filled.Info)
-                        }
                         var dropdown by remember { mutableStateOf(false) }
                         DropdownMenu(toggle = {
                             IconButton(onClick = { dropdown = true }) {
@@ -368,16 +364,29 @@ fun PackageItem(
                         }, expanded = dropdown, onDismissRequest = { dropdown = false }) {
                             DropdownMenuItem(onClick = {
                                 dropdown = false
+                                onInfoClick()
+                            }) {
+                                Text("详情")
+                            }
+                            DropdownMenuItem(onClick = {
+                                dropdown = false
                                 onDeleteClick()
-                            }) { Text("删除") }
+                            }) {
+                                Text("删除")
+                            }
                             DropdownMenuItem(onClick = {
                                 dropdown = false
                                 onCloneClick()
-                            }) { Text("克隆") }
+                            }) {
+                                Text("克隆")
+                            }
                             DropdownMenuItem(onClick = {
                                 dropdown = false
                                 onRenameClick()
-                            }) { Text("重命名") }
+                            }) {
+                                Text("重命名")
+
+                            }
                         }
                     }
                 }
@@ -450,7 +459,7 @@ class ConfirmDeleteDialogHostState {
 fun ConfirmDeleteDialogHost(state: ConfirmDeleteDialogHostState) {
     val data = state.currentData
     if (data != null) {
-        AlertDialog(onDismissRequest = {
+        MyAlertDialog(onDismissRequest = {
             data.dismiss()
         }, title = {
             Text("确认删除吗？")

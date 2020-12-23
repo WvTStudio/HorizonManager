@@ -1,6 +1,7 @@
 package org.wvt.horizonmgr.ui.pacakgemanager
 
 import android.content.Context
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -9,7 +10,6 @@ import kotlinx.coroutines.launch
 import org.wvt.horizonmgr.DependenciesContainer
 import org.wvt.horizonmgr.ui.components.InputDialogHostState
 import org.wvt.horizonmgr.ui.components.ProgressDialogState
-import org.wvt.horizonmgr.ui.startActivity
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -116,8 +116,11 @@ class PackageManagerViewModel(
         _progressState.value = null
     }
 
-    fun startInstallPackageActivity(context: Context) {
-        context.startActivity<InstallPackageActivity>()
+    fun startInstallPackageActivity(context: AppCompatActivity) {
+        viewModelScope.launch {
+            InstallPackageActivity.startForResult(context)
+            loadPackages()
+        }
     }
 
     fun showInfo(context: Context, modId: String) {
