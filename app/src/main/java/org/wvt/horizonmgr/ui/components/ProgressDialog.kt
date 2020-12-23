@@ -28,11 +28,17 @@ fun ProgressDialog(
 
     Dialog(onDismissRequest = {
         // 加载过程中不可关闭
-        if (state is ProgressDialogState.Failed || state is ProgressDialogState.Finished) onCloseRequest()
+        if (state is ProgressDialogState.Failed || state is ProgressDialogState.Finished)
+            onCloseRequest()
     }) {
-        Card(Modifier.fillMaxWidth()) {
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            elevation = 24.dp
+        ) {
             Row(
-                modifier = Modifier.fillMaxWidth().height(96.dp).padding(32.dp),
+                modifier = Modifier.fillMaxWidth()
+                    .wrapContentHeight()
+                    .padding(32.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 when (state) {
@@ -46,14 +52,17 @@ fun ProgressDialog(
                     }
                     is ProgressDialogState.Failed -> {
                         Box(Modifier.size(40.dp), Alignment.Center) {
-                            Icon(imageVector = Icons.Filled.Close, tint = MaterialTheme.colors.error)
+                            Icon(
+                                imageVector = Icons.Filled.Close,
+                                tint = MaterialTheme.colors.error
+                            )
                         }
                         Content(state.message)
                     }
                     is ProgressDialogState.Finished -> {
                         Box(Modifier.size(40.dp), Alignment.Center) {
                             Icon(
-                                imageVector =  Icons.Filled.Check,
+                                imageVector = Icons.Filled.Check,
                                 tint = MaterialTheme.colors.secondary
                             )
                         }
