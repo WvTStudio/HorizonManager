@@ -1,6 +1,6 @@
 package org.wvt.horizonmgr.ui.theme
 
-import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.animation.animate
 import androidx.compose.material.Colors
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
@@ -23,12 +23,15 @@ interface ThemeController {
 
 @Immutable
 data class ThemeConfig(
-    val followSystemDarkTheme: Boolean,
-    val customDarkTheme: Boolean,
+    val followSystemDarkMode: Boolean,
+    val isSystemInDark: Boolean,
+    val isCustomInDark: Boolean,
     val lightColor: Colors,
     val darkColor: Colors,
     val appbarAccent: Boolean
-)
+) {
+    val isDark = if (followSystemDarkMode) isSystemInDark else isCustomInDark
+}
 
 @Composable
 fun HorizonManagerTheme(
@@ -36,11 +39,22 @@ fun HorizonManagerTheme(
     config: ThemeConfig = DefaultThemeConfig,
     content: @Composable () -> Unit
 ) {
-    val darkTheme =
-        if (config.followSystemDarkTheme) isSystemInDarkTheme()
-        else config.customDarkTheme
-
-    val colors = if (darkTheme) config.darkColor else config.lightColor
+    val targetColors = if (config.isDark) config.darkColor else config.lightColor
+    val colors = Colors(
+        primary = animate(targetColors.primary),
+        primaryVariant = animate(targetColors.primaryVariant),
+        secondary = animate(targetColors.secondary),
+        secondaryVariant = animate(targetColors.secondaryVariant),
+        background = animate(targetColors.background),
+        surface = animate(targetColors.surface),
+        error = animate(targetColors.error),
+        onPrimary = animate(targetColors.onPrimary),
+        onSecondary = animate(targetColors.onSecondary),
+        onBackground = animate(targetColors.onBackground),
+        onSurface = animate(targetColors.onSurface),
+        onError = animate(targetColors.onError),
+        isLight = targetColors.isLight
+    )
     Providers(
         AmbientThemeController provides controller,
         AmbientThemeConfig provides config
@@ -74,8 +88,9 @@ object DefaultThemeController : ThemeController {
 }
 
 val DefaultThemeConfig = ThemeConfig(
-    followSystemDarkTheme = true,
-    customDarkTheme = false,
+    followSystemDarkMode = true,
+    isSystemInDark = false,
+    isCustomInDark = false,
     lightColor = LightColorPalette,
     darkColor = DarkColorPalette,
     appbarAccent = false

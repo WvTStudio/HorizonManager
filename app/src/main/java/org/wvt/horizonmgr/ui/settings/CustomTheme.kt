@@ -21,10 +21,10 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import org.wvt.horizonmgr.ui.theme.HorizonManagerTheme
-import org.wvt.horizonmgr.ui.theme.MaterialColors
 import org.wvt.horizonmgr.ui.theme.AmbientThemeConfig
 import org.wvt.horizonmgr.ui.theme.AmbientThemeController
+import org.wvt.horizonmgr.ui.theme.HorizonManagerTheme
+import org.wvt.horizonmgr.ui.theme.MaterialColors
 
 private enum class CheckedColorType {
     LIGHT_PRIMARY, LIGHT_PRIMARY_VARIANT,

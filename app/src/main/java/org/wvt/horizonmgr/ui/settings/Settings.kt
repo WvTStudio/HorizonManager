@@ -76,7 +76,7 @@ fun Settings(
             secondaryText = {
                 DropdownMenu(
                     toggle = {
-                        Text(if (themeConfig.followSystemDarkTheme) "跟随系统" else "自定义")
+                        Text(if (themeConfig.followSystemDarkMode) "跟随系统" else "自定义")
                     },
                     expanded = dropdownMenuExpanded,
                     onDismissRequest = { dropdownMenuExpanded = false }) {
@@ -94,12 +94,10 @@ fun Settings(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     HorizonDivider(Modifier.height(32.dp).padding(end = 16.dp))
                     Switch(
-                        enabled = !themeConfig.followSystemDarkTheme, // 自定义时可以修改
-                        checked = if (themeConfig.followSystemDarkTheme) isSystemInDarkTheme()
-                        else themeConfig.customDarkTheme,
-                        onCheckedChange = {
-                            themeController.setCustomDarkTheme(it)
-                        })
+                        enabled = !themeConfig.followSystemDarkMode, // 自定义时可以修改
+                        checked = themeConfig.isDark,
+                        onCheckedChange = { themeController.setCustomDarkTheme(it) }
+                    )
                 }
             },
             singleLineSecondaryText = true
