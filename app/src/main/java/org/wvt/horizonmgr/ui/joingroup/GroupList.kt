@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
@@ -22,29 +21,19 @@ import org.wvt.horizonmgr.ui.components.NetworkImage
 import org.wvt.horizonmgr.ui.theme.PreviewTheme
 
 @Composable
-fun JoinGroup(
+internal fun GroupList(
     groups: List<WebAPI.QQGroupEntry>,
-    onClose: () -> Unit,
     onGroupSelect: (url: WebAPI.QQGroupEntry) -> Unit
 ) {
-    Column(Modifier.fillMaxSize()) {
-        TopAppBar(title = {
-            Text("加入群组")
-        }, navigationIcon = {
-            IconButton(onClick = onClose) {
-                Icon(Icons.Filled.ArrowBack)
-            }
-        }, backgroundColor = MaterialTheme.colors.surface)
-        ScrollableColumn(Modifier.fillMaxSize()) {
-            groups.forEach {
-                GroupItem(
-                    onClicked = { onGroupSelect(it) },
-                    avatarUrl = it.avatar,
-                    groupName = it.name,
-                    description = it.description,
-                    tag = it.status
-                )
-            }
+    ScrollableColumn(Modifier.fillMaxSize()) {
+        groups.forEach {
+            GroupItem(
+                onClicked = { onGroupSelect(it) },
+                avatarUrl = it.avatar,
+                groupName = it.name,
+                description = it.description,
+                tag = it.status
+            )
         }
     }
 }

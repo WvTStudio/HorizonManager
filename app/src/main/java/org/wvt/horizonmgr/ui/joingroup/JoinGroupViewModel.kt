@@ -17,20 +17,36 @@ class JoinGroupViewModel(
     private val _groups = MutableStateFlow<List<WebAPI.QQGroupEntry>>(emptyList())
     val groups: StateFlow<List<WebAPI.QQGroupEntry>> = _groups
     val isLoading = MutableStateFlow(true)
+    val loadError = MutableStateFlow<Exception?>(null)
+    val startQQError = MutableStateFlow<Exception?>(null)
 
     init {
+        refresh()
+    }
+
+    fun refresh() {
         viewModelScope.launch {
             isLoading.value = true
-            _groups.value = dependencies.webapi.getQQGroupList()
+            loadError.value = null
+            try {
+                _groups.value = dependencies.webapi.getQQGroupList()
+            } catch (e: Exception) {
+                loadError.value = e
+            }
             isLoading.value = false
         }
     }
 
     fun joinGroup(intentUrl: String, context: Context) {
         viewModelScope.launch {
+            startQQError.value = null
             val intent = Intent()
-            intent.data = Uri.parse(intentUrl)
-            context.startActivity(intent)
+            try {
+                intent.data = Uri.parse(intentUrl)
+                context.startActivity(intent)
+            } catch (e: Exception) {
+                startQQError.value = e
+            }
         }
     }
 }
