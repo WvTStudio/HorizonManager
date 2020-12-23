@@ -33,7 +33,6 @@ fun Online(
     val selectedPackageUUID = AmbientSelectedPackageUUID.current
 
     onCommit(enable) { vm.setEnable(enable) }
-
     onCommit(selectedPackageUUID) { vm.setSelectedUUID(selectedPackageUUID) }
 
     downloadState?.let { ProgressDialog(onCloseRequest = { vm.downloadFinish() }, state = it) }
@@ -42,6 +41,7 @@ fun Online(
     Column(Modifier.fillMaxSize()) {
         // Top App Bar
         TuneAppBar2(
+            enable = enable,
             onNavClicked = onNavClicked,
             onFilterValueConfirm = { vm.setFilterValue(it) },
             vm.sources,
@@ -55,7 +55,7 @@ fun Online(
         if (!enable) {
             NotLoginTip()
         } else {
-            // If dit login, displays online mods list.
+            // If do login, displays online mods list.
             Crossfade(
                 modifier = Modifier.fillMaxSize(),
                 current = state
@@ -107,13 +107,11 @@ fun Online(
 @Composable
 private fun NotLoginTip() {
     Box(Modifier.fillMaxSize()) {
-        Providers(AmbientContentAlpha provides ContentAlpha.medium) {
-            Text(
-                modifier = Modifier.align(Alignment.Center),
-                text = "此功能仅在登录后可用",
-                style = MaterialTheme.typography.h6
-            )
-        }
+        Text(
+            modifier = Modifier.align(Alignment.Center),
+            text = "此功能仅在登录后可用",
+            color = MaterialTheme.colors.onSurface.copy(ContentAlpha.medium)
+        )
     }
 }
 

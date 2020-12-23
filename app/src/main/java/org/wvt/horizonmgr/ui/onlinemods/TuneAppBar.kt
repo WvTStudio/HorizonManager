@@ -54,6 +54,7 @@ private val tuneShrink = tween<Float>(225, 0, FastOutSlowInEasing) // Shrink to 
 
 @Composable
 internal fun TuneAppBar2(
+    enable: Boolean,
     onNavClicked: () -> Unit,
     onFilterValueConfirm: (value: String) -> Unit,
     sources: List<OnlineViewModel.Source>,
@@ -161,18 +162,20 @@ internal fun TuneAppBar2(
                         }
                     }
                 }
-                // Tune Button
-                IconButton(modifier = Modifier.align(Alignment.CenterEnd)
-                    .padding(end = 4.dp + offset)
-                    .graphicsLayer(alpha = actionOpacity),
-                    onClick = {
-                        if (expand) onFilterValueConfirm(filterValue.text)
-                        else expand = true
-                    }
-                ) {
-                    Crossfade(current = expand, animation = iconFade) {
-                        if (it) Icon(imageVector = Icons.Filled.Search)
-                        else Icon(imageVector = Icons.Filled.Tune)
+                if(enable) {
+                    // Tune Button
+                    IconButton(modifier = Modifier.align(Alignment.CenterEnd)
+                        .padding(end = 4.dp + offset)
+                        .graphicsLayer(alpha = actionOpacity),
+                        onClick = {
+                            if (expand) onFilterValueConfirm(filterValue.text)
+                            else expand = true
+                        }
+                    ) {
+                        Crossfade(current = expand, animation = iconFade) {
+                            if (it) Icon(imageVector = Icons.Filled.Search)
+                            else Icon(imageVector = Icons.Filled.Tune)
+                        }
                     }
                 }
             }
