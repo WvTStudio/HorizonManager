@@ -1,5 +1,6 @@
 package org.wvt.horizonmgr.ui.components
 
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.*
@@ -49,6 +50,7 @@ class InputDialogHostState {
     }
 }
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun InputDialogHost(state: InputDialogHostState) {
     val data = state.currentData
@@ -57,14 +59,14 @@ fun InputDialogHost(state: InputDialogHostState) {
         Dialog(onDismissRequest = {
             data.cancel()
         }) {
-            Card(elevation = 16.dp) {
+            Card(elevation = 24.dp) {
                 Column {
                     Text(
-                        modifier = Modifier.padding(top = 16.dp, start = 16.dp, end = 16.dp),
+                        modifier = Modifier.padding(top = 24.dp, start = 24.dp, end = 24.dp),
                         text = data.title, style = MaterialTheme.typography.h6
                     )
                     TextField(
-                        modifier = Modifier.padding(top = 16.dp, start = 16.dp, end = 16.dp)
+                        modifier = Modifier.padding(top = 16.dp, start = 24.dp, end = 24.dp)
                             .fillMaxWidth(),
                         value = value,
                         onValueChange = { value = it },
