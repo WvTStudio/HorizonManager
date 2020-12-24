@@ -28,7 +28,7 @@ class PackageDetailActivity : AppCompatActivity() {
             AndroidDependenciesProvider {
                 AndroidHorizonManagerTheme {
                     Surface {
-                        PackageInfo(packageUUID)
+                        PackageInfo(packageUUID) { finish() }
                     }
                 }
             }

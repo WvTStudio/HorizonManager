@@ -26,7 +26,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.wvt.horizonmgr.DependenciesContainer
 import org.wvt.horizonmgr.dependenciesViewModel
-import org.wvt.horizonmgr.service.LocalCache
+import org.wvt.horizonmgr.legacyservice.LocalCache
 import org.wvt.horizonmgr.ui.components.MyAlertDialog
 import org.wvt.horizonmgr.ui.components.NetworkImage
 import org.wvt.horizonmgr.ui.downloaded.DownloadedMods

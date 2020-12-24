@@ -1,4 +1,4 @@
-package org.wvt.horizonmgr.service
+package org.wvt.horizonmgr.legacyservice
 
 /* Mod 存在好几种情况
    1. 在管理器内从汉化组源下载的模组

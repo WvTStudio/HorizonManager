@@ -8,7 +8,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
-import org.wvt.horizonmgr.service.HorizonManager
+import org.wvt.horizonmgr.legacyservice.HorizonManager
 import org.wvt.horizonmgr.ui.AmbientHorizonManager
 import org.wvt.horizonmgr.ui.components.InputDialogHost
 import org.wvt.horizonmgr.ui.components.InputDialogHostState

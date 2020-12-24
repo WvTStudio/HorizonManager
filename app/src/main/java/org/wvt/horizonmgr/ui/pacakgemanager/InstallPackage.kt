@@ -19,7 +19,7 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-import org.wvt.horizonmgr.service.WebAPI
+import org.wvt.horizonmgr.legacyservice.WebAPI
 import org.wvt.horizonmgr.ui.AmbientHorizonManager
 import org.wvt.horizonmgr.ui.AmbientWebAPI
 

@@ -6,8 +6,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.material.Surface
 import androidx.compose.ui.platform.setContent
 import org.wvt.horizonmgr.dependenciesViewModel
-import org.wvt.horizonmgr.service.LocalCache
-import org.wvt.horizonmgr.service.WebAPI
+import org.wvt.horizonmgr.legacyservice.LocalCache
+import org.wvt.horizonmgr.legacyservice.WebAPI
 import org.wvt.horizonmgr.ui.AndroidDependenciesProvider
 import org.wvt.horizonmgr.ui.theme.AndroidHorizonManagerTheme
 

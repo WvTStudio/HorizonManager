@@ -17,7 +17,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.loadVectorResource
 import androidx.compose.ui.unit.dp
 import org.wvt.horizonmgr.R
-import org.wvt.horizonmgr.service.WebAPI
+import org.wvt.horizonmgr.legacyservice.WebAPI
 
 private val rotation = FloatPropKey()
 private val rotationDefinition = transitionDefinition<Int> {

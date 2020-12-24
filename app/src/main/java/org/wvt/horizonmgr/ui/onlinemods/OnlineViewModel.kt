@@ -7,7 +7,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import org.wvt.horizonmgr.DependenciesContainer
-import org.wvt.horizonmgr.service.WebAPI
+import org.wvt.horizonmgr.legacyservice.WebAPI
 import org.wvt.horizonmgr.ui.components.ProgressDialogState
 
 class OnlineViewModel(

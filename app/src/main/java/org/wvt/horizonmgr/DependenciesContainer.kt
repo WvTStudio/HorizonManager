@@ -1,8 +1,8 @@
 package org.wvt.horizonmgr
 
-import org.wvt.horizonmgr.service.HorizonManager
-import org.wvt.horizonmgr.service.LocalCache
-import org.wvt.horizonmgr.service.WebAPI
+import org.wvt.horizonmgr.legacyservice.HorizonManager
+import org.wvt.horizonmgr.legacyservice.LocalCache
+import org.wvt.horizonmgr.legacyservice.WebAPI
 
 interface DependenciesContainer {
     val horizonManager: HorizonManager

@@ -11,7 +11,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.platform.setContent
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
-import org.wvt.horizonmgr.service.WebAPI
+import org.wvt.horizonmgr.legacyservice.WebAPI
 import org.wvt.horizonmgr.ui.AmbientHorizonManager
 import org.wvt.horizonmgr.ui.AmbientWebAPI
 import org.wvt.horizonmgr.ui.AndroidDependenciesProvider

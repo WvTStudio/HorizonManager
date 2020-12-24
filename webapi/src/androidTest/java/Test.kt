@@ -7,6 +7,7 @@ class Test {
 
     @Test
     suspend fun registerAndLoginTest() {
+        println("Testing")
         val random = "%06d".format(Random.nextInt(100000).toString())
         val username = "hzmgr$random"
         val password = "hzmgrtestpassword"

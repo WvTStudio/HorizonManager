@@ -20,7 +20,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import org.wvt.horizonmgr.BuildConfig
 import org.wvt.horizonmgr.DependenciesContainer
-import org.wvt.horizonmgr.service.LocalCache
+import org.wvt.horizonmgr.legacyservice.LocalCache
 import org.wvt.horizonmgr.ui.login.LoginActivity
 import kotlin.coroutines.resume
 

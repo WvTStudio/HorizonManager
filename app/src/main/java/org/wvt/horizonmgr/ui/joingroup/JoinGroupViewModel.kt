@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import org.wvt.horizonmgr.DependenciesContainer
-import org.wvt.horizonmgr.service.WebAPI
+import org.wvt.horizonmgr.legacyservice.WebAPI
 
 class JoinGroupViewModel(
     private val dependencies: DependenciesContainer
@@ -48,5 +48,10 @@ class JoinGroupViewModel(
                 startQQError.value = e
             }
         }
+    }
+
+    fun handledError() {
+        loadError.value = null
+        startQQError.value = null
     }
 }

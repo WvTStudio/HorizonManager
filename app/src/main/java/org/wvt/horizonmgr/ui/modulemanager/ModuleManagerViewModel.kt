@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import org.wvt.horizonmgr.DependenciesContainer
-import org.wvt.horizonmgr.service.HorizonManager
+import org.wvt.horizonmgr.legacyservice.HorizonManager
 import org.wvt.horizonmgr.ui.components.ProgressDialogState
 import java.io.File
 
