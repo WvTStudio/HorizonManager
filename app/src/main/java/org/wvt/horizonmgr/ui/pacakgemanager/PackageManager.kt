@@ -80,6 +80,7 @@ fun PackageManager(
                 actions = {
                     DropdownMenu(
                         toggle = {
+                            // Menu Icon
                             IconButton(onClick = { showMenu = true }) {
                                 Icon(Icons.Filled.MoreVert)
                             }
@@ -87,6 +88,7 @@ fun PackageManager(
                         expanded = showMenu,
                         onDismissRequest = { showMenu = false }
                     ) {
+                        // Menu
                         DropdownMenuItem(onClick = {
                             vm.loadPackages()
                             showMenu = false
@@ -140,10 +142,11 @@ fun PackageManager(
             onExpandStateChange = { fabExpand = it },
             onLocalInstallClick = {
                 // TODO: 2020/11/13
+                vm.localInstall(context)
                 fabExpand = false
             },
             onOnlineInstallClick = {
-                vm.startInstallPackageActivity(context)
+                vm.onlineInstall(context)
                 fabExpand = false
             }
         )
@@ -154,7 +157,9 @@ fun PackageManager(
 private fun EmptyPage() {
     Box(Modifier.fillMaxSize()) {
         Row(Modifier.align(Alignment.Center)) {
-            Text("你还没有安装分包")
+            Providers(AmbientContentAlpha provides ContentAlpha.medium) {
+                Text("你还没有安装分包")
+            }
         }
     }
 }

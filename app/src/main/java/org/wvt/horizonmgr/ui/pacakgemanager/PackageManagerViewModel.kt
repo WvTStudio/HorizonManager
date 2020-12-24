@@ -10,6 +10,7 @@ import kotlinx.coroutines.launch
 import org.wvt.horizonmgr.DependenciesContainer
 import org.wvt.horizonmgr.ui.components.InputDialogHostState
 import org.wvt.horizonmgr.ui.components.ProgressDialogState
+import org.wvt.horizonmgr.ui.fileselector.SelectFileActivity
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -116,9 +117,16 @@ class PackageManagerViewModel(
         _progressState.value = null
     }
 
-    fun startInstallPackageActivity(context: AppCompatActivity) {
+    fun onlineInstall(context: AppCompatActivity) {
         viewModelScope.launch {
             InstallPackageActivity.startForResult(context)
+            loadPackages()
+        }
+    }
+
+    fun localInstall(context: AppCompatActivity) {
+        viewModelScope.launch {
+            val resultFile = SelectFileActivity.startForResult(context)
             loadPackages()
         }
     }

@@ -2,8 +2,8 @@
 
 ## alpha8
 
-Community
-- 将 Community 更换为 Jetpack Compose 方案
+社区界面
+- 将社区界面更换为 Jetpack Compose 方案
 - 添加 “开始新下载任务” 的对话框
 
 自定义主题
@@ -17,14 +17,16 @@ Community
 在线资源界面
 - 现在在未登录的状态下将不显示过滤按钮
 
-
 分包管理界面
 - 现在安装一个分包后，数据会自动刷新
 
-对话框现在以 24dp 的海拔显示
+文件选择界面
+- 改进收藏文件夹的动画效果
 
-进度对话框以 Material Design 规范正常显示
+对话框界面
+- 对话框现在以 24dp 的海拔显示
+- 进度对话框以 Material Design 规范正常显示
+- InputDialog 现在以 24dp 海拔显示
 
-InputDialog 现在以 24dp 海拔显示
-
-改善错误提示的显示效果
+其他
+- 改善错误提示的显示效果
