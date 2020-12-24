@@ -1,39 +1,89 @@
 package org.wvt.horizonmgr.ui.fileselector
 
-import android.annotation.SuppressLint
 import androidx.compose.animation.animate
 import androidx.compose.animation.core.*
 import androidx.compose.animation.transition
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.layout.Measurable
+import androidx.compose.ui.layout.WithConstraints
 import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import org.wvt.horizonmgr.ui.theme.PreviewTheme
+
+
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+internal fun FolderEntry(
+    name: String,
+    onClick: () -> Unit,
+    isStared: Boolean,
+    onStarChange: (isStared: Boolean) -> Unit,
+) {
+    val swipePoint = with(AmbientDensity.current) { 72.dp.toPx() }
+    val anchors = mapOf(0f to 0, -swipePoint to 1)
+
+    val state = rememberSwipeableState(0) {
+        onStarChange(isStared)
+        false
+    }
+
+    val starState = (state.offset.value > -swipePoint - 10) xor !isStared
+
+    Box(
+        Modifier.wrapContentSize()
+            .clickable(onClick = onClick)
+            .swipeable(
+                state = state,
+                anchors = anchors,
+                orientation = Orientation.Horizontal,
+                thresholds = { _, _ -> FractionalThreshold(0.2f) }
+            )
+    ) {
+        ToggleBackgroundWithIcon(
+            modifier = Modifier.matchParentSize(),
+            check = starState,
+            gravity = Alignment.End,
+            activeColor = MaterialTheme.colors.secondary,
+            inactiveColor = MaterialTheme.colors.onBackground.copy(0.12f).compositeOver(MaterialTheme.colors.background),
+            iconActiveColor = MaterialTheme.colors.onSecondary,
+            iconInactiveColor = MaterialTheme.colors.onBackground
+        )
+        ListItem(
+            modifier = Modifier.clickable(onClick = onClick)
+                .offset(offset = { IntOffset(x = state.offset.value.toInt(), y = 0) })
+                .background(MaterialTheme.colors.surface),
+            icon = { Icon(Icons.Filled.Folder) },
+            text = { Text(name) }
+        )
+    }
+}
 
 private enum class IconState {
     OFF, ON
 }
 
-private val iconScaleKey = FloatPropKey()
+private val iconScaleKey = FloatPropKey("Icon Scale")
 
-@SuppressLint("Range")
 private val iconTransition = transitionDefinition<IconState> {
     state(IconState.OFF) {
         set(iconScaleKey, 1f)
@@ -54,72 +104,156 @@ private val iconTransition = transitionDefinition<IconState> {
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
-@Composable
-internal fun FolderEntry(
-    name: String,
-    onClick: () -> Unit,
-    isStared: Boolean,
-    onStarChange: (isStared: Boolean) -> Unit,
-) {
-    val swipePoint = with(AmbientDensity.current) { 72.dp.toPx() }
-    val anchors = mapOf(0f to 0, -swipePoint to 1)
+private fun getTransition(
+    start: Int, end: Int
+): TransitionDefinition<String> = transitionDefinition {
+    state("start") {
+        set(sizeKey, start.toFloat())
+    }
+    state("end") {
+        set(sizeKey, end.toFloat())
+    }
+    transition {
+        sizeKey using tween()
+    }
+}
 
-    val state = rememberSwipeableState(0) {
-        onStarChange(isStared)
-        false
+private val sizeKey = FloatPropKey(label = "size")
+
+/**
+ * check 状态：
+ * primary 背景
+ * 图标为 onPrimary
+ *
+ * uncheck 状态：
+ * surface 背景
+ * 图标为 onSurface
+ *
+ * 从 check 到 uncheck：
+ * 图标抖动一下
+ * surface 涟漪延展
+ * 涟漪动画结束时，背景改为 surface，移除涟漪
+ *
+ * 从 uncheck 到 check：
+ * 图标抖动
+ * primary 涟漪延展
+ * 动画结束时，背景改为 primary，移除涟漪
+ */
+@OptIn(InternalLayoutApi::class)
+@Composable
+private fun ToggleBackgroundWithIcon(
+    modifier: Modifier = Modifier,
+    check: Boolean,
+    gravity: Alignment.Horizontal,
+    activeColor: Color,
+    inactiveColor: Color,
+    iconActiveColor: Color = contentColorFor(activeColor),
+    iconInactiveColor: Color = contentColorFor(inactiveColor)
+) {
+    val density = AmbientDensity.current
+    var checkState by remember { mutableStateOf(check) }
+
+    // 背景色会在涟漪结束后变换
+    val backgroundColor = if (checkState) activeColor
+    else inactiveColor
+
+    val rippleColor = if (check) activeColor
+    else inactiveColor
+
+    var rippleStart by remember { mutableStateOf(false) }
+
+    onCommit(check) {
+        rippleStart = true
     }
 
-    val starState = (state.offset.value > -swipePoint - 10) xor !isStared
+    Box(modifier.background(backgroundColor)) {
+        WithConstraints {
+            val tr = transition(
+                definition = getTransition(0, (constraints.maxHeight + constraints.maxWidth) * 2),
+                initState = if (rippleStart) "start" else "end",
+                toState = "end",
+                onStateChangeFinished = {
+                    checkState = check
+                    rippleStart = false
+                }
+            )
+            val padding = 36.dp
+            Layout(
+                modifier = Modifier.graphicsLayer(clip = true),
+                content = {
+                    Box(
+                        modifier = Modifier.clip(CircleShape)
+                            .background(rippleColor)
+                            .size(with(density) { tr[sizeKey].toDp() })
+                    )
+                }
+            ) { list: List<Measurable>, constraints: Constraints ->
+                val p = list[0].measure(constraints)
+                layout(constraints.maxWidth, constraints.maxHeight) {
+                    p.place(
+                        x = if (gravity == Alignment.Start) {
+                            padding.toIntPx() - p.width / 2
+                        } else {
+                            constraints.maxWidth - padding.toIntPx() - p.width / 2
+                        },
+                        y = (constraints.maxHeight - p.height) / 2
+                    )
+                }
+            }
+        }
 
-    val backgroundColor = animate(
-        if (starState) MaterialTheme.colors.secondary
-        else Color(0xFFC7C7C7)
-    )
+        SlashIcon(
+            modifier = Modifier.align(
+                if (gravity == Alignment.Start) Alignment.CenterStart
+                else Alignment.CenterEnd
+            ).padding(horizontal = 24.dp),
+            isActive = check,
+            activeColor = iconActiveColor,
+            inactiveColor = iconInactiveColor
+        )
+    }
+}
 
+@Composable
+private fun SlashIcon(
+    modifier: Modifier = Modifier,
+    isActive: Boolean,
+    activeColor: Color,
+    inactiveColor: Color
+) {
     val iconColor = animate(
-        if (starState) MaterialTheme.colors.onSecondary
-        else MaterialTheme.colors.onSurface
+        if (isActive) activeColor
+        else inactiveColor
     )
 
     val iconTransitionState = transition(
         definition = iconTransition,
         initState = IconState.OFF,
-        toState = if (starState) IconState.ON else IconState.OFF
+        toState = if (isActive) IconState.ON else IconState.OFF
     )
 
     val iconScale = iconTransitionState[iconScaleKey]
 
-    Box(
-        Modifier.wrapContentSize()
-            .background(backgroundColor)
-            .clickable(onClick = onClick)
-            .swipeable(
-                state = state,
-                anchors = anchors,
-                orientation = Orientation.Horizontal,
-                thresholds = { _, _ -> FractionalThreshold(0.2f) }
-            )
-    ) {
-        Icon(
-            modifier = Modifier.align(Alignment.CenterEnd).padding(end = 24.dp).graphicsLayer(
-                scaleX = iconScale,
-                scaleY = iconScale
-            ),
-            imageVector = if (starState) Icons.Filled.Star else Icons.Filled.StarBorder,
-            tint = iconColor
-        )
-
-        ListItem(
-            modifier = Modifier.clickable(onClick = onClick)
-                .offset(offset = { IntOffset(x = state.offset.value.toInt(), y = 0) })
-                .background(MaterialTheme.colors.surface),
-            icon = { Icon(Icons.Filled.Folder) },
-            text = { Text(name) }
-        )
-    }
+    Icon(
+        modifier = modifier.graphicsLayer(
+            scaleX = iconScale,
+            scaleY = iconScale
+        ),
+        imageVector = if (isActive) Icons.Filled.Star else Icons.Filled.StarBorder,
+        tint = iconColor
+    )
 }
 
+/*private class ItemState {
+    @Volatile
+    private var cont: Continuation<Unit>? = null
+
+    suspend fun check() {
+        suspendCoroutine<Unit> {
+            cont = it
+        }
+    }
+}*/
 
 @Preview
 @Composable
