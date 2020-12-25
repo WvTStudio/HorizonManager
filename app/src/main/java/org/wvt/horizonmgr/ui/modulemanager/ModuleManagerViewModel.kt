@@ -7,9 +7,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import org.wvt.horizonmgr.DependenciesContainer
-import org.wvt.horizonmgr.legacyservice.HorizonManager
 import org.wvt.horizonmgr.ui.components.ProgressDialogState
-import java.io.File
 
 class ModuleManagerViewModel(
     private val dependencies: DependenciesContainer
@@ -17,14 +15,10 @@ class ModuleManagerViewModel(
     enum class Tabs(val label: String) {
         MOD("Mod"), IC_MAP("IC地图"), MC_MAP("MC地图"), IC_TEXTURE("IC材质"), MC_TEXTURE("MC材质")
     }
-
-    private val horizonMgr = dependencies.horizonManager
-
+    
     private var selectedPackageUUID: String? = null
 
     private val _selectedPackage = MutableStateFlow(true)
-    val selectedPackage: StateFlow<Boolean> = _selectedPackage
-
     init {
         viewModelScope.launch {
             selectedPackageUUID = dependencies.localCache.getSelectedPackageUUID()
@@ -40,30 +34,6 @@ class ModuleManagerViewModel(
 
     private val _progressState = MutableStateFlow<ProgressDialogState?>(null)
     val progressState: StateFlow<ProgressDialogState?> = _progressState
-
-
-    fun install(requestSelectFile: suspend () -> String?) {
-        viewModelScope.launch {
-            val path = requestSelectFile() ?: return@launch
-            try {
-                _progressState.value = ProgressDialogState.Loading("正在安装")
-                if (horizonMgr.getFileType(File(path)) != HorizonManager.FileType.Mod)
-                    error("不是Mod")
-                selectedPackageUUID?.let {
-                    horizonMgr.installMod(it, File(path))
-                }
-            } catch (e: Exception) {
-                _progressState.value =
-                    ProgressDialogState.Failed("安装失败", "文件格式不正确")
-                return@launch
-            }
-            _progressState.value = ProgressDialogState.Finished("安装完成")
-        }
-    }
-
-    fun dismiss() {
-        _progressState.value = null
-    }
 
     fun selectTab(tab: Tabs) {
         _selectedTab.value = tab

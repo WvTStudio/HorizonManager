@@ -152,10 +152,7 @@ fun App(
                         onNavClick = { drawerState.open() }
                     )
                     AppViewModel.Screen.LOCAL_MANAGE -> ModuleManager(
-                        onNavClicked = { drawerState.open() },
-                        requestSelectFile = {
-                            SelectFileActivity.startForResult(context)
-                        }
+                        onNavClicked = { drawerState.open() }
                     )
                     AppViewModel.Screen.PACKAGE_MANAGE -> PackageManager(
                         onPackageSelect = selectedPackageChange,

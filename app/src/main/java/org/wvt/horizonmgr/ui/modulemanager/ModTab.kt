@@ -1,5 +1,6 @@
 package org.wvt.horizonmgr.ui.modulemanager
 
+import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animate
 import androidx.compose.foundation.*
@@ -7,7 +8,10 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
+import androidx.compose.material.Icon
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -18,21 +22,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.gesture.longPressGestureFilter
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.AmbientContext
 import androidx.compose.ui.unit.dp
 import org.wvt.horizonmgr.ui.components.EmptyPage
 import org.wvt.horizonmgr.ui.components.LocalImage
 import org.wvt.horizonmgr.ui.components.ProgressDialog
 
 @Composable
-internal fun ModTab(
-    vm: ModTabViewModel
-) {
+internal fun ModTab(vm: ModTabViewModel) {
     val ps by vm.progressState.collectAsState()
     val state by vm.state.collectAsState()
     val mods by vm.mods.collectAsState()
     val enabledMods by vm.enabledMods.collectAsState()
+    val context = AmbientContext.current as AppCompatActivity
 
-    Crossfade(current = state) { state ->
+    Crossfade(
+        current = state
+    ) { state ->
         when (state) {
             is ModTabViewModel.State.Loading -> {
                 Box(Modifier.fillMaxSize()) {
@@ -49,30 +55,43 @@ internal fun ModTab(
                     Text("当前分包内没有已安装的模组")
                 }
             } else {
-                LazyColumn(
-                    contentPadding = PaddingValues(top = 8.dp, bottom = 64.dp)
-                ) {
-                    itemsIndexed(items = mods) { index, item ->
-                        ModItem(
-                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                            enable = enabledMods.contains(item.id),
-                            title = item.name,
-                            text = item.description,
-                            iconPath = item.iconPath,
-                            selected = false,
-                            onLongClick = {},
-                            onEnabledChange = { if (it) vm.enableMod(item) else vm.disableMod(item) },
-                            onClick = {/* TODO 显示 Mod 详情 */ },
-                            onDeleteClick = { vm.deleteMod(item) }
-                        )
+                Box(Modifier.fillMaxSize()) {
+                    LazyColumn(
+                        contentPadding = PaddingValues(top = 8.dp, bottom = 64.dp)
+                    ) {
+                        itemsIndexed(items = mods) { index, item ->
+                            ModItem(
+                                modifier = Modifier.padding(
+                                    horizontal = 16.dp,
+                                    vertical = 8.dp
+                                ),
+                                enable = enabledMods.contains(item.id),
+                                title = item.name,
+                                text = item.description,
+                                iconPath = item.iconPath,
+                                selected = false,
+                                onLongClick = {},
+                                onEnabledChange = {
+                                    if (it) vm.enableMod(item)
+                                    else vm.disableMod(item)
+                                },
+                                onClick = {/* TODO 显示 Mod 详情 */ },
+                                onDeleteClick = { vm.deleteMod(item) }
+                            )
+                        }
                     }
+                    ExtendedFloatingActionButton(
+                        modifier = Modifier.padding(16.dp).align(Alignment.BottomEnd),
+                        icon = { Icon(imageVector = Icons.Filled.Add) },
+                        text = { Text("安装") },
+                        onClick = { vm.install(context) }
+                    )
                 }
             }
         }
-
-    }
-    ps?.let {
-        ProgressDialog(onCloseRequest = vm::dismiss, state = it)
+        ps?.let {
+            ProgressDialog(onCloseRequest = vm::dismiss, state = it)
+        }
     }
 }
 

@@ -1,5 +1,6 @@
 package org.wvt.horizonmgr.ui.modulemanager
 
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -8,6 +9,8 @@ import kotlinx.coroutines.launch
 import org.wvt.horizonmgr.DependenciesContainer
 import org.wvt.horizonmgr.legacyservice.HorizonManager
 import org.wvt.horizonmgr.ui.components.ProgressDialogState
+import org.wvt.horizonmgr.ui.fileselector.SelectFileActivity
+import java.io.File
 import java.util.*
 
 class ModTabViewModel(
@@ -119,5 +122,24 @@ class ModTabViewModel(
 
     fun dismiss() {
         _progressState.value = null
+    }
+
+    fun install(context: AppCompatActivity) {
+        viewModelScope.launch {
+            val path = SelectFileActivity.startForResult(context) ?: return@launch
+            try {
+                _progressState.value = ProgressDialogState.Loading("正在安装")
+                if (horizonMgr.getFileType(File(path)) != HorizonManager.FileType.Mod)
+                    error("不是Mod")
+                selectedPackageUUID?.let {
+                    horizonMgr.installMod(it, File(path))
+                }
+            } catch (e: Exception) {
+                _progressState.value =
+                    ProgressDialogState.Failed("安装失败", "文件格式不正确")
+                return@launch
+            }
+            _progressState.value = ProgressDialogState.Finished("安装完成")
+        }
     }
 }

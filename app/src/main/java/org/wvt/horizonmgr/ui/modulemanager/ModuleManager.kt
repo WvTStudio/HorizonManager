@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -20,13 +19,11 @@ import androidx.compose.ui.util.fastForEachIndexed
 import androidx.compose.ui.zIndex
 import org.wvt.horizonmgr.dependenciesViewModel
 import org.wvt.horizonmgr.ui.components.HorizonDivider
-import org.wvt.horizonmgr.ui.components.ProgressDialog
 import org.wvt.horizonmgr.ui.main.AmbientSelectedPackageUUID
 
 @Composable
 fun ModuleManager(
-    onNavClicked: () -> Unit,
-    requestSelectFile: suspend () -> String?
+    onNavClicked: () -> Unit
 ) {
     val vm = dependenciesViewModel<ModuleManagerViewModel>()
     val selectedTab by vm.selectedTab.collectAsState()
@@ -62,7 +59,7 @@ fun ModuleManager(
                     ModuleManagerViewModel.Tabs.MC_TEXTURE -> ICResTab()
                 }
             }
-            ExtendedFloatingActionButton(
+            /*ExtendedFloatingActionButton(
                 modifier = Modifier.padding(16.dp).align(Alignment.BottomEnd),
                 icon = { Icon(Icons.Filled.Add) },
                 text = { Text("安装") },
@@ -70,7 +67,7 @@ fun ModuleManager(
             )
             ps?.let {
                 ProgressDialog(onCloseRequest = vm::dismiss, state = it)
-            }
+            }*/
         }
     }
 }
