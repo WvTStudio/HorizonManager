@@ -89,7 +89,7 @@ class CommunityViewModel(
         }
     }
 
-    fun clear() {
+    fun clearDownloadTask() {
         newTask.value = null
     }
 }

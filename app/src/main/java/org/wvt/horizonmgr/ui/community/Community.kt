@@ -92,7 +92,7 @@ internal fun Community(onClose: () -> Unit) {
         }
         newtask?.let { it ->
             // New Download Task Dialog
-            Dialog(onDismissRequest = { vm.clear() }) {
+            Dialog(onDismissRequest = { vm.clearDownloadTask() }) {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     elevation = 24.dp
