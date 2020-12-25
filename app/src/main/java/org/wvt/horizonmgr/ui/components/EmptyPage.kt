@@ -1,7 +1,10 @@
 package org.wvt.horizonmgr.ui.components
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.material.AmbientContentAlpha
+import androidx.compose.material.ContentAlpha
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Providers
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 
@@ -11,6 +14,8 @@ fun EmptyPage(
     message: @Composable () -> Unit
 ) {
     Box(modifier = modifier, contentAlignment = Alignment.Center) {
-        message()
+        Providers(AmbientContentAlpha provides ContentAlpha.medium) {
+            message()
+        }
     }
 }

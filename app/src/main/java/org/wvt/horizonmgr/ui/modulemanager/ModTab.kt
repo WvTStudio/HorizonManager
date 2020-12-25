@@ -40,17 +40,13 @@ internal fun ModTab(
                 }
             }
             is ModTabViewModel.State.PackageNotSelected -> {
-                Column(
-                    Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(text = "你还没有选择分包", color = MaterialTheme.colors.onSurface.copy(ContentAlpha.medium))
+                EmptyPage(Modifier.fillMaxSize()) {
+                    Text(text = "你还没有选择分包")
                 }
             }
             is ModTabViewModel.State.OK -> if (mods.isEmpty()) {
                 EmptyPage(Modifier.fillMaxSize()) {
-                    Text("当前分包内没有已安装的模组", color = MaterialTheme.colors.onSurface.copy(ContentAlpha.medium))
+                    Text("当前分包内没有已安装的模组")
                 }
             } else {
                 LazyColumn(
