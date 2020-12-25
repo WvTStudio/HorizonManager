@@ -11,6 +11,7 @@ import androidx.compose.material.icons.filled.Menu
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.onCommit
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -20,6 +21,7 @@ import androidx.compose.ui.zIndex
 import org.wvt.horizonmgr.dependenciesViewModel
 import org.wvt.horizonmgr.ui.components.HorizonDivider
 import org.wvt.horizonmgr.ui.components.ProgressDialog
+import org.wvt.horizonmgr.ui.main.AmbientSelectedPackageUUID
 
 @Composable
 fun ModuleManager(
@@ -29,7 +31,19 @@ fun ModuleManager(
     val vm = dependenciesViewModel<ModuleManagerViewModel>()
     val selectedTab by vm.selectedTab.collectAsState()
     val ps by vm.progressState.collectAsState()
-    val selected by vm.selectedPackage.collectAsState()
+    val modVm = dependenciesViewModel<ModTabViewModel>()
+    val icMapVm = dependenciesViewModel<ICLevelTabViewModel>()
+    val mcMapVm = dependenciesViewModel<MCLevelTabViewModel>()
+
+    val pkgId = AmbientSelectedPackageUUID.current
+
+    onCommit(pkgId) {
+        modVm.setSelectedUUID(pkgId)
+        modVm.load()
+
+        icMapVm.setPackage(pkgId)
+        icMapVm.load()
+    }
 
     Column {
         CustomAppBar(
@@ -41,11 +55,11 @@ fun ModuleManager(
         Box(Modifier.fillMaxSize()) {
             Crossfade(current = selectedTab) {
                 when (it) {
-                    ModuleManagerViewModel.Tabs.MOD -> ModTab()
-                    ModuleManagerViewModel.Tabs.IC_MAP -> LevelTab(LevelTabType.IC)
-                    ModuleManagerViewModel.Tabs.MC_MAP -> LevelTab(LevelTabType.MC)
-                    ModuleManagerViewModel.Tabs.IC_TEXTURE -> ResTab()
-                    ModuleManagerViewModel.Tabs.MC_TEXTURE -> ResTab()
+                    ModuleManagerViewModel.Tabs.MOD -> ModTab(modVm)
+                    ModuleManagerViewModel.Tabs.IC_MAP -> ICLevelTab(icMapVm)
+                    ModuleManagerViewModel.Tabs.MC_MAP -> MCLevelTab(mcMapVm)
+                    ModuleManagerViewModel.Tabs.IC_TEXTURE -> MCResTab()
+                    ModuleManagerViewModel.Tabs.MC_TEXTURE -> ICResTab()
                 }
             }
             ExtendedFloatingActionButton(

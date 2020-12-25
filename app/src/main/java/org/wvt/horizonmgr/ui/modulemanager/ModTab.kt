@@ -1,6 +1,5 @@
 package org.wvt.horizonmgr.ui.modulemanager
 
-import android.util.Log
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animate
 import androidx.compose.foundation.*
@@ -10,33 +9,28 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.Text
 import androidx.compose.material.ripple.rememberRipple
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.gesture.longPressGestureFilter
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import org.wvt.horizonmgr.dependenciesViewModel
 import org.wvt.horizonmgr.ui.components.EmptyPage
 import org.wvt.horizonmgr.ui.components.LocalImage
 import org.wvt.horizonmgr.ui.components.ProgressDialog
-import org.wvt.horizonmgr.ui.main.AmbientSelectedPackageUUID
 
 @Composable
-internal fun ModTab() {
-    val vm = dependenciesViewModel<ModTabViewModel>()
+internal fun ModTab(
+    vm: ModTabViewModel
+) {
     val ps by vm.progressState.collectAsState()
     val state by vm.state.collectAsState()
     val mods by vm.mods.collectAsState()
     val enabledMods by vm.enabledMods.collectAsState()
-    Log.d("ModTab", enabledMods.joinToString())
-    val selectedUUID = AmbientSelectedPackageUUID.current
-
-    onCommit(selectedUUID) {
-        vm.setSelectedUUID(selectedUUID)
-        vm.load()
-    }
 
     Crossfade(current = state) { state ->
         when (state) {

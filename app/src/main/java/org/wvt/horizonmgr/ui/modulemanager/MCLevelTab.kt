@@ -13,16 +13,15 @@ import kotlinx.coroutines.launch
 import org.wvt.horizonmgr.ui.components.*
 
 @Composable
-internal fun ICLevelTab(
-    vm: ICLevelTabViewModel
+internal fun MCLevelTab(
+    vm: MCLevelTabViewModel
 ) {
     val items by vm.levels.collectAsState()
-
     val scope = rememberCoroutineScope()
     var progressDialogState by remember { mutableStateOf<ProgressDialogState?>(null) }
     val inputDialogState = remember { InputDialogHostState() }
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(Modifier.fillMaxSize()) {
         if (items.isEmpty()) {
             EmptyPage(Modifier.matchParentSize()) {
                 Text("当前还没有地图")
@@ -48,7 +47,6 @@ internal fun ICLevelTab(
                                     return@launch
                                 }
                                 progressDialogState = ProgressDialogState.Finished("重命名成功")
-                                vm.load()
                             }
                         }
                     },
@@ -69,8 +67,8 @@ internal fun ICLevelTab(
                 )
             }
         }
-    }
 
+    }
 
     InputDialogHost(state = inputDialogState)
 
