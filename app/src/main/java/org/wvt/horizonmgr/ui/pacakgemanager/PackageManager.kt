@@ -25,10 +25,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import org.wvt.horizonmgr.dependenciesViewModel
-import org.wvt.horizonmgr.ui.components.InputDialogHost
-import org.wvt.horizonmgr.ui.components.InputDialogHostState
-import org.wvt.horizonmgr.ui.components.MyAlertDialog
-import org.wvt.horizonmgr.ui.components.ProgressDialog
+import org.wvt.horizonmgr.ui.components.*
 import org.wvt.horizonmgr.ui.main.AmbientSelectedPackageUUID
 import org.wvt.horizonmgr.ui.theme.PreviewTheme
 import kotlin.coroutines.resume
@@ -92,16 +89,14 @@ fun PackageManager(
                         DropdownMenuItem(onClick = {
                             vm.loadPackages()
                             showMenu = false
-                        }) {
-                            Text("刷新")
-                        }
+                        }) { Text("刷新") }
                     }
                 }
             )
 
             if (vmPackages.isNullOrEmpty()) {
                 // Tips when there was no package installed.
-                EmptyPage()
+                EmptyPage(Modifier.fillMaxSize()) { Text("你还没有安装分包") }
             } else LazyColumn(
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(top = 8.dp, bottom = 64.dp)
@@ -116,9 +111,9 @@ fun PackageManager(
                         onClick = { onPackageSelect(item.uuid) },
                         onInfoClick = { vm.showInfo(context, item.uuid) },
                         onDeleteClick = {
-                            vm.deletePackage(
-                                item.uuid,
-                                confirmDeleteDialogHostState
+                            vm.deletePackage(item.uuid,
+                                confirmDeleteDialogHostState,
+                                { onPackageSelect(null) }
                             )
                         },
                         onRenameClick = { vm.renamePackage(item.uuid, inputDialogHostState) },
@@ -150,17 +145,6 @@ fun PackageManager(
                 fabExpand = false
             }
         )
-    }
-}
-
-@Composable
-private fun EmptyPage() {
-    Box(Modifier.fillMaxSize()) {
-        Row(Modifier.align(Alignment.Center)) {
-            Providers(AmbientContentAlpha provides ContentAlpha.medium) {
-                Text("你还没有安装分包")
-            }
-        }
     }
 }
 
@@ -503,9 +487,7 @@ private fun Pareview() {
                     onOnlineInstallClick = { /*TODO*/ }
                 )
             },
-            emptyPage = {
-                EmptyPage()
-            },
+            emptyPage = {},
             item = { index, item ->
                 PackageItem(
                     modifier = Modifier.padding(16.dp, 8.dp),

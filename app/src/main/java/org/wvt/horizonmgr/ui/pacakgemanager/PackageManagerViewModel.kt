@@ -50,12 +50,12 @@ class PackageManagerViewModel(
 
     fun setSelectedPackage(uuid: String?) {
         selectedPackage = uuid
-
     }
 
     fun deletePackage(
         uuid: String,
-        confirmDeleteDialogHostState: ConfirmDeleteDialogHostState
+        confirmDeleteDialogHostState: ConfirmDeleteDialogHostState,
+        onSucceed: () -> Unit
     ) {
         viewModelScope.launch {
             if (confirmDeleteDialogHostState.showDialog() ==
@@ -70,6 +70,7 @@ class PackageManagerViewModel(
                     return@launch
                 }
                 _progressState.value = ProgressDialogState.Finished("删除成功")
+                onSucceed()
                 loadPackages()
             }
         }
