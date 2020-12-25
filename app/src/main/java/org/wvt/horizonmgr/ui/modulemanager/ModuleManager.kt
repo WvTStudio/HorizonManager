@@ -27,7 +27,6 @@ fun ModuleManager(
 ) {
     val vm = dependenciesViewModel<ModuleManagerViewModel>()
     val selectedTab by vm.selectedTab.collectAsState()
-    val ps by vm.progressState.collectAsState()
     val modVm = dependenciesViewModel<ModTabViewModel>()
     val icMapVm = dependenciesViewModel<ICLevelTabViewModel>()
     val mcMapVm = dependenciesViewModel<MCLevelTabViewModel>()
@@ -59,15 +58,6 @@ fun ModuleManager(
                     ModuleManagerViewModel.Tabs.MC_TEXTURE -> ICResTab()
                 }
             }
-            /*ExtendedFloatingActionButton(
-                modifier = Modifier.padding(16.dp).align(Alignment.BottomEnd),
-                icon = { Icon(Icons.Filled.Add) },
-                text = { Text("安装") },
-                onClick = { vm.install(requestSelectFile) }
-            )
-            ps?.let {
-                ProgressDialog(onCloseRequest = vm::dismiss, state = it)
-            }*/
         }
     }
 }
