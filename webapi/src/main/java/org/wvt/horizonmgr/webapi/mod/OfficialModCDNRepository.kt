@@ -13,9 +13,8 @@ import org.wvt.horizonmgr.webapi.forEachIndexed
 /**
  * Horizon 官方 Mod 仓库的 ICCN CDN 镜像
  */
-class OfficialModCDNRepository(
-    private val client: HttpClient
-) {
+class OfficialModCDNRepository {
+    private val client: HttpClient = HttpClient(CIO)
 
     /**
      * 获取所有模组
@@ -62,7 +61,7 @@ class OfficialModCDNRepository(
      */
     suspend fun getAllMods(): List<OfficialCDNMod> {
         val jsonStr = try {
-            client.get<String>()
+            client.get<String>("https://adodoz.cn/mods/allmodinfo.json")
         } catch (e: Exception) {
             throw NetworkException("Network error: ${e.message}", e)
         }
@@ -83,7 +82,11 @@ class OfficialModCDNRepository(
                         icon = getString("icon"),
                         versionName = getString("version_name"),
                         horizonOptimized = getInt("horizon_optimized") == 1,
-                        lastUpdate = getString("last_update"),
+                        lastUpdate = try {
+                            getString("last_update")
+                        } catch (e: Exception) {
+                            null
+                        },
                         multiplayer = getInt("multiplayer") == 1,
                         likes = getInt("likes"),
                         dislikes = getInt("dislikes")
@@ -108,7 +111,7 @@ data class OfficialCDNMod internal constructor(
     val id: Int,
     val title: String,
     val description: String,
-    val icon: String,
+    private val icon: String,
     val versionName: String,
     val horizonOptimized: Boolean,
     val lastUpdate: String?,
