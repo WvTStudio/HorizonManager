@@ -1,6 +1,8 @@
 package org.wvt.horizonmgr.webapi.mod
 
 import io.ktor.client.*
+import io.ktor.client.engine.cio.*
+import io.ktor.client.features.*
 import io.ktor.client.request.*
 import org.json.JSONException
 import org.json.JSONObject
@@ -11,9 +13,8 @@ import org.wvt.horizonmgr.webapi.forEach
 /**
  * 汉化组仓库
  */
-class ChineseModRepository(
-    private val client: HttpClient
-) {
+class ChineseModRepository {
+    private val client: HttpClient = HttpClient(CIO)
     /**
      * 获取所有模组信息
      *
@@ -93,6 +94,10 @@ class ChineseModRepository(
 
         return result
     }
+
+    suspend fun getModById(id: Int): ChineseMod? {
+        return getAllMods().firstOrNull { it.id == id }
+    }
 }
 
 /**
@@ -153,8 +158,10 @@ class ChineseMod internal constructor(
             throw JsonParseException(jsonStr, e)
         }
 
+        val filePostfix = path.substringAfterLast(".")
+
         return DownloadURL(
-            fileName = fileName,
+            fileName = "$fileName.$filePostfix",
             url = BASE + path
         )
     }
@@ -164,7 +171,7 @@ class ChineseMod internal constructor(
      */
     data class DownloadURL(
         /**
-         * 文件名（含后缀）
+         * 文件名（不含后缀）
          */
         val fileName: String,
         /**

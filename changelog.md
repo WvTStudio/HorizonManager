@@ -1,5 +1,9 @@
 # Changelog
 
+## alpha9
+登录界面
+- 减缓齿轮转速
+
 ## alpha8
 
 社区界面
