@@ -28,39 +28,10 @@ internal fun Community(onClose: () -> Unit) {
     val vm = dependenciesViewModel<CommunityViewModel>()
     val newtask by vm.newTask.collectAsState()
 
-    val backgroundColor = MaterialTheme.colors.background
     var loading by remember { mutableStateOf(true) }
-    var progress by remember { mutableStateOf<Float>(0f) }
+    var progress by remember { mutableStateOf(0f) }
     val context = AmbientContext.current
 
-    val webView = remember {
-        WebView(context).apply {
-            settings.apply {
-                javaScriptEnabled = true
-                setSupportZoom(false)
-                javaScriptCanOpenWindowsAutomatically = true
-                domStorageEnabled = true
-            }
-            webChromeClient = object : WebChromeClient() {
-                override fun onProgressChanged(view: WebView?, newProgress: Int) {
-                    progress = newProgress / 100f
-                }
-            }
-            webViewClient = object : WebViewClient() {
-                override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
-                    loading = true
-                }
-
-                override fun onPageFinished(view: WebView?, url: String?) {
-                    loading = false
-                }
-            }
-            setDownloadListener { url, userAgent, contentDisposition, mimetype, contentLength ->
-                vm.newTask(context, url, mimetype, userAgent, contentDisposition, contentLength)
-            }
-            loadUrl("https://forum.adodoz.cn")
-        }
-    }
 
     Box(Modifier.fillMaxSize()) {
         Column(Modifier.fillMaxSize()) {
@@ -81,12 +52,14 @@ internal fun Community(onClose: () -> Unit) {
                             progress = animate(progress)
                         )
                     }
-                })
-            AndroidView(
+                }
+            )
+            WebViewCompose(
                 modifier = Modifier.weight(1f),
-                viewBlock = { webView },
-                update = {
-                    it.setBackgroundColor(backgroundColor.toArgb())
+                onProgressChanged = { progress = it },
+                onStateChanged = { loading = it },
+                newDownloadTask = { url, userAgent, contentDisposition, mimetype, contentLength ->
+                    vm.newTask(context, url, userAgent, contentDisposition, mimetype, contentLength)
                 }
             )
         }
@@ -114,7 +87,10 @@ internal fun Community(onClose: () -> Unit) {
                             modifier = Modifier.padding(top = 8.dp),
                             text = "大小: " + longSizeToString(it.size)
                         )
-                        Row(Modifier.fillMaxWidth().padding(top = 16.dp, bottom = 8.dp), horizontalArrangement = Arrangement.End) {
+                        Row(
+                            Modifier.fillMaxWidth().padding(top = 16.dp, bottom = 8.dp),
+                            horizontalArrangement = Arrangement.End
+                        ) {
                             TextButton(onClick = { vm.download(context) }) {
                                 Text("下载")
                             }
@@ -124,4 +100,52 @@ internal fun Community(onClose: () -> Unit) {
             }
         }
     }
+}
+
+@Composable
+private fun WebViewCompose(
+    modifier: Modifier = Modifier,
+    onProgressChanged: (progress: Float) ->Unit,
+    onStateChanged: (loading: Boolean) -> Unit,
+    newDownloadTask: (url: String, userAgent: String, contentDisposition: String, mimeType: String, contentLength: Long)->Unit
+) {
+    val backgroundColor = MaterialTheme.colors.background
+    AndroidView(
+        modifier = modifier,
+        viewBlock = {
+            WebView(it).apply {
+                settings.apply {
+                    javaScriptEnabled = true
+                    setSupportZoom(false)
+                    javaScriptCanOpenWindowsAutomatically = true
+                    domStorageEnabled = true
+                }
+                webChromeClient = object : WebChromeClient() {
+                    override fun onProgressChanged(view: WebView?, newProgress: Int) {
+                        onProgressChanged(newProgress / 100f)
+                    }
+                }
+                webViewClient = object : WebViewClient() {
+                    override fun onPageStarted(
+                        view: WebView?,
+                        url: String?,
+                        favicon: Bitmap?
+                    ) {
+                        onStateChanged(true)
+                    }
+
+                    override fun onPageFinished(view: WebView?, url: String?) {
+                        onStateChanged(false)
+                    }
+                }
+                setDownloadListener { url, userAgent, contentDisposition, mimetype, contentLength ->
+                    newDownloadTask(url, mimetype, userAgent, contentDisposition, contentLength)
+                }
+                loadUrl("https://forum.adodoz.cn")
+            }
+        },
+        update = {
+            it.setBackgroundColor(backgroundColor.toArgb())
+        }
+    )
 }
