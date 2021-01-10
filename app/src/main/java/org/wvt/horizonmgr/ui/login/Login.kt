@@ -27,21 +27,7 @@ private val rotationDefinition = transitionDefinition<Int> {
     transition(0 to 1) {
         rotation using infiniteRepeatable(
             animation = tween(
-                durationMillis = 3000,
-                easing = LinearEasing
-            )
-        )
-    }
-}
-
-private val reverseRotation = FloatPropKey()
-private val reverseRotationDefinition = transitionDefinition<Int> {
-    state(0) { this[reverseRotation] = 360f }
-    state(1) { this[reverseRotation] = 0f }
-    transition(0 to 1) {
-        reverseRotation using infiniteRepeatable(
-            animation = tween(
-                durationMillis = 3000,
+                durationMillis = 5000,
                 easing = LinearEasing
             )
         )
