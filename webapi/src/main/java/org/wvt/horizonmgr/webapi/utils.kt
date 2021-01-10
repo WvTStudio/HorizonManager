@@ -3,9 +3,6 @@ package org.wvt.horizonmgr.webapi
 import org.json.JSONArray
 import org.json.JSONException
 
-/**
- * Switch to Default Dispatcher, catch errors and transforms them.
- */
 internal inline fun <T> parseJson(block: () -> T): T {
     return try {
         block()
@@ -21,8 +18,10 @@ internal inline fun <T> parseJson(block: () -> T): T {
 internal fun <T> JSONArray.toArray(): Array<T> {
     val result = arrayOfNulls<Any>(length())
     for (i in 0 until length()) {
+        @Suppress("UNCHECKED_CAST")
         result[i] = get(i) as T
     }
+    @Suppress("UNCHECKED_CAST")
     return result as Array<T>
 }
 
