@@ -11,7 +11,7 @@ import org.wvt.horizonmgr.webapi.forEach
 /**
  * 汉化组仓库
  */
-class LocalizationModRepository(
+class ChineseModRepository(
     private val client: HttpClient
 ) {
     /**
@@ -56,9 +56,9 @@ class LocalizationModRepository(
      * }
      * ```
      */
-    suspend fun getAllMods(): List<LocalizationMod> {
+    suspend fun getAllMods(): List<ChineseMod> {
         val jsonStr = client.get<String>("https://dev.adodoz.cn/api/mod/list")
-        val result = mutableListOf<LocalizationMod>()
+        val result = mutableListOf<ChineseMod>()
         try {
             val json = JSONObject(jsonStr)
             if (json.getString("state") != "success") throw ServiceException("获取失败")
@@ -74,7 +74,7 @@ class LocalizationModRepository(
                         }.toList()
                     }
 
-                    val data = LocalizationMod(
+                    val data = ChineseMod(
                         httpClient = client,
                         id = getInt("id"),
                         name = getString("name"),
@@ -98,7 +98,7 @@ class LocalizationModRepository(
 /**
  * 代表一个汉化组仓库中的 Mod
  */
-class LocalizationMod internal constructor(
+class ChineseMod internal constructor(
     private val httpClient: HttpClient,
     val id: Int,
     val name: String,
