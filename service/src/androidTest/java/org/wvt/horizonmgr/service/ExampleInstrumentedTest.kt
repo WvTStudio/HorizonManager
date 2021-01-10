@@ -1,4 +1,4 @@
-package me.konyaco.horizonmgr.service
+package org.wvt.horizonmgr.service
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
