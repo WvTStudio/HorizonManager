@@ -143,25 +143,22 @@ class ICCNModule {
         val session: String
         val token: String
 
-        with(
-            client.get<HttpResponse>("https://adodoz.cn").headers
-        ) {
-            session = get("set-cookie")
-                ?.takeIf { it.contains("flarum_session") }
-                ?: throw ServerException("session not found")
-            token = get("x-csrf-token")
-                ?: throw ServerException("token not found")
-        }
+        val homePageResponse = client.get<HttpResponse>("https://adodoz.cn")
+        session = homePageResponse.headers["set-cookie"]
+            ?.takeIf { it.contains("flarum_session") }
+            ?: throw ServerException("session not found")
+        token = homePageResponse.headers["x-csrf-token"]
+            ?: throw ServerException("token not found")
 
         // Step 2 - Register
         val regResponse = client.post<HttpResponse>("https://adodoz.cn/register") {
             body = TextContent(
-                JSONObject().apply {
+                contentType = ContentType.Application.Json,
+                text = JSONObject().apply {
                     put("username", username)
                     put("email", email)
                     put("password", password)
-                }.toString(),
-                ContentType.Application.Json
+                }.toString()
             )
             headers {
                 set("referer", "https://adodoz.cn/")
