@@ -27,6 +27,8 @@ import kotlin.coroutines.resume
 class MainActivityViewModel(
     private val dependencies: DependenciesContainer
 ) : ViewModel() {
+    var initializing = MutableStateFlow(true)
+
     val userInfo: MutableStateFlow<LocalCache.CachedUserInfo?> = MutableStateFlow(null)
     val selectedPackage: MutableStateFlow<String?> = MutableStateFlow(null)
     val showPermissionDialog: MutableStateFlow<Boolean> = MutableStateFlow(false)
@@ -45,8 +47,8 @@ class MainActivityViewModel(
         viewModelScope.launch {
             userInfo.value = dependencies.localCache.getCachedUserInfo()
             selectedPackage.value = dependencies.localCache.getSelectedPackageUUID()
+            initializing.value = false
         }
-        getUpdate()
     }
 
     fun getUpdate() {

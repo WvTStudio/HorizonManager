@@ -28,8 +28,10 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme(R.style.Theme_HorizonManagerCompose_NoActionBar) // cancel the slash theme
+
         setContent {
             val vm = dependenciesViewModel<MainActivityViewModel>()
+            val initializing by vm.initializing.collectAsState()
             val userInfo by vm.userInfo.collectAsState()
             val selectedPackage by vm.selectedPackage.collectAsState()
             val showPermissionDialog by vm.showPermissionDialog.collectAsState()
@@ -45,13 +47,15 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
-            onActive { vm.checkPermission(this@MainActivity) }
+            onActive {
+                vm.checkPermission(this@MainActivity)
+                vm.getUpdate()
+            }
 
             AndroidDependenciesProvider {
                 AndroidHorizonManagerTheme {
                     Surface(color = MaterialTheme.colors.background) {
-                        App(
-//                            navController = navController,
+                        if (!initializing) App(
                             dependencies = dependencies,
                             userInfo = userInfo,
                             requestLogin = { vm.requestLogin(this) },
@@ -64,28 +68,28 @@ class MainActivity : AppCompatActivity() {
                             donate = { startActivity<DonateActivity>() },
                             settings = { startActivity<SettingsActivity>() },
                         )
+                    }
 
-                        if (showPermissionDialog) {
-                            RequestPermissionDialog {
-                                vm.dismiss()
-                                vm.requestPermission(this)
+                    if (showPermissionDialog) {
+                        RequestPermissionDialog {
+                            vm.dismiss()
+                            vm.requestPermission(this)
+                        }
+                    }
+
+                    val theNewVersion = newVersion
+
+                    if (theNewVersion != null && displayNewVersionDialog) {
+                        NewVersionDialog(
+                            versionName = theNewVersion.versionName,
+                            versionCode = theNewVersion.versionCode,
+                            changelog = theNewVersion.changelog,
+                            onConfirm = { displayNewVersionDialog = false },
+                            onIgnore = {
+                                vm.ignoreVersion(theNewVersion.versionCode)
+                                displayNewVersionDialog = false
                             }
-                        }
-
-                        val theNewVersion = newVersion
-
-                        if (theNewVersion != null && displayNewVersionDialog) {
-                            NewVersionDialog(
-                                versionName = theNewVersion.versionName,
-                                versionCode = theNewVersion.versionCode,
-                                changelog = theNewVersion.changelog,
-                                onConfirm = { displayNewVersionDialog = false },
-                                onIgnore = {
-                                    vm.ignoreVersion(theNewVersion.versionCode)
-                                    displayNewVersionDialog = false
-                                }
-                            )
-                        }
+                        )
                     }
                 }
             }
