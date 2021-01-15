@@ -88,6 +88,11 @@ class InstalledMod internal constructor(
         return description
     }
 
+    suspend fun getName(): String {
+        parse()
+        return name
+    }
+
     /**
      * 启用该 MOD
      *

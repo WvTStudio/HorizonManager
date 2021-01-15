@@ -132,7 +132,6 @@ fun Donate(
 
 @Composable
 fun RandomPlaceLayout(modifier: Modifier, content: @Composable () -> Unit) {
-    val random = Random
     Layout(
         modifier = modifier,
         content = content
@@ -143,8 +142,8 @@ fun RandomPlaceLayout(modifier: Modifier, content: @Composable () -> Unit) {
         }
         layout(constraints.maxWidth, constraints.maxHeight) {
             placeables.fastForEach {
-                val x = random.nextInt(0, constraints.maxWidth - it.width)
-                val y = random.nextInt(0, constraints.maxHeight - it.height)
+                val x = Random.nextInt(0, constraints.maxWidth - it.width)
+                val y = Random.nextInt(0, constraints.maxHeight - it.height)
                 it.place(x, y)
             }
         }
