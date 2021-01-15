@@ -29,12 +29,10 @@ class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            val vm = dependenciesViewModel<LoginViewModel>()
-
             AndroidDependenciesProvider {
                 AndroidHorizonManagerTheme {
                     Surface {
-                        Login(vm, ::onLoginSuccess, ::onCancel)
+                        Login(::onLoginSuccess, ::onCancel)
                     }
                 }
             }

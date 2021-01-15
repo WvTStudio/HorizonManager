@@ -1,5 +1,7 @@
 package org.wvt.horizonmgr.ui.login
 
+import androidx.activity.ComponentActivity
+import androidx.activity.OnBackPressedCallback
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.layout.*
@@ -14,9 +16,11 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.AmbientContext
 import androidx.compose.ui.res.loadVectorResource
 import androidx.compose.ui.unit.dp
 import org.wvt.horizonmgr.R
+import org.wvt.horizonmgr.dependenciesViewModel
 import org.wvt.horizonmgr.legacyservice.WebAPI
 
 private val rotation = FloatPropKey()
@@ -37,10 +41,11 @@ private val rotationDefinition = transitionDefinition<Int> {
 @OptIn(ExperimentalAnimationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun Login(
-    vm: LoginViewModel,
     onLoginSuccess: (WebAPI.UserInfo) -> Unit,
     onCancel: () -> Unit
 ) {
+    val context = AmbientContext.current as ComponentActivity
+    val vm = dependenciesViewModel<LoginViewModel>()
     val fabState by vm.fabState.collectAsState()
 
     val snackbarHostState = remember { SnackbarHostState() }
@@ -49,42 +54,63 @@ fun Login(
 
     val rotateGear = transition(definition = rotationDefinition, initState = 0, toState = 1)
 
+    onActive {
+        context.onBackPressedDispatcher.addCallback(object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                if (screen == 1) {
+                    screen = 0
+                } else if (screen == 0) {
+                    onCancel()
+                }
+            }
+        })
+
+    }
+
     Box(Modifier.fillMaxSize()) {
         // Gear Animations
         gearResource?.let {
             Box(
-                Modifier.size(256.dp)
+                Modifier
+                    .size(256.dp)
                     .offset(x = 128.dp)
                     .graphicsLayer(rotationZ = rotateGear[rotation])
                     .align(Alignment.TopEnd)
             ) {
                 Box(
-                    modifier = Modifier.fillMaxSize().paint(
-                        painter = rememberVectorPainter(it),
-                        contentScale = ContentScale.Crop,
-                        colorFilter = ColorFilter.tint(MaterialTheme.colors.onSurface.copy(0.12f))
-                    )
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .paint(
+                            painter = rememberVectorPainter(it),
+                            contentScale = ContentScale.Crop,
+                            colorFilter = ColorFilter.tint(MaterialTheme.colors.onSurface.copy(0.12f))
+                        )
                 )
             }
             Box(
-                Modifier.size(256.dp)
+                Modifier
+                    .size(256.dp)
                     .offset(x = (-128).dp)
                     .graphicsLayer(rotationZ = rotateGear[rotation])
                     .align(Alignment.BottomStart)
             ) {
                 Box(
-                    Modifier.fillMaxSize().paint(
-                        painter = rememberVectorPainter(it),
-                        contentScale = ContentScale.Fit,
-                        colorFilter = ColorFilter.tint(MaterialTheme.colors.onSurface.copy(0.12f))
-                    )
+                    Modifier
+                        .fillMaxSize()
+                        .paint(
+                            painter = rememberVectorPainter(it),
+                            contentScale = ContentScale.Fit,
+                            colorFilter = ColorFilter.tint(MaterialTheme.colors.onSurface.copy(0.12f))
+                        )
                 )
             }
         }
 
         // Back button
         IconButton(
-            modifier = Modifier.align(Alignment.TopStart).padding(4.dp),
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .padding(4.dp),
             onClick = {
                 if (screen == 1)
                     screen = 0
@@ -125,7 +151,9 @@ fun Login(
         }
 
         SnackbarHost(
-            modifier = Modifier.align(Alignment.BottomCenter).padding(16.dp),
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(16.dp),
             hostState = snackbarHostState
         )
     }
