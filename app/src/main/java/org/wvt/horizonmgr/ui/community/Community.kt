@@ -4,6 +4,8 @@ import android.graphics.Bitmap
 import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import androidx.activity.ComponentActivity
+import androidx.activity.OnBackPressedCallback
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animate
 import androidx.compose.foundation.layout.*
@@ -32,13 +34,16 @@ internal fun Community(onClose: () -> Unit) {
     var progress by remember { mutableStateOf(0f) }
     val context = AmbientContext.current
 
-
     Box(Modifier.fillMaxSize()) {
         Column(Modifier.fillMaxSize()) {
             TopAppBar(
-                modifier = Modifier.fillMaxWidth().wrapContentHeight().zIndex(
-                    with(AmbientDensity.current) { 4.dp.toPx() }
-                ).shadow(4.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight()
+                    .zIndex(
+                        with(AmbientDensity.current) { 4.dp.toPx() }
+                    )
+                    .shadow(4.dp),
                 title = {
                     Text("Inner Core 中文社区")
                 }, navigationIcon = {
@@ -60,7 +65,7 @@ internal fun Community(onClose: () -> Unit) {
                 onStateChanged = { loading = it },
                 newDownloadTask = { url, userAgent, contentDisposition, mimetype, contentLength ->
                     vm.newTask(context, url, userAgent, contentDisposition, mimetype, contentLength)
-                }
+                }, onClose = onClose
             )
         }
         newtask?.let { it ->
@@ -88,7 +93,9 @@ internal fun Community(onClose: () -> Unit) {
                             text = "大小: " + longSizeToString(it.size)
                         )
                         Row(
-                            Modifier.fillMaxWidth().padding(top = 16.dp, bottom = 8.dp),
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(top = 16.dp, bottom = 8.dp),
                             horizontalArrangement = Arrangement.End
                         ) {
                             TextButton(onClick = { vm.download(context) }) {
@@ -105,11 +112,14 @@ internal fun Community(onClose: () -> Unit) {
 @Composable
 private fun WebViewCompose(
     modifier: Modifier = Modifier,
-    onProgressChanged: (progress: Float) ->Unit,
+    onProgressChanged: (progress: Float) -> Unit,
     onStateChanged: (loading: Boolean) -> Unit,
-    newDownloadTask: (url: String, userAgent: String, contentDisposition: String, mimeType: String, contentLength: Long)->Unit
+    newDownloadTask: (url: String, userAgent: String, contentDisposition: String, mimeType: String, contentLength: Long) -> Unit,
+    onClose: () -> Unit
 ) {
     val backgroundColor = MaterialTheme.colors.background
+    val backpack = (AmbientContext.current as ComponentActivity).onBackPressedDispatcher
+
     AndroidView(
         modifier = modifier,
         viewBlock = {
@@ -142,6 +152,16 @@ private fun WebViewCompose(
                     newDownloadTask(url, mimetype, userAgent, contentDisposition, contentLength)
                 }
                 loadUrl("https://forum.adodoz.cn")
+            }.also { view ->
+                backpack.addCallback(object : OnBackPressedCallback(true) {
+                    override fun handleOnBackPressed() {
+                        if (view.canGoBack()) {
+                            view.goBack()
+                        } else {
+                            onClose()
+                        }
+                    }
+                })
             }
         },
         update = {
