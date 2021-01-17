@@ -70,7 +70,7 @@ fun RegisterPage(
                         imeAction = ImeAction.Next
                     ),
                     onImeActionPerformed = { _, _ ->
-                        usernameFocus.freeFocus()
+                        emailFocus.requestFocus()
                     }
                 )
                 Spacer(modifier = Modifier.height(16.dp))
@@ -89,16 +89,16 @@ fun RegisterPage(
                         imeAction = ImeAction.Next
                     ),
                     onImeActionPerformed = { _, _ ->
-                        emailFocus.freeFocus()
+                        passwordFocus.requestFocus()
                     }
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 TextField(
                     modifier = Modifier.focusOrder(passwordFocus) {
-                            previous = emailFocus
-                            up = emailFocus
-                            next = confirmFocus
-                            down = confirmFocus
+                        previous = emailFocus
+                        up = emailFocus
+                        next = confirmFocus
+                        down = confirmFocus
                     },
                     value = password,
                     onValueChange = { password = it },
@@ -109,7 +109,7 @@ fun RegisterPage(
                     ),
                     visualTransformation = PasswordVisualTransformation(),
                     onImeActionPerformed = { _, _ ->
-                        passwordFocus.freeFocus()
+                        confirmFocus.requestFocus()
                     }
                 )
                 Spacer(modifier = Modifier.height(16.dp))
@@ -126,7 +126,7 @@ fun RegisterPage(
                         imeAction = ImeAction.Done
                     ),
                     visualTransformation = PasswordVisualTransformation(),
-                    onImeActionPerformed = { imeAction, softwareKeyboardController ->
+                    onImeActionPerformed = { _, softwareKeyboardController ->
                         softwareKeyboardController?.hideSoftwareKeyboard()
                         confirmFocus.freeFocus()
                         onRegisterRequest(
