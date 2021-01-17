@@ -228,9 +228,6 @@ fun CustomTheme(requestClose: () -> Unit) {
     }
 }
 
-private val shrinkTween = tween<Float>(250, 0, LinearOutSlowInEasing)
-private val expandTween = tween<Float>(250, 40, LinearOutSlowInEasing)
-
 @Composable
 private fun SelectColorItem(
     modifier: Modifier = Modifier,
@@ -239,6 +236,8 @@ private fun SelectColorItem(
     selected: Boolean,
     onSelect: () -> Unit
 ) {
+    val shrinkTween = remember { tween<Float>(250, 0, LinearOutSlowInEasing) }
+    val expandTween = remember { tween<Float>(250, 40, LinearOutSlowInEasing) }
     var pressed by remember { mutableStateOf(false) }
     val scale = animateAsState(
         targetValue = if (selected) {
@@ -255,7 +254,6 @@ private fun SelectColorItem(
         }
         Surface(
             modifier = Modifier.size(128.dp, 96.dp).padding(top = 8.dp)
-//                .clickable(onClick = onSelect, indication = null)
                 .pressIndicatorGestureFilter(
                     onStart = { pressed = true },
                     onStop = {
@@ -352,7 +350,7 @@ private fun ColorItem(
         shape = RoundedCornerShape(percent = roundPercent)
     ) {
         AnimatedVisibility(
-            visible = selected, enter = fadeIn(), exit = fadeOut()
+            visible = selected, enter = remember { fadeIn() }, exit = remember { fadeOut() }
         ) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Text(text = "T", color = contentColor)
