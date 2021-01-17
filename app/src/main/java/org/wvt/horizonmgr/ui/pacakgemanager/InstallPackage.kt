@@ -1,6 +1,7 @@
 package org.wvt.horizonmgr.ui.pacakgemanager
 
 import androidx.compose.animation.*
+import androidx.compose.animation.core.animateAsState
 import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
@@ -98,7 +99,7 @@ fun InstallPackage(packInfo: WebAPI.ICPackage, name: String, onFinished: () -> U
                     exit = fadeOut()
                 ) {
                     LinearProgressIndicator(
-                        progress = animate(totalProgress),
+                        progress = animateAsState(totalProgress).value,
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
@@ -112,10 +113,8 @@ fun InstallPackage(packInfo: WebAPI.ICPackage, name: String, onFinished: () -> U
                         index > currentStep -> 2 // todoit
                         else -> -1
                     }
-                    val contentColor = animate(
-                        if (state == 2) AmbientContentColor.current.copy(alpha = 0.5f)
-                        else MaterialTheme.colors.onSurface
-                    )
+                    val contentColor = animateAsState(if (state == 2) AmbientContentColor.current.copy(alpha = 0.5f)
+                    else MaterialTheme.colors.onSurface).value
                     ListItem(
                         modifier = Modifier.height(72.dp),
                         icon = {
@@ -134,7 +133,7 @@ fun InstallPackage(packInfo: WebAPI.ICPackage, name: String, onFinished: () -> U
                                     if (state == 1) {
                                         // Doing
                                         if (step.progressable)
-                                            CircularProgressIndicator(animate(currentProgress))
+                                            CircularProgressIndicator(animateAsState(currentProgress).value)
                                         else CircularProgressIndicator()
                                     } else if (state == 0) {
                                         // Finished

@@ -1,6 +1,6 @@
 package org.wvt.horizonmgr.ui.fileselector
 
-import androidx.compose.animation.animate
+import androidx.compose.animation.animateAsState
 import androidx.compose.animation.core.*
 import androidx.compose.animation.transition
 import androidx.compose.foundation.background
@@ -139,7 +139,6 @@ private val sizeKey = FloatPropKey(label = "size")
  * primary 涟漪延展
  * 动画结束时，背景改为 primary，移除涟漪
  */
-@OptIn(InternalLayoutApi::class)
 @Composable
 private fun ToggleBackgroundWithIcon(
     modifier: Modifier = Modifier,
@@ -221,10 +220,10 @@ private fun SlashIcon(
     activeColor: Color,
     inactiveColor: Color
 ) {
-    val iconColor = animate(
+    val iconColor = animateAsState(
         if (isActive) activeColor
         else inactiveColor
-    )
+    ).value
 
     val iconTransitionState = transition(
         definition = iconTransition,

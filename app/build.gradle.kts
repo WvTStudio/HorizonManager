@@ -50,7 +50,7 @@ android {
     }
     composeOptions {
         kotlinCompilerVersion = "1.4.21"
-        kotlinCompilerExtensionVersion = "1.0.0-alpha09"
+        kotlinCompilerExtensionVersion = "1.0.0-alpha10"
     }
     lintOptions {
         disable("InvalidFragmentVersionForActivityResult")
@@ -73,7 +73,7 @@ android {
 }
 
 dependencies {
-    val composeVersion = "1.0.0-alpha09"
+    val composeVersion = "1.0.0-alpha10"
 
     implementation(project(":webapi"))
     implementation(project(":service"))

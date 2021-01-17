@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.animation.*
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.animateAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -44,11 +45,13 @@ fun PackageManager(
     onNavClick: () -> Unit
 ) {
     val context = AmbientContext.current as AppCompatActivity
+    val selectedPackageUUID = AmbientSelectedPackageUUID.current
 
     val vm = dependenciesViewModel<PackageManagerViewModel>()
-    val selectedPackageUUID = AmbientSelectedPackageUUID.current
+
     onCommit(selectedPackageUUID) {
         vm.setSelectedPackage(selectedPackageUUID)
+        vm.loadPackages()
     }
 
     val vmPackages by vm.packages.collectAsState()
@@ -85,7 +88,7 @@ fun PackageManager(
                         expanded = showMenu,
                         onDismissRequest = { showMenu = false }
                     ) {
-                        // Menu
+                        // Menu  
                         DropdownMenuItem(onClick = {
                             vm.loadPackages()
                             showMenu = false
@@ -244,7 +247,7 @@ private fun FABs(
                 modifier = Modifier.padding(top = 16.dp),
                 onClick = { onExpandStateChange(!expand) }
             ) {
-                val rotate = animate(if (expand) 45f else 0f)
+                val rotate = animateAsState(if (expand) 45f else 0f).value
                 // Rotate 45° to be Close Icon
                 // TODO: 2020/11/13 Use animation icon to instead this.
                 Icon(
@@ -267,7 +270,10 @@ private fun FABEntry(
     onClick: () -> Unit
 ) {
     val transition =
-        animate(if (expand) 1f else 0f, animSpec = if (expand) enterAnim else exitAnim)
+        animateAsState(
+            if (expand) 1f else 0f,
+            animationSpec = if (expand) enterAnim else exitAnim
+        ).value
 
     if (transition > 0f) {
         Row(modifier = modifier.wrapContentSize(), verticalAlignment = Alignment.CenterVertically) {
@@ -279,7 +285,8 @@ private fun FABEntry(
                 )
             ) {
                 Card(
-                    modifier = Modifier.height(40.dp)
+                    modifier = Modifier
+                        .height(40.dp)
                         .padding(vertical = 4.dp, horizontal = 16.dp)
                         .wrapContentWidth(),
                     elevation = 2.dp
@@ -331,7 +338,9 @@ fun PackageItem(
             // Body
             Row {
                 Column(
-                    Modifier.weight(1f).padding(16.dp)
+                    Modifier
+                        .weight(1f)
+                        .padding(16.dp)
                 ) {
                     // Title
                     Text(title, style = MaterialTheme.typography.h5)
@@ -374,7 +383,6 @@ fun PackageItem(
                                 onRenameClick()
                             }) {
                                 Text("重命名")
-
                             }
                         }
                     }
@@ -382,13 +390,15 @@ fun PackageItem(
             }
             // Footer
             Row(
-                modifier = Modifier.padding(
-                    top = 4.dp,
-                    bottom = 8.dp,
-                    start = 16.dp,
-                    end = 8.dp
-                )
-                    .fillMaxWidth().heightIn(min = 32.dp),
+                modifier = Modifier
+                    .padding(
+                        top = 4.dp,
+                        bottom = 8.dp,
+                        start = 16.dp,
+                        end = 8.dp
+                    )
+                    .fillMaxWidth()
+                    .heightIn(min = 32.dp),
                 verticalAlignment = Alignment.Bottom
             ) {
                 Providers(AmbientContentColor provides MaterialTheme.colors.primary) {

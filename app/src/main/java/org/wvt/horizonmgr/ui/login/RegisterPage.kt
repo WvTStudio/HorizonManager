@@ -4,12 +4,15 @@ import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Providers
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.savedinstancestate.savedInstanceState
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focusRequester
+import androidx.compose.ui.focus.focusOrder
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -25,26 +28,18 @@ fun RegisterPage(
     fabState: FabState,
     onRegisterRequest: (username: String, email: String, password: String, confirmPassword: String) -> Unit
 ) {
-    var username by savedInstanceState(saver = TextFieldValue.Saver) {
-        TextFieldValue()
-    }
-    val usernameFocus = remember { FocusRequester() }
-    var email by savedInstanceState(saver = TextFieldValue.Saver) {
-        TextFieldValue()
-    }
-    val emailFocus = remember { FocusRequester() }
-    var password by savedInstanceState(saver = TextFieldValue.Saver) {
-        TextFieldValue()
-    }
-    val passwordFocus = remember { FocusRequester() }
-    var confirmPassword by savedInstanceState(saver = TextFieldValue.Saver) {
-        TextFieldValue()
-    }
-    val confirmFocus = remember { FocusRequester() }
+    val (usernameFocus, emailFocus, passwordFocus, confirmFocus) = FocusRequester.createRefs()
+    var username by savedInstanceState(saver = TextFieldValue.Saver) { TextFieldValue() }
+    var email by savedInstanceState(saver = TextFieldValue.Saver) { TextFieldValue() }
+    var password by savedInstanceState(saver = TextFieldValue.Saver) { TextFieldValue() }
+    var confirmPassword by savedInstanceState(saver = TextFieldValue.Saver) { TextFieldValue() }
 
     Box(Modifier.fillMaxSize()) {
         ScrollableColumn(
-            modifier = Modifier.wrapContentWidth().fillMaxHeight().align(Alignment.Center),
+            modifier = Modifier
+                .wrapContentWidth()
+                .fillMaxHeight()
+                .align(Alignment.Center),
             verticalArrangement = Arrangement.Center
         ) {
             Text("注册", color = MaterialTheme.colors.primary, fontSize = 64.sp)
@@ -55,13 +50,18 @@ fun RegisterPage(
                 )
             }
             Column(
-                modifier = Modifier.wrapContentWidth().fillMaxHeight(),
+                modifier = Modifier
+                    .wrapContentWidth()
+                    .fillMaxHeight(),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Spacer(modifier = Modifier.height(32.dp))
                 TextField(
-                    modifier = Modifier.focusRequester(usernameFocus),
+                    modifier = Modifier.focusOrder(usernameFocus) {
+                        next = emailFocus
+                        down = emailFocus
+                    },
                     value = username,
                     onValueChange = { username = it },
                     label = { Text("用户名") },
@@ -69,15 +69,18 @@ fun RegisterPage(
                         keyboardType = KeyboardType.Text,
                         imeAction = ImeAction.Next
                     ),
-                    onImeActionPerformed = { imeAction, softwareKeyboardController ->
-                        softwareKeyboardController?.hideSoftwareKeyboard()
+                    onImeActionPerformed = { _, _ ->
                         usernameFocus.freeFocus()
-                        emailFocus.requestFocus()
                     }
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 TextField(
-                    modifier = Modifier.focusRequester(emailFocus),
+                    modifier = Modifier.focusOrder(emailFocus) {
+                        previous = usernameFocus
+                        up = usernameFocus
+                        next = passwordFocus
+                        down = passwordFocus
+                    },
                     value = email,
                     onValueChange = { email = it },
                     label = { Text("邮箱") },
@@ -85,15 +88,18 @@ fun RegisterPage(
                         keyboardType = KeyboardType.Ascii,
                         imeAction = ImeAction.Next
                     ),
-                    onImeActionPerformed = { imeAction, softwareKeyboardController ->
-                        softwareKeyboardController?.hideSoftwareKeyboard()
+                    onImeActionPerformed = { _, _ ->
                         emailFocus.freeFocus()
-                        passwordFocus.requestFocus()
                     }
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 TextField(
-                    modifier = Modifier.focusRequester(passwordFocus),
+                    modifier = Modifier.focusOrder(passwordFocus) {
+                            previous = emailFocus
+                            up = emailFocus
+                            next = confirmFocus
+                            down = confirmFocus
+                    },
                     value = password,
                     onValueChange = { password = it },
                     label = { Text("密码") },
@@ -102,15 +108,16 @@ fun RegisterPage(
                         imeAction = ImeAction.Next
                     ),
                     visualTransformation = PasswordVisualTransformation(),
-                    onImeActionPerformed = { imeAction, softwareKeyboardController ->
-                        softwareKeyboardController?.hideSoftwareKeyboard()
+                    onImeActionPerformed = { _, _ ->
                         passwordFocus.freeFocus()
-                        confirmFocus.requestFocus()
                     }
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 TextField(
-                    modifier = Modifier.focusRequester(confirmFocus),
+                    modifier = Modifier.focusOrder(confirmFocus) {
+                        previous = passwordFocus
+                        up = passwordFocus
+                    },
                     value = confirmPassword,
                     onValueChange = { confirmPassword = it },
                     label = { Text("重复密码") },

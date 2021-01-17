@@ -2,6 +2,7 @@ package org.wvt.horizonmgr.ui.settings
 
 import androidx.compose.animation.*
 import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.animateAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.ScrollableRow
@@ -239,15 +240,15 @@ private fun SelectColorItem(
     onSelect: () -> Unit
 ) {
     var pressed by remember { mutableStateOf(false) }
-    val scale = animate(
-        target = if (selected) {
+    val scale = animateAsState(
+        targetValue = if (selected) {
             if (pressed) 1f
             else 1.1f
         } else {
             if (pressed) 0.9f
             else 1f
-        }, animSpec = if (pressed) shrinkTween else expandTween
-    )
+        }, animationSpec = if (pressed) shrinkTween else expandTween
+    ).value
     Column(modifier) {
         Providers(AmbientContentAlpha provides ContentAlpha.medium) {
             Text(text = text)
@@ -263,8 +264,8 @@ private fun SelectColorItem(
                     },
                     onCancel = { pressed = false })
                 .graphicsLayer(scaleX = scale, scaleY = scale),
-            color = animate(color),
-            elevation = animate(if (selected) 8.dp else 0.dp),
+            color = animateAsState(color).value,
+            elevation = animateAsState(if (selected) 8.dp else 0.dp).value,
             shape = RoundedCornerShape(size = 4.dp)
         ) {}
     }
@@ -338,7 +339,7 @@ private fun ColorItem(
     selected: Boolean,
     onSelect: () -> Unit
 ) {
-    val roundPercent = animate(if (selected) 50 else 0)
+    val roundPercent = animateAsState(if (selected) 50 else 0).value
     val contentColor = remember(color) {
         MaterialColors.contentColorFor(color)
     }

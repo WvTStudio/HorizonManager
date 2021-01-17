@@ -3,6 +3,7 @@ package org.wvt.horizonmgr.ui.pacakgemanager
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.animation.Crossfade
@@ -44,6 +45,7 @@ class InstallPackageActivity : AppCompatActivity() {
         setContent {
             AndroidDependenciesProvider {
                 AndroidHorizonManagerTheme {
+                    // TODO 2021/1/18 重构这坨屎
                     var screen: Int by remember { mutableStateOf(0) }
                     var packages by remember { mutableStateOf<List<WebAPI.ICPackage>>(emptyList()) }
                     var mappedPackages by remember {
@@ -59,6 +61,14 @@ class InstallPackageActivity : AppCompatActivity() {
                     val horizonMgr = AmbientHorizonManager.current
 
                     onActive {
+                        onBackPressedDispatcher.addCallback(object : OnBackPressedCallback(true) {
+                            override fun handleOnBackPressed() {
+                                when (screen) {
+                                    0 -> finish()
+                                    1 -> screen = 0
+                                }
+                            }
+                        })
                         scope.launch {
                             packages = try {
                                 webApi.getPackages()

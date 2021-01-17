@@ -1,6 +1,6 @@
 package org.wvt.horizonmgr.ui.theme
 
-import androidx.compose.animation.animate
+import androidx.compose.animation.animateAsState
 import androidx.compose.material.Colors
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
@@ -41,18 +41,18 @@ fun HorizonManagerTheme(
 ) {
     val targetColors = if (config.isDark) config.darkColor else config.lightColor
     val colors = Colors(
-        primary = animate(targetColors.primary),
-        primaryVariant = animate(targetColors.primaryVariant),
-        secondary = animate(targetColors.secondary),
-        secondaryVariant = animate(targetColors.secondaryVariant),
-        background = animate(targetColors.background),
-        surface = animate(targetColors.surface),
-        error = animate(targetColors.error),
-        onPrimary = animate(targetColors.onPrimary),
-        onSecondary = animate(targetColors.onSecondary),
-        onBackground = animate(targetColors.onBackground),
-        onSurface = animate(targetColors.onSurface),
-        onError = animate(targetColors.onError),
+        primary = animateAsState(targetColors.primary).value,
+        primaryVariant = animateAsState(targetColors.primaryVariant).value,
+        secondary = animateAsState(targetColors.secondary).value,
+        secondaryVariant = animateAsState(targetColors.secondaryVariant).value,
+        background = animateAsState(targetColors.background).value,
+        surface = animateAsState(targetColors.surface).value,
+        error = animateAsState(targetColors.error).value,
+        onPrimary = animateAsState(targetColors.onPrimary).value,
+        onSecondary = animateAsState(targetColors.onSecondary).value,
+        onBackground = animateAsState(targetColors.onBackground).value,
+        onSurface = animateAsState(targetColors.onSurface).value,
+        onError = animateAsState(targetColors.onError).value,
         isLight = targetColors.isLight
     )
     Providers(

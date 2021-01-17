@@ -2,7 +2,7 @@ package org.wvt.horizonmgr.ui.modulemanager
 
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.animation.Crossfade
-import androidx.compose.animation.animate
+import androidx.compose.animation.animateAsState
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -122,7 +122,10 @@ private fun ModItem(
     ) {
         Column(
             Modifier.indication(interactionState, indication = rememberRipple())
-                .background(animate(if (selected) MaterialTheme.colors.primary.copy(0.12f) else Color.Transparent))
+                .background(
+                    animateAsState(
+                        if (selected) MaterialTheme.colors.primary.copy(0.12f) else Color.Transparent).value
+                )
                 .padding(top = 16.dp, bottom = 4.dp, start = 16.dp, end = 16.dp)
         ) {
             Row {

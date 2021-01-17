@@ -1,6 +1,5 @@
 package org.wvt.horizonmgr.ui.components
 
-import androidx.compose.animation.animate
 import androidx.compose.animation.core.*
 import androidx.compose.animation.transition
 import androidx.compose.foundation.Canvas
@@ -69,7 +68,8 @@ fun AnimateLogo(modifier: Modifier = Modifier) {
 
     var pressed by remember { mutableStateOf(false) }
 
-    val scaleAnim = animate(if (pressed) 1.4f else 1f, if (pressed) expandTween else shrinkTween)
+    val scaleAnim =
+        animateAsState(if (pressed) 1.4f else 1f, if (pressed) expandTween else shrinkTween).value
 
     Surface(
         modifier = modifier.size(64.dp)

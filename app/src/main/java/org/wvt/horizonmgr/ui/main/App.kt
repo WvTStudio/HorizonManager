@@ -2,7 +2,7 @@ package org.wvt.horizonmgr.ui.main
 
 import androidx.activity.ComponentActivity
 import androidx.compose.animation.Crossfade
-import androidx.compose.animation.animate
+import androidx.compose.animation.animateAsState
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.*
@@ -30,7 +30,6 @@ import org.wvt.horizonmgr.legacyservice.LocalCache
 import org.wvt.horizonmgr.ui.components.MyAlertDialog
 import org.wvt.horizonmgr.ui.components.NetworkImage
 import org.wvt.horizonmgr.ui.downloaded.DownloadedMods
-import org.wvt.horizonmgr.ui.fileselector.SelectFileActivity
 import org.wvt.horizonmgr.ui.modulemanager.ModuleManager
 import org.wvt.horizonmgr.ui.news.News
 import org.wvt.horizonmgr.ui.onlinemods.Online
@@ -318,8 +317,10 @@ private fun NavigationItem(
     val interactionState = remember { InteractionState() }
     Surface(
         shape = RoundedCornerShape(4.dp),
-        color = animate(if (checked) MaterialTheme.colors.primary.copy(alpha = 0.12f) else Color.Transparent),
-        contentColor = animate(if (checked) MaterialTheme.colors.primary else MaterialTheme.colors.onSurface),
+        color = animateAsState(
+            if (checked) MaterialTheme.colors.primary.copy(alpha = 0.12f) else Color.Transparent).value,
+        contentColor = animateAsState(
+            if (checked) MaterialTheme.colors.primary else MaterialTheme.colors.onSurface).value,
         modifier = Modifier.clickable(
             onClick = { onCheckedChange(!checked) },
             interactionState = interactionState,

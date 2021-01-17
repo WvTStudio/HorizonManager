@@ -1,7 +1,7 @@
 package org.wvt.horizonmgr.ui.modulemanager
 
 import androidx.compose.animation.Crossfade
-import androidx.compose.animation.animate
+import androidx.compose.animation.animateAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.material.*
@@ -116,10 +116,10 @@ private fun TabItem(label: String, selected: Boolean, onTabSelected: () -> Unit)
     ) {
         Text(
             text = label,
-            color = animate(
+            color = animateAsState(
                 if (selected) MaterialTheme.colors.onSurface
                 else MaterialTheme.colors.onSurface.copy(0.44f)
-            )
+            ).value
         )
     }
 }

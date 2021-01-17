@@ -1,6 +1,6 @@
 package org.wvt.horizonmgr.ui.components
 
-import androidx.compose.animation.animate
+import androidx.compose.animation.core.animateAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -47,7 +47,7 @@ fun ProgressDialog(
                         Content(state.message)
                     }
                     is ProgressDialogState.ProgressLoading -> {
-                        CircularProgressIndicator(animate(state.progress))
+                        CircularProgressIndicator(animateAsState(state.progress).value)
                         Content(state.message)
                     }
                     is ProgressDialogState.Failed -> {

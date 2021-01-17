@@ -2,7 +2,7 @@ package org.wvt.horizonmgr.ui.fileselector
 
 import android.os.Environment
 import androidx.compose.animation.Crossfade
-import androidx.compose.animation.animate
+import androidx.compose.animation.animateAsState
 import androidx.compose.foundation.ScrollableRow
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -293,10 +293,8 @@ private fun PathTab(
                 Text(
                     modifier = Modifier.padding(top = 16.dp, bottom = 16.dp),
                     text = pathName,
-                    color = animate(
-                        if (data.depth == index) MaterialTheme.colors.onSurface
-                        else MaterialTheme.colors.onSurface.copy(alpha = 0.5f)
-                    ) // 选中高亮
+                    color = animateAsState(if (data.depth == index) MaterialTheme.colors.onSurface
+                    else MaterialTheme.colors.onSurface.copy(alpha = 0.5f)).value // 选中高亮
                 )
             }
 

@@ -1,11 +1,7 @@
 package org.wvt.horizonmgr.ui.onlinemods
 
 import androidx.compose.animation.Crossfade
-import androidx.compose.animation.animate
-import androidx.compose.animation.core.FastOutLinearInEasing
-import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.LinearOutSlowInEasing
-import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -70,17 +66,17 @@ internal fun TuneAppBar2(
 
     var filterValue by remember { mutableStateOf(TextFieldValue()) }
 
-    val actionOpacity = animate(if (expand) 0.72f else 1f)
+    val actionOpacity = animateAsState(if (expand) 0.72f else 1f).value
 
-    val offset = animate(
+    val offset = animateAsState(
         if (expand) 16.dp else 0.dp,
-        animSpec = if (expand) searchBoxEnter else searchBoxExit
-    )
+        animationSpec = if (expand) searchBoxEnter else searchBoxExit
+    ).value
 
-    val contentOpacity = animate(
+    val contentOpacity = animateAsState(
         if (expand) 1f else 0f,
         if (expand) contentAppear else contentDisappear
-    )
+    ).value
 //    val leftOffset = animate(if (expand) 16.dp else 0.dp)
 //    val rightOffset = animate(if (expand) 16.dp else 0.dp)
 //    val topOffset = animate(if (expand) 16.dp else 0.dp)
@@ -227,7 +223,7 @@ private fun AppBarLayout(
     content: @Composable () -> Unit
 ) {
     val progress =
-        animate(if (expand) 1f else 0f, if (expand) tuneExpand else tuneShrink)
+        animateAsState(if (expand) 1f else 0f, if (expand) tuneExpand else tuneShrink).value
     Layout(content) { m: List<Measurable>, c: Constraints ->
         check(m.size == 3)
 

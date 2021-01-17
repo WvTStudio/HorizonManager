@@ -26,10 +26,6 @@ class PackageManagerViewModel(
     private val _progressState = MutableStateFlow<ProgressDialogState?>(null)
     val progressState: StateFlow<ProgressDialogState?> = _progressState
 
-    init {
-        loadPackages()
-    }
-
     fun loadPackages() {
         viewModelScope.launch {
             try {

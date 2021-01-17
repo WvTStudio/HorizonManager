@@ -7,7 +7,7 @@ import android.webkit.WebViewClient
 import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
 import androidx.compose.animation.Crossfade
-import androidx.compose.animation.animate
+import androidx.compose.animation.core.animateAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -54,7 +54,7 @@ internal fun Community(onClose: () -> Unit) {
                     Crossfade(current = loading) {
                         if (it) CircularProgressIndicator(
                             modifier = Modifier.size(36.dp),
-                            progress = animate(progress)
+                            progress = animateAsState(progress).value
                         )
                     }
                 }

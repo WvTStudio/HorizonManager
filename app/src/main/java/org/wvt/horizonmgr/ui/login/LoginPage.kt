@@ -3,12 +3,15 @@ package org.wvt.horizonmgr.ui.login
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Providers
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.savedinstancestate.savedInstanceState
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focusRequester
+import androidx.compose.ui.focus.focusOrder
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -24,8 +27,7 @@ fun LoginPage(
     onRegisterRequested: () -> Unit,
     fabState: FabState
 ) {
-    val accountFocus = remember { FocusRequester() }
-    val passwordFocus = remember { FocusRequester() }
+    val (accountFocus, passwordFocus) = FocusRequester.createRefs()
     var account by savedInstanceState(saver = TextFieldValue.Saver) {
         TextFieldValue()
     }
@@ -53,7 +55,10 @@ fun LoginPage(
             ) {
                 Spacer(modifier = Modifier.height(32.dp))
                 TextField(
-                    modifier = Modifier.focusRequester(accountFocus),
+                    modifier = Modifier.focusOrder(accountFocus) {
+                        next = passwordFocus
+                        down = passwordFocus
+                    },
                     value = account,
                     onValueChange = { account = it },
                     label = { Text("用户名/邮箱") },
@@ -61,15 +66,16 @@ fun LoginPage(
                         keyboardType = KeyboardType.Text,
                         imeAction = ImeAction.Next
                     ),
-                    onImeActionPerformed = { imeAction, softwareKeyboardController ->
-                        accountFocus.freeFocus()
+                    onImeActionPerformed = { _, _ ->
                         passwordFocus.requestFocus()
-                        softwareKeyboardController?.hideSoftwareKeyboard()
                     }
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 TextField(
-                    modifier = Modifier.focusRequester(passwordFocus),
+                    modifier = Modifier.focusOrder(passwordFocus) {
+                        previous = accountFocus
+                        up = accountFocus
+                    },
                     value = password,
                     onValueChange = { password = it },
                     label = { Text("密码") },
@@ -78,7 +84,7 @@ fun LoginPage(
                         imeAction = ImeAction.Done
                     ),
                     visualTransformation = PasswordVisualTransformation(),
-                    onImeActionPerformed = { imeAction, softwareKeyboardController ->
+                    onImeActionPerformed = { _, softwareKeyboardController ->
                         softwareKeyboardController?.hideSoftwareKeyboard()
                         passwordFocus.freeFocus()
                         onLoginClicked(account.text, password.text)
