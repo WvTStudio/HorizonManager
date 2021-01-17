@@ -26,15 +26,20 @@ class DonateViewModel(
     fun refresh() {
         viewModelScope.launch {
             val result = mutableSetOf<DonateItem>()
-            webApi.getDonates().forEach {
-                result.add(
-                    DonateItem(
-                        name = it.name,
-                        size = it.money.toFloatOrNull()?.let {
-                            TextUnit.Sp(log(it + 1f, 1.5f) * 2)
-                        } ?: 2.sp
+            try {
+                webApi.getDonates().forEach {
+                    result.add(
+                        DonateItem(
+                            name = it.name,
+                            size = it.money.toFloatOrNull()?.let {
+                                TextUnit.Sp(log(it + 1f, 1.5f) * 2)
+                            } ?: 2.sp
+                        )
                     )
-                )
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                // TODO 添加错误提示
             }
             _donates.value = result
         }
