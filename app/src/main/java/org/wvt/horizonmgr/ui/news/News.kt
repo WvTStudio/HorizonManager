@@ -52,7 +52,9 @@ private fun NewsUI(
 ) {
     Column(Modifier.fillMaxSize()) {
         TopAppBar(
-            modifier = Modifier.fillMaxWidth().zIndex(4.dp.value),
+            modifier = Modifier
+                .fillMaxWidth()
+                .zIndex(4.dp.value),
             title = { Text("推荐资讯") },
             navigationIcon = { IconButton(onClick = onNavClick) { Icon(Icons.Filled.Menu) } },
             backgroundColor = MaterialTheme.colors.surface
@@ -67,7 +69,9 @@ private fun NewsUI(
                         when (it) {
                             is NewsViewModel.News.Article -> {
                                 NewsItem(
-                                    modifier = Modifier.fillMaxWidth().padding(16.dp),
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(16.dp),
                                     title = it.title,
                                     brief = it.brief,
                                     onClick = { onNewsClick(it) },
@@ -83,9 +87,12 @@ private fun NewsUI(
                     }
                 }
                 is NewsViewModel.State.Error -> Box(Modifier.fillMaxSize()) {
-                    ErrorPage(message = {
-                        Text("加载出错")
-                    }, onRetryClick = onRefreshClick)
+                    ErrorPage(
+                        modifier = Modifier.align(Alignment.Center),
+                        message = {
+                            Text("加载出错")
+                        }, onRetryClick = onRefreshClick
+                    )
                 }
             }
         }
@@ -105,14 +112,20 @@ private fun NewsItem(
         else brief
     }
     Card(modifier = modifier.clickable(onClick = onClick), elevation = 2.dp) {
-        Box(Modifier.fillMaxWidth().wrapContentHeight()) {
+        Box(
+            Modifier
+                .fillMaxWidth()
+                .wrapContentHeight()) {
             // Cover Image
             Surface(
-                modifier = Modifier.fillMaxWidth().aspectRatio(4f / 3f),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .aspectRatio(4f / 3f),
                 content = coverImage
             )
             Column(
-                modifier = Modifier.wrapContentHeight()
+                modifier = Modifier
+                    .wrapContentHeight()
                     .fillMaxWidth()
                     .background(Color.Black.copy(0.32f))
                     .padding(16.dp)
