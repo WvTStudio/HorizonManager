@@ -123,12 +123,12 @@ fun Login(
         // Login Page
         AnimatedVisibility(
             visible = screen == 0,
-            enter = fadeIn() + slideInHorizontally({ -40 }),
-            exit = fadeOut() + slideOutHorizontally({ -40 })
+            initiallyVisible = true,
+            enter = remember { fadeIn() + slideInHorizontally({ -80 }) },
+            exit = remember { fadeOut() + slideOutHorizontally({ -80 }) }
         ) {
             LoginPage(onLoginClicked = { account, password ->
                 vm.login(account, password, snackbarHostState, onLoginSuccess)
-//                login(scope, account, password)
             }, onRegisterRequested = {
                 screen = 1
             }, fabState = fabState)
@@ -137,8 +137,9 @@ fun Login(
         // RegisterPage
         AnimatedVisibility(
             visible = screen == 1,
-            enter = fadeIn() + slideInHorizontally({ 40 }),
-            exit = fadeOut() + slideOutHorizontally({ 40 })
+            initiallyVisible = false,
+            enter = remember { fadeIn() + slideInHorizontally({ 80 }) },
+            exit = remember { fadeOut() + slideOutHorizontally({ 80 }) }
         ) {
             RegisterPage(
                 fabState = fabState,
