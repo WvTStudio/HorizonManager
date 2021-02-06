@@ -24,6 +24,7 @@ import kotlin.coroutines.resumeWithException
 @Composable
 fun NetworkImage(
     url: String,
+    contentDescription: String?,
     modifier: Modifier = Modifier,
     backgroundColor: Color = MaterialTheme.colors.onSurface.copy(alpha = 0.12f),
     alignment: Alignment = Alignment.Center,
@@ -50,7 +51,7 @@ fun NetworkImage(
     ) {
         Crossfade(current = image) {
             if (it != null) {
-                Image(it, Modifier.fillMaxSize(), alignment, contentScale, alpha, colorFilter)
+                Image(it, contentDescription, Modifier.fillMaxSize(), alignment, contentScale, alpha, colorFilter)
             }
         }
     }

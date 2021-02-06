@@ -2,6 +2,7 @@ package org.wvt.horizonmgr.ui.downloaded
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Extension
@@ -22,9 +23,12 @@ fun DownloadedMods(onNavClicked: () -> Unit) {
     val progressState by vm.progressState.collectAsState()
     val selected = AmbientSelectedPackageUUID.current
 
-    onCommit(selected) {
+    DisposableEffect(selected) {
         vm.setSelectedPackage(selected)
         vm.refresh()
+        onDispose {
+            // TODO: 2021/2/6 添加 cancel 逻辑
+        }
     }
 
     Column(Modifier.fillMaxSize()) {
@@ -33,27 +37,34 @@ fun DownloadedMods(onNavClicked: () -> Unit) {
                 Text("本地资源")
             }, navigationIcon = {
                 IconButton(onClick = onNavClicked, content = {
-                    Icon(Icons.Filled.Menu)
+                    Icon(Icons.Filled.Menu, "菜单")
                 })
             }, backgroundColor = MaterialTheme.colors.surface
         )
 
         if (mods.isEmpty()) {
-            Box(Modifier.fillMaxSize().padding(16.dp), Alignment.Center) {
-                Text("本地资源列表为空，您可以从在线资源中下载到本地", color = MaterialTheme.colors.onSurface.copy(ContentAlpha.medium))
+            Box(
+                Modifier
+                    .fillMaxSize()
+                    .padding(16.dp), Alignment.Center
+            ) {
+                Text(
+                    "本地资源列表为空，您可以从在线资源中下载到本地",
+                    color = MaterialTheme.colors.onSurface.copy(ContentAlpha.medium)
+                )
             }
         } else {
             LazyColumn(
                 contentPadding = PaddingValues(top = 8.dp, bottom = 64.dp)
             ) {
-                items(mods) {
+                itemsIndexed(mods) { _, item ->
                     ModItem(
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                        name = it.name,
-                        description = it.description,
+                        name = item.name,
+                        description = item.description,
                         icon = emptyContent(),
-                        onInstallClicked = { vm.install(it) },
-                        onDeleteClicked = { vm.delete(it) }
+                        onInstallClicked = { vm.install(item) },
+                        onDeleteClicked = { vm.delete(item) }
                     )
                 }
             }
@@ -85,17 +96,31 @@ private fun ModItem(
                     text = description
                 )
             }
-            Box(modifier = Modifier.fillMaxWidth().padding(top = 16.dp, bottom = 8.dp)) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 16.dp, bottom = 8.dp)
+            ) {
                 // Delete Button
                 TextButton(
-                    modifier = Modifier.padding(start = 16.dp).align(Alignment.CenterStart),
+                    modifier = Modifier
+                        .padding(start = 16.dp)
+                        .align(Alignment.CenterStart),
                     onClick = onDeleteClicked
                 ) { Text("删除", color = MaterialTheme.colors.primary) }
                 // Install Button
                 IconButton(
-                    modifier = Modifier.padding(end = 16.dp).align(Alignment.CenterEnd),
+                    modifier = Modifier
+                        .padding(end = 16.dp)
+                        .align(Alignment.CenterEnd),
                     onClick = onInstallClicked
-                ) { Icon(imageVector = Icons.Filled.Extension, tint = MaterialTheme.colors.primary) }
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Extension,
+                        tint = MaterialTheme.colors.primary,
+                        contentDescription = null
+                    )
+                }
             }
         }
     }

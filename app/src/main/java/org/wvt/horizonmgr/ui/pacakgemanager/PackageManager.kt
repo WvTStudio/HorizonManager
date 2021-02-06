@@ -2,13 +2,11 @@ package org.wvt.horizonmgr.ui.pacakgemanager
 
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.animation.*
-import androidx.compose.animation.core.AnimationSpec
-import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.animateAsState
-import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -75,14 +73,14 @@ fun PackageManager(
                 title = {
                     Text("分包管理")
                 }, navigationIcon = {
-                    IconButton(onClick = onNavClick) { Icon(Icons.Filled.Menu) }
+                    IconButton(onClick = onNavClick) { Icon(Icons.Filled.Menu, "菜单") }
                 }, backgroundColor = MaterialTheme.colors.surface,
                 actions = {
                     DropdownMenu(
                         toggle = {
                             // Menu Icon
                             IconButton(onClick = { showMenu = true }) {
-                                Icon(Icons.Filled.MoreVert)
+                                Icon(Icons.Filled.MoreVert, "更多")
                             }
                         },
                         expanded = showMenu,
@@ -175,7 +173,7 @@ private fun <T> PackageManagerUI(
                 title = {
                     Text("分包管理")
                 }, navigationIcon = {
-                    IconButton(onClick = onNavClick) { Icon(Icons.Filled.Menu) }
+                    IconButton(onClick = onNavClick) { Icon(Icons.Filled.Menu, "菜单") }
                 }, backgroundColor = MaterialTheme.colors.surface
             )
 
@@ -231,7 +229,7 @@ private fun FABs(
                 enterAnim = fab2Enter,
                 exitAnim = fab2Exit,
                 text = { Text("在线安装") },
-                icon = { Icon(Icons.Filled.CloudDownload) },
+                icon = { Icon(Icons.Filled.CloudDownload, null) },
                 onClick = onOnlineInstallClick
             )
             FABEntry(
@@ -240,19 +238,20 @@ private fun FABs(
                 enterAnim = fab1Enter,
                 exitAnim = fab1Exit,
                 text = { Text("本地导入") },
-                icon = { Icon(Icons.Filled.Storage) },
+                icon = { Icon(Icons.Filled.Storage, null) },
                 onClick = onLocalInstallClick
             )
             FloatingActionButton(
                 modifier = Modifier.padding(top = 16.dp),
                 onClick = { onExpandStateChange(!expand) }
             ) {
-                val rotate = animateAsState(if (expand) 45f else 0f).value
+                val rotate = animateFloatAsState(if (expand) 45f else 0f).value
                 // Rotate 45° to be Close Icon
                 // TODO: 2020/11/13 Use animation icon to instead this.
                 Icon(
                     modifier = Modifier.graphicsLayer(rotationZ = rotate),
-                    imageVector = Icons.Filled.Add
+                    imageVector = Icons.Filled.Add,
+                    contentDescription = "添加"
                 )
             }
         }
@@ -270,7 +269,7 @@ private fun FABEntry(
     onClick: () -> Unit
 ) {
     val transition =
-        animateAsState(
+        animateFloatAsState(
             if (expand) 1f else 0f,
             animationSpec = if (expand) enterAnim else exitAnim
         ).value
@@ -357,7 +356,7 @@ fun PackageItem(
                         var dropdown by remember { mutableStateOf(false) }
                         DropdownMenu(toggle = {
                             IconButton(onClick = { dropdown = true }) {
-                                Icon(imageVector = Icons.Filled.MoreVert)
+                                Icon(imageVector = Icons.Filled.MoreVert, contentDescription =  "更多")
                             }
                         }, expanded = dropdown, onDismissRequest = { dropdown = false }) {
                             DropdownMenuItem(onClick = {
@@ -407,7 +406,7 @@ fun PackageItem(
                         enter = fadeIn(),
                         exit = fadeOut()
                     ) {
-                        Icon(Icons.Filled.CheckCircle)
+                        Icon(Icons.Filled.CheckCircle, "已选择")
                     }
                 }
                 Row(Modifier.weight(1f), horizontalArrangement = Arrangement.End) {

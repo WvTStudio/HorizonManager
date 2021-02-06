@@ -117,7 +117,7 @@ fun Login(
                 else if (screen == 0)
                     onCancel()
             }) {
-            Icon(Icons.Filled.ArrowBack)
+            Icon(Icons.Filled.ArrowBack, contentDescription = "返回")
         }
 
         // Login Page

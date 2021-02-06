@@ -1,16 +1,14 @@
 package org.wvt.horizonmgr.ui.modulemanager
 
 import androidx.compose.animation.Crossfade
-import androidx.compose.animation.animateAsState
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.onCommit
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -33,12 +31,13 @@ fun ModuleManager(
 
     val pkgId = AmbientSelectedPackageUUID.current
 
-    onCommit(pkgId) {
+    DisposableEffect(pkgId) {
         modVm.setSelectedUUID(pkgId)
         modVm.load()
 
         icMapVm.setPackage(pkgId)
         icMapVm.load()
+        onDispose {}
     }
 
     Column {
@@ -97,7 +96,7 @@ private fun CustomAppBar(
             }
         }, navigationIcon = {
             IconButton(onClick = onNavClicked, content = {
-                Icon(Icons.Filled.Menu)
+                Icon(Icons.Filled.Menu, contentDescription = "菜单")
             })
         }, backgroundColor = MaterialTheme.colors.surface
     )
@@ -109,6 +108,7 @@ private fun TabItem(label: String, selected: Boolean, onTabSelected: () -> Unit)
         modifier = Modifier.selectable(
             selected = selected,
             onClick = onTabSelected,
+            interactionState = remember { InteractionState() },
             indication = null
         ).fillMaxHeight(),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -116,7 +116,7 @@ private fun TabItem(label: String, selected: Boolean, onTabSelected: () -> Unit)
     ) {
         Text(
             text = label,
-            color = animateAsState(
+            color = animateColorAsState(
                 if (selected) MaterialTheme.colors.onSurface
                 else MaterialTheme.colors.onSurface.copy(0.44f)
             ).value

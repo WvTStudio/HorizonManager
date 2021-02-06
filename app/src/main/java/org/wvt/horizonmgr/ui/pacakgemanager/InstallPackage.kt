@@ -118,7 +118,7 @@ fun InstallPackage(packInfo: WebAPI.ICPackage, name: String, onFinished: () -> U
                     ListItem(
                         modifier = Modifier.height(72.dp),
                         icon = {
-                            Icon(step.icon, Modifier, contentColor)
+                            Icon(step.icon, null, Modifier, contentColor)
                         }, text = {
                             Text(
                                 text = step.label,
@@ -137,9 +137,9 @@ fun InstallPackage(packInfo: WebAPI.ICPackage, name: String, onFinished: () -> U
                                         else CircularProgressIndicator()
                                     } else if (state == 0) {
                                         // Finished
-                                        Icon(Icons.Filled.Check)
+                                        Icon(Icons.Filled.Check, "成功")
                                     } else if (state == -1) {
-                                        Icon(Icons.Filled.Error)
+                                        Icon(Icons.Filled.Error, "失败")
                                     }
                                     // Todoit - Nothing
                                 }

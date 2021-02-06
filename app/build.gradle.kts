@@ -14,7 +14,7 @@ android {
         applicationId = "org.wvt.horizonmgr"
         minSdkVersion(21)
         targetSdkVersion(30)
-        versionCode = 9
+        versionCode = 10
         versionName = "2.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -25,8 +25,8 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 file("proguard-rules.pro")
             )
-            isShrinkResources = true
-            isMinifyEnabled = true
+//            isShrinkResources = true
+//            isMinifyEnabled = true
         }
         getByName("debug") {
             versionNameSuffix = "-debug"
@@ -36,9 +36,9 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 file("proguard-rules.pro")
             )
-            isShrinkResources = true
-            isMinifyEnabled = true
-            versionNameSuffix = "-alpha8"
+//            isShrinkResources = true
+//            isMinifyEnabled = true
+            versionNameSuffix = "-alpha9"
         }
     }
     compileOptions {
@@ -49,8 +49,8 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerVersion = "1.4.21"
-        kotlinCompilerExtensionVersion = "1.0.0-alpha10"
+//        kotlinCompilerVersion = "1.4.21-2"
+        kotlinCompilerExtensionVersion = "1.0.0-alpha11"
     }
     lintOptions {
         disable("InvalidFragmentVersionForActivityResult")
@@ -73,10 +73,10 @@ android {
 }
 
 dependencies {
-    val composeVersion = "1.0.0-alpha10"
+    val composeVersion = "1.0.0-alpha11"
 
-    implementation(project(":webapi"))
-    implementation(project(":service"))
+//    implementation(project(":webapi"))
+//    implementation(project(":service"))
 
     implementation(platform("com.google.firebase:firebase-bom:26.1.0"))
 //    implementation("com.google.firebase:firebase-analytics-ktx")
@@ -88,7 +88,7 @@ dependencies {
     implementation("androidx.core:core-ktx:1.3.2")
     implementation("androidx.appcompat:appcompat:1.2.0")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0")
-    implementation("com.google.android.material:material:1.2.1")
+    implementation("com.google.android.material:material:1.3.0")
 
     implementation("com.github.bumptech.glide:glide:4.11.0")
     annotationProcessor("com.github.bumptech.glide:compiler:4.11.0")

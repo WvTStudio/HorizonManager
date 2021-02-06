@@ -23,7 +23,7 @@ fun ChoosePackage(
 ) {
     Column(Modifier.fillMaxSize()) {
         TopAppBar(
-            navigationIcon = { IconButton(onClick = onCancel) { Icon(Icons.Filled.ArrowBack) } },
+            navigationIcon = { IconButton(onClick = onCancel) { Icon(Icons.Filled.ArrowBack, contentDescription = "返回") } },
             title = { Text("在线安装分包") }, backgroundColor = MaterialTheme.colors.surface
         )
         if (items.isEmpty()) {
@@ -34,10 +34,10 @@ fun ChoosePackage(
             items.forEachIndexed { index, it ->
                 ListItem(
                     modifier = Modifier.clickable(onClick = { onChoose(index) }),
-                    icon = { Icon(imageVector = Icons.Filled.Extension) },
+                    icon = { Icon(imageVector = Icons.Filled.Extension, contentDescription = "安装") },
                     text = { Text(if (it.recommended) "${it.name}（推荐）" else it.name) },
                     secondaryText = { Text(it.version) },
-                    trailing = { Icon(imageVector = Icons.Filled.ArrowForward) }
+                    trailing = { Icon(imageVector = Icons.Filled.ArrowForward, contentDescription = "选择") }
                 )
             }
         }
@@ -54,7 +54,7 @@ fun EditName(
     Column(Modifier.fillMaxSize()) {
         TopAppBar(
             navigationIcon = {
-                IconButton(onClick = onCancel) { Icon(Icons.Filled.ArrowBack) }
+                IconButton(onClick = onCancel) { Icon(Icons.Filled.ArrowBack, contentDescription = "返回") }
             },
             title = {
                 Text("输入分包的名字")
@@ -69,7 +69,7 @@ fun EditName(
         Row(verticalAlignment = Alignment.CenterVertically) {
             ListItem(
                 modifier = Modifier.weight(1f),
-                icon = { Icon(imageVector = Icons.Filled.Extension) },
+                icon = { Icon(imageVector = Icons.Filled.Extension, contentDescription = "信息") },
                 text = { Text(item.name) },
                 secondaryText = { Text(item.version) }
             )

@@ -2,11 +2,13 @@ package org.wvt.horizonmgr.utils
 
 import org.json.JSONArray
 
-inline fun <T> JSONArray.toArray(): Array<T> {
+fun <T> JSONArray.toArray(): Array<T> {
     val result = arrayOfNulls<Any>(length())
     for (i in 0 until length()) {
+        @Suppress("UNCHECKED_CAST")
         result[i] = get(i) as T
     }
+    @Suppress("UNCHECKED_CAST")
     return result as Array<T>
 }
 

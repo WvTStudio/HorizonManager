@@ -32,7 +32,7 @@ class DonateViewModel(
                         DonateItem(
                             name = it.name,
                             size = it.money.toFloatOrNull()?.let {
-                                TextUnit.Sp(log(it + 1f, 1.5f) * 2)
+                                (log(it + 1f, 1.5f) * 2).sp
                             } ?: 2.sp
                         )
                     )

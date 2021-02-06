@@ -8,6 +8,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.animateAsState
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -48,13 +49,13 @@ internal fun Community(onClose: () -> Unit) {
                     Text("Inner Core 中文社区")
                 }, navigationIcon = {
                     IconButton(onClick = onClose) {
-                        Icon(Icons.Filled.Close)
+                        Icon(Icons.Filled.Close, "关闭")
                     }
                 }, backgroundColor = MaterialTheme.colors.surface, actions = {
                     Crossfade(current = loading) {
                         if (it) CircularProgressIndicator(
                             modifier = Modifier.size(36.dp),
-                            progress = animateAsState(progress).value
+                            progress = animateFloatAsState(progress).value
                         )
                     }
                 }

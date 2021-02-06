@@ -7,8 +7,8 @@ import androidx.compose.material.Colors
 import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.onCommit
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.AmbientContext
@@ -28,8 +28,9 @@ fun AndroidHorizonManagerTheme(content: @Composable () -> Unit) {
         controller ?: AndroidThemeController(context).also { controller = it }
     }
 
-    onCommit(isSystemInDarkTheme()) {
+    DisposableEffect(isSystemInDarkTheme()) {
         theController.update()
+        onDispose {  }
     }
 
     HorizonManagerTheme(

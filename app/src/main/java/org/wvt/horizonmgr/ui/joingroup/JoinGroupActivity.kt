@@ -31,7 +31,8 @@ class JoinGroupActivity : AppCompatActivity() {
             val snackbar = remember { SnackbarHostState() }
 
             val scope = rememberCoroutineScope()
-            onCommit(startError) {
+
+            LaunchedEffect(startError) {
                 if (startError != null) {
                     vm.handledError()
                     scope.launch {
@@ -51,7 +52,7 @@ class JoinGroupActivity : AppCompatActivity() {
                                 Text("加入群组")
                             }, navigationIcon = {
                                 IconButton(onClick = { finish() }) {
-                                    Icon(Icons.Filled.ArrowBack)
+                                    Icon(Icons.Filled.ArrowBack, contentDescription = "返回")
                                 }
                             }, backgroundColor = MaterialTheme.colors.surface)
                             when {

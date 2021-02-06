@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -43,7 +44,7 @@ internal fun MCLevelTab(
                                 } catch (e: Exception) {
                                     e.printStackTrace()
                                     progressDialogState =
-                                        ProgressDialogState.Failed("重命名失败", e.localizedMessage)
+                                        ProgressDialogState.Failed("重命名失败", e.localizedMessage ?: "")
                                     return@launch
                                 }
                                 progressDialogState = ProgressDialogState.Finished("重命名成功")

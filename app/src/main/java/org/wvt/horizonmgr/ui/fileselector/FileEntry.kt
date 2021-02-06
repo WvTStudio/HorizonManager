@@ -13,7 +13,7 @@ import androidx.compose.ui.Modifier
 internal fun FileEntry(name: String, onClick: () -> Unit) {
     ListItem(
         modifier = Modifier.clickable(onClick = onClick),
-        icon = { Icon(Icons.Filled.InsertDriveFile) },
+        icon = { Icon(Icons.Filled.InsertDriveFile, contentDescription = "文件") },
         text = { Text(name) }
     )
 }

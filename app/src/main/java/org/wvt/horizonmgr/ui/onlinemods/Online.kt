@@ -4,6 +4,7 @@ import androidx.compose.animation.Crossfade
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -32,8 +33,14 @@ fun Online(
     val installState by vm.installState.collectAsState()
     val selectedPackageUUID = AmbientSelectedPackageUUID.current
 
-    onCommit(enable) { vm.setEnable(enable) }
-    onCommit(selectedPackageUUID) { vm.setSelectedUUID(selectedPackageUUID) }
+    DisposableEffect(enable) {
+        vm.setEnable(enable)
+        onDispose { }
+    }
+    DisposableEffect(selectedPackageUUID) {
+        vm.setSelectedUUID(selectedPackageUUID)
+        onDispose { }
+    }
 
     downloadState?.let { ProgressDialog(onCloseRequest = { vm.downloadFinish() }, state = it) }
     installState?.let { ProgressDialog(onCloseRequest = { vm.installFinish() }, state = it) }
@@ -74,7 +81,7 @@ fun Online(
                             contentPadding = PaddingValues(top = 16.dp, bottom = 64.dp),
                             state = lazyListState
                         ) {
-                            items(items = state.modList) { item ->
+                            itemsIndexed(state.modList) { _, item ->
                                 ModItem(
                                     modifier = Modifier.padding(
                                         horizontal = 16.dp,
@@ -115,7 +122,6 @@ private fun NotLoginTip() {
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 private fun ModItem(
     modifier: Modifier = Modifier,
@@ -129,7 +135,11 @@ private fun ModItem(
         ) {
             // Information
             Row {
-                Column(Modifier.weight(1f).padding(end = 8.dp)) {
+                Column(
+                    Modifier
+                        .weight(1f)
+                        .padding(end = 8.dp)
+                ) {
                     // Title
                     Text(title, style = MaterialTheme.typography.h5)
                     // Secondary Text
@@ -142,25 +152,30 @@ private fun ModItem(
                 // Image
                 NetworkImage(
                     url = imageUrl,
-                    modifier = Modifier.size(80.dp).clip(RoundedCornerShape(4.dp))
+                    contentDescription = "模组图标",
+                    modifier = Modifier
+                        .size(80.dp)
+                        .clip(RoundedCornerShape(4.dp))
                 )
             }
             // Actions
             Row(
-                modifier = Modifier.padding(top = 8.dp).fillMaxWidth(),
+                modifier = Modifier
+                    .padding(top = 8.dp)
+                    .fillMaxWidth(),
                 horizontalArrangement = Arrangement.End
             ) {
                 Providers(AmbientContentColor provides MaterialTheme.colors.primary) {
                     // Install Button
                     IconButton(onClick = onInstallClick) {
-                        Icon(Icons.Filled.Extension)
+                        Icon(Icons.Filled.Extension, contentDescription = "安装")
                     }
                     // Download Button
                     IconButton(
                         onClick = onDownloadClick,
                         modifier = Modifier.padding(start = 8.dp)
                     ) {
-                        Icon(Icons.Filled.GetApp)
+                        Icon(Icons.Filled.GetApp, contentDescription = "仅下载")
                     }
                 }
             }

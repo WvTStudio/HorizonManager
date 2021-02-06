@@ -33,6 +33,7 @@ internal fun LevelItem(
                 }
                 LocalImage(
                     path = screenshot,
+                    contentDescription = "存档预览图",
                     modifier = Modifier.padding(16.dp)
                         .height(72.dp)
                         .clip(RoundedCornerShape(4.dp))

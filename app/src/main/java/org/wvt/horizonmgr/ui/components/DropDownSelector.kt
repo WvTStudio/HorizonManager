@@ -45,7 +45,7 @@ fun DropDownSelector(
                         rememberRipple(bounded = false, radius = 24.dp)
                     ),
                     onClick = { dropDown = true }
-                ) { Icon(Icons.Filled.ArrowDropDown) }
+                ) { Icon(Icons.Filled.ArrowDropDown, "展开") }
             }, dropdownContent = {
                 items.forEachIndexed { index, item ->
                     DropdownMenuItem(onClick = {

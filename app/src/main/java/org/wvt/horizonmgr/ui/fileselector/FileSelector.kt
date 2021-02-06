@@ -3,10 +3,11 @@ package org.wvt.horizonmgr.ui.fileselector
 import android.os.Environment
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animateAsState
-import androidx.compose.foundation.ScrollableRow
-import androidx.compose.foundation.clickable
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -15,6 +16,7 @@ import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.gesture.tapGestureFilter
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.tooling.preview.Preview
@@ -125,29 +127,26 @@ fun FileSelector(onCancel: () -> Unit, onSelect: (String) -> Unit) {
     var tabDepth by remember { mutableStateOf(0) }
 
     // 初始化任务，获取内置存储的位置，解析该目录的子目录文件，获取固定目录
-    onActive {
+    LaunchedEffect(Unit) {
         isLoading = true
-        val job = scope.launch(Dispatchers.Default) {
-            val storage = getRootStorage()
-            val theFixedPaths = listOf(
-                storage.resolve("Download").copy(name = "下载的文件"),
-                storage.resolve("Tencent/QQfile_recv").copy(name = "QQ接收的文件")
-            )
-            storagePath = storage
-            storageDepth = storage.depth
+        val storage = getRootStorage()
+        val theFixedPaths = listOf(
+            storage.resolve("Download").copy(name = "下载的文件"),
+            storage.resolve("Tencent/QQfile_recv").copy(name = "QQ接收的文件")
+        )
+        storagePath = storage
+        storageDepth = storage.depth
 
-            currentHolderPath = storage
-            currentDepth = storage.depth
+        currentHolderPath = storage
+        currentDepth = storage.depth
 
-            fixedPaths = theFixedPaths
-            subPaths = getFileItems(storage.absolutePath)
+        fixedPaths = theFixedPaths
+        subPaths = getFileItems(storage.absolutePath)
 
-            tabPaths = listOf("内部存储")
-            tabDepth = 0
+        tabPaths = listOf("内部存储")
+        tabDepth = 0
 
-            isLoading = false
-        }
-        onDispose { job.cancel() }
+        isLoading = false
     }
 
     fun changeDepth(depth: Int) {
@@ -233,7 +232,7 @@ private fun CustomAppBar(
         Column {
             TopAppBar(
                 title = { Text("选择文件") },
-                navigationIcon = { IconButton(onClick = onCancel) { Icon(Icons.Filled.ArrowBack) } },
+                navigationIcon = { IconButton(onClick = onCancel) { Icon(Icons.Filled.ArrowBack, "返回") } },
                 backgroundColor = Color.Transparent,
                 elevation = 0.dp
             )
@@ -261,11 +260,7 @@ private fun PathTab(
     // 每一段路径的宽度
     val sizes = remember { mutableStateListOf<Int>() }
 
-    /*onCommit(data.paths) {
-        sizes.clear()
-    }*/
-
-    onCommit(data.depth) {
+    LaunchedEffect(data.depth) {
         if (sizes.isNotEmpty()) {
             var value = 0
             for (i in 0..data.depth) {
@@ -276,44 +271,46 @@ private fun PathTab(
         }
     }
 
-    ScrollableRow(
-        verticalAlignment = Alignment.CenterVertically,
-        scrollState = scrollState
-    ) {
-        // heading padding
-        Spacer(modifier = Modifier.width(72.dp))
-        data.paths.forEachIndexed { index, pathName ->
-            Box(
-                modifier = Modifier.clickable(
-                    onClick = { onSelectDepth(index) },
-                    indication = null
-                ).onGloballyPositioned { sizes.add(index, it.size.width) },
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    modifier = Modifier.padding(top = 16.dp, bottom = 16.dp),
-                    text = pathName,
-                    color = animateAsState(if (data.depth == index) MaterialTheme.colors.onSurface
-                    else MaterialTheme.colors.onSurface.copy(alpha = 0.5f)).value // 选中高亮
-                )
-            }
+    LazyRow(verticalAlignment = Alignment.CenterVertically) {
+        // TODO: 2021/2/6 改成 Lazy 模式
+        item {
+            // heading padding
+            Spacer(modifier = Modifier.width(72.dp))
+            data.paths.forEachIndexed { index, pathName ->
+                Box(
+                    modifier = Modifier
+                        .tapGestureFilter { onSelectDepth(index) }
+                        .onGloballyPositioned { sizes.add(index, it.size.width) },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        modifier = Modifier.padding(top = 16.dp, bottom = 16.dp),
+                        text = pathName,
+                        color = animateColorAsState(
+                            if (data.depth == index) MaterialTheme.colors.onSurface
+                            else MaterialTheme.colors.onSurface.copy(alpha = 0.5f)
+                        ).value // 选中高亮
+                    )
+                }
 
-            // paths.size = 1:
-            //     index: 0 (>)
-            //     size:  1 (>)
-            // paths.size = 4:
-            //     index: 0 > 1 > 2 > 3 (>)
-            //     size:  4 > 4 > 4 > 4 (>)
-            if (index + 1 < data.paths.size) {
-                Icon(
-                    modifier = Modifier.padding(start = 8.dp, end = 8.dp),
-                    imageVector = Icons.Filled.ChevronRight,
-                    tint = MaterialTheme.colors.onSurface.copy(alpha = 0.5f)
-                )
+                // paths.size = 1:
+                //     index: 0 (>)
+                //     size:  1 (>)
+                // paths.size = 4:
+                //     index: 0 > 1 > 2 > 3 (>)
+                //     size:  4 > 4 > 4 > 4 (>)
+                if (index + 1 < data.paths.size) {
+                    Icon(
+                        modifier = Modifier.padding(start = 8.dp, end = 8.dp),
+                        imageVector = Icons.Filled.ChevronRight,
+                        tint = MaterialTheme.colors.onSurface.copy(alpha = 0.5f),
+                        contentDescription = null
+                    )
+                }
             }
+            // trailing padding
+            Spacer(modifier = Modifier.width(32.dp))
         }
-        // trailing padding
-        Spacer(modifier = Modifier.width(32.dp))
     }
 }
 

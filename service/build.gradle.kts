@@ -13,7 +13,7 @@ android {
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
-    /*buildTypes {
+    buildTypes {
         create("alpha") {
             isMinifyEnabled = true
             proguardFiles = mutableListOf(
@@ -28,7 +28,7 @@ android {
                 file("proguard-rules.pro")
             )
         }
-    }*/
+    }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8

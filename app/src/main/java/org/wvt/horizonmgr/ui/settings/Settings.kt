@@ -34,7 +34,7 @@ fun Settings(
     Column(Modifier.fillMaxSize()) {
         TopAppBar(title = {}, navigationIcon = {
             IconButton(onClick = { context.finish() }) {
-                Icon(Icons.Filled.ArrowBack)
+                Icon(Icons.Filled.ArrowBack, "返回")
             }
         }, backgroundColor = Color.Transparent, elevation = 0.dp)
         Row(Modifier.padding(top = 8.dp, start = 54.dp)) {
@@ -45,6 +45,7 @@ fun Settings(
                     Text("By")
                     Image(
                         modifier = Modifier.padding(start = 4.dp, top = 4.dp),
+                        contentDescription = "LOGO",
                         imageVector = vectorResource(
                             id = if (isSystemInDarkTheme()) R.drawable.ic_logo_banner_dark
                             else R.drawable.ic_logo_banner
@@ -71,7 +72,7 @@ fun Settings(
 
         ListItem(
             modifier = Modifier.clickable(onClick = { dropdownMenuExpanded = true }),
-            icon = { Icon(imageVector = Icons.Default.Timelapse) },
+            icon = { Icon(imageVector = Icons.Default.Timelapse, null) },
             text = { Text("夜间模式") },
             secondaryText = {
                 DropdownMenu(
@@ -105,7 +106,7 @@ fun Settings(
 
         ListItem(
             modifier = Modifier.clickable(onClick = requestCustomTheme),
-            icon = { Icon(imageVector = Icons.Filled.FormatPaint) },
+            icon = { Icon(imageVector = Icons.Filled.FormatPaint, null) },
             text = { Text("自定义主题色") }
         )
 
@@ -118,13 +119,13 @@ fun Settings(
 
         ListItem(
             modifier = Modifier.clickable(onClick = {}),
-            icon = { Icon(imageVector = Icons.Filled.Storage) },
+            icon = { Icon(imageVector = Icons.Filled.Storage, null) },
             text = { Text("清除下载缓存") }
         )
 
         ListItem(
             modifier = Modifier.clickable(onClick = {}),
-            icon = { Icon(Icons.Filled.PushPin) },
+            icon = { Icon(Icons.Filled.PushPin, null) },
             text = { Text("固定文件夹") }
         )
     }

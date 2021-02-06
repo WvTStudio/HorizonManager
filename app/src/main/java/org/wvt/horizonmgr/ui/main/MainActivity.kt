@@ -23,7 +23,7 @@ import org.wvt.horizonmgr.ui.theme.AndroidHorizonManagerTheme
 import org.wvt.horizonmgr.ui.theme.PreviewTheme
 
 class MainActivity : AppCompatActivity() {
-    private val dependencies = HorizonManagerApplication.container
+//    private val dependencies = HorizonManagerApplication.container
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,22 +41,25 @@ class MainActivity : AppCompatActivity() {
 
 //            val navController = rememberNavController()
 
-            onCommit(newVersion) {
+            DisposableEffect(newVersion) {
                 if (newVersion != null) {
                     displayNewVersionDialog = true
                 }
+                onDispose {}
             }
 
-            onActive {
+            DisposableEffect(Unit) {
                 vm.checkPermission(this@MainActivity)
                 vm.getUpdate()
+                onDispose {
+                    // TODO: 2021/2/6 添加 Cancel 逻辑
+                }
             }
 
             AndroidDependenciesProvider {
                 AndroidHorizonManagerTheme {
                     Surface(color = MaterialTheme.colors.background) {
                         if (!initializing) App(
-                            dependencies = dependencies,
                             userInfo = userInfo,
                             requestLogin = { vm.requestLogin(this) },
                             requestLogout = vm::logOut,

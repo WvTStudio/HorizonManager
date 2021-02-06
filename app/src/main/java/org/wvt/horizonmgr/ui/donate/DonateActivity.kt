@@ -38,8 +38,11 @@ class DonateActivity : AppCompatActivity() {
             val mDonates by vm.donates.collectAsState()
 
 
-            onCommit(vm) {
+            DisposableEffect(vm) {
                 vm.refresh()
+                onDispose {
+                    // TODO: 2021/2/6  添加 cancel
+                }
             }
 
             AndroidHorizonManagerTheme {

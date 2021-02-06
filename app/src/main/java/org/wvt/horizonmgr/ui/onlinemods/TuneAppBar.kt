@@ -66,14 +66,14 @@ internal fun TuneAppBar2(
 
     var filterValue by remember { mutableStateOf(TextFieldValue()) }
 
-    val actionOpacity = animateAsState(if (expand) 0.72f else 1f).value
+    val actionOpacity = animateFloatAsState(if (expand) 0.72f else 1f).value
 
-    val offset = animateAsState(
+    val offset = animateDpAsState(
         if (expand) 16.dp else 0.dp,
         animationSpec = if (expand) searchBoxEnter else searchBoxExit
     ).value
 
-    val contentOpacity = animateAsState(
+    val contentOpacity = animateFloatAsState(
         if (expand) 1f else 0f,
         if (expand) contentAppear else contentDisappear
     ).value
@@ -115,8 +115,8 @@ internal fun TuneAppBar2(
                         else onNavClicked()
                     }) {
                     Crossfade(current = expand, animation = iconFade) {
-                        if (it) Icon(imageVector = Icons.Filled.ArrowBack)
-                        else Icon(imageVector = Icons.Filled.Menu)
+                        if (it) Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "关闭")
+                        else Icon(imageVector = Icons.Filled.Menu, contentDescription = "菜单")
                     }
                 }
                 Crossfade(current = expand, animation = iconFade) {
@@ -169,8 +169,8 @@ internal fun TuneAppBar2(
                         }
                     ) {
                         Crossfade(current = expand, animation = iconFade) {
-                            if (it) Icon(imageVector = Icons.Filled.Search)
-                            else Icon(imageVector = Icons.Filled.Tune)
+                            if (it) Icon(imageVector = Icons.Filled.Search, contentDescription = "搜索")
+                            else Icon(imageVector = Icons.Filled.Tune, contentDescription = "过滤选项")
                         }
                     }
                 }
@@ -189,7 +189,7 @@ internal fun TuneAppBar2(
                             modifier = Modifier.padding(top = 8.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Icon(imageVector = Icons.Filled.Language)
+                            Icon(imageVector = Icons.Filled.Language, contentDescription = "源仓库")
                             DropDownSelector(
                                 modifier = Modifier.padding(start = 16.dp).fillMaxWidth(),
                                 items = sources.map { it.label },
@@ -202,7 +202,7 @@ internal fun TuneAppBar2(
                             modifier = Modifier.padding(top = 8.dp).fillMaxWidth(),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Icon(imageVector = Icons.Filled.Sort)
+                            Icon(imageVector = Icons.Filled.Sort, contentDescription = "排序方式")
                             DropDownSelector(
                                 modifier = Modifier.padding(start = 16.dp),
                                 items = sortModes.map { it.label },
@@ -223,7 +223,7 @@ private fun AppBarLayout(
     content: @Composable () -> Unit
 ) {
     val progress =
-        animateAsState(if (expand) 1f else 0f, if (expand) tuneExpand else tuneShrink).value
+        animateFloatAsState(if (expand) 1f else 0f, if (expand) tuneExpand else tuneShrink).value
     Layout(content) { m: List<Measurable>, c: Constraints ->
         check(m.size == 3)
 

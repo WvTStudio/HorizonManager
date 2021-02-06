@@ -2,14 +2,13 @@ package org.wvt.horizonmgr.ui.modulemanager
 
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.animation.Crossfade
-import androidx.compose.animation.animateAsState
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.material.Icon
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.ripple.rememberRipple
@@ -81,8 +80,10 @@ internal fun ModTab(vm: ModTabViewModel) {
                         }
                     }
                     ExtendedFloatingActionButton(
-                        modifier = Modifier.padding(16.dp).align(Alignment.BottomEnd),
-                        icon = { Icon(imageVector = Icons.Filled.Add) },
+                        modifier = Modifier
+                            .padding(16.dp)
+                            .align(Alignment.BottomEnd),
+                        icon = { Icon(imageVector = Icons.Filled.Add, contentDescription = null) },
                         text = { Text("安装") },
                         onClick = { vm.install(context) }
                     )
@@ -110,21 +111,26 @@ private fun ModItem(
 ) {
     val interactionState = remember { InteractionState() }
     Card(
-        modifier = modifier.clickable(
-            onClick = onClick,
-            interactionState = interactionState,
-            indication = null
-        ).longPressGestureFilter { onLongClick() },
+        modifier = modifier
+            .clickable(
+                onClick = onClick,
+                interactionState = interactionState,
+                indication = null
+            )
+            .longPressGestureFilter { onLongClick() },
         border = if (selected) BorderStroke(
             1.dp, MaterialTheme.colors.primary
         ) else null,
         elevation = 2.dp
     ) {
         Column(
-            Modifier.indication(interactionState, indication = rememberRipple())
+            Modifier
+                .indication(interactionState, indication = rememberRipple())
                 .background(
-                    animateAsState(
-                        if (selected) MaterialTheme.colors.primary.copy(0.12f) else Color.Transparent).value
+                    animateColorAsState(
+                        if (selected) MaterialTheme.colors.primary.copy(0.12f)
+                        else Color.Transparent
+                    ).value
                 )
                 .padding(top = 16.dp, bottom = 4.dp, start = 16.dp, end = 16.dp)
         ) {
@@ -139,13 +145,18 @@ private fun ModItem(
                 }
                 // Mod Icon
                 LocalImage(
-                    modifier = Modifier.size(80.dp).clip(RoundedCornerShape(4.dp)),
+                    modifier = Modifier
+                        .size(80.dp)
+                        .clip(RoundedCornerShape(4.dp)),
                     path = iconPath,
+                    contentDescription = "模组图标"
                 )
             }
             // Footer controller buttons
             Row(
-                modifier = Modifier.fillMaxWidth().padding(top = 16.dp, bottom = 8.dp, end = 8.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 16.dp, bottom = 8.dp, end = 8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 // Delete button

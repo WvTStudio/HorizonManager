@@ -1,6 +1,6 @@
 package org.wvt.horizonmgr.ui.fileselector
 
-import androidx.compose.animation.animateAsState
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.*
 import androidx.compose.animation.transition
 import androidx.compose.foundation.background
@@ -20,9 +20,9 @@ import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.Measurable
-import androidx.compose.ui.layout.WithConstraints
 import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Constraints
@@ -30,7 +30,9 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import org.wvt.horizonmgr.ui.theme.PreviewTheme
 
-
+/**
+ * 带左滑收藏功能的文件夹列表项
+ */
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 internal fun FolderEntry(
@@ -50,7 +52,8 @@ internal fun FolderEntry(
     val starState = (state.offset.value > -swipePoint - 10) xor !isStared
 
     Box(
-        Modifier.wrapContentSize()
+        Modifier
+            .wrapContentSize()
             .clickable(onClick = onClick)
             .swipeable(
                 state = state,
@@ -64,15 +67,17 @@ internal fun FolderEntry(
             check = starState,
             gravity = Alignment.End,
             activeColor = MaterialTheme.colors.secondary,
-            inactiveColor = MaterialTheme.colors.onBackground.copy(0.12f).compositeOver(MaterialTheme.colors.background),
+            inactiveColor = MaterialTheme.colors.onBackground.copy(0.12f)
+                .compositeOver(MaterialTheme.colors.background),
             iconActiveColor = MaterialTheme.colors.onSecondary,
             iconInactiveColor = MaterialTheme.colors.onBackground
         )
         ListItem(
-            modifier = Modifier.clickable(onClick = onClick)
+            modifier = Modifier
+                .clickable(onClick = onClick)
                 .offset(offset = { IntOffset(x = state.offset.value.toInt(), y = 0) })
                 .background(MaterialTheme.colors.surface),
-            icon = { Icon(Icons.Filled.Folder) },
+            icon = { Icon(Icons.Filled.Folder, contentDescription = "文件夹") },
             text = { Text(name) }
         )
     }
@@ -161,12 +166,13 @@ private fun ToggleBackgroundWithIcon(
 
     var rippleStart by remember { mutableStateOf(false) }
 
-    onCommit(check) {
+    DisposableEffect(check) {
         rippleStart = true
+        onDispose { }
     }
 
     Box(modifier.background(backgroundColor)) {
-        WithConstraints {
+        BoxWithConstraints {
             val tr = transition(
                 definition = getTransition(0, (constraints.maxHeight + constraints.maxWidth) * 2),
                 initState = if (rippleStart) "start" else "end",
@@ -181,7 +187,8 @@ private fun ToggleBackgroundWithIcon(
                 modifier = Modifier.graphicsLayer(clip = true),
                 content = {
                     Box(
-                        modifier = Modifier.clip(CircleShape)
+                        modifier = Modifier
+                            .clip(CircleShape)
                             .background(rippleColor)
                             .size(with(density) { tr[sizeKey].toDp() })
                     )
@@ -201,45 +208,62 @@ private fun ToggleBackgroundWithIcon(
             }
         }
 
-        SlashIcon(
-            modifier = Modifier.align(
-                if (gravity == Alignment.Start) Alignment.CenterStart
-                else Alignment.CenterEnd
-            ).padding(horizontal = 24.dp),
+        SwitchIcon(
+            modifier = Modifier
+                .align(
+                    if (gravity == Alignment.Start) Alignment.CenterStart
+                    else Alignment.CenterEnd
+                )
+                .padding(horizontal = 24.dp),
             isActive = check,
+            activeIcon = Icons.Filled.Star,
             activeColor = iconActiveColor,
-            inactiveColor = iconInactiveColor
+            inactiveIcon = Icons.Filled.StarBorder,
+            inactiveColor = iconInactiveColor,
         )
     }
 }
 
+/**
+ * 可切换的图标，在切换时会跳动一下并更换颜色
+ */
 @Composable
-private fun SlashIcon(
+private fun SwitchIcon(
     modifier: Modifier = Modifier,
     isActive: Boolean,
+    activeIcon: ImageVector,
     activeColor: Color,
+    inactiveIcon: ImageVector,
     inactiveColor: Color
 ) {
-    val iconColor = animateAsState(
+    val iconColor = animateColorAsState(
         if (isActive) activeColor
         else inactiveColor
     ).value
 
-    val iconTransitionState = transition(
-        definition = iconTransition,
-        initState = IconState.OFF,
-        toState = if (isActive) IconState.ON else IconState.OFF
+    val transition = updateTransition(targetState = if (isActive) IconState.ON else IconState.OFF)
+    val scale by transition.animateFloat(
+        transitionSpec = {
+            keyframes {
+                durationMillis = 160
+                1f at 0
+                1.2f at 80 with FastOutLinearInEasing
+                1f at 160 with LinearOutSlowInEasing
+            }
+        },
+        targetValueByState = {
+            1f
+        }
     )
-
-    val iconScale = iconTransitionState[iconScaleKey]
 
     Icon(
         modifier = modifier.graphicsLayer(
-            scaleX = iconScale,
-            scaleY = iconScale
+            scaleX = scale,
+            scaleY = scale
         ),
-        imageVector = if (isActive) Icons.Filled.Star else Icons.Filled.StarBorder,
-        tint = iconColor
+        imageVector = if (isActive) activeIcon else inactiveIcon,
+        tint = iconColor,
+        contentDescription = null
     )
 }
 

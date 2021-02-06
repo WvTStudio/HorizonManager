@@ -6,13 +6,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.onCommit
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -43,8 +41,9 @@ fun PackageInfo(
     val pkgSize = vm.pkgSize.collectAsState().value
     val state = vm.state.collectAsState().value
 
-    onCommit(pkgId) {
+    DisposableEffect(pkgId) {
         vm.refresh(pkgId)
+        onDispose {  }
     }
 
     Column(Modifier.fillMaxSize()) {
@@ -52,7 +51,7 @@ fun PackageInfo(
             Text("分包详情")
         }, navigationIcon = {
             IconButton(onClick = onCloseClick) {
-                Icon(Icons.Filled.ArrowBack)
+                Icon(Icons.Filled.ArrowBack, "返回")
             }
         }, backgroundColor = MaterialTheme.colors.surface)
         Crossfade(
@@ -69,16 +68,18 @@ fun PackageInfo(
                     ErrorPage(message = { Text("获取分包详情失败") }, onRetryClick = { vm.refresh(pkgId) })
                 }
                 PackageDetailViewModel.State.SUCCEED -> {
-                    ScrollableColumn {
-                        if (manifest != null && pkgInfo != null) {
-                            ManifestSection(manifest, pkgInfo.uuid, pkgInfo.packageUUID)
-                            FileSection(pkgInfo.path, remember(pkgSize) {
-                                when (pkgSize) {
-                                    is PackageDetailViewModel.PackageSize.Succeed -> pkgSize.sizeStr + "  共 ${pkgSize.count} 个文件"
-                                    is PackageDetailViewModel.PackageSize.Failed -> "计算出错"
-                                    is PackageDetailViewModel.PackageSize.Loading -> "正在计算"
-                                }
-                            })
+                    LazyColumn {
+                        item {
+                            if (manifest != null && pkgInfo != null) {
+                                ManifestSection(manifest, pkgInfo.uuid, pkgInfo.packageUUID)
+                                FileSection(pkgInfo.path, remember(pkgSize) {
+                                    when (pkgSize) {
+                                        is PackageDetailViewModel.PackageSize.Succeed -> pkgSize.sizeStr + "  共 ${pkgSize.count} 个文件"
+                                        is PackageDetailViewModel.PackageSize.Failed -> "计算出错"
+                                        is PackageDetailViewModel.PackageSize.Loading -> "正在计算"
+                                    }
+                                })
+                            }
                         }
                     }
                 }
@@ -100,56 +101,56 @@ private fun ManifestSection(
         modifier = Modifier.padding(top = 16.dp, bottom = 8.dp, start = 72.dp)
     )
     ListItem(icon = {
-        Icon(Icons.Filled.Extension, modifier = Modifier.padding(top = 4.dp))
+        Icon(Icons.Filled.Extension, modifier = Modifier.padding(top = 4.dp), contentDescription = null)
     }, text = {
         Text("分包名称")
     }, secondaryText = {
         Text(manifest.packName)
     })
     ListItem(icon = {
-        Icon(Icons.Filled.Person, modifier = Modifier.padding(top = 4.dp))
+        Icon(Icons.Filled.Person, modifier = Modifier.padding(top = 4.dp), contentDescription = null)
     }, text = {
         Text("开发者")
     }, secondaryText = {
         Text(manifest.developer)
     })
     ListItem(icon = {
-        Icon(Icons.Filled.Description, modifier = Modifier.padding(top = 4.dp))
+        Icon(Icons.Filled.Description, modifier = Modifier.padding(top = 4.dp), contentDescription = null)
     }, text = {
         Text("版本信息")
     }, secondaryText = {
         Text(manifest.packVersionName)
     })
     ListItem(icon = {
-        Icon(Icons.Filled.Description, modifier = Modifier.padding(top = 4.dp))
+        Icon(Icons.Filled.Description, modifier = Modifier.padding(top = 4.dp), contentDescription = null)
     }, text = {
         Text("版本号")
     }, secondaryText = {
         Text(manifest.packVersionCode.toString())
     })
     ListItem(icon = {
-        Icon(Icons.Filled.Description, modifier = Modifier.padding(top = 4.dp))
+        Icon(Icons.Filled.Description, modifier = Modifier.padding(top = 4.dp), contentDescription = null)
     }, text = {
         Text("UUID")
     }, secondaryText = {
         Text(uuid)
     })
     ListItem(icon = {
-        Icon(Icons.Filled.Description, modifier = Modifier.padding(top = 4.dp))
+        Icon(Icons.Filled.Description, modifier = Modifier.padding(top = 4.dp), contentDescription = null)
     }, text = {
         Text("分包 UUID")
     }, secondaryText = {
         Text(packageUUID)
     })
     ListItem(icon = {
-        Icon(Icons.Filled.Gamepad, modifier = Modifier.padding(top = 4.dp))
+        Icon(Icons.Filled.Gamepad, modifier = Modifier.padding(top = 4.dp), contentDescription = null)
     }, text = {
         Text("游戏版本")
     }, secondaryText = {
         Text(manifest.gameVersion)
     })
     ListItem(icon = {
-        Icon(Icons.Filled.Notes, modifier = Modifier.padding(top = 4.dp))
+        Icon(Icons.Filled.Notes, modifier = Modifier.padding(top = 4.dp), contentDescription = null)
     }, text = {
         Text("分包描述")
     }, secondaryText = {
@@ -169,14 +170,14 @@ private fun FileSection(
         modifier = Modifier.padding(top = 16.dp, bottom = 8.dp, start = 72.dp)
     )
     ListItem(icon = {
-        Icon(Icons.Filled.Folder, modifier = Modifier.padding(top = 4.dp))
+        Icon(Icons.Filled.Folder, modifier = Modifier.padding(top = 4.dp), contentDescription = null)
     }, text = {
         Text("分包路径")
     }, secondaryText = {
         Text(path)
     })
     ListItem(icon = {
-        Icon(Icons.Filled.Storage, modifier = Modifier.padding(top = 4.dp))
+        Icon(Icons.Filled.Storage, modifier = Modifier.padding(top = 4.dp), contentDescription = null)
     }, text = {
         Text("分包大小")
     }, secondaryText = {

@@ -58,7 +58,8 @@ private fun GroupItem(
             NetworkImage(
                 modifier = Modifier.size(42.dp)
                     .clip(RoundedCornerShape(percent = 50)),
-                url = avatarUrl
+                url = avatarUrl,
+                contentDescription = "头像"
             )
             // Tag
             StatusTag(modifier = Modifier.padding(top = 8.dp), text = tag)
@@ -89,7 +90,7 @@ private fun GroupItem(
             Modifier.padding(start = 16.dp, end = 16.dp).wrapContentSize(),
             verticalArrangement = Arrangement.Center
         ) {
-            Icon(Icons.Filled.ArrowForward)
+            Icon(Icons.Filled.ArrowForward, "加入")
         }
     }
 }

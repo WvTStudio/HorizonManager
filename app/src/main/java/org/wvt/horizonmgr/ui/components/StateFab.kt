@@ -30,15 +30,19 @@ fun StateFab(
             FabState.TODO -> FloatingActionButton(
                 onClick = onClicked,
                 contentColor = MaterialTheme.colors.onSecondary
-            ) { Icon(Icons.Filled.ArrowForward) }
+            ) {
+                Icon(Icons.Filled.ArrowForward, contentDescription = "下一步")
+            }
             FabState.LOADING -> CircularProgressIndicator()
             FabState.SUCCEED -> Icon(
                 imageVector = Icons.Filled.Check,
-                tint = MaterialTheme.colors.secondary
+                tint = MaterialTheme.colors.secondary,
+                contentDescription = "成功"
             )
             FabState.FAILED -> Icon(
                 imageVector = Icons.Filled.Clear,
-                tint = MaterialTheme.colors.error
+                tint = MaterialTheme.colors.error,
+                contentDescription = "失败"
             )
         }
     }

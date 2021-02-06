@@ -2,6 +2,7 @@ package org.wvt.horizonmgr.ui.news
 
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -11,6 +12,10 @@ import org.wvt.horizonmgr.DependenciesContainer
 class NewsViewModel(
     private val dependencies: DependenciesContainer
 ) : ViewModel() {
+    companion object {
+        const val TAG = "NewsViewModel"
+    }
+
     sealed class News {
         data class Article(
             val id: Int,
@@ -40,6 +45,8 @@ class NewsViewModel(
                 }
             } catch (e: Exception) {
                 state.value = State.Error(e)
+                Log.e(TAG, "Failed to refresh news", e)
+                e.printStackTrace()
                 return@launch
             }
             news.value = result

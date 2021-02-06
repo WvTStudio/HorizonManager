@@ -3,6 +3,7 @@ package org.wvt.horizonmgr.ui.news
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -31,7 +32,7 @@ fun NewsContent(
             modifier = Modifier.zIndex(4.dp.value),
             navigationIcon = {
                 IconButton(onClick = onNavClick) {
-                    Icon(Icons.Filled.ArrowBack)
+                    Icon(Icons.Filled.ArrowBack, contentDescription = "返回")
                 }
             }, title = {
                 Text("资讯正文")
@@ -42,52 +43,59 @@ fun NewsContent(
                 Box(Modifier.fillMaxSize()) {
                     CircularProgressIndicator(Modifier.align(Alignment.Center))
                 }
-            } else ScrollableColumn(Modifier.fillMaxSize()) {
-                NetworkImage(
-                    modifier = Modifier.padding(16.dp)
-                        .fillMaxWidth()
-                        .aspectRatio(16f / 9f)
-                        .clip(RoundedCornerShape(4.dp)),
-                    url = news.coverUrl,
-                    contentScale = ContentScale.Crop
-                )
+            } else {
+                LazyColumn(modifier = Modifier.fillMaxSize()) {
+                    // use `item` for separate elements like headers
+                    // and `items` for lists of identical elements
+                    item {
+                        NetworkImage(
+                            modifier = Modifier.padding(16.dp)
+                                .fillMaxWidth()
+                                .aspectRatio(16f / 9f)
+                                .clip(RoundedCornerShape(4.dp)),
+                            url = news.coverUrl,
+                            contentDescription = "封面",
+                            contentScale = ContentScale.Crop
+                        )
 
-                // Title
-                Text(
-                    modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 8.dp),
-                    text = news.title, style = MaterialTheme.typography.h5
-                )
+                        // Title
+                        Text(
+                            modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 8.dp),
+                            text = news.title, style = MaterialTheme.typography.h5
+                        )
 
-                /*Label(
-                    modifier = Modifier.padding(start = 16.dp),
-                    text = "摘要"
-                )*/
+                        /*Label(
+                            modifier = Modifier.padding(start = 16.dp),
+                            text = "摘要"
+                        )*/
 
-                // Brief
-                Text(
-                    modifier = Modifier.padding(start = 24.dp, end = 24.dp, top = 16.dp),
-                    text = news.brief,
-                    style = MaterialTheme.typography.body2,
-                    color = MaterialTheme.colors.onSurface.copy(0.54f)
-                )
+                        // Brief
+                        Text(
+                            modifier = Modifier.padding(start = 24.dp, end = 24.dp, top = 16.dp),
+                            text = news.brief,
+                            style = MaterialTheme.typography.body2,
+                            color = MaterialTheme.colors.onSurface.copy(0.54f)
+                        )
 
-                /*Label(
-                    modifier = Modifier.padding(start = 16.dp),
-                    text = "正文"
-                )*/
+                        /*Label(
+                            modifier = Modifier.padding(start = 16.dp),
+                            text = "正文"
+                        )*/
 
-                Divider(
-                    Modifier.padding(top = 24.dp).fillMaxWidth(0.8f)
-                        .align(Alignment.CenterHorizontally)
-                )
+                        Divider(
+                            Modifier.padding(top = 24.dp).fillMaxWidth(0.8f)
+                                .align(Alignment.CenterHorizontally)
+                        )
 
-                // Content
-                Text(
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 24.dp),
-                    text = news.content,
-                    style = MaterialTheme.typography.body1,
-                    color = MaterialTheme.colors.onSurface.copy(0.74f)
-                )
+                        // Content
+                        Text(
+                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 24.dp),
+                            text = news.content,
+                            style = MaterialTheme.typography.body1,
+                            color = MaterialTheme.colors.onSurface.copy(0.74f)
+                        )
+                    }
+                }
             }
         }
     }

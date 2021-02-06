@@ -9,6 +9,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.savedinstancestate.savedInstanceState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusOrder
@@ -21,6 +22,7 @@ import androidx.compose.ui.unit.sp
 import org.wvt.horizonmgr.ui.components.FabState
 import org.wvt.horizonmgr.ui.components.StateFab
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun LoginPage(
     onLoginClicked: (account: String, password: String) -> Unit,

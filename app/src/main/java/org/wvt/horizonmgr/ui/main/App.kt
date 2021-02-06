@@ -1,16 +1,17 @@
 package org.wvt.horizonmgr.ui.main
 
-import androidx.activity.ComponentActivity
 import androidx.compose.animation.Crossfade
-import androidx.compose.animation.animateAsState
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.*
+import androidx.compose.foundation.AmbientIndication
+import androidx.compose.foundation.InteractionState
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.indication
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.material.Icon
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
@@ -20,11 +21,10 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.AmbientContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import org.wvt.horizonmgr.DependenciesContainer
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.wvt.horizonmgr.dependenciesViewModel
 import org.wvt.horizonmgr.legacyservice.LocalCache
 import org.wvt.horizonmgr.ui.components.MyAlertDialog
@@ -43,8 +43,6 @@ private val anim = tween<Float>(300, 0, LinearEasing)
 
 @Composable
 fun App(
-//    navController: NavHostController,
-    dependencies: DependenciesContainer,
     userInfo: LocalCache.CachedUserInfo?,
     requestLogin: () -> Unit,
     requestLogout: () -> Unit,
@@ -56,7 +54,6 @@ fun App(
     donate: () -> Unit,
     settings: () -> Unit
 ) {
-    val context = AmbientContext.current as ComponentActivity
     val vm = dependenciesViewModel<AppViewModel>()
     val cs by vm.currentScreen.collectAsState()
 
@@ -223,12 +220,14 @@ private fun Drawer(
         drawerState = state,
         drawerContent = {
             Column(modifier = Modifier.fillMaxSize()) {
-                ScrollableColumn(modifier = Modifier.weight(1f)) {
-                    header()
-                    Divider(Modifier.padding(top = 16.dp))
-                    Column(Modifier.padding(vertical = 8.dp)) { tabs() }
-                    Divider()
-                    Column(Modifier.padding(vertical = 8.dp)) { items() }
+                LazyColumn(modifier = Modifier.weight(1f)) {
+                    item {
+                        header()
+                        Divider(Modifier.padding(top = 16.dp))
+                        Column(Modifier.padding(vertical = 8.dp)) { tabs() }
+                        Divider()
+                        Column(Modifier.padding(vertical = 8.dp)) { items() }
+                    }
                 }
                 Divider()
                 // Settings
@@ -271,7 +270,8 @@ private fun DrawerHeader(
     Column(Modifier.padding(16.dp)) {
         val interactionState = remember { InteractionState() }
         Surface(
-            modifier = Modifier.size(48.dp)
+            modifier = Modifier
+                .size(48.dp)
                 .clickable(
                     onClick = {
                         if (userInfo == null) requestLogin()
@@ -285,11 +285,14 @@ private fun DrawerHeader(
             userInfo?.let {
                 NetworkImage(
                     url = it.avatarUrl,
+                    contentDescription = "头像",
                     contentScale = ContentScale.Crop,
-                    modifier = Modifier.indication(
-                        interactionState,
-                        AmbientIndication.current()
-                    ).fillMaxSize()
+                    modifier = Modifier
+                        .indication(
+                            interactionState,
+                            AmbientIndication.current()
+                        )
+                        .fillMaxSize()
                 )
             }
         }
@@ -317,23 +320,26 @@ private fun NavigationItem(
     val interactionState = remember { InteractionState() }
     Surface(
         shape = RoundedCornerShape(4.dp),
-        color = animateAsState(
-            if (checked) MaterialTheme.colors.primary.copy(alpha = 0.12f) else Color.Transparent).value,
-        contentColor = animateAsState(
-            if (checked) MaterialTheme.colors.primary else MaterialTheme.colors.onSurface).value,
-        modifier = Modifier.clickable(
-            onClick = { onCheckedChange(!checked) },
-            interactionState = interactionState,
-            indication = null
-        ).height(48.dp).fillMaxWidth().padding(horizontal = 8.dp, vertical = 2.dp)
+        color = animateColorAsState(if (checked) MaterialTheme.colors.primary.copy(alpha = 0.12f) else Color.Transparent).value,
+        contentColor = animateColorAsState(if (checked) MaterialTheme.colors.primary else MaterialTheme.colors.onSurface).value,
+        modifier = Modifier
+            .clickable(
+                onClick = { onCheckedChange(!checked) },
+                interactionState = interactionState,
+                indication = null
+            )
+            .height(48.dp)
+            .fillMaxWidth()
+            .padding(horizontal = 8.dp, vertical = 2.dp)
     ) {
         Providers(AmbientContentAlpha provides ContentAlpha.high) {
             Row(
-                Modifier.fillMaxSize()
+                Modifier
+                    .fillMaxSize()
                     .indication(interactionState, AmbientIndication.current()),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(imageVector = icon, modifier = Modifier.padding(start = 8.dp))
+                Icon(imageVector = icon, modifier = Modifier.padding(start = 8.dp), contentDescription = null)
                 Text(
                     text = text,
                     modifier = Modifier.padding(start = 24.dp, end = 8.dp),

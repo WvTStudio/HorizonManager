@@ -1,10 +1,10 @@
 package org.wvt.horizonmgr.ui.news
 
 import androidx.compose.animation.Crossfade
-import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
@@ -31,7 +31,10 @@ fun News(
     val state by vm.state.collectAsState()
     val context = AmbientContext.current
 
-    onCommit(vm) { vm.refresh() }
+    DisposableEffect(vm) {
+        vm.refresh()
+        onDispose { }
+    }
 
     NewsUI(
         onNavClick = onNavClick,
@@ -56,7 +59,11 @@ private fun NewsUI(
                 .fillMaxWidth()
                 .zIndex(4.dp.value),
             title = { Text("推荐资讯") },
-            navigationIcon = { IconButton(onClick = onNavClick) { Icon(Icons.Filled.Menu) } },
+            navigationIcon = {
+                IconButton(onClick = onNavClick) {
+                    Icon(imageVector = Icons.Filled.Menu, contentDescription = "菜单")
+                }
+            },
             backgroundColor = MaterialTheme.colors.surface
         )
         Crossfade(current = state) {
@@ -64,24 +71,29 @@ private fun NewsUI(
                 is NewsViewModel.State.Loading -> Box(Modifier.fillMaxSize()) {
                     CircularProgressIndicator(Modifier.align(Alignment.Center))
                 }
-                is NewsViewModel.State.Succeed -> ScrollableColumn(Modifier.fillMaxSize()) {
-                    news.forEach {
-                        when (it) {
-                            is NewsViewModel.News.Article -> {
-                                NewsItem(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(16.dp),
-                                    title = it.title,
-                                    brief = it.brief,
-                                    onClick = { onNewsClick(it) },
-                                    coverImage = {
-                                        NetworkImage(
-                                            url = it.coverUrl,
-                                            contentScale = ContentScale.Crop
+                is NewsViewModel.State.Succeed -> {
+                    LazyColumn(modifier = Modifier.fillMaxSize()) {
+                        item {
+                            news.forEach { item ->
+                                when (item) {
+                                    is NewsViewModel.News.Article -> {
+                                        NewsItem(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(16.dp),
+                                            title = item.title,
+                                            brief = item.brief,
+                                            onClick = { onNewsClick(item) },
+                                            coverImage = {
+                                                NetworkImage(
+                                                    url = item.coverUrl,
+                                                    contentScale = ContentScale.Crop,
+                                                    contentDescription = "封面"
+                                                )
+                                            }
                                         )
                                     }
-                                )
+                                }
                             }
                         }
                     }
@@ -115,7 +127,8 @@ private fun NewsItem(
         Box(
             Modifier
                 .fillMaxWidth()
-                .wrapContentHeight()) {
+                .wrapContentHeight()
+        ) {
             // Cover Image
             Surface(
                 modifier = Modifier

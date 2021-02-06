@@ -4,7 +4,6 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
@@ -13,6 +12,7 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.gesture.tapGestureFilter
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.Measurable
@@ -50,29 +50,31 @@ fun Donate(
             Surface(
                 color = if (light) alipayColor else MaterialTheme.colors.background,
                 modifier = Modifier.weight(1f).fillMaxWidth()
-                    .clickable(onClick = onAlipayClicked, indication = null)
+                    .tapGestureFilter {  onAlipayClicked() }
+//                    .clickable(onClick = onAlipayClicked, indication = null)
             ) {
                 Box(Modifier.fillMaxSize()) {
                     Icon(
                         modifier = Modifier.align(Alignment.Center),
                         imageVector = vectorResource(id = R.drawable.ic_alipay),
-                        tint = if (light) Color.White else alipayColor
+                        tint = if (light) Color.White else alipayColor,
+                        contentDescription = "支付宝支付"
                     )
                 }
             }
             // Wechat
             Surface(
                 color = if (light) wechatColor else MaterialTheme.colors.background,
-                modifier = Modifier.weight(1f).fillMaxWidth().clickable(
-                    onClick = onWechatPayClicked,
-                    indication = null
-                )
+                modifier = Modifier.weight(1f).fillMaxWidth()
+                    .tapGestureFilter { onWechatPayClicked() }
+//                    .clickable(onClick = onWechatPayClicked, indication = null)
             ) {
                 Box(Modifier.fillMaxSize()) {
                     Icon(
                         modifier = Modifier.align(Alignment.Center),
                         imageVector = vectorResource(id = R.drawable.ic_wechatpay),
-                        tint = if (light) Color.White else wechatColor
+                        tint = if (light) Color.White else wechatColor,
+                        contentDescription = "微信支付"
                     )
                 }
             }
@@ -81,7 +83,9 @@ fun Donate(
             TopAppBar(
                 title = { Text("选择捐赠方式") },
                 navigationIcon = {
-                    IconButton(onClick = onClose) { Icon(imageVector = Icons.Filled.ArrowBack) }
+                    IconButton(onClick = onClose) {
+                        Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "返回")
+                    }
                 },
                 elevation = 0.dp,
                 backgroundColor = Color.Transparent,
