@@ -1,9 +1,10 @@
 package org.wvt.horizonmgr.ui.pacakgemanager
 
 import androidx.compose.animation.*
-import androidx.compose.animation.core.animateAsState
-import androidx.compose.foundation.ScrollableColumn
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
@@ -51,7 +52,7 @@ fun InstallPackage(packInfo: WebAPI.ICPackage, name: String, onFinished: () -> U
     var currentProgress by remember { mutableStateOf(0f) }
     var currentStepState by remember { mutableStateOf(0) } // 0: todoit, 1: doing, 2: failed
 
-    onActive {
+    DisposableEffect(Unit) {
         scope.launch {
             val task = webApi.downloadPackage(packInfo)
             task.progressChannel().receiveAsFlow().conflate().collect {
@@ -81,6 +82,9 @@ fun InstallPackage(packInfo: WebAPI.ICPackage, name: String, onFinished: () -> U
             totalProgress = 1f
             currentStep++
         }
+        onDispose {
+            // TODO: 2021/2/7 添加 Cancel 逻辑
+        }
     }
 
     Box(Modifier.fillMaxSize()) {
@@ -92,20 +96,23 @@ fun InstallPackage(packInfo: WebAPI.ICPackage, name: String, onFinished: () -> U
             }, navigationIcon = {
                 // 安装目前不可被取消
             }, backgroundColor = MaterialTheme.colors.surface)
-            Row(Modifier.height(2.dp).fillMaxWidth()) {
+            Row(
+                Modifier
+                    .height(2.dp)
+                    .fillMaxWidth()) {
                 AnimatedVisibility(
                     visible = totalProgress < 1f,
                     enter = fadeIn(),
                     exit = fadeOut()
                 ) {
                     LinearProgressIndicator(
-                        progress = animateAsState(totalProgress).value,
+                        progress = animateFloatAsState(totalProgress).value,
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
             }
-            ScrollableColumn(Modifier.fillMaxSize()) {
-                steps.forEachIndexed { index, step ->
+            LazyColumn(Modifier.fillMaxSize()) {
+                itemsIndexed(steps) { index, step ->
                     val state = when {
                         index == currentStep && currentStepState == 2 -> -1
                         index < currentStep -> 0 // finished
@@ -113,8 +120,10 @@ fun InstallPackage(packInfo: WebAPI.ICPackage, name: String, onFinished: () -> U
                         index > currentStep -> 2 // todoit
                         else -> -1
                     }
-                    val contentColor = animateAsState(if (state == 2) AmbientContentColor.current.copy(alpha = 0.5f)
-                    else MaterialTheme.colors.onSurface).value
+                    val contentColor = animateColorAsState(
+                        if (state == 2) AmbientContentColor.current.copy(alpha = 0.5f)
+                        else MaterialTheme.colors.onSurface
+                    ).value
                     ListItem(
                         modifier = Modifier.height(72.dp),
                         icon = {
@@ -133,7 +142,10 @@ fun InstallPackage(packInfo: WebAPI.ICPackage, name: String, onFinished: () -> U
                                     if (state == 1) {
                                         // Doing
                                         if (step.progressable)
-                                            CircularProgressIndicator(animateAsState(currentProgress).value)
+                                            CircularProgressIndicator(
+                                                animateFloatAsState(
+                                                    currentProgress
+                                                ).value)
                                         else CircularProgressIndicator()
                                     } else if (state == 0) {
                                         // Finished
@@ -151,7 +163,9 @@ fun InstallPackage(packInfo: WebAPI.ICPackage, name: String, onFinished: () -> U
         }
         AnimatedVisibility(
             visible = totalProgress >= 1f, enter = fadeIn(), exit = fadeOut(),
-            modifier = Modifier.align(Alignment.BottomEnd).padding(16.dp)
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(16.dp)
         ) {
             Button(onClick = onFinished) {
                 Text("完成")

@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.onCommit
 import androidx.compose.ui.platform.setContent
 import org.wvt.horizonmgr.dependenciesViewModel
@@ -18,8 +19,11 @@ class NewsContentActivity : AppCompatActivity() {
 
         setContent {
             val vm = dependenciesViewModel<NewsContentViewModel>()
-            onCommit(vm) {
+            DisposableEffect(vm) {
                 vm.refresh(id)
+                onDispose {
+                    // TODO: 2021/2/7 添加 Dispose 逻辑
+                }
             }
             AndroidHorizonManagerTheme {
                 Surface(color = MaterialTheme.colors.background) {

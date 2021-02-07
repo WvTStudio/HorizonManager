@@ -1,10 +1,7 @@
 package org.wvt.horizonmgr.ui.settings
 
 import androidx.compose.animation.*
-import androidx.compose.animation.core.LinearOutSlowInEasing
-import androidx.compose.animation.core.animateAsState
-import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -124,7 +121,7 @@ fun CustomTheme(requestClose: () -> Unit) {
                 }
             )
             Divider(Modifier.fillMaxWidth())
-            LazyColumn {
+            LazyColumn(Modifier.weight(1f)) {
                 item {
                     Text(
                         modifier = Modifier.padding(top = 16.dp, start = 24.dp),
@@ -258,7 +255,7 @@ private fun SelectColorItem(
     val shrinkTween = remember { tween<Float>(250, 0, LinearOutSlowInEasing) }
     val expandTween = remember { tween<Float>(250, 40, LinearOutSlowInEasing) }
     var pressed by remember { mutableStateOf(false) }
-    val scale = animateAsState(
+    val scale = animateFloatAsState(
         targetValue = if (selected) {
             if (pressed) 1f
             else 1.1f
@@ -371,7 +368,7 @@ private fun ColorItem(
     selected: Boolean,
     onSelect: () -> Unit
 ) {
-    val roundPercent = animateAsState(if (selected) 50 else 0).value
+    val roundPercent = animateIntAsState(if (selected) 50 else 0).value
     val contentColor = remember(color) { MaterialColors.contentColorFor(color) }
 
     Surface(

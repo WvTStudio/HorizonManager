@@ -186,7 +186,6 @@ fun FileSelector(onCancel: () -> Unit, onSelect: (String) -> Unit) {
         }
     }
 
-
     Column {
         CustomAppBar(
             onCancel = onCancel,
@@ -195,24 +194,30 @@ fun FileSelector(onCancel: () -> Unit, onSelect: (String) -> Unit) {
                 changeDepth(it + storageDepth)
             }
         )
-        Crossfade(current = subPaths) { subPaths ->
-            PathList(
-                modifier = Modifier.fillMaxSize(),
-                pinedPath = fixedPaths.fastMap { PathListEntry.Folder(it.name) },
-                entries = subPaths.fastMap {
-                    if (it.isDirectory) PathListEntry.Folder(it.name)
-                    else PathListEntry.File(it.name)
-                },
-                onPinnedFolderSelect = {
-                    changeHolderPath(fixedPaths[it])
-                },
-                onFolderSelect = {
-                    changeHolderPath(subPaths[it])
-                },
-                onFileSelect = {
-                    onSelect(subPaths[it].absolutePath)
+        Crossfade(current = isLoading) {
+            if (it) {
+                Box(Modifier.fillMaxSize(), Alignment.Center) {
+                    CircularProgressIndicator()
                 }
-            )
+            } else {
+                PathList(
+                    modifier = Modifier.fillMaxSize(),
+                    pinedPath = fixedPaths.fastMap { PathListEntry.Folder(it.name) },
+                    entries = subPaths.fastMap {
+                        if (it.isDirectory) PathListEntry.Folder(it.name)
+                        else PathListEntry.File(it.name)
+                    },
+                    onPinnedFolderSelect = {
+                        changeHolderPath(fixedPaths[it])
+                    },
+                    onFolderSelect = {
+                        changeHolderPath(subPaths[it])
+                    },
+                    onFileSelect = {
+                        onSelect(subPaths[it].absolutePath)
+                    }
+                )
+            }
         }
     }
 }
@@ -231,7 +236,14 @@ private fun CustomAppBar(
         Column {
             TopAppBar(
                 title = { Text("选择文件") },
-                navigationIcon = { IconButton(onClick = onCancel) { Icon(Icons.Filled.ArrowBack, "返回") } },
+                navigationIcon = {
+                    IconButton(onClick = onCancel) {
+                        Icon(
+                            Icons.Filled.ArrowBack,
+                            "返回"
+                        )
+                    }
+                },
                 backgroundColor = Color.Transparent,
                 elevation = 0.dp
             )
@@ -270,45 +282,41 @@ private fun PathTab(
         }
     }
 
-    LazyRow(verticalAlignment = Alignment.CenterVertically) {
-        // TODO: 2021/2/6 改成 Lazy 模式
-        item {
-            // heading padding
-            Spacer(modifier = Modifier.width(72.dp))
-            data.paths.forEachIndexed { index, pathName ->
-                Box(
-                    modifier = Modifier
-                        .tapGestureFilter { onSelectDepth(index) }
-                        .onGloballyPositioned { sizes.add(index, it.size.width) },
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        modifier = Modifier.padding(top = 16.dp, bottom = 16.dp),
-                        text = pathName,
-                        color = animateColorAsState(
-                            if (data.depth == index) MaterialTheme.colors.onSurface
-                            else MaterialTheme.colors.onSurface.copy(alpha = 0.5f)
-                        ).value // 选中高亮
-                    )
-                }
-
-                // paths.size = 1:
-                //     index: 0 (>)
-                //     size:  1 (>)
-                // paths.size = 4:
-                //     index: 0 > 1 > 2 > 3 (>)
-                //     size:  4 > 4 > 4 > 4 (>)
-                if (index + 1 < data.paths.size) {
-                    Icon(
-                        modifier = Modifier.padding(start = 8.dp, end = 8.dp),
-                        imageVector = Icons.Filled.ChevronRight,
-                        tint = MaterialTheme.colors.onSurface.copy(alpha = 0.5f),
-                        contentDescription = null
-                    )
-                }
+    LazyRow(
+        verticalAlignment = Alignment.CenterVertically,
+        contentPadding = PaddingValues(start = 72.dp, end = 32.dp)
+    ) {
+        itemsIndexed(data.paths) { index, item ->
+            Box(
+                modifier = Modifier
+                    .tapGestureFilter { onSelectDepth(index) }
+                    .onGloballyPositioned { sizes.add(index, it.size.width) },
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    modifier = Modifier.padding(top = 16.dp, bottom = 16.dp),
+                    text = item,
+                    color = animateColorAsState(
+                        if (data.depth == index) MaterialTheme.colors.onSurface
+                        else MaterialTheme.colors.onSurface.copy(alpha = 0.5f)
+                    ).value // 选中高亮
+                )
             }
-            // trailing padding
-            Spacer(modifier = Modifier.width(32.dp))
+
+            // paths.size = 1:
+            //     index: 0 (>)
+            //     size:  1 (>)
+            // paths.size = 4:
+            //     index: 0 > 1 > 2 > 3 (>)
+            //     size:  4 > 4 > 4 > 4 (>)
+            if (index + 1 < data.paths.size) {
+                Icon(
+                    modifier = Modifier.padding(start = 8.dp, end = 8.dp),
+                    imageVector = Icons.Filled.ChevronRight,
+                    tint = MaterialTheme.colors.onSurface.copy(alpha = 0.5f),
+                    contentDescription = null
+                )
+            }
         }
     }
 }
@@ -347,26 +355,30 @@ private fun PathList(
         Divider(Modifier.padding(top = 8.dp, bottom = 8.dp))
     }
 
-    if (entries.isEmpty()) {
-        // 如果子文件是空的，那么 LazyColumnForIndex 不会触发，需要手动检测
-        Column(modifier) {
-            header()
-            Box(Modifier.fillMaxSize()) {
-                Text(
-                    modifier = Modifier.align(Alignment.Center),
-                    text = "空文件夹"
-                )
+    Crossfade(current = entries) { entries->
+        if (entries.isEmpty()) {
+            // 如果子文件是空的，那么 LazyColumnForIndex 不会触发，需要手动检测
+            Column(modifier) {
+                header()
+                Box(Modifier.fillMaxSize()) {
+                    Text(
+                        modifier = Modifier.align(Alignment.Center),
+                        text = "空文件夹"
+                    )
+                }
             }
-        }
-    } else {
-        LazyColumn(modifier) {
-            itemsIndexed(entries) { index, item ->
-                if (index == 0) header()
-                if (item is PathListEntry.Folder) {
-                    FolderItem(name = item.name, onClick = { onFolderSelect(index) },
-                        isStared = false, onStarChange = {})
-                } else if (item is PathListEntry.File) {
-                    FileEntry(name = item.name, onClick = { onFileSelect(index) })
+        } else {
+            LazyColumn(modifier) {
+                item {
+                    header()
+                }
+                itemsIndexed(entries) { index, item ->
+                    if (item is PathListEntry.Folder) {
+                        FolderItem(name = item.name, onClick = { onFolderSelect(index) },
+                            isStared = false, onStarChange = {})
+                    } else if (item is PathListEntry.File) {
+                        FileEntry(name = item.name, onClick = { onFileSelect(index) })
+                    }
                 }
             }
         }

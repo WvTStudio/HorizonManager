@@ -1,9 +1,10 @@
 package org.wvt.horizonmgr.ui.joingroup
 
-import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -25,8 +26,10 @@ internal fun GroupList(
     groups: List<WebAPI.QQGroupEntry>,
     onGroupSelect: (url: WebAPI.QQGroupEntry) -> Unit
 ) {
-    ScrollableColumn(Modifier.fillMaxSize()) {
-        groups.forEach {
+    LazyColumn(modifier = Modifier.fillMaxSize()) {
+        // use `item` for separate elements like headers
+        // and `items` for lists of identical elements
+        items(groups) {
             GroupItem(
                 onClicked = { onGroupSelect(it) },
                 avatarUrl = it.avatar,

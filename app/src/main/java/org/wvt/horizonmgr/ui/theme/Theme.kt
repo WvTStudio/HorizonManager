@@ -1,6 +1,6 @@
 package org.wvt.horizonmgr.ui.theme
 
-import androidx.compose.animation.animateAsState
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.material.Colors
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
@@ -41,18 +41,18 @@ fun HorizonManagerTheme(
 ) {
     val targetColors = if (config.isDark) config.darkColor else config.lightColor
     val colors = Colors(
-        primary = animateAsState(targetColors.primary).value,
-        primaryVariant = animateAsState(targetColors.primaryVariant).value,
-        secondary = animateAsState(targetColors.secondary).value,
-        secondaryVariant = animateAsState(targetColors.secondaryVariant).value,
-        background = animateAsState(targetColors.background).value,
-        surface = animateAsState(targetColors.surface).value,
-        error = animateAsState(targetColors.error).value,
-        onPrimary = animateAsState(targetColors.onPrimary).value,
-        onSecondary = animateAsState(targetColors.onSecondary).value,
-        onBackground = animateAsState(targetColors.onBackground).value,
-        onSurface = animateAsState(targetColors.onSurface).value,
-        onError = animateAsState(targetColors.onError).value,
+        primary = animateColorAsState(targetColors.primary).value,
+        primaryVariant = animateColorAsState(targetColors.primaryVariant).value,
+        secondary = animateColorAsState(targetColors.secondary).value,
+        secondaryVariant = animateColorAsState(targetColors.secondaryVariant).value,
+        background = animateColorAsState(targetColors.background).value,
+        surface = animateColorAsState(targetColors.surface).value,
+        error = animateColorAsState(targetColors.error).value,
+        onPrimary = animateColorAsState(targetColors.onPrimary).value,
+        onSecondary = animateColorAsState(targetColors.onSecondary).value,
+        onBackground = animateColorAsState(targetColors.onBackground).value,
+        onSurface = animateColorAsState(targetColors.onSurface).value,
+        onError = animateColorAsState(targetColors.onError).value,
         isLight = targetColors.isLight
     )
     Providers(

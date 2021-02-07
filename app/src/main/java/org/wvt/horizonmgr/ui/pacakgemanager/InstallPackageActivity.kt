@@ -60,7 +60,7 @@ class InstallPackageActivity : AppCompatActivity() {
                     val webApi = AmbientWebAPI.current
                     val horizonMgr = AmbientHorizonManager.current
 
-                    onActive {
+                    DisposableEffect(Unit) {
                         onBackPressedDispatcher.addCallback(object : OnBackPressedCallback(true) {
                             override fun handleOnBackPressed() {
                                 when (screen) {
@@ -85,6 +85,9 @@ class InstallPackageActivity : AppCompatActivity() {
                                     it.recommended
                                 )
                             }
+                        }
+                        onDispose {
+                            // TODO: 2021/2/7 添加 Dispose 逻辑
                         }
                     }
 

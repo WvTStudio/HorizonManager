@@ -1,7 +1,6 @@
 package org.wvt.horizonmgr.ui.news
 
 import androidx.compose.animation.Crossfade
-import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -45,12 +44,11 @@ fun NewsContent(
                 }
             } else {
                 LazyColumn(modifier = Modifier.fillMaxSize()) {
-                    // use `item` for separate elements like headers
-                    // and `items` for lists of identical elements
                     item {
                         NetworkImage(
-                            modifier = Modifier.padding(16.dp)
-                                .fillMaxWidth()
+                            modifier = Modifier
+                                .padding(16.dp)
+                                .fillParentMaxWidth()
                                 .aspectRatio(16f / 9f)
                                 .clip(RoundedCornerShape(4.dp)),
                             url = news.coverUrl,
@@ -83,13 +81,17 @@ fun NewsContent(
                         )*/
 
                         Divider(
-                            Modifier.padding(top = 24.dp).fillMaxWidth(0.8f)
+                            Modifier
+                                .padding(top = 24.dp)
+                                .fillParentMaxWidth(0.8f)
                                 .align(Alignment.CenterHorizontally)
                         )
 
                         // Content
                         Text(
-                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 24.dp),
+                            modifier = Modifier
+                                .padding(horizontal = 16.dp, vertical = 24.dp)
+                                .fillParentMaxWidth(),
                             text = news.content,
                             style = MaterialTheme.typography.body1,
                             color = MaterialTheme.colors.onSurface.copy(0.74f)
@@ -109,7 +111,9 @@ private fun Label(
     Column(modifier.wrapContentSize(unbounded = true)) {
         Text(modifier = Modifier.wrapContentWidth(), text = text)
         Surface(
-            modifier = Modifier.fillMaxWidth().height(8.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(8.dp),
             color = MaterialTheme.colors.secondary,
             content = emptyContent()
         )

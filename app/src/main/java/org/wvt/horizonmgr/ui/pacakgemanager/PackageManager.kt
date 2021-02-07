@@ -47,9 +47,12 @@ fun PackageManager(
 
     val vm = dependenciesViewModel<PackageManagerViewModel>()
 
-    onCommit(selectedPackageUUID) {
+    DisposableEffect(selectedPackageUUID) {
         vm.setSelectedPackage(selectedPackageUUID)
         vm.loadPackages()
+        onDispose {
+            // TODO: 2021/2/7 添加 Dispose 逻辑
+        }
     }
 
     val vmPackages by vm.packages.collectAsState()
