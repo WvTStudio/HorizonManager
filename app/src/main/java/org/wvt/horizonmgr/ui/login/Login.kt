@@ -23,22 +23,7 @@ import org.wvt.horizonmgr.R
 import org.wvt.horizonmgr.dependenciesViewModel
 import org.wvt.horizonmgr.legacyservice.WebAPI
 
-private val rotation = FloatPropKey()
-private val rotationDefinition = transitionDefinition<Int> {
-    state(0) { this[rotation] = 0f }
-    state(1) { this[rotation] = 360f }
-
-    transition(0 to 1) {
-        rotation using infiniteRepeatable(
-            animation = tween(
-                durationMillis = 5000,
-                easing = LinearEasing
-            )
-        )
-    }
-}
-
-@OptIn(ExperimentalAnimationApi::class, ExperimentalMaterialApi::class)
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun Login(
     onLoginSuccess: (WebAPI.UserInfo) -> Unit,
@@ -52,9 +37,19 @@ fun Login(
     var screen by remember { mutableStateOf(0) }
     val gearResource = loadVectorResource(id = R.drawable.ic_gear_full).resource.resource
 
-    val rotateGear = transition(definition = rotationDefinition, initState = 0, toState = 1)
+    val gearRotation = rememberInfiniteTransition().animateFloat(
+        initialValue = 0f,
+        targetValue = 360f,
+        animationSpec = InfiniteRepeatableSpec(
+            tween(
+                durationMillis = 5000,
+                easing = LinearEasing
+            ),
+            RepeatMode.Restart
+        )
+    ).value
 
-    onActive {
+    DisposableEffect(Unit) {
         context.onBackPressedDispatcher.addCallback(object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 if (screen == 1) {
@@ -64,7 +59,9 @@ fun Login(
                 }
             }
         })
-
+        onDispose {
+            // TODO: 2021/2/7 添加 Dispose 逻辑
+        }
     }
 
     Box(Modifier.fillMaxSize()) {
@@ -74,7 +71,7 @@ fun Login(
                 Modifier
                     .size(256.dp)
                     .offset(x = 128.dp)
-                    .graphicsLayer(rotationZ = rotateGear[rotation])
+                    .graphicsLayer(rotationZ = gearRotation)
                     .align(Alignment.TopEnd)
             ) {
                 Box(
@@ -91,7 +88,7 @@ fun Login(
                 Modifier
                     .size(256.dp)
                     .offset(x = (-128).dp)
-                    .graphicsLayer(rotationZ = rotateGear[rotation])
+                    .graphicsLayer(rotationZ = gearRotation)
                     .align(Alignment.BottomStart)
             ) {
                 Box(
