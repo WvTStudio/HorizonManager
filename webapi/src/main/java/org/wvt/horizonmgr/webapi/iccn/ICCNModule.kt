@@ -8,12 +8,10 @@ import io.ktor.client.request.forms.*
 import io.ktor.client.statement.*
 import io.ktor.content.*
 import io.ktor.http.*
+import io.ktor.utils.io.errors.*
 import org.json.JSONException
 import org.json.JSONObject
-import org.wvt.horizonmgr.webapi.JsonParseException
-import org.wvt.horizonmgr.webapi.ServerException
-import org.wvt.horizonmgr.webapi.ServiceException
-import org.wvt.horizonmgr.webapi.forEach
+import org.wvt.horizonmgr.webapi.*
 
 /**
  * 该类是 ICCN Forum 的 API
@@ -45,17 +43,26 @@ class ICCNModule {
      * ```
      *
      * @throws [LoginFailedException] 登录失败
+     * [NetworkException] 网络错误
+     * [JsonParseException] 解析 Json 时出错
      */
     suspend fun login(account: String, password: String): UserClient {
-        val jsonStr = client.submitForm<String>(
-            url = "https://adodoz.cn/app_login.php",
-            formParameters = Parameters.build {
-                set("username", account)
-                set("password", password)
-            }
-        )
-
-        val json = JSONObject(jsonStr)
+        val jsonStr = try {
+            client.submitForm<String>(
+                url = "https://adodoz.cn/app_login.php",
+                formParameters = Parameters.build {
+                    set("username", account)
+                    set("password", password)
+                }
+            )
+        } catch (e: IOException) {
+            throw NetworkException("发送登录数据失败", e)
+        }
+        val json = try {
+            JSONObject(jsonStr)
+        } catch (e: JSONException) {
+            throw JsonParseException(jsonStr, e)
+        }
         val status = try {
             json.getInt("status")
         } catch (e: JSONException) {
@@ -134,16 +141,20 @@ class ICCNModule {
      * ```
      *
      * @return UID
-     * @throws [RegisterFailedException] 服务器返回了注册失败的消息。
-     *
-     * [RegisterFailedException.errors] 属性包含了服务器返回的所有导致注册失败的因素
+     * @throws [RegisterFailedException] 服务器返回了注册失败的消息。RegisterFailedException.errors 属性包含了服务器返回的所有导致注册失败的因素
+     * [NetworkException] 网络错误
+     * [JsonParseException] 解析 Json 时出错
      */
     suspend fun register(username: String, email: String, password: String): String {
         // Step 1 - Get session and token
         val session: String
         val token: String
 
-        val homePageResponse = client.get<HttpResponse>("https://adodoz.cn")
+        val homePageResponse = try {
+            client.get<HttpResponse>("https://adodoz.cn")
+        } catch (e: IOException) {
+            throw NetworkException("获取 ICCN 主页失败", e)
+        }
         session = homePageResponse.headers["set-cookie"]
             ?.takeIf { it.contains("flarum_session") }
             ?: throw ServerException("session not found")
@@ -151,28 +162,32 @@ class ICCNModule {
             ?: throw ServerException("token not found")
 
         // Step 2 - Register
-        val regResponse = client.post<HttpResponse>("https://adodoz.cn/register") {
-            body = TextContent(
-                contentType = ContentType.Application.Json,
-                text = JSONObject().apply {
-                    put("username", username)
-                    put("email", email)
-                    put("password", password)
-                }.toString()
-            )
-            headers {
-                set("referer", "https://adodoz.cn/")
-                set("cookie", session)
-                set("user-agent", "Horizon Manager")
-                set("x-csrf-token", token)
+        val regResponse = try {
+            client.post<HttpResponse>("https://adodoz.cn/register") {
+                body = TextContent(
+                    contentType = ContentType.Application.Json,
+                    text = JSONObject().apply {
+                        put("username", username)
+                        put("email", email)
+                        put("password", password)
+                    }.toString()
+                )
+                headers {
+                    set("referer", "https://adodoz.cn/")
+                    set("cookie", session)
+                    set("user-agent", "Horizon Manager")
+                    set("x-csrf-token", token)
+                }
             }
+        } catch (e: IOException) {
+            throw NetworkException("发送注册数据失败", e)
         }
 
         // Step3 - Parse register result
         val responseContent = regResponse.readText()
         if (regResponse.status.value == 201) {
             // succeed
-            val id = try {
+            return try {
                 JSONObject(responseContent)
                     .getJSONObject("data")
                     .getString("id")
@@ -180,7 +195,6 @@ class ICCNModule {
                 // Generally, the cause is that "id" does not exist.
                 throw JsonParseException(responseContent, e)
             }
-            return id
         } else {
             // error
             val errors = mutableListOf<RegisterErrorEntry>()

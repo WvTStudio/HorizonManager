@@ -1,5 +1,6 @@
 package org.wvt.horizonmgr.ui.login
 
+import android.util.Log
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.SnackbarHostState
 import androidx.lifecycle.ViewModel
@@ -8,34 +9,43 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import org.wvt.horizonmgr.DependenciesContainer
-import org.wvt.horizonmgr.legacyservice.WebAPI
 import org.wvt.horizonmgr.ui.components.FabState
+import org.wvt.horizonmgr.webapi.NetworkException
+import org.wvt.horizonmgr.webapi.iccn.ICCNModule
+
+private const val TAG = "LoginViewModelLogger"
 
 class LoginViewModel(private val dependencies: DependenciesContainer) : ViewModel() {
-    private val webApi = dependencies.webapi
+    private val iccn = dependencies.iccn
     val fabState = MutableStateFlow<FabState>(FabState.TODO)
 
-    @OptIn(ExperimentalMaterialApi::class)
     fun login(
         account: String,
         password: String,
         snackbarHostState: SnackbarHostState,
-        onLoginSuccess: (WebAPI.UserInfo) -> Unit
+        onLoginSuccess: (account: String, avatar: String?, name: String, uid: String) -> Unit
     ) {
-        // TODO: 2020/11/13 要不要解耦啊？我也不知道
         viewModelScope.launch {
             fabState.value = FabState.LOADING
             val userInfo = try {
-                webApi.login(account, password)
-            } catch (e: WebAPI.WebAPIException) {
+                iccn.login(account, password)
+            } catch (e: ICCNModule.LoginFailedException) {
                 fabState.value = FabState.FAILED
                 launch {
-                    snackbarHostState.showSnackbar(e.message, "确定")
+                    snackbarHostState.showSnackbar("账号或密码错误", "确定")
+                    fabState.value = FabState.TODO
+                }
+                return@launch
+            } catch (e: NetworkException) {
+                Log.d(TAG, "登录失败，网络错误", e)
+                fabState.value = FabState.FAILED
+                launch {
+                    snackbarHostState.showSnackbar("网络错误，请稍后重试", "确定")
                     fabState.value = FabState.TODO
                 }
                 return@launch
             } catch (e: Exception) {
-                e.printStackTrace()
+                Log.d(TAG, "注册失败，未知错误", e)
                 fabState.value = FabState.FAILED
                 launch {
                     snackbarHostState.showSnackbar("未知错误，请稍后重试", "确定")
@@ -46,7 +56,7 @@ class LoginViewModel(private val dependencies: DependenciesContainer) : ViewMode
             fabState.value = FabState.SUCCEED
             launch { snackbarHostState.showSnackbar("登录成功") }
             delay(800)
-            onLoginSuccess(userInfo)
+            onLoginSuccess(userInfo.account, userInfo.avatarUrl, userInfo.name, userInfo.uid)
         }
     }
 
@@ -68,18 +78,20 @@ class LoginViewModel(private val dependencies: DependenciesContainer) : ViewMode
                 fabState.value = FabState.TODO
             } else {
                 val uid = try {
-                    webApi.register(username, email, pass)
-                } catch (e: WebAPI.RegisterException) {
+                    iccn.register(username, email, pass)
+                } catch (e: ICCNModule.RegisterFailedException) {
                     fabState.value = FabState.FAILED
                     snackbarHostState.showSnackbar(e.errors.first().detail, "确认")
                     fabState.value = FabState.TODO
                     return@launch
-                } catch (e: WebAPI.NetworkException) {
+                } catch (e: NetworkException) {
+                    Log.e(TAG, "注册失败，网络错误", e)
                     fabState.value = FabState.FAILED
-                    snackbarHostState.showSnackbar(e.message, "确认")
+                    snackbarHostState.showSnackbar("网络错误，请稍后重试", "确认")
                     fabState.value = FabState.TODO
                     return@launch
                 } catch (e: Exception) {
+                    Log.d(TAG, "注册失败，未知错误", e)
                     fabState.value = FabState.FAILED
                     snackbarHostState.showSnackbar("未知错误，请稍后重试", "确认")
                     fabState.value = FabState.TODO

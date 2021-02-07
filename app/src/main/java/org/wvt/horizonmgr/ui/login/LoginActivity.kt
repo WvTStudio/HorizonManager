@@ -44,13 +44,13 @@ class LoginActivity : AppCompatActivity() {
         finish()
     }
 
-    private fun onLoginSuccess(userInfo: WebAPI.UserInfo) {
+    private fun onLoginSuccess(account: String, avatar: String?, name: String, uid: String) {
         setResult(LOGIN_SUCCESS,
             Intent().apply {
-                putExtra("id", userInfo.id)
-                putExtra("name", userInfo.name)
-                putExtra("account", userInfo.account)
-                putExtra("avatarUrl", userInfo.avatarUrl)
+                putExtra("id", uid)
+                putExtra("name", name)
+                putExtra("account", account)
+                putExtra("avatarUrl", avatar)
             }
         )
         finish()

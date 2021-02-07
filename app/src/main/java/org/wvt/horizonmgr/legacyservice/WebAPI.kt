@@ -23,6 +23,7 @@ import java.net.URL
 import java.net.URLEncoder
 import kotlin.coroutines.EmptyCoroutineContext
 
+@Deprecated("Deprecated")
 class WebAPI private constructor(context: Context) {
     companion object {
         private var instance: WeakReference<WebAPI?> = WeakReference(null)

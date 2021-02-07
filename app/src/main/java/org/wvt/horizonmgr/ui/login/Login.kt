@@ -26,7 +26,7 @@ import org.wvt.horizonmgr.legacyservice.WebAPI
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun Login(
-    onLoginSuccess: (WebAPI.UserInfo) -> Unit,
+    onLoginSuccess: (account: String, avatar: String?, name: String, uid: String) -> Unit,
     onCancel: () -> Unit
 ) {
     val context = AmbientContext.current as ComponentActivity
