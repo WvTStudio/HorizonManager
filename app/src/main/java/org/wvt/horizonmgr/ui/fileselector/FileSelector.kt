@@ -2,7 +2,6 @@ package org.wvt.horizonmgr.ui.fileselector
 
 import android.os.Environment
 import androidx.compose.animation.Crossfade
-import androidx.compose.animation.animateAsState
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -339,7 +338,7 @@ private fun PathList(
             style = MaterialTheme.typography.subtitle1
         )
         pinedPath.fastForEachIndexed { index, folder ->
-            FolderEntry(name = folder.name,
+            FolderItem(name = folder.name,
                 onClick = { onPinnedFolderSelect(index) },
                 isStared = true,
                 onStarChange = {}
@@ -364,7 +363,7 @@ private fun PathList(
             itemsIndexed(entries) { index, item ->
                 if (index == 0) header()
                 if (item is PathListEntry.Folder) {
-                    FolderEntry(name = item.name, onClick = { onFolderSelect(index) },
+                    FolderItem(name = item.name, onClick = { onFolderSelect(index) },
                         isStared = false, onStarChange = {})
                 } else if (item is PathListEntry.File) {
                     FileEntry(name = item.name, onClick = { onFileSelect(index) })

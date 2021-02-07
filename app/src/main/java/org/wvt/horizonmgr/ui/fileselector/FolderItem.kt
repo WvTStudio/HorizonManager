@@ -2,7 +2,6 @@ package org.wvt.horizonmgr.ui.fileselector
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.*
-import androidx.compose.animation.transition
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -28,6 +27,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.util.lerp
+import kotlinx.coroutines.launch
 import org.wvt.horizonmgr.ui.theme.PreviewTheme
 
 /**
@@ -35,13 +36,13 @@ import org.wvt.horizonmgr.ui.theme.PreviewTheme
  */
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-internal fun FolderEntry(
+internal fun FolderItem(
     name: String,
     onClick: () -> Unit,
     isStared: Boolean,
     onStarChange: (isStared: Boolean) -> Unit,
 ) {
-    val swipePoint = with(AmbientDensity.current) { 72.dp.toPx() }
+    val swipePoint = with(AmbientDensity.current) { 74.dp.toPx() }
     val anchors = mapOf(0f to 0, -swipePoint to 1)
 
     val state = rememberSwipeableState(0) {
@@ -87,43 +88,10 @@ private enum class IconState {
     OFF, ON
 }
 
-private val iconScaleKey = FloatPropKey("Icon Scale")
-
-private val iconTransition = transitionDefinition<IconState> {
-    state(IconState.OFF) {
-        set(iconScaleKey, 1f)
-    }
-    state(IconState.ON) {
-        set(iconScaleKey, 1f)
-    }
-    transition(
-        IconState.ON to IconState.OFF,
-        IconState.OFF to IconState.ON
-    ) {
-        iconScaleKey using keyframes {
-            durationMillis = 160
-            1f at 0
-            1.2f at 80 with FastOutLinearInEasing
-            1f at 160 with LinearOutSlowInEasing
-        }
-    }
-}
-
-private fun getTransition(
-    start: Int, end: Int
-): TransitionDefinition<String> = transitionDefinition {
-    state("start") {
-        set(sizeKey, start.toFloat())
-    }
-    state("end") {
-        set(sizeKey, end.toFloat())
-    }
-    transition {
-        sizeKey using tween()
-    }
-}
-
-private val sizeKey = FloatPropKey(label = "size")
+data class Ripple(
+    val check: Boolean,
+    val animatable: Animatable<Float, AnimationVector1D>
+)
 
 /**
  * check 状态：
@@ -154,67 +122,77 @@ private fun ToggleBackgroundWithIcon(
     iconActiveColor: Color = contentColorFor(activeColor),
     iconInactiveColor: Color = contentColorFor(inactiveColor)
 ) {
-    val density = AmbientDensity.current
+    val scope = rememberCoroutineScope()
+    // 当动画结束时，checkState 才会被实际应用成 check，背景色将根据此状态，在动画结束时改变
     var checkState by remember { mutableStateOf(check) }
-
-    // 背景色会在涟漪结束后变换
-    val backgroundColor = if (checkState) activeColor
-    else inactiveColor
-
-    val rippleColor = if (check) activeColor
-    else inactiveColor
-
-    var rippleStart by remember { mutableStateOf(false) }
+    val ripples = remember { mutableSetOf<Ripple>() }
 
     DisposableEffect(check) {
-        rippleStart = true
+        scope.launch {
+            val animatable = Animatable(0f)
+            val ripple = Ripple(check, animatable)
+            ripples.add(ripple)
+            try {
+                animatable.animateTo(1f, tween())
+                animatable.snapTo(0f)
+                checkState = check
+            } finally {
+                ripples.remove(ripple)
+            }
+        }
         onDispose { }
     }
 
-    Box(modifier.background(backgroundColor)) {
+    Box(
+        modifier.background(
+            if (checkState) activeColor
+            else inactiveColor
+        )
+    ) {
+        // Ripple
         BoxWithConstraints {
-            val tr = transition(
-                definition = getTransition(0, (constraints.maxHeight + constraints.maxWidth) * 2),
-                initState = if (rippleStart) "start" else "end",
-                toState = "end",
-                onStateChangeFinished = {
-                    checkState = check
-                    rippleStart = false
-                }
-            )
-            val padding = 36.dp
-            Layout(
-                modifier = Modifier.graphicsLayer(clip = true),
-                content = {
-                    Box(
-                        modifier = Modifier
-                            .clip(CircleShape)
-                            .background(rippleColor)
-                            .size(with(density) { tr[sizeKey].toDp() })
-                    )
-                }
-            ) { list: List<Measurable>, constraints: Constraints ->
-                val p = list[0].measure(constraints)
-                layout(constraints.maxWidth, constraints.maxHeight) {
-                    p.place(
-                        x = if (gravity == Alignment.Start) {
-                            padding.toIntPx() - p.width / 2
-                        } else {
-                            constraints.maxWidth - padding.toIntPx() - p.width / 2
-                        },
-                        y = (constraints.maxHeight - p.height) / 2
-                    )
+            for (ripple in ripples) {
+                val rippleSizePx = lerp(
+                    0,
+                    (constraints.maxHeight + constraints.maxWidth) * 2,
+                    ripple.animatable.value
+                )
+                val padding = 40.dp
+                Layout(
+                    modifier = Modifier.graphicsLayer(clip = true),
+                    content = {
+                        // 涟漪
+                        Box(
+                            modifier = Modifier
+                                .clip(CircleShape)
+                                .background(if (ripple.check) activeColor else inactiveColor)
+                                .size(with(AmbientDensity.current) { rippleSizePx.toDp() })
+                        )
+                    }
+                ) { list: List<Measurable>, constraints: Constraints ->
+                    val p = list[0].measure(constraints)
+                    layout(constraints.maxWidth, constraints.maxHeight) {
+                        p.place(
+                            x = if (gravity == Alignment.Start) {
+                                padding.toIntPx() - p.width / 2
+                            } else {
+                                constraints.maxWidth - padding.toIntPx() - p.width / 2
+                            },
+                            y = (constraints.maxHeight - p.height) / 2
+                        )
+                    }
                 }
             }
         }
 
+        // Icon
         SwitchIcon(
             modifier = Modifier
                 .align(
                     if (gravity == Alignment.Start) Alignment.CenterStart
                     else Alignment.CenterEnd
                 )
-                .padding(horizontal = 24.dp),
+                .padding(horizontal = 28.dp),
             isActive = check,
             activeIcon = Icons.Filled.Star,
             activeColor = iconActiveColor,
@@ -247,7 +225,7 @@ private fun SwitchIcon(
             keyframes {
                 durationMillis = 160
                 1f at 0
-                1.2f at 80 with FastOutLinearInEasing
+                1.2f at 40 with FastOutLinearInEasing
                 1f at 160 with LinearOutSlowInEasing
             }
         },
@@ -267,22 +245,11 @@ private fun SwitchIcon(
     )
 }
 
-/*private class ItemState {
-    @Volatile
-    private var cont: Continuation<Unit>? = null
-
-    suspend fun check() {
-        suspendCoroutine<Unit> {
-            cont = it
-        }
-    }
-}*/
-
 @Preview
 @Composable
 private fun FolderEntryPreview() {
     PreviewTheme(Modifier) {
-        FolderEntry(
+        FolderItem(
             name = "Test File",
             onClick = {},
             isStared = false,
