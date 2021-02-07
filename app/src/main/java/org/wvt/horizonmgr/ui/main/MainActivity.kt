@@ -2,14 +2,17 @@ package org.wvt.horizonmgr.ui.main
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.savedinstancestate.savedInstanceState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.tooling.preview.Preview
-import org.wvt.horizonmgr.HorizonManagerApplication
+import androidx.compose.ui.unit.dp
 import org.wvt.horizonmgr.R
 import org.wvt.horizonmgr.dependenciesViewModel
 import org.wvt.horizonmgr.ui.AndroidDependenciesProvider
@@ -123,15 +126,20 @@ private fun NewVersionDialog(
     MyAlertDialog(
         title = { Text("发现新版本") },
         text = {
-            Text(
-                """
-                    版本名：${versionName}
-                    版本号：${versionCode}
-                    更新日志：${changelog}
-                """.trimIndent()
-            )
+            LazyColumn(Modifier.fillMaxHeight(0.6f)) {
+                item {
+                    Text(
+                        """
+                        |版本名：${versionName}
+                        |版本号：${versionCode}
+                        |更新日志：
+                        |${changelog}
+                        """.trimMargin()
+                    )
+                }
+            }
         },
-        onDismissRequest = {},
+        onDismissRequest = onConfirm,
         confirmButton = {
             TextButton(onClick = onConfirm) {
                 Text("确定")
@@ -153,7 +161,44 @@ private fun NewVersionDialogPreview() {
             NewVersionDialog(
                 versionName = "2.0.0",
                 versionCode = 100,
-                changelog = "测试更新日志",
+                changelog = """
+                    社区界面
+                    - 将社区界面更换为 Jetpack Compose 方案
+                    - 添加 “开始新下载任务” 的对话框
+
+                    自定义主题
+                    - 改善切换夜间模式的代码逻辑
+                    - 更改主题颜色时可以平滑过渡
+
+                    加入群组界面
+                    - 网络出错时会显示错误而不是崩溃
+                    - QQ 无法打开时会显示错误而不是崩溃
+
+                    在线资源界面
+                    - 现在在未登录的状态下将不显示过滤按钮
+
+                    分包管理界面
+                    - 现在安装一个分包后，数据会自动刷新
+                    - 分包详情入口移至菜单
+                    - 分包详情将显示更多信息
+                    - 现在点击本地安装会打开文件选择页面，但功能未实现
+
+                    文件选择界面
+                    - 改进收藏文件夹的动画效果
+
+                    对话框界面
+                    - 进度对话框现在正确遵守 Material Design
+                    - 对话框现在以 24dp 的海拔显示
+                    - InputDialog 现在以 24dp 海拔显示
+
+                    模组管理界面
+                    - 使所有 Tab 的逻辑保持一致性
+                    - 在未选择分包的时候不会再显示安装按钮，且安装按钮只在 Mod Tab 显示
+
+                    其他
+                    - 改善错误提示的显示效果
+                    - 修复部分 Bug
+                """.trimIndent(),
                 onConfirm = {},
                 onIgnore = {}
             )
