@@ -75,8 +75,8 @@ android {
 dependencies {
     val composeVersion = "1.0.0-alpha11"
 
-//    implementation(project(":webapi"))
-//    implementation(project(":service"))
+    implementation(project(":webapi"))
+    implementation(project(":service"))
 
     implementation(platform("com.google.firebase:firebase-bom:26.1.0"))
 //    implementation("com.google.firebase:firebase-analytics-ktx")

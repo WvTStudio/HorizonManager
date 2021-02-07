@@ -21,7 +21,7 @@ class NewsContentViewModel(
     fun refresh(newsId: Int) {
         viewModelScope.launch {
             val content = try {
-                dependencies.webapi.getNewsContent(newsId)
+                dependencies.news.getNews(newsId)
             } catch (e: Exception) {
                 // TODO: 2020/11/3 添加错误信息
                 e.printStackTrace()

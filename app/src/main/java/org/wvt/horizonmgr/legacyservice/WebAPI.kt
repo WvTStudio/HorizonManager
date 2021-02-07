@@ -447,7 +447,7 @@ class WebAPI private constructor(context: Context) {
         val result = mutableListOf<News>()
 
         parseJson {
-            val json = JSONArray(response.content)
+            val json = JSONArray(response.content ?: error("Json string is null"))
             json.forEachIndexed<JSONObject> { index, item ->
                 val id = item.getInt("id")
                 val title = item.getString("title")

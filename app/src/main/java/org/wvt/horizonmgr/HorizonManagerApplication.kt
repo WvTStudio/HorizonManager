@@ -9,6 +9,12 @@ import androidx.lifecycle.ViewModelProvider
 import org.wvt.horizonmgr.legacyservice.HorizonManager
 import org.wvt.horizonmgr.legacyservice.LocalCache
 import org.wvt.horizonmgr.legacyservice.WebAPI
+import org.wvt.horizonmgr.webapi.iccn.ICCNModule
+import org.wvt.horizonmgr.webapi.mgrinfo.MgrInfoModule
+import org.wvt.horizonmgr.webapi.mod.ChineseModRepository
+import org.wvt.horizonmgr.webapi.mod.OfficialModCDNRepository
+import org.wvt.horizonmgr.webapi.news.MgrNewsModule
+import org.wvt.horizonmgr.webapi.pack.OfficialPackageCDNRepository
 
 class HorizonManagerApplication : Application() {
     companion object {
@@ -20,7 +26,7 @@ class HorizonManagerApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        container = DependenciesContainerImpl(this)
+        container = DependenciesContainer(this)
         dependenciesVMFactory = DependenciesVMFactory(container)
     }
 }
@@ -33,22 +39,51 @@ inline fun <reified T : ViewModel> dependenciesViewModel(): T {
 private class DependenciesVMFactory(
     private val dependenciesContainer: DependenciesContainer
 ) : ViewModelProvider.Factory {
-    override fun <T : ViewModel?> create(p0: Class<T>): T {
-        return p0.getConstructor(DependenciesContainer::class.java)
+
+    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+        return modelClass.getConstructor(DependenciesContainer::class.java)
             .newInstance(dependenciesContainer)
     }
 }
 
-private class DependenciesContainerImpl(private val context: Context) : DependenciesContainer {
-    override val horizonManager: HorizonManager by lazy {
+class DependenciesContainer internal constructor(private val context: Context) {
+    val horizonManager: HorizonManager by lazy {
         HorizonManager.getOrCreateInstance(context)
     }
 
-    override val localCache: LocalCache by lazy {
+    val localCache: LocalCache by lazy {
         LocalCache.createInstance(context)
     }
 
-    override val webapi: WebAPI by lazy {
+    val webapi: WebAPI by lazy {
         WebAPI.createInstance(context)
+    }
+
+    val manager by lazy {
+        org.wvt.horizonmgr.service.HorizonManager(context)
+    }
+
+    val packRepository by lazy {
+        OfficialPackageCDNRepository()
+    }
+
+    val chineseModRepository by lazy {
+        ChineseModRepository()
+    }
+
+    val cdnModRepository by lazy {
+        OfficialModCDNRepository()
+    }
+
+    val mgrInfo by lazy {
+        MgrInfoModule()
+    }
+
+    val iccn by lazy {
+        ICCNModule()
+    }
+
+    val news by lazy {
+        MgrNewsModule()
     }
 }

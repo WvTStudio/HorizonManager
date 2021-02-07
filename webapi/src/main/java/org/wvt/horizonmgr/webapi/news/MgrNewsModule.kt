@@ -51,7 +51,15 @@ class MgrNewsModule {
                 val brief = item.getString("brief")
                 val updateTime = item.getString("updateTime")
 
-                result.add(NewsSuggestion(id, title, brief, cover, updateTime))
+                result.add(
+                    NewsSuggestion(
+                        newsId = id,
+                        cover = cover,
+                        title = title,
+                        brief = brief,
+                        updateISOTime = updateTime
+                    )
+                )
             }
         }
 

@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
@@ -72,28 +73,35 @@ private fun NewsUI(
                     CircularProgressIndicator(Modifier.align(Alignment.Center))
                 }
                 is NewsViewModel.State.Succeed -> {
-                    LazyColumn(modifier = Modifier.fillMaxSize()) {
-                        item {
-                            news.forEach { item ->
-                                when (item) {
-                                    is NewsViewModel.News.Article -> {
-                                        NewsItem(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .padding(16.dp),
-                                            title = item.title,
-                                            brief = item.brief,
-                                            onClick = { onNewsClick(item) },
-                                            coverImage = {
-                                                NetworkImage(
-                                                    url = item.coverUrl,
-                                                    contentScale = ContentScale.Crop,
-                                                    contentDescription = "封面"
-                                                )
-                                            }
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(top = 8.dp, bottom = 8.dp)
+                    ) {
+                        items(news) { item ->
+                            when {
+                                item is NewsViewModel.News.Article && item.coverUrl != null -> NewsItem(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 8.dp, horizontal = 16.dp),
+                                    title = item.title,
+                                    brief = item.brief,
+                                    onClick = { onNewsClick(item) },
+                                    coverImage = {
+                                        NetworkImage(
+                                            url = item.coverUrl,
+                                            contentScale = ContentScale.Crop,
+                                            contentDescription = "封面"
                                         )
                                     }
-                                }
+                                )
+                                item is NewsViewModel.News.Article && item.coverUrl == null -> NewsItemNoCover(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 8.dp, horizontal = 16.dp),
+                                    title = item.title,
+                                    brief = item.brief,
+                                    onClick = { onNewsClick(item) }
+                                )
                             }
                         }
                     }
@@ -112,6 +120,39 @@ private fun NewsUI(
 }
 
 @Composable
+private fun NewsItemNoCover(
+    modifier: Modifier = Modifier,
+    title: String,
+    brief: String,
+    onClick: () -> Unit
+) {
+    val cutBrief = remember(brief) {
+        brief.take(160)
+    }
+    Card(modifier = modifier, elevation = 2.dp) {
+        Column(
+            modifier = Modifier
+                .clickable(onClick = onClick)
+                .wrapContentHeight()
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            // Title
+            Text(
+                text = title,
+                style = MaterialTheme.typography.subtitle1
+            )
+            // Brief
+            Text(
+                text = cutBrief,
+                style = MaterialTheme.typography.body2,
+                color = MaterialTheme.colors.onSurface.copy(ContentAlpha.medium)
+            )
+        }
+    }
+}
+
+@Composable
 private fun NewsItem(
     modifier: Modifier = Modifier,
     title: String,
@@ -120,12 +161,12 @@ private fun NewsItem(
     onClick: () -> Unit
 ) {
     val cutBrief = remember(brief) {
-        if (brief.length > 64) brief.substring(0, 160) + "..."
-        else brief
+        brief.take(160)
     }
-    Card(modifier = modifier.clickable(onClick = onClick), elevation = 2.dp) {
+    Card(modifier = modifier, elevation = 2.dp) {
         Box(
             Modifier
+                .clickable(onClick = onClick)
                 .fillMaxWidth()
                 .wrapContentHeight()
         ) {
@@ -133,7 +174,7 @@ private fun NewsItem(
             Surface(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .aspectRatio(4f / 3f),
+                    .aspectRatio(16f / 10f),
                 content = coverImage
             )
             Column(
@@ -174,7 +215,15 @@ private fun NewsPreview() {
                         0,
                         "Test article",
                         "Test brief",
-                        "http://aaa.aaa"
+                        "http://aaa.aaa",
+                        "2020-2020"
+                    ),
+                    NewsViewModel.News.Article(
+                        0,
+                        "Test article",
+                        "Test brief",
+                        "http://aaa.aaa",
+                        "2020-2020"
                     )
                 )
             },

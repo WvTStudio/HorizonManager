@@ -7,7 +7,16 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toJavaInstant
+import kotlinx.datetime.toJavaLocalDateTime
+import kotlinx.datetime.toLocalDateTime
 import org.wvt.horizonmgr.DependenciesContainer
+import java.text.SimpleDateFormat
+import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeFormatterBuilder
+import java.time.format.FormatStyle
+import java.util.*
 
 class NewsViewModel(
     private val dependencies: DependenciesContainer
@@ -21,7 +30,8 @@ class NewsViewModel(
             val id: Int,
             val title: String,
             val brief: String,
-            val coverUrl: String
+            val coverUrl: String?,
+            val updateTime: String
         ) : News()
     }
 
@@ -35,13 +45,21 @@ class NewsViewModel(
 
     val state: MutableStateFlow<State> = MutableStateFlow(State.Loading)
 
+    private val formatter = SimpleDateFormat.getDateInstance()
+
     fun refresh() {
         state.value = State.Loading
 
         viewModelScope.launch {
             val result = try {
-                dependencies.webapi.getNews().map { (id, title, brief, coverUrl) ->
-                    News.Article(id, title, brief, coverUrl)
+                dependencies.news.getNewsSuggestions().map {
+                    News.Article(
+                        it.newsId,
+                        it.title,
+                        it.brief,
+                        it.cover.takeIf { it.isNotBlank() },
+                        formatter.format(Date(it.updateTime.epochSeconds))
+                    )
                 }
             } catch (e: Exception) {
                 state.value = State.Error(e)
