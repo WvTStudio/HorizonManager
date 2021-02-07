@@ -40,7 +40,8 @@ fun RegisterPage(
             modifier = Modifier
                 .wrapContentWidth()
                 .fillMaxHeight()
-                .align(Alignment.Center)
+                .align(Alignment.Center),
+            verticalArrangement = Arrangement.Center
         ) {
             item {
                 Text("注册", color = MaterialTheme.colors.primary, fontSize = 64.sp)
@@ -53,7 +54,7 @@ fun RegisterPage(
                 Column(
                     modifier = Modifier
                         .wrapContentWidth()
-                        .fillMaxHeight(),
+                        .wrapContentHeight(),
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
