@@ -12,24 +12,25 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.AmbientContext
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import org.wvt.horizonmgr.BuildConfig
 import org.wvt.horizonmgr.R
 import org.wvt.horizonmgr.ui.components.AnimateLogo
 import org.wvt.horizonmgr.ui.components.HorizonDivider
-import org.wvt.horizonmgr.ui.theme.AmbientThemeConfig
-import org.wvt.horizonmgr.ui.theme.AmbientThemeController
+import org.wvt.horizonmgr.ui.theme.LocalThemeConfig
+import org.wvt.horizonmgr.ui.theme.LocalThemeController
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun Settings(
     requestCustomTheme: () -> Unit
 ) {
-    val context = AmbientContext.current as AppCompatActivity
+    val context = LocalContext.current as AppCompatActivity
     val versionName = remember { "Version " + BuildConfig.VERSION_NAME }
-    val themeController = AmbientThemeController.current
-    val themeConfig = AmbientThemeConfig.current
+    val themeController = LocalThemeController.current
+    val themeConfig = LocalThemeConfig.current
 
     Column(Modifier.fillMaxSize()) {
         TopAppBar(title = {}, navigationIcon = {
@@ -75,20 +76,21 @@ fun Settings(
             icon = { Icon(imageVector = Icons.Default.Timelapse, null) },
             text = { Text("夜间模式") },
             secondaryText = {
-                DropdownMenu(
-                    toggle = {
-                        Text(if (themeConfig.followSystemDarkMode) "跟随系统" else "自定义")
-                    },
-                    expanded = dropdownMenuExpanded,
-                    onDismissRequest = { dropdownMenuExpanded = false }) {
-                    DropdownMenuItem(onClick = {
-                        themeController.setFollowSystemDarkTheme(true)
-                        dropdownMenuExpanded = false
-                    }) { Text("跟随系统") }
-                    DropdownMenuItem(onClick = {
-                        themeController.setFollowSystemDarkTheme(false)
-                        dropdownMenuExpanded = false
-                    }) { Text("自定义") }
+                Box {
+                    Text(if (themeConfig.followSystemDarkMode) "跟随系统" else "自定义")
+                    DropdownMenu(
+                        expanded = dropdownMenuExpanded,
+                        onDismissRequest = { dropdownMenuExpanded = false }
+                    ) {
+                        DropdownMenuItem(onClick = {
+                            themeController.setFollowSystemDarkTheme(true)
+                            dropdownMenuExpanded = false
+                        }) { Text("跟随系统") }
+                        DropdownMenuItem(onClick = {
+                            themeController.setFollowSystemDarkTheme(false)
+                            dropdownMenuExpanded = false
+                        }) { Text("自定义") }
+                    }
                 }
             },
             trailing = {

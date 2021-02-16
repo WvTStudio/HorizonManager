@@ -21,9 +21,8 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import org.wvt.horizonmgr.dependenciesViewModel
 import org.wvt.horizonmgr.legacyservice.WebAPI
-import org.wvt.horizonmgr.ui.AmbientHorizonManager
-import org.wvt.horizonmgr.ui.AmbientWebAPI
 
 private data class Step(
     val icon: ImageVector,
@@ -32,14 +31,16 @@ private data class Step(
 )
 
 // TODO 反正是要改的 屎山就屎山吧
-@OptIn(ExperimentalAnimationApi::class)
+@OptIn(ExperimentalAnimationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun InstallPackage(packInfo: WebAPI.ICPackage, name: String, onFinished: () -> Unit) {
-    // TODO: 2020/11/5 使用 ViewModel 重写 
+    val vm = dependenciesViewModel<InstallPackageViewModel>()
+
+    // TODO: 2020/11/5 使用 ViewModel 重写
     var totalProgress by remember { mutableStateOf(0f) }
     val scope = rememberCoroutineScope()
-    val horizonMgr = AmbientHorizonManager.current
-    val webApi = AmbientWebAPI.current
+    val horizonMgr = vm.horizonMgr
+    val webApi = vm.webApi
 
     val steps = remember {
         listOf(
@@ -121,7 +122,7 @@ fun InstallPackage(packInfo: WebAPI.ICPackage, name: String, onFinished: () -> U
                         else -> -1
                     }
                     val contentColor = animateColorAsState(
-                        if (state == 2) AmbientContentColor.current.copy(alpha = 0.5f)
+                        if (state == 2) LocalContentColor.current.copy(alpha = 0.5f)
                         else MaterialTheme.colors.onSurface
                     ).value
                     ListItem(
@@ -136,8 +137,8 @@ fun InstallPackage(packInfo: WebAPI.ICPackage, name: String, onFinished: () -> U
                         }, trailing = {
                             Box(Modifier.width(48.dp)) {
                                 Crossfade(
-                                    current = state,
-                                    modifier = Modifier.align(Alignment.Center)
+                                    modifier = Modifier.align(Alignment.Center),
+                                    targetState = state
                                 ) {
                                     if (state == 1) {
                                         // Doing

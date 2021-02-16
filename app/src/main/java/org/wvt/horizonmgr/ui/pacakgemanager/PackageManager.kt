@@ -1,8 +1,14 @@
 package org.wvt.horizonmgr.ui.pacakgemanager
 
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.animation.*
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.*
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.Interaction
+import androidx.compose.foundation.InteractionState
+import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -11,11 +17,11 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.savedinstancestate.savedInstanceState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.platform.AmbientContext
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
@@ -42,7 +48,7 @@ fun PackageManager(
     onPackageSelect: (uuid: String?) -> Unit,
     onNavClick: () -> Unit
 ) {
-    val context = AmbientContext.current as AppCompatActivity
+    val context = LocalContext.current as AppCompatActivity
     val selectedPackageUUID = AmbientSelectedPackageUUID.current
 
     val vm = dependenciesViewModel<PackageManagerViewModel>()
@@ -61,7 +67,7 @@ fun PackageManager(
     val snackbarHostState = remember { SnackbarHostState() }
     val confirmDeleteDialogHostState = remember { ConfirmDeleteDialogHostState() }
     val inputDialogHostState = remember { InputDialogHostState() }
-    var fabExpand by savedInstanceState { false }
+    var fabExpand by rememberSaveable { mutableStateOf(false) }
 
     vmPs?.let {
         ProgressDialog(onCloseRequest = vm::dismiss, state = it)
@@ -79,21 +85,21 @@ fun PackageManager(
                     IconButton(onClick = onNavClick) { Icon(Icons.Filled.Menu, "菜单") }
                 }, backgroundColor = MaterialTheme.colors.surface,
                 actions = {
-                    DropdownMenu(
-                        toggle = {
-                            // Menu Icon
-                            IconButton(onClick = { showMenu = true }) {
-                                Icon(Icons.Filled.MoreVert, "更多")
-                            }
-                        },
-                        expanded = showMenu,
-                        onDismissRequest = { showMenu = false }
-                    ) {
-                        // Menu  
-                        DropdownMenuItem(onClick = {
-                            vm.loadPackages()
-                            showMenu = false
-                        }) { Text("刷新") }
+                    Box {
+                        // Menu Icon
+                        IconButton(onClick = { showMenu = true }) {
+                            Icon(Icons.Filled.MoreVert, "更多")
+                        }
+                        DropdownMenu(
+                            expanded = showMenu,
+                            onDismissRequest = { showMenu = false }
+                        ) {
+                            // Menu
+                            DropdownMenuItem(onClick = {
+                                vm.loadPackages()
+                                showMenu = false
+                            }) { Text("刷新") }
+                        }
                     }
                 }
             )
@@ -293,7 +299,7 @@ private fun FABEntry(
                         .wrapContentWidth(),
                     elevation = 2.dp
                 ) {
-                    Providers(AmbientContentAlpha provides ContentAlpha.medium) {
+                    Providers(LocalContentAlpha provides ContentAlpha.medium) {
                         Box(
                             modifier = Modifier.padding(horizontal = 16.dp),
                             contentAlignment = Alignment.Center,
@@ -335,8 +341,20 @@ fun PackageItem(
     onCloneClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Card(modifier = modifier, elevation = 2.dp) {
-        Column(Modifier.clickable(onClick = onClick)) {
+    val interactionState = remember { InteractionState() }
+    Card(
+        modifier = modifier,
+        elevation = animateDpAsState(
+            if (interactionState.contains(Interaction.Pressed)) 8.dp else 1.dp
+        ).value
+    ) {
+        Column(
+            Modifier.clickable(
+                onClick = onClick,
+                interactionState = interactionState,
+                indication = LocalIndication.current
+            )
+        ) {
             // Body
             Row {
                 Column(
@@ -354,38 +372,42 @@ fun PackageItem(
                     )
                 }
                 // Actions
-                Providers(AmbientContentAlpha provides ContentAlpha.medium) {
+                Providers(LocalContentAlpha provides ContentAlpha.medium) {
                     Row(Modifier.padding(top = 8.dp, end = 4.dp)) {
                         var dropdown by remember { mutableStateOf(false) }
-                        DropdownMenu(toggle = {
+                        Box {
                             IconButton(onClick = { dropdown = true }) {
-                                Icon(imageVector = Icons.Filled.MoreVert, contentDescription =  "更多")
+                                Icon(imageVector = Icons.Filled.MoreVert, contentDescription = "更多")
                             }
-                        }, expanded = dropdown, onDismissRequest = { dropdown = false }) {
-                            DropdownMenuItem(onClick = {
-                                dropdown = false
-                                onInfoClick()
-                            }) {
-                                Text("详情")
+                            DropdownMenu(
+                                expanded = dropdown,
+                                onDismissRequest = { dropdown = false }) {
+                                DropdownMenuItem(onClick = {
+                                    dropdown = false
+                                    onInfoClick()
+                                }) {
+                                    Text("详情")
+                                }
+                                DropdownMenuItem(onClick = {
+                                    dropdown = false
+                                    onDeleteClick()
+                                }) {
+                                    Text("删除")
+                                }
+                                DropdownMenuItem(onClick = {
+                                    dropdown = false
+                                    onCloneClick()
+                                }) {
+                                    Text("克隆")
+                                }
+                                DropdownMenuItem(onClick = {
+                                    dropdown = false
+                                    onRenameClick()
+                                }) {
+                                    Text("重命名")
+                                }
                             }
-                            DropdownMenuItem(onClick = {
-                                dropdown = false
-                                onDeleteClick()
-                            }) {
-                                Text("删除")
-                            }
-                            DropdownMenuItem(onClick = {
-                                dropdown = false
-                                onCloneClick()
-                            }) {
-                                Text("克隆")
-                            }
-                            DropdownMenuItem(onClick = {
-                                dropdown = false
-                                onRenameClick()
-                            }) {
-                                Text("重命名")
-                            }
+
                         }
                     }
                 }
@@ -403,7 +425,7 @@ fun PackageItem(
                     .heightIn(min = 32.dp),
                 verticalAlignment = Alignment.Bottom
             ) {
-                Providers(AmbientContentColor provides MaterialTheme.colors.primary) {
+                Providers(LocalContentColor provides MaterialTheme.colors.primary) {
                     AnimatedVisibility(
                         visible = selected,
                         enter = fadeIn(),
@@ -413,7 +435,7 @@ fun PackageItem(
                     }
                 }
                 Row(Modifier.weight(1f), horizontalArrangement = Arrangement.End) {
-                    Providers(AmbientContentAlpha provides ContentAlpha.medium) {
+                    Providers(LocalContentAlpha provides ContentAlpha.medium) {
                         Text(text = installTime, style = MaterialTheme.typography.caption)
                     }
                 }

@@ -1,13 +1,10 @@
 package org.wvt.horizonmgr.ui.login
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Providers
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.savedinstancestate.savedInstanceState
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -30,11 +27,12 @@ fun LoginPage(
     fabState: FabState
 ) {
     val (accountFocus, passwordFocus) = FocusRequester.createRefs()
-    var account by savedInstanceState(saver = TextFieldValue.Saver) {
-        TextFieldValue()
+
+    var account by remember {
+        mutableStateOf(TextFieldValue())
     }
-    var password by savedInstanceState(saver = TextFieldValue.Saver) {
-        TextFieldValue()
+    var password by remember {
+        mutableStateOf(TextFieldValue())
     }
 
     Box(Modifier.fillMaxSize()) {
@@ -45,7 +43,7 @@ fun LoginPage(
             Text(
                 text = "登录", color = MaterialTheme.colors.primary, fontSize = 64.sp
             )
-            Providers(AmbientContentAlpha provides ContentAlpha.medium) {
+            Providers(LocalContentAlpha provides ContentAlpha.medium) {
                 Text(
                     modifier = Modifier.padding(top = 16.dp),
                     text = "使用 InnerCore 中文社区账号登录",
@@ -68,9 +66,9 @@ fun LoginPage(
                         keyboardType = KeyboardType.Text,
                         imeAction = ImeAction.Next
                     ),
-                    onImeActionPerformed = { _, _ ->
+                    keyboardActions = KeyboardActions(onNext = {
                         passwordFocus.requestFocus()
-                    }
+                    })
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 TextField(
@@ -81,16 +79,16 @@ fun LoginPage(
                     value = password,
                     onValueChange = { password = it },
                     label = { Text("密码") },
+                    visualTransformation = PasswordVisualTransformation(),
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Password,
                         imeAction = ImeAction.Done
                     ),
-                    visualTransformation = PasswordVisualTransformation(),
-                    onImeActionPerformed = { _, softwareKeyboardController ->
-                        softwareKeyboardController?.hideSoftwareKeyboard()
+                    keyboardActions = KeyboardActions(onDone = {
+//                        softwareKeyboardController?.hideSoftwareKeyboard()
                         passwordFocus.freeFocus()
                         onLoginClicked(account.text, password.text)
-                    }
+                    })
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 StateFab(state = fabState, onClicked = {

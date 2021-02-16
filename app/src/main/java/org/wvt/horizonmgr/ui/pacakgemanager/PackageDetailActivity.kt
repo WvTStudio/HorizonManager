@@ -6,7 +6,6 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.material.Surface
 import androidx.compose.ui.platform.setContent
-import org.wvt.horizonmgr.ui.AndroidDependenciesProvider
 import org.wvt.horizonmgr.ui.theme.AndroidHorizonManagerTheme
 
 class PackageDetailActivity : AppCompatActivity() {
@@ -25,11 +24,9 @@ class PackageDetailActivity : AppCompatActivity() {
         val packageUUID = intent.getStringExtra("package_uuid") ?: return finish()
 
         setContent {
-            AndroidDependenciesProvider {
-                AndroidHorizonManagerTheme {
-                    Surface {
-                        PackageInfo(packageUUID) { finish() }
-                    }
+            AndroidHorizonManagerTheme {
+                Surface {
+                    PackageInfo(packageUUID) { finish() }
                 }
             }
         }

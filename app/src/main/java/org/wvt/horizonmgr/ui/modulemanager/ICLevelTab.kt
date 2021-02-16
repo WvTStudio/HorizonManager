@@ -28,7 +28,7 @@ internal fun ICLevelTab(
     val inputDialogState = remember { InputDialogHostState() }
 
 
-    Crossfade(current = state) {
+    Crossfade(state) {
         when (it) {
             ICLevelTabViewModel.State.Loading -> {
                 Box(modifier = Modifier.fillMaxSize()) {

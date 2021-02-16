@@ -5,11 +5,12 @@ import io.ktor.client.engine.cio.*
 import io.ktor.client.features.*
 import io.ktor.client.request.*
 import org.json.JSONArray
+import org.json.JSONException
 import org.json.JSONObject
+import org.wvt.horizonmgr.webapi.JsonParseException
 import org.wvt.horizonmgr.webapi.NetworkException
-import org.wvt.horizonmgr.webapi.ParseException
 import org.wvt.horizonmgr.webapi.forEach
-import org.wvt.horizonmgr.webapi.parseJson
+import java.io.IOException
 
 
 /**
@@ -36,24 +37,26 @@ class MgrInfoModule {
      * ]
      * ```
      *
-     * @throws [NetworkException], [ParseException]
+     * @throws [NetworkException], [JsonParseException]
      */
     suspend fun getDonateList(): List<DonateRecord> {
         val json = try {
             client.get<String>("https://adodoz.cn/hzmgr/v2/donates.json")
-        } catch (e: Exception) {
+        } catch (e: IOException) {
             // TODO 检查异常的类型
-            throw NetworkException("Ktor network exception", e)
+            throw NetworkException("获取捐赠列表失败", e)
         }
 
         val result = mutableListOf<DonateRecord>()
 
-        parseJson {
+        try {
             JSONArray(json).forEach<JSONObject> {
                 val name = it.getString("name")
                 val money = it.getInt("money")
                 result.add(DonateRecord(name, money))
             }
+        } catch (e: JSONException) {
+            throw JsonParseException(json, e)
         }
 
         return result
@@ -76,9 +79,13 @@ class MgrInfoModule {
      * ```
      */
     suspend fun getQQGroupList(): List<QQGroup> {
-        val json = client.get<String>("https://adodoz.cn/hzmgr/v1/qqgroups.json")
+        val json = try {
+            client.get<String>("https://adodoz.cn/hzmgr/v1/qqgroups.json")
+        } catch (e: IOException) {
+            throw NetworkException("获取群组列表失败", e)
+        }
         val result = mutableListOf<QQGroup>()
-        parseJson {
+        try {
             JSONArray(json).forEach<JSONObject> {
                 result.add(
                     QQGroup(
@@ -90,6 +97,8 @@ class MgrInfoModule {
                     )
                 )
             }
+        } catch (e: JSONException) {
+            throw JsonParseException(json, e)
         }
         return result
     }
@@ -98,14 +107,20 @@ class MgrInfoModule {
      * 获取所有版本通道
      */
     suspend fun getVersionChannels(): List<VersionChannel> {
-        val response = client.get<String>("https://adodoz.cn/hzmgr/v1/versioninfo.json")
+        val response = try {
+            client.get<String>("https://adodoz.cn/hzmgr/v1/versioninfo.json")
+        } catch (e: IOException) {
+            throw NetworkException("获取版本信息失败", e)
+        }
         val result = mutableListOf<VersionChannel>()
 
-        parseJson {
+        try {
             JSONArray(response).forEach<JSONObject> {
                 val channel = it.getString("channel")
                 result.add(VersionChannel(channel))
             }
+        } catch (e: JSONException) {
+            throw JsonParseException(response, e)
         }
         return result
     }
@@ -114,15 +129,21 @@ class MgrInfoModule {
      * 获取名为 [channelName] 的版本通道
      */
     suspend fun getChannelByName(channelName: String): VersionChannel? {
-        val response = client.get<String>("https://adodoz.cn/hzmgr/v1/versioninfo.json")
+        val response = try {
+            client.get<String>("https://adodoz.cn/hzmgr/v1/versioninfo.json")
+        } catch (e: IOException) {
+            throw NetworkException("获取版本信息失败", e)
+        }
 
-        parseJson {
+        try {
             JSONArray(response).forEach<JSONObject> {
                 val channel = it.getString("channel")
                 if (channel == channelName) {
                     return VersionChannel(channel)
                 }
             }
+        } catch (e: JSONException) {
+            throw JsonParseException(response, e)
         }
 
         return null

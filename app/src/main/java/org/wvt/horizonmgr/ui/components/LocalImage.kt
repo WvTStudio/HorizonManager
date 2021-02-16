@@ -40,7 +40,7 @@ fun LocalImage(
         modifier = modifier,
         color = backgroundColor
     ) {
-        Crossfade(current = image) {
+        Crossfade(image) {
             if (it != null) {
                 Image(
                     it,

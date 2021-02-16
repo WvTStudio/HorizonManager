@@ -13,7 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.AmbientContext
+import androidx.compose.ui.platform.LocalContext
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
@@ -33,7 +33,7 @@ fun NetworkImage(
     colorFilter: ColorFilter? = null
 ) {
     var image by remember { mutableStateOf<ImageBitmap?>(null) }
-    val context = AmbientContext.current
+    val context = LocalContext.current
 
     LaunchedEffect(url) {
         image = try {
@@ -49,7 +49,7 @@ fun NetworkImage(
         modifier = modifier,
         color = backgroundColor
     ) {
-        Crossfade(current = image) {
+        Crossfade(image) {
             if (it != null) {
                 Image(it, contentDescription, Modifier.fillMaxSize(), alignment, contentScale, alpha, colorFilter)
             }

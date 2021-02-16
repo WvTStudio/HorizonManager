@@ -3,6 +3,7 @@ package org.wvt.horizonmgr.webapi
 import org.json.JSONArray
 import org.json.JSONException
 
+@Deprecated("Deprecated", replaceWith = ReplaceWith("try block catch(e: JSONException) {\nthrow JsonParseException(jsonStr, e)\n}", "org.json.JSONException"))
 internal inline fun <T> parseJson(block: () -> T): T {
     return try {
         block()

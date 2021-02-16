@@ -4,8 +4,8 @@ import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.AmbientIndication
 import androidx.compose.foundation.InteractionState
+import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.indication
 import androidx.compose.foundation.layout.*
@@ -24,7 +24,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.wvt.horizonmgr.dependenciesViewModel
 import org.wvt.horizonmgr.legacyservice.LocalCache
 import org.wvt.horizonmgr.ui.components.MyAlertDialog
@@ -36,8 +35,8 @@ import org.wvt.horizonmgr.ui.onlinemods.Online
 import org.wvt.horizonmgr.ui.pacakgemanager.PackageManager
 import org.wvt.horizonmgr.ui.theme.PreviewTheme
 
-val AmbientSelectedPackageUUID = staticAmbientOf<String?>()
-val AmbientDrawerState = staticAmbientOf<DrawerState>()
+val AmbientSelectedPackageUUID = staticCompositionLocalOf<String?>()
+val AmbientDrawerState = staticCompositionLocalOf<DrawerState>()
 
 private val anim = tween<Float>(300, 0, LinearEasing)
 
@@ -73,21 +72,6 @@ fun App(
             DrawerTabs(screens = screens, currentScreen = cs, onChange = {
                 vm.navigate(it)
                 drawerState.close()
-                /*val route = when(it) {
-                    AppViewModel.Screen.HOME -> "news"
-                    AppViewModel.Screen.PACKAGE_MANAGE -> "package_manager"
-                    AppViewModel.Screen.LOCAL_MANAGE -> "module_manager"
-                    AppViewModel.Screen.ONLINE_DOWNLOAD -> "online_resource"
-                    AppViewModel.Screen.DOWNLOADED_MOD -> "local_resource"
-                }
-                navController.popBackStack()
-                navController.navigate(route) {
-                    launchSingleTop = true
-                    anim {
-                        enter  = android.R.anim.slide_in_left
-                        exit  = android.R.anim.slide_out_right
-                    }
-                }*/
             })
         },
         items = {
@@ -109,40 +93,7 @@ fun App(
             AmbientDrawerState provides drawerState,
             AmbientSelectedPackageUUID provides selectedPackageUUID
         ) {
-            /*NavHost(navController = navController, startDestination = "module_manager") {
-                composable("news") {
-                    News(
-                        onNavClick = { drawerState.open() }
-                    )
-                }
-                composable("package_manager") {
-                    LocalManager(
-                        onNavClicked = { drawerState.open() },
-                        requestSelectFile = {
-                            SelectFileActivity.startForResult(context)
-                        }
-                    )
-                }
-                composable("module_manager") {
-                    PackageManager(
-                        onPackageSelect = selectedPackageChange,
-                        onNavClick = { drawerState.open() }
-                    )
-                }
-                composable("online_resource") {
-                    Online(
-                        enable = userInfo != null,
-                        onNavClicked = { drawerState.open() }
-                    )
-                }
-                composable("local_resource") {
-                    DownloadedMods(
-                        onNavClicked = { drawerState.open() }
-                    )
-                }
-            }*/
-
-            Crossfade(current = cs, animation = anim) { cs ->
+            Crossfade(targetState = cs, animationSpec = anim) { cs ->
                 when (cs) {
                     AppViewModel.Screen.HOME -> News(
                         onNavClick = { drawerState.open() }
@@ -268,6 +219,7 @@ private fun DrawerHeader(
     }
     // Avatar
     Column(Modifier.padding(16.dp)) {
+        // TODO: 2021/2/15 Remove Indication
         val interactionState = remember { InteractionState() }
         Surface(
             modifier = Modifier
@@ -290,7 +242,7 @@ private fun DrawerHeader(
                     modifier = Modifier
                         .indication(
                             interactionState,
-                            AmbientIndication.current()
+                            LocalIndication.current
                         )
                         .fillMaxSize()
                 )
@@ -317,29 +269,28 @@ private fun NavigationItem(
     text: String,
     icon: ImageVector
 ) {
+    // TODO: 2021/2/15 Remove InteractionState
     val interactionState = remember { InteractionState() }
     Surface(
         shape = RoundedCornerShape(4.dp),
         color = animateColorAsState(if (checked) MaterialTheme.colors.primary.copy(alpha = 0.12f) else Color.Transparent).value,
         contentColor = animateColorAsState(if (checked) MaterialTheme.colors.primary else MaterialTheme.colors.onSurface).value,
         modifier = Modifier
-            .clickable(
-                onClick = { onCheckedChange(!checked) },
-                interactionState = interactionState,
-                indication = null
-            )
             .height(48.dp)
             .fillMaxWidth()
             .padding(horizontal = 8.dp, vertical = 2.dp)
     ) {
-        Providers(AmbientContentAlpha provides ContentAlpha.high) {
+        Providers(LocalContentAlpha provides ContentAlpha.high) {
             Row(
-                Modifier
-                    .fillMaxSize()
-                    .indication(interactionState, AmbientIndication.current()),
+                Modifier.fillMaxSize()
+                    .clickable { onCheckedChange(!checked) },
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(imageVector = icon, modifier = Modifier.padding(start = 8.dp), contentDescription = null)
+                Icon(
+                    imageVector = icon,
+                    modifier = Modifier.padding(start = 8.dp),
+                    contentDescription = null
+                )
                 Text(
                     text = text,
                     modifier = Modifier.padding(start = 24.dp, end = 8.dp),

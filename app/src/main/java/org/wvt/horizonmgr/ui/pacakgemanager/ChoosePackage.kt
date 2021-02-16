@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.dp
 
 data class ChoosePackageItem(val name: String, val version: String, val recommended: Boolean)
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ChoosePackage(
     items: List<ChoosePackageItem>,
@@ -23,7 +24,14 @@ fun ChoosePackage(
 ) {
     Column(Modifier.fillMaxSize()) {
         TopAppBar(
-            navigationIcon = { IconButton(onClick = onCancel) { Icon(Icons.Filled.ArrowBack, contentDescription = "返回") } },
+            navigationIcon = {
+                IconButton(onClick = onCancel) {
+                    Icon(
+                        Icons.Filled.ArrowBack,
+                        contentDescription = "返回"
+                    )
+                }
+            },
             title = { Text("在线安装分包") }, backgroundColor = MaterialTheme.colors.surface
         )
         if (items.isEmpty()) {
@@ -34,48 +42,67 @@ fun ChoosePackage(
             items.forEachIndexed { index, it ->
                 ListItem(
                     modifier = Modifier.clickable(onClick = { onChoose(index) }),
-                    icon = { Icon(imageVector = Icons.Filled.Extension, contentDescription = "安装") },
+                    icon = {
+                        Icon(
+                            imageVector = Icons.Filled.Extension,
+                            contentDescription = "安装"
+                        )
+                    },
                     text = { Text(if (it.recommended) "${it.name}（推荐）" else it.name) },
                     secondaryText = { Text(it.version) },
-                    trailing = { Icon(imageVector = Icons.Filled.ArrowForward, contentDescription = "选择") }
+                    trailing = {
+                        Icon(
+                            imageVector = Icons.Filled.ArrowForward,
+                            contentDescription = "选择"
+                        )
+                    }
                 )
             }
         }
     }
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun EditName(
-    item: ChoosePackageItem,
+    name: String,
+    version: String,
     onCancel: () -> Unit,
     onConfirm: (name: String) -> Unit
 ) {
-    var name by remember { mutableStateOf(TextFieldValue(text = "Inner Core")) }
+    var customName by remember { mutableStateOf(TextFieldValue(text = "$name $version")) }
     Column(Modifier.fillMaxSize()) {
         TopAppBar(
             navigationIcon = {
-                IconButton(onClick = onCancel) { Icon(Icons.Filled.ArrowBack, contentDescription = "返回") }
+                IconButton(onClick = onCancel) {
+                    Icon(
+                        Icons.Filled.ArrowBack,
+                        contentDescription = "返回"
+                    )
+                }
             },
             title = {
                 Text("输入分包的名字")
             }, backgroundColor = MaterialTheme.colors.surface
         )
         OutlinedTextField(
-            modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, top = 16.dp),
-            value = name,
-            onValueChange = { name = it },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 16.dp, end = 16.dp, top = 16.dp),
+            value = customName,
+            onValueChange = { customName = it },
             label = { Text("分包名称") })
 
         Row(verticalAlignment = Alignment.CenterVertically) {
             ListItem(
                 modifier = Modifier.weight(1f),
                 icon = { Icon(imageVector = Icons.Filled.Extension, contentDescription = "信息") },
-                text = { Text(item.name) },
-                secondaryText = { Text(item.version) }
+                text = { Text(name) },
+                secondaryText = { Text(version) }
             )
             Button(
                 modifier = Modifier.padding(horizontal = 16.dp),
-                onClick = { onConfirm(name.text) }
+                onClick = { onConfirm(customName.text) }
             ) { Text("下一步") }
         }
     }

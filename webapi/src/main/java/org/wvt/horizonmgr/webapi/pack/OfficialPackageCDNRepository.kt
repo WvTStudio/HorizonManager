@@ -6,7 +6,9 @@ import io.ktor.client.request.*
 import org.json.JSONException
 import org.json.JSONObject
 import org.wvt.horizonmgr.webapi.JsonParseException
+import org.wvt.horizonmgr.webapi.NetworkException
 import org.wvt.horizonmgr.webapi.forEach
+import java.io.IOException
 
 /**
  * 官方分包仓库的 CDN
@@ -45,8 +47,12 @@ class OfficialPackageCDNRepository {
      */
     @OptIn(ExperimentalStdlibApi::class)
     suspend fun getAllPackages(): List<OfficialCDNPackage> {
-        val jsonStr =
+        val jsonStr = try {
             httpClient.get<String>("https://cdn.jsdelivr.net/gh/WvTStudio/horizon-cloud-config@master/packs.json")
+        } catch (e: IOException) {
+            throw NetworkException("获取分包信息失败", e)
+        }
+
         val result = mutableListOf<OfficialCDNPackage>()
 
         try {
@@ -112,10 +118,18 @@ class OfficialCDNPackage internal constructor(
     )
 
     suspend fun getManifest(): String {
-        return httpClient.get(manifestUrl)
+        return try {
+            httpClient.get(manifestUrl)
+        } catch (e: IOException) {
+            throw NetworkException("获取清单失败", e)
+        }
     }
 
     suspend fun getChangeLog(): String {
-        return httpClient.get(changelogUrl)
+        return try {
+            httpClient.get(changelogUrl)
+        } catch (e: IOException) {
+            throw NetworkException("获取更新日志失败", e)
+        }
     }
 }

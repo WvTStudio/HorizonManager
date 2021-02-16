@@ -3,6 +3,7 @@ package org.wvt.horizonmgr.ui.modulemanager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -11,7 +12,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -19,9 +19,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.gesture.longPressGestureFilter
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.AmbientContext
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import org.wvt.horizonmgr.ui.components.EmptyPage
 import org.wvt.horizonmgr.ui.components.LocalImage
@@ -33,11 +33,9 @@ internal fun ModTab(vm: ModTabViewModel) {
     val state by vm.state.collectAsState()
     val mods by vm.mods.collectAsState()
     val enabledMods by vm.enabledMods.collectAsState()
-    val context = AmbientContext.current as AppCompatActivity
+    val context = LocalContext.current as AppCompatActivity
 
-    Crossfade(
-        current = state
-    ) { state ->
+    Crossfade(state) { state ->
         when (state) {
             is ModTabViewModel.State.Loading -> {
                 Box(Modifier.fillMaxSize()) {
@@ -96,6 +94,7 @@ internal fun ModTab(vm: ModTabViewModel) {
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun ModItem(
     modifier: Modifier = Modifier,
@@ -111,38 +110,35 @@ private fun ModItem(
 ) {
     val interactionState = remember { InteractionState() }
     Card(
-        modifier = modifier
-            .clickable(
-                onClick = onClick,
-                interactionState = interactionState,
-                indication = null
-            )
-            .longPressGestureFilter { onLongClick() },
-        border = if (selected) BorderStroke(
-            1.dp, MaterialTheme.colors.primary
-        ) else null,
-        elevation = 2.dp
+        modifier = modifier,
+        border = if (selected) BorderStroke(1.dp, MaterialTheme.colors.primary) else null,
+        elevation = animateDpAsState(targetValue = if (interactionState.contains(Interaction.Pressed)) 8.dp else 1.dp).value
     ) {
         Column(
-            Modifier
-                .indication(interactionState, indication = rememberRipple())
-                .background(
-                    animateColorAsState(
-                        if (selected) MaterialTheme.colors.primary.copy(0.12f)
-                        else Color.Transparent
-                    ).value
-                )
-                .padding(top = 16.dp, bottom = 4.dp, start = 16.dp, end = 16.dp)
+            Modifier.combinedClickable(
+                interactionState = interactionState,
+                indication = LocalIndication.current,
+                onClick = onClick, onLongClick = onLongClick
+            ).background(
+                animateColorAsState(
+                    if (selected) MaterialTheme.colors.primary.copy(0.12f)
+                    else Color.Transparent
+                ).value
+            ).padding(top = 16.dp, bottom = 4.dp, start = 16.dp, end = 16.dp)
         ) {
             Row {
                 Column(Modifier.weight(1f)) {
                     Text(title, style = MaterialTheme.typography.h5)
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text, style = MaterialTheme.typography.subtitle1,
+                        text = text,
+                        style = MaterialTheme.typography.subtitle1,
+                        maxLines = 4,
+                        overflow = TextOverflow.Ellipsis,
                         color = MaterialTheme.colors.onSurface.copy(alpha = 0.5f)
                     )
                 }
+                Spacer(modifier = Modifier.width(8.dp))
                 // Mod Icon
                 LocalImage(
                     modifier = Modifier

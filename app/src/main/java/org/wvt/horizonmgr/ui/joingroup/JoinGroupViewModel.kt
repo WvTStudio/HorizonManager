@@ -3,19 +3,19 @@ package org.wvt.horizonmgr.ui.joingroup
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import org.wvt.horizonmgr.DependenciesContainer
-import org.wvt.horizonmgr.legacyservice.WebAPI
+
+private const val TAG = "JoinGroupVMLogger"
 
 class JoinGroupViewModel(
     private val dependencies: DependenciesContainer
 ) : ViewModel() {
-    private val _groups = MutableStateFlow<List<WebAPI.QQGroupEntry>>(emptyList())
-    val groups: StateFlow<List<WebAPI.QQGroupEntry>> = _groups
+    val groups = MutableStateFlow<List<QQGroupEntry>>(emptyList())
     val isLoading = MutableStateFlow(true)
     val loadError = MutableStateFlow<Exception?>(null)
     val startQQError = MutableStateFlow<Exception?>(null)
@@ -28,11 +28,16 @@ class JoinGroupViewModel(
         viewModelScope.launch {
             isLoading.value = true
             loadError.value = null
-            try {
-                _groups.value = dependencies.webapi.getQQGroupList()
+            val data = try {
+                dependencies.mgrInfo.getQQGroupList().map {
+                    QQGroupEntry(it.status, it.avatarUrl, it.name, it.description, it.urlLink)
+                }
             } catch (e: Exception) {
+                Log.e(TAG, "获取群组失败", e)
                 loadError.value = e
+                return@launch
             }
+            groups.value = data
             isLoading.value = false
         }
     }
@@ -46,6 +51,7 @@ class JoinGroupViewModel(
                 context.startActivity(intent)
             } catch (e: Exception) {
                 startQQError.value = e
+                return@launch
             }
         }
     }

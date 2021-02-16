@@ -48,7 +48,7 @@ fun ModuleManager(
             onNavClicked = onNavClicked
         )
         Box(Modifier.fillMaxSize()) {
-            Crossfade(current = selectedTab) {
+            Crossfade(selectedTab) {
                 when (it) {
                     ModuleManagerViewModel.Tabs.MOD -> ModTab(modVm)
                     ModuleManagerViewModel.Tabs.IC_MAP -> ICLevelTab(icMapVm)

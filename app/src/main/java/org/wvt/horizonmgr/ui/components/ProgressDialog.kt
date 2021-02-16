@@ -1,6 +1,5 @@
 package org.wvt.horizonmgr.ui.components
 
-import androidx.compose.animation.core.animateAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
@@ -79,7 +78,7 @@ fun ProgressDialog(
 
 @Composable
 private fun Content(content: String) {
-    Providers(AmbientContentAlpha provides ContentAlpha.high) {
+    Providers(LocalContentAlpha provides ContentAlpha.high) {
         Text(
             modifier = Modifier.padding(start = 32.dp, end = 16.dp),
             text = content

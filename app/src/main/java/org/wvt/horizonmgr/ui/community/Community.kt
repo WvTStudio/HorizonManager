@@ -16,8 +16,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.platform.AmbientContext
-import androidx.compose.ui.platform.AmbientDensity
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Dialog
@@ -32,7 +32,7 @@ internal fun Community(onClose: () -> Unit) {
 
     var loading by remember { mutableStateOf(true) }
     var progress by remember { mutableStateOf(0f) }
-    val context = AmbientContext.current
+    val context = LocalContext.current
 
     Box(Modifier.fillMaxSize()) {
         Column(Modifier.fillMaxSize()) {
@@ -41,7 +41,7 @@ internal fun Community(onClose: () -> Unit) {
                     .fillMaxWidth()
                     .wrapContentHeight()
                     .zIndex(
-                        with(AmbientDensity.current) { 4.dp.toPx() }
+                        with(LocalDensity.current) { 4.dp.toPx() }
                     )
                     .shadow(4.dp),
                 title = {
@@ -51,7 +51,7 @@ internal fun Community(onClose: () -> Unit) {
                         Icon(Icons.Filled.Close, "关闭")
                     }
                 }, backgroundColor = MaterialTheme.colors.surface, actions = {
-                    Crossfade(current = loading) {
+                    Crossfade(loading) {
                         if (it) CircularProgressIndicator(
                             modifier = Modifier.size(36.dp),
                             progress = animateFloatAsState(progress).value
@@ -118,7 +118,7 @@ private fun WebViewCompose(
     onClose: () -> Unit
 ) {
     val backgroundColor = MaterialTheme.colors.background
-    val backpack = (AmbientContext.current as ComponentActivity).onBackPressedDispatcher
+    val backpack = (LocalContext.current as ComponentActivity).onBackPressedDispatcher
 
     AndroidView(
         modifier = modifier,

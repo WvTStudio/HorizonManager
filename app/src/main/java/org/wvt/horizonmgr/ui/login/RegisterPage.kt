@@ -2,13 +2,10 @@ package org.wvt.horizonmgr.ui.login
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Providers
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.savedinstancestate.savedInstanceState
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -30,10 +27,10 @@ fun RegisterPage(
     onRegisterRequest: (username: String, email: String, password: String, confirmPassword: String) -> Unit
 ) {
     val (usernameFocus, emailFocus, passwordFocus, confirmFocus) = FocusRequester.createRefs()
-    var username by savedInstanceState(saver = TextFieldValue.Saver) { TextFieldValue() }
-    var email by savedInstanceState(saver = TextFieldValue.Saver) { TextFieldValue() }
-    var password by savedInstanceState(saver = TextFieldValue.Saver) { TextFieldValue() }
-    var confirmPassword by savedInstanceState(saver = TextFieldValue.Saver) { TextFieldValue() }
+    var username by remember { mutableStateOf(TextFieldValue()) }
+    var email by remember { mutableStateOf(TextFieldValue()) }
+    var password by remember { mutableStateOf(TextFieldValue()) }
+    var confirmPassword by remember { mutableStateOf(TextFieldValue()) }
 
     Box(Modifier.fillMaxSize()) {
         LazyColumn(
@@ -45,7 +42,7 @@ fun RegisterPage(
         ) {
             item {
                 Text("注册", color = MaterialTheme.colors.primary, fontSize = 64.sp)
-                Providers(AmbientContentAlpha provides ContentAlpha.medium) {
+                Providers(LocalContentAlpha provides ContentAlpha.medium) {
                     Text(
                         modifier = Modifier.padding(top = 16.dp),
                         text = "注册到 InnerCore 中文社区 ",
@@ -71,9 +68,10 @@ fun RegisterPage(
                             keyboardType = KeyboardType.Text,
                             imeAction = ImeAction.Next
                         ),
-                        onImeActionPerformed = { _, _ ->
+                        keyboardActions = KeyboardActions(onNext = {
                             emailFocus.requestFocus()
-                        }
+                        })
+
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     TextField(
@@ -90,9 +88,9 @@ fun RegisterPage(
                             keyboardType = KeyboardType.Ascii,
                             imeAction = ImeAction.Next
                         ),
-                        onImeActionPerformed = { _, _ ->
+                        keyboardActions = KeyboardActions(onNext = {
                             passwordFocus.requestFocus()
-                        }
+                        })
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     TextField(
@@ -105,14 +103,12 @@ fun RegisterPage(
                         value = password,
                         onValueChange = { password = it },
                         label = { Text("密码") },
+                        visualTransformation = PasswordVisualTransformation(),
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Password,
                             imeAction = ImeAction.Next
                         ),
-                        visualTransformation = PasswordVisualTransformation(),
-                        onImeActionPerformed = { _, _ ->
-                            confirmFocus.requestFocus()
-                        }
+                        keyboardActions = KeyboardActions(onNext = { confirmFocus.requestFocus() })
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     TextField(
@@ -123,13 +119,12 @@ fun RegisterPage(
                         value = confirmPassword,
                         onValueChange = { confirmPassword = it },
                         label = { Text("重复密码") },
+                        visualTransformation = PasswordVisualTransformation(),
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Text,
                             imeAction = ImeAction.Done
                         ),
-                        visualTransformation = PasswordVisualTransformation(),
-                        onImeActionPerformed = { _, softwareKeyboardController ->
-                            softwareKeyboardController?.hideSoftwareKeyboard()
+                        keyboardActions = KeyboardActions(onDone = {
                             confirmFocus.freeFocus()
                             onRegisterRequest(
                                 username.text,
@@ -137,7 +132,7 @@ fun RegisterPage(
                                 password.text,
                                 confirmPassword.text
                             )
-                        }
+                        })
                     )
                     StateFab(
                         modifier = Modifier.padding(top = 16.dp),

@@ -7,8 +7,10 @@ import io.ktor.client.request.*
 import org.json.JSONException
 import org.json.JSONObject
 import org.wvt.horizonmgr.webapi.JsonParseException
+import org.wvt.horizonmgr.webapi.NetworkException
 import org.wvt.horizonmgr.webapi.ServiceException
 import org.wvt.horizonmgr.webapi.forEach
+import java.io.IOException
 
 /**
  * 汉化组仓库
@@ -58,7 +60,11 @@ class ChineseModRepository {
      * ```
      */
     suspend fun getAllMods(): List<ChineseMod> {
-        val jsonStr = client.get<String>("https://dev.adodoz.cn/api/mod/list")
+        val jsonStr = try {
+            client.get<String>("https://dev.adodoz.cn/api/mod/list")
+        }catch (e: IOException) {
+            throw NetworkException("获取汉化源 Mod 列表失败", e)
+        }
         val result = mutableListOf<ChineseMod>()
         try {
             val json = JSONObject(jsonStr)

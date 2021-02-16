@@ -3,6 +3,7 @@ package org.wvt.horizonmgr.ui.settings
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -14,15 +15,15 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.gesture.pressIndicatorGestureFilter
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import org.wvt.horizonmgr.ui.theme.AmbientThemeConfig
-import org.wvt.horizonmgr.ui.theme.AmbientThemeController
 import org.wvt.horizonmgr.ui.theme.HorizonManagerTheme
+import org.wvt.horizonmgr.ui.theme.LocalThemeConfig
+import org.wvt.horizonmgr.ui.theme.LocalThemeController
 import org.wvt.horizonmgr.ui.theme.MaterialColors
 
 private enum class CheckedColorType {
@@ -43,8 +44,8 @@ data class CustomColor(
 fun CustomTheme(requestClose: () -> Unit) {
     val colors = remember { MaterialColors.series }
     var checkedColorType by remember { mutableStateOf(CheckedColorType.LIGHT_PRIMARY) }
-    val themeConfig = AmbientThemeConfig.current
-    val themeController = AmbientThemeController.current
+    val themeConfig = LocalThemeConfig.current
+    val themeController = LocalThemeController.current
 
     var lightColor by remember {
         mutableStateOf(
@@ -123,83 +124,90 @@ fun CustomTheme(requestClose: () -> Unit) {
             Divider(Modifier.fillMaxWidth())
             LazyColumn(Modifier.weight(1f)) {
                 item {
-                    Text(
-                        modifier = Modifier.padding(top = 16.dp, start = 24.dp),
-                        text = "亮色主题",
-                        color = MaterialTheme.colors.primary
-                    )
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 16.dp),
-                        horizontalArrangement = Arrangement.SpaceEvenly
-                    ) {
-                        SelectColorItem(text = "主题色",
-                            color = getColor(lightColor.primary),
-                            selected = checkedColorType == CheckedColorType.LIGHT_PRIMARY,
-                            onSelect = { checkedColorType = CheckedColorType.LIGHT_PRIMARY })
-                        SelectColorItem(text = "主题色 - 变体",
-                            color = getColor(lightColor.primaryVariant),
-                            selected = checkedColorType == CheckedColorType.LIGHT_PRIMARY_VARIANT,
-                            onSelect = { checkedColorType = CheckedColorType.LIGHT_PRIMARY_VARIANT }
+                    // TODO: 2021/2/8 再套一层 Column 是因为 alpha11 的 LazyColumn 在内部组件移出屏外会出现问题，在问题解决后应当删除此 Column
+                    Column(Modifier.fillParentMaxWidth()) {
+                        Text(
+                            modifier = Modifier.padding(top = 16.dp, start = 24.dp),
+                            text = "亮色主题",
+                            color = MaterialTheme.colors.primary
                         )
-                    }
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 16.dp),
-                        horizontalArrangement = Arrangement.SpaceEvenly
-                    ) {
-                        SelectColorItem(text = "补充色",
-                            color = getColor(lightColor.secondary),
-                            selected = checkedColorType == CheckedColorType.LIGHT_SECONDARY,
-                            onSelect = { checkedColorType = CheckedColorType.LIGHT_SECONDARY })
-                        SelectColorItem(text = "补充色 - 变体",
-                            color = getColor(lightColor.secondaryVariant),
-                            selected = checkedColorType == CheckedColorType.LIGHT_SECONDARY_VARIANT,
-                            onSelect = {
-                                checkedColorType = CheckedColorType.LIGHT_SECONDARY_VARIANT
-                            }
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 16.dp),
+                            horizontalArrangement = Arrangement.SpaceEvenly
+                        ) {
+                            SelectColorItem(text = "主题色",
+                                color = getColor(lightColor.primary),
+                                selected = checkedColorType == CheckedColorType.LIGHT_PRIMARY,
+                                onSelect = { checkedColorType = CheckedColorType.LIGHT_PRIMARY })
+                            SelectColorItem(text = "主题色 - 变体",
+                                color = getColor(lightColor.primaryVariant),
+                                selected = checkedColorType == CheckedColorType.LIGHT_PRIMARY_VARIANT,
+                                onSelect = {
+                                    checkedColorType = CheckedColorType.LIGHT_PRIMARY_VARIANT
+                                }
+                            )
+                        }
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 16.dp),
+                            horizontalArrangement = Arrangement.SpaceEvenly
+                        ) {
+                            SelectColorItem(text = "补充色",
+                                color = getColor(lightColor.secondary),
+                                selected = checkedColorType == CheckedColorType.LIGHT_SECONDARY,
+                                onSelect = { checkedColorType = CheckedColorType.LIGHT_SECONDARY })
+                            SelectColorItem(text = "补充色 - 变体",
+                                color = getColor(lightColor.secondaryVariant),
+                                selected = checkedColorType == CheckedColorType.LIGHT_SECONDARY_VARIANT,
+                                onSelect = {
+                                    checkedColorType = CheckedColorType.LIGHT_SECONDARY_VARIANT
+                                }
+                            )
+                        }
+                        Divider(
+                            Modifier
+                                .padding(vertical = 16.dp)
+                                .fillMaxWidth()
                         )
-                    }
-                    Divider(
-                        Modifier
-                            .padding(vertical = 16.dp)
-                            .fillMaxWidth()
-                    )
-                    Text(
-                        modifier = Modifier.padding(start = 24.dp),
-                        text = "暗色主题",
-                        color = MaterialTheme.colors.primary
-                    )
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 16.dp),
-                        horizontalArrangement = Arrangement.SpaceEvenly
-                    ) {
-                        SelectColorItem(text = "主题色",
-                            color = getColor(darkColor.primary),
-                            selected = checkedColorType == CheckedColorType.DARK_PRIMARY,
-                            onSelect = { checkedColorType = CheckedColorType.DARK_PRIMARY })
-                        SelectColorItem(text = "主题色 - 变体",
-                            color = getColor(darkColor.primaryVariant),
-                            selected = checkedColorType == CheckedColorType.DARK_PRIMARY_VARIANT,
-                            onSelect = { checkedColorType = CheckedColorType.DARK_PRIMARY_VARIANT }
+                        Text(
+                            modifier = Modifier.padding(start = 24.dp),
+                            text = "暗色主题",
+                            color = MaterialTheme.colors.primary
                         )
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 16.dp),
+                            horizontalArrangement = Arrangement.SpaceEvenly
+                        ) {
+                            SelectColorItem(text = "主题色",
+                                color = getColor(darkColor.primary),
+                                selected = checkedColorType == CheckedColorType.DARK_PRIMARY,
+                                onSelect = { checkedColorType = CheckedColorType.DARK_PRIMARY })
+                            SelectColorItem(text = "主题色 - 变体",
+                                color = getColor(darkColor.primaryVariant),
+                                selected = checkedColorType == CheckedColorType.DARK_PRIMARY_VARIANT,
+                                onSelect = {
+                                    checkedColorType = CheckedColorType.DARK_PRIMARY_VARIANT
+                                }
+                            )
+                        }
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 16.dp),
+                            horizontalArrangement = Arrangement.SpaceEvenly
+                        ) {
+                            SelectColorItem(text = "补充色",
+                                color = getColor(darkColor.secondary),
+                                selected = checkedColorType == CheckedColorType.DARK_SECONDARY,
+                                onSelect = { checkedColorType = CheckedColorType.DARK_SECONDARY })
+                        }
+                        Spacer(modifier = Modifier.height(64.dp))
                     }
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 16.dp),
-                        horizontalArrangement = Arrangement.SpaceEvenly
-                    ) {
-                        SelectColorItem(text = "补充色",
-                            color = getColor(darkColor.secondary),
-                            selected = checkedColorType == CheckedColorType.DARK_SECONDARY,
-                            onSelect = { checkedColorType = CheckedColorType.DARK_SECONDARY })
-                    }
-                    Spacer(modifier = Modifier.height(64.dp))
                 }
             }
         }
@@ -265,20 +273,21 @@ private fun SelectColorItem(
         }, animationSpec = if (pressed) shrinkTween else expandTween
     ).value
     Column(modifier) {
-        Providers(AmbientContentAlpha provides ContentAlpha.medium) {
+        Providers(LocalContentAlpha provides ContentAlpha.medium) {
             Text(text = text)
         }
         Surface(
             modifier = Modifier
                 .size(128.dp, 96.dp)
                 .padding(top = 8.dp)
-                .pressIndicatorGestureFilter(
-                    onStart = { pressed = true },
-                    onStop = {
+                .pointerInput(Unit) {
+                    detectTapGestures(onPress = {
+                        pressed = true
+                        val succeed = tryAwaitRelease()
+                        if (succeed) { onSelect() }
                         pressed = false
-                        onSelect()
-                    },
-                    onCancel = { pressed = false })
+                    })
+                }
                 .graphicsLayer(scaleX = scale, scaleY = scale),
             color = animateColorAsState(color).value,
             elevation = animateDpAsState(if (selected) 8.dp else 0.dp).value,
@@ -310,7 +319,7 @@ private fun MaterialColorPalette(
                                 .padding(1.dp)
                                 .height(42.dp)
                         )
-                        Providers(AmbientContentAlpha provides ContentAlpha.medium) {
+                        Providers(LocalContentAlpha provides ContentAlpha.medium) {
                             for (i in colors) {
                                 Box(
                                     modifier = Modifier
@@ -329,7 +338,7 @@ private fun MaterialColorPalette(
                     }
                     Column {
                         Row {
-                            Providers(AmbientContentAlpha provides ContentAlpha.medium) {
+                            Providers(LocalContentAlpha provides ContentAlpha.medium) {
                                 tags.forEach {
                                     Box(
                                         modifier = Modifier

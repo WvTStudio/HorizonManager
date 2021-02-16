@@ -5,6 +5,7 @@ import androidx.compose.animation.core.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -49,7 +50,7 @@ private val tuneExpand = tween<Float>(275, 40, FastOutSlowInEasing) // Expand to
 private val tuneShrink = tween<Float>(225, 0, FastOutSlowInEasing) // Shrink to exit
 
 @Composable
-internal fun TuneAppBar2(
+internal fun TuneAppBar(
     enable: Boolean,
     onNavClicked: () -> Unit,
     onFilterValueConfirm: (value: String) -> Unit,
@@ -94,7 +95,7 @@ internal fun TuneAppBar2(
                     .height(56.dp),
                 shape = RoundedCornerShape(4.dp),
                 elevation = 4.dp,
-                content = emptyContent()
+                content = {}
             )
 
             // AppBar & SearchBox
@@ -114,12 +115,12 @@ internal fun TuneAppBar2(
                         if (expand) expand = false
                         else onNavClicked()
                     }) {
-                    Crossfade(current = expand, animation = iconFade) {
+                    Crossfade(targetState = expand, animationSpec = iconFade) {
                         if (it) Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "关闭")
                         else Icon(imageVector = Icons.Filled.Menu, contentDescription = "菜单")
                     }
                 }
-                Crossfade(current = expand, animation = iconFade) {
+                Crossfade(targetState = expand, animationSpec = iconFade) {
                     Box(
                         modifier = Modifier.align(Alignment.CenterStart)
                             .padding(start = 72.dp + offset, end = 24.dp + offset)
@@ -147,7 +148,9 @@ internal fun TuneAppBar2(
                                     fontSize = 18.sp
                                 ),
                                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-                                onImeActionPerformed = { onFilterValueConfirm(filterValue.text) }
+                                keyboardActions = KeyboardActions(onSearch = {
+                                    onFilterValueConfirm(filterValue.text)
+                                })
                             )
                         } else { // Title
                             Text(
@@ -168,7 +171,7 @@ internal fun TuneAppBar2(
                             else expand = true
                         }
                     ) {
-                        Crossfade(current = expand, animation = iconFade) {
+                        Crossfade(targetState = expand, animationSpec = iconFade) {
                             if (it) Icon(imageVector = Icons.Filled.Search, contentDescription = "搜索")
                             else Icon(imageVector = Icons.Filled.Tune, contentDescription = "过滤选项")
                         }
@@ -180,7 +183,7 @@ internal fun TuneAppBar2(
             Box(
                 Modifier.wrapContentHeight().graphicsLayer(alpha = contentOpacity).layoutId("content")
             ) {
-                Providers(AmbientContentAlpha provides ContentAlpha.medium) {
+                Providers(LocalContentAlpha provides ContentAlpha.medium) {
                     Column(
                         Modifier.padding(top = 8.dp, start = 32.dp, end = 16.dp, bottom = 16.dp)
                     ) {

@@ -10,12 +10,8 @@ import androidx.compose.animation.Crossfade
 import androidx.compose.material.Surface
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.setContent
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
-import org.wvt.horizonmgr.legacyservice.WebAPI
-import org.wvt.horizonmgr.ui.AmbientHorizonManager
-import org.wvt.horizonmgr.ui.AmbientWebAPI
-import org.wvt.horizonmgr.ui.AndroidDependenciesProvider
+import org.wvt.horizonmgr.dependenciesViewModel
 import org.wvt.horizonmgr.ui.theme.AndroidHorizonManagerTheme
 import kotlin.coroutines.resume
 
@@ -43,24 +39,40 @@ class InstallPackageActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            AndroidDependenciesProvider {
-                AndroidHorizonManagerTheme {
-                    // TODO 2021/1/18 重构这坨屎
-                    var screen: Int by remember { mutableStateOf(0) }
-                    var packages by remember { mutableStateOf<List<WebAPI.ICPackage>>(emptyList()) }
+            AndroidHorizonManagerTheme {
+                // TODO 2021/1/18 重构这坨屎
+                val vm = dependenciesViewModel<InstallPackageViewModel>()
+                val vmPackages by vm.packages.collectAsState()
+
+
+                var screen: Int by remember { mutableStateOf(0) }
+/*                    var packages by remember { mutableStateOf<List<WebAPI.ICPackage>>(emptyList()) }
                     var mappedPackages by remember {
-                        mutableStateOf<List<ChoosePackageItem>>(
-                            emptyList()
-                        )
-                    }
-                    var chosenIndex by remember { mutableStateOf<Int>(-1) }
-                    var customName by remember { mutableStateOf<String?>(null) }
+                        mutableStateOf<List<ChoosePackageItem>>(emptyList())
+                    }*/
+                var chosenIndex by remember { mutableStateOf<Int>(-1) }
+                var customName by remember { mutableStateOf<String?>(null) }
+/*
                     val scope = rememberCoroutineScope()
 
                     val webApi = AmbientWebAPI.current
                     val horizonMgr = AmbientHorizonManager.current
+*/
 
-                    DisposableEffect(Unit) {
+                DisposableEffect(Unit) {
+                    onBackPressedDispatcher.addCallback(object : OnBackPressedCallback(true) {
+                        override fun handleOnBackPressed() {
+                            when (screen) {
+                                0 -> finish()
+                                1 -> screen = 0
+                            }
+                        }
+                    })
+                    vm.getPackages()
+                    onDispose { }
+                }
+
+/*                    DisposableEffect(Unit) {
                         onBackPressedDispatcher.addCallback(object : OnBackPressedCallback(true) {
                             override fun handleOnBackPressed() {
                                 when (screen) {
@@ -89,30 +101,31 @@ class InstallPackageActivity : AppCompatActivity() {
                         onDispose {
                             // TODO: 2021/2/7 添加 Dispose 逻辑
                         }
-                    }
+                    }*/
 
-                    Surface {
-                        Crossfade(current = screen) { it ->
-                            when (it) {
-                                0 -> ChoosePackage(
-                                    onChoose = {
-                                        chosenIndex = it
-                                        screen = 1
-                                    },
-                                    onCancel = { finish() },
-                                    items = mappedPackages
-                                )
-                                1 -> EditName(mappedPackages[chosenIndex],
-                                    onConfirm = {
-                                        customName = it
-                                        screen = 2
-                                    },
-                                    onCancel = { screen = 0 }
-                                )
-                                2 -> InstallPackage(packages[chosenIndex], customName!!) {
-                                    finish()
-                                }
-                            }
+                Surface {
+                    Crossfade(targetState = screen) { it ->
+                        when (it) {
+                            0 -> ChoosePackage(
+                                onChoose = {
+                                    chosenIndex = it
+                                    screen = 1
+                                },
+                                onCancel = { finish() },
+                                items = vmPackages
+                            )
+                            1 -> EditName(
+                                vmPackages[chosenIndex].name,
+                                vmPackages[chosenIndex].version,
+                                onConfirm = {
+                                    customName = it
+                                    screen = 2
+                                },
+                                onCancel = { screen = 0 }
+                            )
+                            /*2 -> InstallPackage(vmPackages[chosenIndex], customName!!) {
+                                finish()
+                            }*/
                         }
                     }
                 }

@@ -60,7 +60,7 @@ fun PackageInfo(
         }, backgroundColor = MaterialTheme.colors.surface)
         Crossfade(
             modifier = Modifier.weight(1f),
-            current = state
+            targetState = state
         ) { state ->
             when (state) {
                 PackageDetailViewModel.State.LOADING -> {
@@ -92,6 +92,7 @@ fun PackageInfo(
     }
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun ManifestSection(
     manifest: HorizonManager.PackageManifest,
@@ -162,6 +163,7 @@ private fun ManifestSection(
     })
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun FileSection(
     path: String,

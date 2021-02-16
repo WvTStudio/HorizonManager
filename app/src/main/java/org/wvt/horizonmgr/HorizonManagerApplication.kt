@@ -3,6 +3,7 @@ package org.wvt.horizonmgr
 import android.app.Application
 import android.content.Context
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.viewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -17,12 +18,10 @@ import org.wvt.horizonmgr.webapi.news.MgrNewsModule
 import org.wvt.horizonmgr.webapi.pack.OfficialPackageCDNRepository
 
 class HorizonManagerApplication : Application() {
-    companion object {
-        lateinit var container: DependenciesContainer
-            private set
-        lateinit var dependenciesVMFactory: ViewModelProvider.Factory
-            private set
-    }
+    lateinit var container: DependenciesContainer
+        private set
+    lateinit var dependenciesVMFactory: ViewModelProvider.Factory
+        private set
 
     override fun onCreate() {
         super.onCreate()
@@ -33,7 +32,8 @@ class HorizonManagerApplication : Application() {
 
 @Composable
 inline fun <reified T : ViewModel> dependenciesViewModel(): T {
-    return viewModel(factory = HorizonManagerApplication.dependenciesVMFactory)
+    val app = LocalContext.current.applicationContext as HorizonManagerApplication
+    return viewModel(factory = app.dependenciesVMFactory)
 }
 
 private class DependenciesVMFactory(
@@ -47,6 +47,7 @@ private class DependenciesVMFactory(
 }
 
 class DependenciesContainer internal constructor(private val context: Context) {
+    @Deprecated("Deprecated")
     val horizonManager: HorizonManager by lazy {
         HorizonManager.getOrCreateInstance(context)
     }
@@ -55,6 +56,7 @@ class DependenciesContainer internal constructor(private val context: Context) {
         LocalCache.createInstance(context)
     }
 
+    @Deprecated("Deprecated")
     val webapi: WebAPI by lazy {
         WebAPI.createInstance(context)
     }

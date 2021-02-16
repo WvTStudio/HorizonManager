@@ -1,8 +1,13 @@
 # Changelog
 
+## alpha10
+
+错误页面
+- 将重试按钮换为 OutlinedButton 样式
+
 ## alpha9
 
-新闻界面
+资讯界面
 - 错误信息现在居中显示
 
 版本更新对话框

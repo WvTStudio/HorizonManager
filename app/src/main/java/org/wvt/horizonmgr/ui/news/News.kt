@@ -1,8 +1,8 @@
 package org.wvt.horizonmgr.ui.news
 
 import androidx.compose.animation.Crossfade
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -14,7 +14,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.AmbientContext
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
@@ -30,7 +31,7 @@ fun News(
     val vm = dependenciesViewModel<NewsViewModel>()
     val news by vm.news.collectAsState()
     val state by vm.state.collectAsState()
-    val context = AmbientContext.current
+    val context = LocalContext.current
 
     DisposableEffect(vm) {
         vm.refresh()
@@ -67,7 +68,7 @@ private fun NewsUI(
             },
             backgroundColor = MaterialTheme.colors.surface
         )
-        Crossfade(current = state) {
+        Crossfade(state) {
             when (it) {
                 is NewsViewModel.State.Loading -> Box(Modifier.fillMaxSize()) {
                     CircularProgressIndicator(Modifier.align(Alignment.Center))
@@ -126,13 +127,20 @@ private fun NewsItemNoCover(
     brief: String,
     onClick: () -> Unit
 ) {
-    val cutBrief = remember(brief) {
-        brief.take(160)
-    }
-    Card(modifier = modifier, elevation = 2.dp) {
+    val interactionState = remember { InteractionState() }
+    Card(
+        modifier = modifier,
+        elevation = animateDpAsState(
+            if (interactionState.contains(Interaction.Pressed)) 8.dp else 1.dp
+        ).value
+    ) {
         Column(
             modifier = Modifier
-                .clickable(onClick = onClick)
+                .clickable(
+                    onClick = onClick,
+                    interactionState = interactionState,
+                    indication = LocalIndication.current
+                )
                 .wrapContentHeight()
                 .fillMaxWidth()
                 .padding(16.dp)
@@ -140,13 +148,17 @@ private fun NewsItemNoCover(
             // Title
             Text(
                 text = title,
-                style = MaterialTheme.typography.subtitle1
+                style = MaterialTheme.typography.subtitle1,
+                maxLines = 3,
+                overflow = TextOverflow.Ellipsis
             )
             // Brief
             Text(
-                text = cutBrief,
+                text = brief,
                 style = MaterialTheme.typography.body2,
-                color = MaterialTheme.colors.onSurface.copy(ContentAlpha.medium)
+                color = MaterialTheme.colors.onSurface.copy(ContentAlpha.medium),
+                maxLines = 5,
+                overflow = TextOverflow.Ellipsis
             )
         }
     }
@@ -160,13 +172,17 @@ private fun NewsItem(
     coverImage: @Composable () -> Unit,
     onClick: () -> Unit
 ) {
-    val cutBrief = remember(brief) {
-        brief.take(160)
-    }
-    Card(modifier = modifier, elevation = 2.dp) {
+    val interactionState = remember { InteractionState() }
+    Card(modifier = modifier, elevation = animateDpAsState(
+        if (interactionState.contains(Interaction.Pressed)) 8.dp else 1.dp
+    ).value) {
         Box(
             Modifier
-                .clickable(onClick = onClick)
+                .clickable(
+                    onClick = onClick,
+                    interactionState = interactionState,
+                    indication = LocalIndication.current
+                )
                 .fillMaxWidth()
                 .wrapContentHeight()
         ) {
@@ -189,13 +205,17 @@ private fun NewsItem(
                 Text(
                     text = title,
                     style = MaterialTheme.typography.h6,
-                    color = Color.White
+                    color = Color.White,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
                 )
                 // Brief
                 Text(
-                    text = cutBrief,
+                    text = brief,
                     style = MaterialTheme.typography.body2,
-                    color = Color.White
+                    color = Color.White,
+                    maxLines = 3,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
         }
@@ -222,7 +242,7 @@ private fun NewsPreview() {
                         0,
                         "Test article",
                         "Test brief",
-                        "http://aaa.aaa",
+                        null,
                         "2020-2020"
                     )
                 )

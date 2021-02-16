@@ -17,25 +17,30 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import org.wvt.horizonmgr.legacyservice.WebAPI
 import org.wvt.horizonmgr.ui.components.NetworkImage
 import org.wvt.horizonmgr.ui.theme.PreviewTheme
 
+data class QQGroupEntry(
+    val tag: String,
+    val avatarUrl: String,
+    val name: String,
+    val description: String,
+    val url: String
+)
+
 @Composable
 internal fun GroupList(
-    groups: List<WebAPI.QQGroupEntry>,
-    onGroupSelect: (url: WebAPI.QQGroupEntry) -> Unit
+    groups: List<QQGroupEntry>,
+    onGroupSelect: (url: QQGroupEntry) -> Unit
 ) {
     LazyColumn(modifier = Modifier.fillMaxSize()) {
-        // use `item` for separate elements like headers
-        // and `items` for lists of identical elements
         items(groups) {
             GroupItem(
                 onClicked = { onGroupSelect(it) },
-                avatarUrl = it.avatar,
+                avatarUrl = it.avatarUrl,
                 groupName = it.name,
                 description = it.description,
-                tag = it.status
+                tag = it.tag
             )
         }
     }
@@ -50,16 +55,22 @@ private fun GroupItem(
     tag: String
 ) {
     Row(
-        Modifier.clickable(onClick = onClicked).fillMaxWidth().wrapContentHeight()
+        Modifier
+            .clickable(onClick = onClicked)
+            .fillMaxWidth()
+            .wrapContentHeight()
             .padding(vertical = 16.dp)
     ) {
         Column(
-            modifier = Modifier.padding(start = 16.dp, end = 24.dp).wrapContentSize(),
+            modifier = Modifier
+                .padding(start = 16.dp, end = 24.dp)
+                .wrapContentSize(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             // Group Avatar
             NetworkImage(
-                modifier = Modifier.size(42.dp)
+                modifier = Modifier
+                    .size(42.dp)
                     .clip(RoundedCornerShape(percent = 50)),
                 url = avatarUrl,
                 contentDescription = "头像"
@@ -68,7 +79,11 @@ private fun GroupItem(
             StatusTag(modifier = Modifier.padding(top = 8.dp), text = tag)
         }
         // Information
-        Column(Modifier.weight(1f).wrapContentHeight()) {
+        Column(
+            Modifier
+                .weight(1f)
+                .wrapContentHeight()
+        ) {
             // GroupName
             Providers(AmbientContentAlpha provides ContentAlpha.high) {
                 Box(Modifier.fillMaxWidth()) {
@@ -90,7 +105,9 @@ private fun GroupItem(
         }
         // Arrow Icon
         Column(
-            Modifier.padding(start = 16.dp, end = 16.dp).wrapContentSize(),
+            Modifier
+                .padding(start = 16.dp, end = 16.dp)
+                .wrapContentSize(),
             verticalArrangement = Arrangement.Center
         ) {
             Icon(Icons.Filled.ArrowForward, "加入")
@@ -106,7 +123,8 @@ private fun StatusTag(
 ) {
     Box(modifier.border(1.dp, contentColor, RoundedCornerShape(4.dp))) {
         Text(
-            modifier = Modifier.align(Alignment.Center)
+            modifier = Modifier
+                .align(Alignment.Center)
                 .padding(horizontal = 8.dp, vertical = 4.dp),
             text = text,
             style = MaterialTheme.typography.caption,

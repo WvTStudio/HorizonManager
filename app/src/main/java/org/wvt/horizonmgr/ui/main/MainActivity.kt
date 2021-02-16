@@ -1,48 +1,55 @@
 package org.wvt.horizonmgr.ui.main
 
 import android.os.Bundle
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.savedinstancestate.savedInstanceState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
+import org.wvt.horizonmgr.HorizonManagerApplication
 import org.wvt.horizonmgr.R
-import org.wvt.horizonmgr.dependenciesViewModel
-import org.wvt.horizonmgr.ui.AndroidDependenciesProvider
 import org.wvt.horizonmgr.ui.community.CommunityActivity
 import org.wvt.horizonmgr.ui.components.MyAlertDialog
 import org.wvt.horizonmgr.ui.donate.DonateActivity
 import org.wvt.horizonmgr.ui.joingroup.JoinGroupActivity
+import org.wvt.horizonmgr.ui.login.LoginResultContract
 import org.wvt.horizonmgr.ui.settings.SettingsActivity
 import org.wvt.horizonmgr.ui.startActivity
 import org.wvt.horizonmgr.ui.theme.AndroidHorizonManagerTheme
 import org.wvt.horizonmgr.ui.theme.PreviewTheme
 
 class MainActivity : AppCompatActivity() {
-//    private val dependencies = HorizonManagerApplication.container
+
+    private lateinit var app: HorizonManagerApplication
+    private lateinit var vm: MainActivityViewModel
+
+    private val login = registerForActivityResult(LoginResultContract()) {
+        vm.setUserInfo(it)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme(R.style.Theme_HorizonManagerCompose_NoActionBar) // cancel the slash theme
+        app = application as HorizonManagerApplication
+
+        vm =
+            viewModels<MainActivityViewModel>(factoryProducer = { app.dependenciesVMFactory }).value
 
         setContent {
-            val vm = dependenciesViewModel<MainActivityViewModel>()
+//            val vm = dependenciesViewModel<MainActivityViewModel>()
             val initializing by vm.initializing.collectAsState()
             val userInfo by vm.userInfo.collectAsState()
             val selectedPackage by vm.selectedPackage.collectAsState()
             val showPermissionDialog by vm.showPermissionDialog.collectAsState()
 
             val newVersion by vm.newVersion.collectAsState()
-            var displayNewVersionDialog by savedInstanceState { false }
-
-//            val navController = rememberNavController()
+            var displayNewVersionDialog by rememberSaveable { mutableStateOf(false) }
 
             DisposableEffect(newVersion) {
                 if (newVersion != null) {
@@ -59,44 +66,42 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
-            AndroidDependenciesProvider {
-                AndroidHorizonManagerTheme {
-                    Surface(color = MaterialTheme.colors.background) {
-                        if (!initializing) App(
-                            userInfo = userInfo,
-                            requestLogin = { vm.requestLogin(this) },
-                            requestLogout = vm::logOut,
-                            selectedPackageUUID = selectedPackage,
-                            selectedPackageChange = vm::setSelectedPackage,
-                            openGame = { vm.openGame(this) },
-                            community = { startActivity<CommunityActivity>() },
-                            joinGroup = { startActivity<JoinGroupActivity>() },
-                            donate = { startActivity<DonateActivity>() },
-                            settings = { startActivity<SettingsActivity>() },
-                        )
-                    }
+            AndroidHorizonManagerTheme {
+                Surface(color = MaterialTheme.colors.background) {
+                    if (!initializing) App(
+                        userInfo = userInfo,
+                        requestLogin = { login.launch(this) },
+                        requestLogout = vm::logOut,
+                        selectedPackageUUID = selectedPackage,
+                        selectedPackageChange = vm::setSelectedPackage,
+                        openGame = { vm.openGame(this) },
+                        community = { startActivity<CommunityActivity>() },
+                        joinGroup = { startActivity<JoinGroupActivity>() },
+                        donate = { startActivity<DonateActivity>() },
+                        settings = { startActivity<SettingsActivity>() },
+                    )
+                }
 
-                    if (showPermissionDialog) {
-                        RequestPermissionDialog {
-                            vm.dismiss()
-                            vm.requestPermission(this)
+                if (showPermissionDialog) {
+                    RequestPermissionDialog {
+                        vm.dismiss()
+                        vm.requestPermission(this)
+                    }
+                }
+
+                val theNewVersion = newVersion
+
+                if (theNewVersion != null && displayNewVersionDialog) {
+                    NewVersionDialog(
+                        versionName = theNewVersion.versionName,
+                        versionCode = theNewVersion.versionCode,
+                        changelog = theNewVersion.changelog,
+                        onConfirm = { displayNewVersionDialog = false },
+                        onIgnore = {
+                            vm.ignoreVersion(theNewVersion.versionCode)
+                            displayNewVersionDialog = false
                         }
-                    }
-
-                    val theNewVersion = newVersion
-
-                    if (theNewVersion != null && displayNewVersionDialog) {
-                        NewVersionDialog(
-                            versionName = theNewVersion.versionName,
-                            versionCode = theNewVersion.versionCode,
-                            changelog = theNewVersion.changelog,
-                            onConfirm = { displayNewVersionDialog = false },
-                            onIgnore = {
-                                vm.ignoreVersion(theNewVersion.versionCode)
-                                displayNewVersionDialog = false
-                            }
-                        )
-                    }
+                    )
                 }
             }
         }

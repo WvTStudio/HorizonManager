@@ -3,12 +3,15 @@ package org.wvt.horizonmgr.webapi.mgrinfo
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.features.*
-import io.ktor.client.features.get
 import io.ktor.client.request.*
 import org.json.JSONArray
+import org.json.JSONException
 import org.json.JSONObject
+import org.wvt.horizonmgr.webapi.JsonParseException
+import org.wvt.horizonmgr.webapi.NetworkException
+import org.wvt.horizonmgr.webapi.ServerException
 import org.wvt.horizonmgr.webapi.forEach
-import org.wvt.horizonmgr.webapi.parseJson
+import java.io.IOException
 
 /**
  * 代表某个版本号
@@ -23,9 +26,13 @@ class Version internal constructor(
     }
 
     suspend fun getData(): VersionData {
-        val response = client.get<String>("https://adodoz.cn/hzmgr/v1/changelogs.json")
+        val response = try {
+            client.get<String>("https://adodoz.cn/hzmgr/v1/changelogs.json")
+        } catch (e: IOException) {
+            throw NetworkException("获取更新日志失败", e)
+        }
         var result: VersionData? = null
-        parseJson {
+        try {
             JSONArray(response).forEach<JSONObject> {
                 val channel = it.getString("channel")
                 val versionCode = it.getInt("versionCode")
@@ -33,10 +40,11 @@ class Version internal constructor(
                     val versionName = it.getString("versionName")
                     val changelog = it.getString("changelog")
                     result = VersionData(channelName, versionCode, versionName, changelog)
-                    return@parseJson
                 }
             }
+        } catch (e: JSONException) {
+            throw JsonParseException(response, e)
         }
-        return result ?: error("Data seemed to be removed on the server.")
+        return result ?: throw ServerException("无法找到更新日志")
     }
 }

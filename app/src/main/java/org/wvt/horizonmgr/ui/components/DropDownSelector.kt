@@ -4,6 +4,7 @@ import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.indication
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -32,28 +33,28 @@ fun DropDownSelector(
         ),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Crossfade(current = items[selectedIndex]) {
+        Crossfade(items[selectedIndex]) {
             Text(it, style = MaterialTheme.typography.body1)
+        }
+        Box {
+            IconButton(
+                modifier = Modifier.indication(
+                    sourceInteractionState,
+                    rememberRipple(bounded = false, radius = 24.dp)
+                ),
+                onClick = { dropDown = true }
+            ) { Icon(Icons.Filled.ArrowDropDown, "展开") }
         }
         DropdownMenu(
             expanded = dropDown,
-            onDismissRequest = { dropDown = false },
-            toggle = {
-                IconButton(
-                    modifier = Modifier.indication(
-                        sourceInteractionState,
-                        rememberRipple(bounded = false, radius = 24.dp)
-                    ),
-                    onClick = { dropDown = true }
-                ) { Icon(Icons.Filled.ArrowDropDown, "展开") }
-            }, dropdownContent = {
-                items.forEachIndexed { index, item ->
-                    DropdownMenuItem(onClick = {
-                        dropDown = false
-                        onSelected(index)
-                    }) { Text(item) }
-                }
+            onDismissRequest = { dropDown = false }
+        ) {
+            items.forEachIndexed { index, item ->
+                DropdownMenuItem(onClick = {
+                    dropDown = false
+                    onSelected(index)
+                }) { Text(item) }
             }
-        )
+        }
     }
 }

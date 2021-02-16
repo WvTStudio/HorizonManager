@@ -11,26 +11,23 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.AmbientContext
+import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.edit
 
 private val config = mutableStateOf<ThemeConfig>(DefaultThemeConfig)
-private var controller: AndroidThemeController? = null
 
 /**
  * 该组件使用 SharedPreference 实现主题配置的持久化存储
  */
 @Composable
 fun AndroidHorizonManagerTheme(content: @Composable () -> Unit) {
-    val context = AmbientContext.current.applicationContext
+    val context = LocalContext.current.applicationContext
 
-    val theController = remember(context) {
-        controller ?: AndroidThemeController(context).also { controller = it }
-    }
+    val theController = remember(context) { AndroidThemeController(context) }
 
     DisposableEffect(isSystemInDarkTheme()) {
         theController.update()
-        onDispose {  }
+        onDispose { }
     }
 
     HorizonManagerTheme(
@@ -131,21 +128,24 @@ private class LocalConfig(context: Context) {
 
 internal class AndroidThemeController(
     private val context: Context
-    ) : ThemeController {
+) : ThemeController {
 
     private val localConfig = LocalConfig(context)
 
-    init { update() }
+    init {
+        update()
+    }
 
     fun update() {
         val lightColor = localConfig.getLightColor()
-        val darkColor =  localConfig.getDarkColor()
+        val darkColor = localConfig.getDarkColor()
 
 //        val followSystem = AppCompatDelegate.getDefaultNightMode()
 
         val configFollowSystem = localConfig.getFollowSystemDarkMode()
         val isConfigCustomInDark = localConfig.getCustomDarkMode()
-        val isSystemInDark = context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
+        val isSystemInDark =
+            context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
 
         config.value = config.value.copy(
             followSystemDarkMode = configFollowSystem,

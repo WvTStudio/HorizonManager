@@ -7,11 +7,11 @@ import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Providers
-import androidx.compose.runtime.staticAmbientOf
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
 
-val AmbientThemeController = staticAmbientOf<ThemeController>()
-val AmbientThemeConfig = staticAmbientOf<ThemeConfig>()
+val LocalThemeController = staticCompositionLocalOf<ThemeController>()
+val LocalThemeConfig = staticCompositionLocalOf<ThemeConfig>()
 
 interface ThemeController {
     fun setFollowSystemDarkTheme(enable: Boolean)
@@ -56,8 +56,8 @@ fun HorizonManagerTheme(
         isLight = targetColors.isLight
     )
     Providers(
-        AmbientThemeController provides controller,
-        AmbientThemeConfig provides config
+        LocalThemeController provides controller,
+        LocalThemeConfig provides config
     ) {
         MaterialTheme(
             colors = colors,

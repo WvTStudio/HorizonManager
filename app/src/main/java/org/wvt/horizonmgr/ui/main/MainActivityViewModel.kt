@@ -11,22 +11,28 @@ import android.provider.Settings
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlinx.coroutines.withContext
 import org.wvt.horizonmgr.BuildConfig
 import org.wvt.horizonmgr.DependenciesContainer
 import org.wvt.horizonmgr.legacyservice.LocalCache
 import org.wvt.horizonmgr.ui.login.LoginActivity
+import org.wvt.horizonmgr.ui.login.LoginResult
+import org.wvt.horizonmgr.ui.login.startForResult
+import org.wvt.horizonmgr.webapi.NetworkException
 import kotlin.coroutines.resume
 
+private const val TAG = "MainActivityVM"
+
 class MainActivityViewModel(
-    private val dependencies: DependenciesContainer
+    dependencies: DependenciesContainer
 ) : ViewModel() {
+    private val localCache = dependencies.localCache
+    private val mgrInfo = dependencies.mgrInfo
+
     var initializing = MutableStateFlow(true)
 
     val userInfo: MutableStateFlow<LocalCache.CachedUserInfo?> = MutableStateFlow(null)
@@ -45,8 +51,8 @@ class MainActivityViewModel(
 
     init {
         viewModelScope.launch {
-            userInfo.value = dependencies.localCache.getCachedUserInfo()
-            selectedPackage.value = dependencies.localCache.getSelectedPackageUUID()
+            userInfo.value = localCache.getCachedUserInfo()
+            selectedPackage.value = localCache.getSelectedPackageUUID()
             initializing.value = false
         }
     }
@@ -54,73 +60,96 @@ class MainActivityViewModel(
     fun getUpdate() {
         viewModelScope.launch {
             Log.d(
-                "MainVM",
-                "build_type: " + BuildConfig.BUILD_TYPE + ", version_code: " + BuildConfig.VERSION_CODE
+                TAG,
+                "build_type: " + BuildConfig.BUILD_TYPE + ", " +
+                        "version_code: " + BuildConfig.VERSION_CODE
             )
 
             // 获取本地忽略的最新版本号
-            ignoreVersion = dependencies.localCache.getIgnoreVersion()
+            ignoreVersion = localCache.getIgnoreVersion()
             val ig = ignoreVersion
 
-            // 查找当前 Channel 的最新版本
-            val l = try {
-                dependencies.webapi.getLatestVersions().find {
-                    it.channel == BuildConfig.BUILD_TYPE
-                }
+            val channel = try {
+                mgrInfo.getChannelByName(BuildConfig.BUILD_TYPE)
+            } catch (e: NetworkException) {
+                // TODO: 2021/2/8 添加网络错误的逻辑
+                return@launch
             } catch (e: Exception) {
-                e.printStackTrace()
+                Log.e(TAG, "获取版本通道失败", e)
                 return@launch
             } ?: return@launch
 
-            Log.d("MainVM", "latestversion: $l")
+            // 查找当前 Channel 的最新版本
+            val latest = try {
+                channel.latestVersion()
+            } catch (e: NetworkException) {
+                // TODO: 2021/2/8 添加网络错误的逻辑
+                return@launch
+            } catch (e: Exception) {
+                Log.e(TAG, "获取最新版本信息失败", e)
+                return@launch
+            }
+
+            Log.d(TAG, "latestVersion: $latest")
 
             // 如果最新版本不比当前版本大则退出
-            if (l.latestVersionCode <= BuildConfig.VERSION_CODE) return@launch
+            if (latest.versionCode <= BuildConfig.VERSION_CODE) return@launch
 
             // 如果最新版本不比忽略的版本大，则退出
-            if (ig != null && l.latestVersionCode <= ig) return@launch
+            if (ig != null && latest.versionCode <= ig) return@launch
 
             // 获取最新版本的信息
-            val v = try {
-                dependencies.webapi.getChangelogs().find {
-                    it.versionCode == l.latestVersionCode
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
+            val versionData = try {
+                latest.getData()
+            } catch (e: NetworkException) {
+                // TODO: 2021/2/8 添加网络错误的逻辑
                 return@launch
-            } ?: return@launch
+            } catch (e: Exception) {
+                Log.e(TAG, "获取版本数据失败", e)
+                return@launch
+            }
 
             newVersion.value = NewVersion(
-                versionName = v.versionName,
-                versionCode = v.versionCode,
-                changelog = v.changelog
+                versionName = versionData.versionName,
+                versionCode = versionData.versionCode,
+                changelog = versionData.changeLog
             )
         }
     }
 
     fun setSelectedPackage(uuid: String?) {
         viewModelScope.launch {
-            dependencies.localCache.setSelectedPackageUUID(uuid)
+            localCache.setSelectedPackageUUID(uuid)
             selectedPackage.value = uuid
         }
     }
 
-    fun setUserInfo(userInfo: LocalCache.CachedUserInfo?) {
+    fun setUserInfo(userInfo: LoginResult) {
         viewModelScope.launch {
-            if (userInfo == null) dependencies.localCache.clearCachedUserInfo()
-            else dependencies.localCache.cacheUserInfo(
-                userInfo.id,
+            if (userInfo is LoginResult.Succeed) {
+                localCache.cacheUserInfo(
+                    userInfo.uid,
+                    userInfo.name,
+                    userInfo.account,
+                    userInfo.avatar
+                )
+            }
+            this@MainActivityViewModel.userInfo.value = localCache.getCachedUserInfo()
+            /*
+            if (userInfo == null) localCache.clearCachedUserInfo()
+            else localCache.cacheUserInfo(
+                userInfo.uid,
                 userInfo.name,
                 userInfo.account,
                 userInfo.avatarUrl
             )
-            this@MainActivityViewModel.userInfo.value = userInfo
+             = userInfo*/
         }
     }
 
     fun logOut() {
         viewModelScope.launch {
-            dependencies.localCache.clearCachedUserInfo()
+            localCache.clearCachedUserInfo()
             userInfo.value = null
         }
     }
@@ -186,27 +215,35 @@ class MainActivityViewModel(
             return
         } catch (e: Exception) {
         }
+
+        // TODO: 2021/2/8 全都打开失败后提示
     }
 
-    fun requestLogin(context: ComponentActivity) {
-        viewModelScope.launch {
-            val userInfo = withContext(Dispatchers.Main) { startLoginActivity(context) }
+    fun requestLogin(context: AppCompatActivity) {
+        GlobalScope.launch {
+            Log.d(TAG, "Start activity")
+            val userInfo = LoginActivity.startForResult(context)
+//            val userInfo = withContext(Dispatchers.Main) { startLoginActivity(context) }
             setUserInfo(userInfo)
+            Log.d(TAG, "Activity resulted")
         }
     }
 
     fun ignoreVersion(versionCode: Int) {
         viewModelScope.launch {
-            dependencies.localCache.setIgnoreVersion(versionCode)
+            localCache.setIgnoreVersion(versionCode)
         }
     }
 
     private suspend fun startLoginActivity(activity: ComponentActivity): LocalCache.CachedUserInfo? {
         return suspendCancellableCoroutine { cont ->
-            activity.registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            activity.registerForActivityResult(
+                ActivityResultContracts.StartActivityForResult()
+            ) {
                 if (it.resultCode == LoginActivity.LOGIN_SUCCESS) {
                     val data = it.data ?: return@registerForActivityResult cont.resume(null)
                     val result = with(LoginActivity) { data.getResult() }
+                    Log.d(TAG, "Login result: ${result.toString()}")
                     cont.resume(result)
                 } else {
                     cont.resume(null)

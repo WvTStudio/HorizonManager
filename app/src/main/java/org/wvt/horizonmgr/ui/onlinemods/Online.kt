@@ -1,7 +1,6 @@
 package org.wvt.horizonmgr.ui.onlinemods
 
 import androidx.compose.animation.Crossfade
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -17,6 +16,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import org.wvt.horizonmgr.dependenciesViewModel
+import org.wvt.horizonmgr.legacyservice.WebAPI
+import org.wvt.horizonmgr.ui.components.ErrorPage
 import org.wvt.horizonmgr.ui.components.NetworkImage
 import org.wvt.horizonmgr.ui.components.ProgressDialog
 import org.wvt.horizonmgr.ui.main.AmbientSelectedPackageUUID
@@ -47,7 +48,7 @@ fun Online(
 
     Column(Modifier.fillMaxSize()) {
         // Top App Bar
-        TuneAppBar2(
+        TuneAppBar(
             enable = enable,
             onNavClicked = onNavClicked,
             onFilterValueConfirm = { vm.setFilterValue(it) },
@@ -65,7 +66,7 @@ fun Online(
             // If do login, displays online mods list.
             Crossfade(
                 modifier = Modifier.fillMaxSize(),
-                current = state
+                targetState= state
             ) { state ->
                 when (state) {
                     is OnlineViewModel.State.Loading -> Box(
@@ -74,37 +75,19 @@ fun Online(
                     ) {
                         CircularProgressIndicator()
                     }
-                    is OnlineViewModel.State.OK -> Box(Modifier.fillMaxSize()) {
-                        val lazyListState = rememberLazyListState()
-                        LazyColumn(
-                            modifier = Modifier.fillMaxSize(),
-                            contentPadding = PaddingValues(top = 16.dp, bottom = 64.dp),
-                            state = lazyListState
-                        ) {
-                            itemsIndexed(state.modList) { _, item ->
-                                ModItem(
-                                    modifier = Modifier.padding(
-                                        horizontal = 16.dp,
-                                        vertical = 8.dp
-                                    ),
-                                    title = item.name,
-                                    text = item.description,
-                                    imageUrl = item.iconUrl,
-                                    onDownloadClick = { vm.download(item) },
-                                    onInstallClick = { vm.install(item) }
-                                )
-                            }
-                        }
-                    }
-                    is OnlineViewModel.State.Error -> Column(
+                    is OnlineViewModel.State.OK -> ModList(
                         modifier = Modifier.fillMaxSize(),
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Text(state.message)
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Button(onClick = vm::refresh) { Text("重试") }
-                    }
+                        mods = state.modList,
+                        onDownloadClick = { vm.download(it) },
+                        onInstallClick = { vm.install(it) }
+                    )
+                    is OnlineViewModel.State.Error -> ErrorPage(
+                        modifier = Modifier.fillMaxSize(),
+                        message = {
+                            Text(state.message)
+                        },
+                        onRetryClick = vm::refresh
+                    )
                 }
             }
         }
@@ -119,6 +102,37 @@ private fun NotLoginTip() {
             text = "此功能仅在登录后可用",
             color = MaterialTheme.colors.onSurface.copy(ContentAlpha.medium)
         )
+    }
+}
+
+@Composable
+private fun ModList(
+    modifier: Modifier = Modifier,
+    mods: List<WebAPI.OnlineModInfo>,
+    onDownloadClick: (WebAPI.OnlineModInfo) -> Unit,
+    onInstallClick: (WebAPI.OnlineModInfo) -> Unit
+) {
+    Box(modifier) {
+        val lazyListState = rememberLazyListState()
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(top = 16.dp, bottom = 64.dp),
+            state = lazyListState
+        ) {
+            itemsIndexed(mods) { _, item ->
+                ModItem(
+                    modifier = Modifier.padding(
+                        horizontal = 16.dp,
+                        vertical = 8.dp
+                    ),
+                    title = item.name,
+                    text = item.description,
+                    imageUrl = item.iconUrl,
+                    onDownloadClick = { onDownloadClick(item) },
+                    onInstallClick = { onInstallClick(item) }
+                )
+            }
+        }
     }
 }
 

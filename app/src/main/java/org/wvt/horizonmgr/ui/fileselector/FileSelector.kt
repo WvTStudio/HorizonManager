@@ -194,7 +194,7 @@ fun FileSelector(onCancel: () -> Unit, onSelect: (String) -> Unit) {
                 changeDepth(it + storageDepth)
             }
         )
-        Crossfade(current = isLoading) {
+        Crossfade(isLoading) {
             if (it) {
                 Box(Modifier.fillMaxSize(), Alignment.Center) {
                     CircularProgressIndicator()
@@ -355,7 +355,7 @@ private fun PathList(
         Divider(Modifier.padding(top = 8.dp, bottom = 8.dp))
     }
 
-    Crossfade(current = entries) { entries->
+    Crossfade(entries) { entries->
         if (entries.isEmpty()) {
             // 如果子文件是空的，那么 LazyColumnForIndex 不会触发，需要手动检测
             Column(modifier) {

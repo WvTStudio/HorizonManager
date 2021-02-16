@@ -38,7 +38,7 @@ class LocalCache private constructor(context: Context) {
     }
 
     data class CachedUserInfo(
-        val id: Int,
+        val uid: String,
         val name: String,
         val account: String,
         val avatarUrl: String
@@ -49,7 +49,7 @@ class LocalCache private constructor(context: Context) {
             val name = getString("name", null) ?: return@with null
             val account = getString("account", null) ?: return@with null
             val avatarUrl = getString("avatar_url", null) ?: return@with null
-            val id = getInt("id", -1).takeIf { it != -1 } ?: return@with null
+            val id = getString("uid", null) ?: return@with null
             CachedUserInfo(id, name, account, avatarUrl)
         }
     }
@@ -60,10 +60,10 @@ class LocalCache private constructor(context: Context) {
         }
     }
 
-    suspend fun cacheUserInfo(id: Int, name: String, account: String, avatarUrl: String) {
+    suspend fun cacheUserInfo(uid: String, name: String, account: String, avatarUrl: String) {
         withContext(Dispatchers.IO) {
             userInfoPref.edit {
-                putInt("id", id)
+                putString("uid", uid)
                 putString("account", account)
                 putString("avatar_url", avatarUrl)
                 putString("name", name)
@@ -74,7 +74,7 @@ class LocalCache private constructor(context: Context) {
     suspend fun cacheUserInfo(userInfo: CachedUserInfo) {
         withContext(Dispatchers.IO) {
             userInfoPref.edit {
-                putInt("id", userInfo.id)
+                putString("uid", userInfo.uid)
                 putString("account", userInfo.account)
                 putString("avatar_url", userInfo.avatarUrl)
                 putString("name", userInfo.name)
@@ -135,4 +135,4 @@ class LocalCache private constructor(context: Context) {
 }
 
 fun WebAPI.UserInfo.mapToCachedUserInfo() =
-    LocalCache.CachedUserInfo(id, name, account, avatarUrl)
+    LocalCache.CachedUserInfo(id.toString(), name, account, avatarUrl)
