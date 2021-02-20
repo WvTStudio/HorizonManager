@@ -13,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import org.wvt.horizonmgr.BuildConfig
@@ -25,16 +26,16 @@ import org.wvt.horizonmgr.ui.theme.LocalThemeController
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun Settings(
+    versionName: String,
+    onNavClick: () -> Unit,
     requestCustomTheme: () -> Unit
 ) {
-    val context = LocalContext.current as AppCompatActivity
-    val versionName = remember { "Version " + BuildConfig.VERSION_NAME }
     val themeController = LocalThemeController.current
     val themeConfig = LocalThemeConfig.current
 
     Column(Modifier.fillMaxSize()) {
         TopAppBar(title = {}, navigationIcon = {
-            IconButton(onClick = { context.finish() }) {
+            IconButton(onClick = onNavClick) {
                 Icon(Icons.Filled.ArrowBack, "返回")
             }
         }, backgroundColor = Color.Transparent, elevation = 0.dp)
@@ -47,13 +48,13 @@ fun Settings(
                     Image(
                         modifier = Modifier.padding(start = 4.dp, top = 4.dp),
                         contentDescription = "LOGO",
-                        imageVector = vectorResource(
+                        painter = painterResource(
                             id = if (isSystemInDarkTheme()) R.drawable.ic_logo_banner_dark
                             else R.drawable.ic_logo_banner
                         )
                     )
                 }
-                Providers(AmbientContentAlpha provides ContentAlpha.medium) {
+                Providers(LocalContentAlpha provides ContentAlpha.medium) {
                     Text(
                         modifier = Modifier.padding(top = 4.dp),
                         text = versionName,

@@ -33,8 +33,8 @@
         <activity android:name=".ui.settings.CustomThemeActivity" />
         <activity android:name=".ui.joingroup.JoinGroupActivity" />
         <activity android:name=".ui.community.CommunityActivity" />
-        <activity android:name=".ui.pacakgemanager.InstallPackageActivity" />
-        <activity android:name=".ui.fileselector.SelectFileActivity" />
+        <activity android:name=".ui.onlineinstall.InstallPackageActivity" />
+        <activity android:name=".ui.fileselector.FileSelectorActivity" />
         <activity android:name=".ui.pacakgemanager.PackageDetailActivity" />
         <activity android:name=".ui.settings.SettingsActivity" />
         <activity android:name=".ui.login.LoginActivity" />

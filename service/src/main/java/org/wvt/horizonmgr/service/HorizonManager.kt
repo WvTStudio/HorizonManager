@@ -5,8 +5,8 @@ import android.os.Environment
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
-import org.wvt.horizonmgr.service.pack.ZipPackage
 import org.wvt.horizonmgr.service.pack.InstalledPackage
+import org.wvt.horizonmgr.service.pack.ZipPackage
 import org.wvt.horizonmgr.service.utils.translateToValidFile
 import java.io.File
 import java.util.*
@@ -40,7 +40,7 @@ class HorizonManager constructor(context: Context) {
      */
     suspend fun installPackage(
         zipPackage: ZipPackage,
-        graphicsZip: File
+        graphicsZip: File?
     ): InstalledPackage = withContext(Dispatchers.IO) {
         if (packDir.exists().not()) packDir.mkdirs()
         // 根据指定分包名称生成目录
@@ -50,8 +50,9 @@ class HorizonManager constructor(context: Context) {
         outDir.resolve(".installation_started").createNewFile()
         // 直接解压到 packs 文件夹
         CoroutineZip.unzip(zipPackage.getPackageFile(), outDir).await()
+        // TODO: 2021/2/20 测试如果没有 graphics 是否能运行
         // 预览图压缩包直接复制改名
-        graphicsZip.copyTo(outDir.resolve(".cached_graphics"))
+        graphicsZip?.copyTo(outDir.resolve(".cached_graphics"))
         val uuid = UUID.randomUUID().toString().toLowerCase(Locale.ROOT)
         outDir.resolve(".installation_info").outputStream().writer().use {
             val jsonStr = InstallationInfo(
@@ -72,6 +73,23 @@ class HorizonManager constructor(context: Context) {
         val customName: String,
         val internalId: String
     ) {
+        companion object {
+            fun fromJson(jsonStr: String): InstallationInfo? {
+                return try {
+                    with(JSONObject(jsonStr)) {
+                        InstallationInfo(
+                            packageId = getString("uuid"),
+                            timeStamp = getLong("timestamp"),
+                            customName = getString("customName"),
+                            internalId = getString("internalId")
+                        )
+                    }
+                } catch (e: Exception) {
+                    null
+                }
+            }
+        }
+
         fun toJson(): String {
             return with(JSONObject()) {
                 put("uuid", packageId)

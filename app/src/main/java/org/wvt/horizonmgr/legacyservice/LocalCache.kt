@@ -7,10 +7,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 class LocalCache private constructor(context: Context) {
-    private val fixedFoldersPref: SharedPreferences
-    private val userInfoPref: SharedPreferences
-    private val selectedPackagePref: SharedPreferences
-    private val optionsPref: SharedPreferences
+    private val fixedFoldersPref: SharedPreferences =
+        context.getSharedPreferences(FIXED_FOLDERS, Context.MODE_PRIVATE)
+    private val userInfoPref: SharedPreferences = context.getSharedPreferences(USER_INFO, Context.MODE_PRIVATE)
+    private val selectedPackagePref: SharedPreferences =
+        context.getSharedPreferences(SELECTED_PACKAGE, Context.MODE_PRIVATE)
+    private val optionsPref: SharedPreferences = context.getSharedPreferences(OPTIONS, Context.MODE_PRIVATE)
 
     companion object {
         private const val USER_INFO = "user_info"
@@ -28,13 +30,6 @@ class LocalCache private constructor(context: Context) {
             instance = LocalCache(context)
             return instance!!
         }
-    }
-
-    init {
-        fixedFoldersPref = context.getSharedPreferences(FIXED_FOLDERS, Context.MODE_PRIVATE)
-        userInfoPref = context.getSharedPreferences(USER_INFO, Context.MODE_PRIVATE)
-        selectedPackagePref = context.getSharedPreferences(SELECTED_PACKAGE, Context.MODE_PRIVATE)
-        optionsPref = context.getSharedPreferences(OPTIONS, Context.MODE_PRIVATE)
     }
 
     data class CachedUserInfo(

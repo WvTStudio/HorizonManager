@@ -1,5 +1,6 @@
 package org.wvt.horizonmgr.ui.login
 
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
 import androidx.compose.animation.*
@@ -24,9 +25,7 @@ import androidx.compose.ui.unit.dp
 import org.wvt.horizonmgr.R
 import org.wvt.horizonmgr.dependenciesViewModel
 
-private val rotationSpec = InfiniteRepeatableSpec<Float>(
-    tween(durationMillis = 5000, easing = LinearEasing), RepeatMode.Restart
-)
+private const val TAG = "ComposeLogin"
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
@@ -34,17 +33,44 @@ fun Login(
     onLoginSuccess: (account: String, avatar: String?, name: String, uid: String) -> Unit,
     onCancel: () -> Unit
 ) {
-    val context = LocalContext.current as ComponentActivity
+    // FIXME: 2021/2/19 修复齿轮不转的问题
     val vm = dependenciesViewModel<LoginViewModel>()
+    val context = LocalContext.current as ComponentActivity
+    var rotation by remember { mutableStateOf(0f) }
+
     val fabState by vm.fabState.collectAsState()
 
     val snackbarHostState = remember { SnackbarHostState() }
     var screen by remember { mutableStateOf(0) }
     val gearResource = painterResource(id = R.drawable.ic_gear_full)
 
-    val gearRotation by rememberInfiniteTransition().animateFloat(
-        initialValue = 0f, targetValue = 360f, animationSpec = rotationSpec
+    LaunchedEffect(Unit) {
+        animate(
+            initialValue = 0f, targetValue = 360f,
+            animationSpec = infiniteRepeatable(
+                tween(durationMillis = 5000, easing = LinearEasing),
+                RepeatMode.Reverse
+            )
+        ) { value, velocity ->
+            rotation = value
+            Log.d(TAG, "aRotation: $value")
+        }
+    }
+/*
+
+    val transition = rememberInfiniteTransition()
+
+    val gearRotation by transition.animateFloat(
+        initialValue = 0f, targetValue = 360f,
+        animationSpec = infiniteRepeatable(
+            tween(durationMillis = 5000, easing = LinearEasing),
+            RepeatMode.Reverse
+        )
     )
+
+
+    Log.d(TAG, "rotation: $gearRotation")
+*/
 
     DisposableEffect(Unit) {
         context.onBackPressedDispatcher.addCallback(object : OnBackPressedCallback(true) {
@@ -62,6 +88,8 @@ fun Login(
     }
 
     Box(Modifier.fillMaxSize()) {
+        val gearColor = MaterialTheme.colors.onSurface.copy(0.12f)
+
         // Gear Animations
         Box(
             Modifier
@@ -70,9 +98,12 @@ fun Login(
                 .align(Alignment.TopEnd)
         ) {
             Canvas(modifier = Modifier.matchParentSize(), onDraw = {
-                rotate(gearRotation) {
+                rotate(rotation) {
                     with(gearResource) {
-                        draw(Size(256.dp.toPx(), 256.dp.toPx()))
+                        draw(
+                            Size(256.dp.toPx(), 256.dp.toPx()),
+                            colorFilter = ColorFilter.tint(gearColor)
+                        )
                     }
                 }
             })
@@ -81,7 +112,7 @@ fun Login(
             Modifier
                 .size(256.dp)
                 .offset(x = (-128).dp)
-                .graphicsLayer(rotationZ = gearRotation)
+                .graphicsLayer(rotationZ = rotation)
                 .align(Alignment.BottomStart)
         ) {
             Box(
@@ -90,7 +121,7 @@ fun Login(
                     .paint(
                         painter = gearResource,
                         contentScale = ContentScale.Fit,
-                        colorFilter = ColorFilter.tint(MaterialTheme.colors.onSurface.copy(0.12f))
+                        colorFilter = ColorFilter.tint(gearColor)
                     )
             )
         }
@@ -113,8 +144,8 @@ fun Login(
         AnimatedVisibility(
             visible = screen == 0,
             initiallyVisible = true,
-            enter = remember { fadeIn() + slideInHorizontally({ -80 }) },
-            exit = remember { fadeOut() + slideOutHorizontally({ -80 }) }
+            enter = fadeIn() + slideInHorizontally({ -80 }),
+            exit = fadeOut() + slideOutHorizontally({ -80 })
         ) {
             LoginPage(onLoginClicked = { account, password ->
                 vm.login(account, password, snackbarHostState, onLoginSuccess)
@@ -127,8 +158,8 @@ fun Login(
         AnimatedVisibility(
             visible = screen == 1,
             initiallyVisible = false,
-            enter = remember { fadeIn() + slideInHorizontally({ 80 }) },
-            exit = remember { fadeOut() + slideOutHorizontally({ 80 }) }
+            enter = fadeIn() + slideInHorizontally({ 80 }),
+            exit = fadeOut() + slideOutHorizontally({ 80 })
         ) {
             RegisterPage(
                 fabState = fabState,

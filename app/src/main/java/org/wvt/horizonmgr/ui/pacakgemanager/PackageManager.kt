@@ -1,6 +1,5 @@
 package org.wvt.horizonmgr.ui.pacakgemanager
 
-import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.*
@@ -21,7 +20,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
@@ -31,7 +30,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import org.wvt.horizonmgr.dependenciesViewModel
 import org.wvt.horizonmgr.ui.components.*
-import org.wvt.horizonmgr.ui.main.AmbientSelectedPackageUUID
+import org.wvt.horizonmgr.ui.main.LocalSelectedPackageUUID
 import org.wvt.horizonmgr.ui.theme.PreviewTheme
 import kotlin.coroutines.resume
 
@@ -46,30 +45,34 @@ data class PackageManagerItem(
 @Composable
 fun PackageManager(
     onPackageSelect: (uuid: String?) -> Unit,
+    navigateToPackageInfo: (uuid: String) -> Unit,
+    onOnlineInstallClick: () -> Unit,
+    onLocalInstallClick: () -> Unit,
     onNavClick: () -> Unit
 ) {
-    val context = LocalContext.current as AppCompatActivity
-    val selectedPackageUUID = AmbientSelectedPackageUUID.current
+    val selectedPackageUUID = LocalSelectedPackageUUID.current
 
     val vm = dependenciesViewModel<PackageManagerViewModel>()
 
-    DisposableEffect(selectedPackageUUID) {
-        vm.setSelectedPackage(selectedPackageUUID)
+    DisposableEffect(Unit) {
         vm.loadPackages()
-        onDispose {
-            // TODO: 2021/2/7 添加 Dispose 逻辑
-        }
+        onDispose { }
     }
 
-    val vmPackages by vm.packages.collectAsState()
-    val vmPs by vm.progressState.collectAsState()
+    DisposableEffect(selectedPackageUUID) {
+        vm.setSelectedPackage(selectedPackageUUID)
+        onDispose {}
+    }
+
+    val packages by vm.packages.collectAsState()
+    val progresstate by vm.progressState.collectAsState()
 
     val snackbarHostState = remember { SnackbarHostState() }
     val confirmDeleteDialogHostState = remember { ConfirmDeleteDialogHostState() }
     val inputDialogHostState = remember { InputDialogHostState() }
     var fabExpand by rememberSaveable { mutableStateOf(false) }
 
-    vmPs?.let {
+    progresstate?.let {
         ProgressDialog(onCloseRequest = vm::dismiss, state = it)
     }
 
@@ -104,14 +107,14 @@ fun PackageManager(
                 }
             )
 
-            if (vmPackages.isNullOrEmpty()) {
+            if (packages.isNullOrEmpty()) {
                 // Tips when there was no package installed.
                 EmptyPage(Modifier.fillMaxSize()) { Text("你还没有安装分包") }
             } else LazyColumn(
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(top = 8.dp, bottom = 64.dp)
             ) {
-                itemsIndexed(vmPackages) { index, item ->
+                itemsIndexed(packages) { index, item ->
                     PackageItem(
                         modifier = Modifier.padding(16.dp, 8.dp),
                         title = item.name,
@@ -119,7 +122,7 @@ fun PackageManager(
                         installTime = item.timeStr,
                         selected = item.uuid == selectedPackageUUID,
                         onClick = { onPackageSelect(item.uuid) },
-                        onInfoClick = { vm.showInfo(context, item.uuid) },
+                        onInfoClick = { navigateToPackageInfo(item.uuid) },
                         onDeleteClick = {
                             vm.deletePackage(item.uuid,
                                 confirmDeleteDialogHostState,
@@ -132,6 +135,7 @@ fun PackageManager(
                 }
             }
         }
+
         SnackbarHost(hostState = snackbarHostState)
 
         // Displays when user is deleting a package
@@ -146,12 +150,11 @@ fun PackageManager(
             expand = fabExpand,
             onExpandStateChange = { fabExpand = it },
             onLocalInstallClick = {
-                // TODO: 2020/11/13
-                vm.localInstall(context)
+                onLocalInstallClick()
                 fabExpand = false
             },
             onOnlineInstallClick = {
-                vm.onlineInstall(context)
+                onOnlineInstallClick()
                 fabExpand = false
             }
         )
@@ -363,12 +366,15 @@ fun PackageItem(
                         .padding(16.dp)
                 ) {
                     // Title
-                    Text(title, style = MaterialTheme.typography.h5)
+                    Text(title, style = MaterialTheme.typography.h6)
                     // Description
                     Text(
                         modifier = Modifier.padding(top = 8.dp),
-                        text = description, style = MaterialTheme.typography.subtitle1,
-                        color = MaterialTheme.colors.onSurface.copy(alpha = 0.5f)
+                        text = description,
+                        style = MaterialTheme.typography.body1,
+                        color = MaterialTheme.colors.onSurface.copy(alpha = 0.5f),
+                        maxLines = 4,
+                        overflow = TextOverflow.Ellipsis
                     )
                 }
                 // Actions
@@ -447,29 +453,29 @@ fun PackageItem(
 class ConfirmDeleteDialogHostState {
     var currentData by mutableStateOf<Data?>(null)
         private set
+
     private val mutex = Mutex()
 
-    suspend fun showDialog(): DialogResult {
-        mutex.withLock {
-            return try {
-                suspendCancellableCoroutine<DialogResult> { cont ->
-                    currentData = Data(cont)
-                }
-            } finally {
-                currentData = null
+    suspend fun showDialog(): DialogResult = mutex.withLock {
+        try {
+            return suspendCancellableCoroutine { cont ->
+                currentData = Data(cont)
             }
+        } finally {
+            currentData = null
         }
     }
 
+    @Stable
     class Data(
         private val continuation: CancellableContinuation<DialogResult>
     ) {
         fun confirm() {
-            continuation.resume(DialogResult.CONFIRM)
+            if (continuation.isActive) continuation.resume(DialogResult.CONFIRM)
         }
 
         fun dismiss() {
-            continuation.resume(DialogResult.DISMISS)
+            if (continuation.isActive) continuation.resume(DialogResult.DISMISS)
         }
     }
 
@@ -485,21 +491,13 @@ fun ConfirmDeleteDialogHost(state: ConfirmDeleteDialogHostState) {
         MyAlertDialog(onDismissRequest = {
             data.dismiss()
         }, title = {
-            Text("确认删除吗？")
+            Text("是否确认删除")
         }, text = {
-            Text("分包内的模组、地图、材质都将一并删除，且无法恢复！请谨慎选择")
+            Text("分包内的模组、地图、材质都将一并删除，且无法恢复！")
         }, dismissButton = {
-            TextButton(onClick = {
-                data.dismiss()
-            }) {
-                Text("取消")
-            }
+            TextButton(onClick = { data.dismiss() }) { Text("取消") }
         }, confirmButton = {
-            TextButton(onClick = {
-                data.confirm()
-            }) {
-                Text("删除")
-            }
+            TextButton(onClick = { data.confirm() }) { Text("删除") }
         })
     }
 }

@@ -3,9 +3,12 @@ package org.wvt.horizonmgr.service.pack
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
+import org.wvt.horizonmgr.service.HorizonManager
 import org.wvt.horizonmgr.service.mod.InstalledMod
 import org.wvt.horizonmgr.service.mod.ZipMod
+import org.wvt.horizonmgr.service.utils.translateToValidFile
 import java.io.File
+import java.util.*
 
 /**
  * 该类代表一个已经安装的分包
@@ -13,6 +16,12 @@ import java.io.File
 class InstalledPackage constructor(
     private val pkgDir: File
 ) {
+    object ManifestParser {
+        fun parse() {
+
+        }
+    }
+
     class PackageDoesNotExistsException() : Exception("Package does not exists.")
 
     // TODO: 2020/11/1 使该 Package 始终能返回最新数据
@@ -135,7 +144,7 @@ class InstalledPackage constructor(
     /**
      * 获取该分包的所有 Mod
      */
-    fun getMods(): List<InstalledMod> {
+    suspend fun getMods(): List<InstalledMod> = withContext(Dispatchers.IO) {
         // TODO: 2020/11/13
         val result = mutableListOf<InstalledMod>()
 
@@ -152,12 +161,29 @@ class InstalledPackage constructor(
                 continue
             }
         }
-        return result
+        return@withContext result
     }
 
     suspend fun delete() {
         withContext(Dispatchers.IO) {
             pkgDir.deleteRecursively()
         }
+    }
+
+    suspend fun clone(newName: String) = withContext(Dispatchers.IO) {
+        val targetDir = pkgDir.parentFile!!.resolve(newName).translateToValidFile()
+        pkgDir.copyRecursively(targetDir)
+        InstalledPackage(targetDir)
+
+        val oldInfo = HorizonManager.InstallationInfo.fromJson(
+            targetDir.resolve(".installation_info").readText()
+        ) ?: error("解析JSON失败")
+
+        val newInfo = oldInfo.copy(
+            customName = newName,
+            internalId = UUID.randomUUID().toString().toLowerCase(Locale.ROOT)
+        )
+        targetDir.resolve(".installation_info").writeText(newInfo.toJson())
+        return@withContext newInfo
     }
 }

@@ -12,11 +12,13 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class NewsViewModel(
-    private val dependencies: DependenciesContainer
+    dependencies: DependenciesContainer
 ) : ViewModel() {
     companion object {
         const val TAG = "NewsViewModel"
     }
+
+    private val newsModule = dependencies.news
 
     sealed class News {
         data class Article(
@@ -45,7 +47,7 @@ class NewsViewModel(
 
         viewModelScope.launch {
             val result = try {
-                dependencies.news.getNewsSuggestions().map {
+                newsModule.getNewsSuggestions().map {
                     News.Article(
                         it.newsId,
                         it.title,
@@ -55,13 +57,12 @@ class NewsViewModel(
                     )
                 }
             } catch (e: Exception) {
-                state.value = State.Error(e)
+                state.emit(State.Error(e))
                 Log.e(TAG, "Failed to refresh news", e)
-                e.printStackTrace()
                 return@launch
             }
-            news.value = result
-            state.value = State.Succeed
+            news.emit(result)
+            state.emit(State.Succeed)
         }
     }
 

@@ -62,25 +62,20 @@ internal fun TuneAppBar(
     onSortModeSelect: (index: OnlineViewModel.SortMode) -> Unit
 ) {
     var expand by remember { mutableStateOf(false) }
-//    val searchBoxScale = animate(if (expand) 1f else 1.5f)
-//    val searchBoxOpacity = animate(if (expand) 1f else 0f)
 
     var filterValue by remember { mutableStateOf(TextFieldValue()) }
 
-    val actionOpacity = animateFloatAsState(if (expand) 0.72f else 1f).value
+    val actionOpacity by animateFloatAsState(if (expand) 0.72f else 1f)
 
-    val offset = animateDpAsState(
+    val offset by animateDpAsState(
         if (expand) 16.dp else 0.dp,
         animationSpec = if (expand) searchBoxEnter else searchBoxExit
-    ).value
+    )
 
-    val contentOpacity = animateFloatAsState(
+    val contentOpacity by animateFloatAsState(
         if (expand) 1f else 0f,
         if (expand) contentAppear else contentDisappear
-    ).value
-//    val leftOffset = animate(if (expand) 16.dp else 0.dp)
-//    val rightOffset = animate(if (expand) 16.dp else 0.dp)
-//    val topOffset = animate(if (expand) 16.dp else 0.dp)
+    )
 
     Surface(
         modifier = Modifier.fillMaxWidth().wrapContentHeight().zIndex(4.dp.value),

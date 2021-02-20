@@ -57,11 +57,11 @@ internal fun ICLevelTab(
                             onRenameClicked = {
                                 scope.launch {
                                     val result: InputDialogHostState.DialogResult =
-                                        inputDialogState.showDialog("请输入新名称", "新名称")
+                                        inputDialogState.showDialog("New-${item.name}","请输入新名称", "新名称")
                                     if (result is InputDialogHostState.DialogResult.Confirm) {
                                         progressDialogState = ProgressDialogState.Loading("正在重命名")
                                         try {
-                                            vm.renameLevel(item.path, result.name)
+                                            vm.renameLevel(item.path, result.input)
                                         } catch (e: Exception) {
                                             e.printStackTrace()
                                             progressDialogState =

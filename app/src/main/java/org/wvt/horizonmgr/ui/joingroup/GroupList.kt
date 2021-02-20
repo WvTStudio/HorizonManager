@@ -85,7 +85,7 @@ private fun GroupItem(
                 .wrapContentHeight()
         ) {
             // GroupName
-            Providers(AmbientContentAlpha provides ContentAlpha.high) {
+            Providers(LocalContentAlpha provides ContentAlpha.high) {
                 Box(Modifier.fillMaxWidth()) {
                     // GroupName
                     Text(
@@ -96,7 +96,7 @@ private fun GroupItem(
                 }
             }
             // Description
-            Providers(AmbientContentAlpha provides ContentAlpha.medium) {
+            Providers(LocalContentAlpha provides ContentAlpha.medium) {
                 Text(
                     modifier = Modifier.padding(top = 8.dp),
                     text = description, style = MaterialTheme.typography.body2

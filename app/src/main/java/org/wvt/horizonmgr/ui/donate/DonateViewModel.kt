@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import org.wvt.horizonmgr.DependenciesContainer
-import org.wvt.horizonmgr.legacyservice.WebAPI.NetworkException
+import org.wvt.horizonmgr.webapi.NetworkException
 import kotlin.math.log
 
 private const val TAG = "DonateVMLogger"
@@ -45,7 +45,7 @@ class DonateViewModel(
                 Log.e(TAG, "获取捐赠列表失败", e)
                 return@launch
             }
-            _donates.value = result
+            _donates.emit(result)
         }
     }
 }

@@ -23,6 +23,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.platform.AmbientDensity
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntOffset
@@ -42,7 +43,7 @@ internal fun FolderItem(
     isStared: Boolean,
     onStarChange: (isStared: Boolean) -> Unit,
 ) {
-    val swipePoint = with(AmbientDensity.current) { 74.dp.toPx() }
+    val swipePoint = with(LocalDensity.current) { 74.dp.toPx() }
     val anchors = mapOf(0f to 0, -swipePoint to 1)
 
     val state = rememberSwipeableState(0) {
@@ -166,7 +167,7 @@ private fun ToggleBackgroundWithIcon(
                             modifier = Modifier
                                 .clip(CircleShape)
                                 .background(if (ripple.check) activeColor else inactiveColor)
-                                .size(with(AmbientDensity.current) { rippleSizePx.toDp() })
+                                .size(with(LocalDensity.current) { rippleSizePx.toDp() })
                         )
                     }
                 ) { list: List<Measurable>, constraints: Constraints ->
@@ -174,9 +175,9 @@ private fun ToggleBackgroundWithIcon(
                     layout(constraints.maxWidth, constraints.maxHeight) {
                         p.place(
                             x = if (gravity == Alignment.Start) {
-                                padding.toIntPx() - p.width / 2
+                                padding.roundToPx() - p.width / 2
                             } else {
-                                constraints.maxWidth - padding.toIntPx() - p.width / 2
+                                constraints.maxWidth - padding.roundToPx() - p.width / 2
                             },
                             y = (constraints.maxHeight - p.height) / 2
                         )

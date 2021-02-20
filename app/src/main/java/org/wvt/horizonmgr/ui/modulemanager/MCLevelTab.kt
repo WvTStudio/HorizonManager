@@ -36,15 +36,18 @@ internal fun MCLevelTab(
                     onRenameClicked = {
                         scope.launch {
                             val result: InputDialogHostState.DialogResult =
-                                inputDialogState.showDialog("请输入新名称", "新名称")
+                                inputDialogState.showDialog(item.name, "请输入新名称", "新名称")
                             if (result is InputDialogHostState.DialogResult.Confirm) {
                                 progressDialogState = ProgressDialogState.Loading("正在重命名")
                                 try {
-                                    vm.renameLevel(item.path, result.name)
+                                    vm.renameLevel(item.path, result.input)
                                 } catch (e: Exception) {
                                     e.printStackTrace()
                                     progressDialogState =
-                                        ProgressDialogState.Failed("重命名失败", e.localizedMessage ?: "")
+                                        ProgressDialogState.Failed(
+                                            "重命名失败",
+                                            e.localizedMessage ?: ""
+                                        )
                                     return@launch
                                 }
                                 progressDialogState = ProgressDialogState.Finished("重命名成功")

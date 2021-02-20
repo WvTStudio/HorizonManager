@@ -8,10 +8,7 @@ import androidx.activity.result.contract.ActivityResultContract
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.material.Surface
 import androidx.compose.ui.platform.setContent
-import kotlinx.coroutines.suspendCancellableCoroutine
-import org.wvt.horizonmgr.legacyservice.LocalCache
 import org.wvt.horizonmgr.ui.theme.AndroidHorizonManagerTheme
-import kotlin.coroutines.resume
 
 private const val TAG = "LoginActivity"
 
@@ -34,7 +31,7 @@ class LoginResultContract : ActivityResultContract<Context, LoginResult>() {
 
     override fun parseResult(resultCode: Int, intent: Intent?): LoginResult {
         when (resultCode) {
-            LoginActivity.LOGIN_SUCCESS -> {
+            LoginActivity.LOGIN_SUCCEED -> {
                 if (intent == null) return LoginResult.Canceled
                 return with(intent) {
                     LoginResult.Succeed(
@@ -49,38 +46,21 @@ class LoginResultContract : ActivityResultContract<Context, LoginResult>() {
                     )
                 }
             }
-            LoginActivity.LOGIN_CANCEL -> return LoginResult.Canceled
+            LoginActivity.LOGIN_CANCELED -> return LoginResult.Canceled
             else -> return LoginResult.Canceled
         }
     }
 }
 
-suspend fun LoginActivity.Companion.startForResult(activity: AppCompatActivity): LoginResult {
-    return suspendCancellableCoroutine<LoginResult> { cont ->
-        activity.registerForActivityResult(LoginResultContract(), activity.activityResultRegistry) {
-            cont.resume(it)
-        }.launch(activity)
-    }
-}
-
 class LoginActivity : AppCompatActivity() {
     companion object {
-        const val LOGIN_CANCEL = 0
-        const val LOGIN_SUCCESS = 1
+        const val LOGIN_CANCELED = 0
+        const val LOGIN_SUCCEED = 1
 
         const val EXTRA_UID = "uid"
         const val EXTRA_NAME = "name"
         const val EXTRA_ACCOUNT = "account"
         const val EXTRA_AVATAR = "avatar"
-
-        fun Intent.getResult(): LocalCache.CachedUserInfo? {
-            return LocalCache.CachedUserInfo(
-                getStringExtra(EXTRA_UID) ?: return null,
-                getStringExtra(EXTRA_NAME) ?: return null,
-                getStringExtra(EXTRA_ACCOUNT) ?: return null,
-                getStringExtra(EXTRA_AVATAR) ?: return null
-            )
-        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -88,25 +68,26 @@ class LoginActivity : AppCompatActivity() {
         setContent {
             AndroidHorizonManagerTheme {
                 Surface {
-                    Login(::onLoginSuccess, ::onCancel)
+                    Login(::onLoginSucceed, ::onCancel)
                 }
             }
         }
     }
 
     private fun onCancel() {
-        setResult(LOGIN_CANCEL)
+        setResult(LOGIN_CANCELED)
+        Log.d(TAG, "Login canceled.")
         finish()
     }
 
-    private fun onLoginSuccess(account: String, avatar: String?, name: String, uid: String) {
+    private fun onLoginSucceed(account: String, avatar: String?, name: String, uid: String) {
         val result = Intent().apply {
             putExtra(EXTRA_UID, uid)
             putExtra(EXTRA_NAME, name)
             putExtra(EXTRA_ACCOUNT, account)
             putExtra(EXTRA_AVATAR, avatar)
         }
-        setResult(LOGIN_SUCCESS, result)
+        setResult(LOGIN_SUCCEED, result)
         Log.d(TAG, "Login succeed: $result")
         finish()
     }

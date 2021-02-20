@@ -1,6 +1,5 @@
 package org.wvt.horizonmgr.ui.modulemanager
 
-import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
@@ -20,7 +19,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import org.wvt.horizonmgr.ui.components.EmptyPage
@@ -28,12 +26,14 @@ import org.wvt.horizonmgr.ui.components.LocalImage
 import org.wvt.horizonmgr.ui.components.ProgressDialog
 
 @Composable
-internal fun ModTab(vm: ModTabViewModel) {
+internal fun ModTab(
+    vm: ModTabViewModel,
+    onAddModClicked: () -> Unit
+) {
     val ps by vm.progressState.collectAsState()
     val state by vm.state.collectAsState()
     val mods by vm.mods.collectAsState()
     val enabledMods by vm.enabledMods.collectAsState()
-    val context = LocalContext.current as AppCompatActivity
 
     Crossfade(state) { state ->
         when (state) {
@@ -47,12 +47,12 @@ internal fun ModTab(vm: ModTabViewModel) {
                     Text(text = "你还没有选择分包")
                 }
             }
-            is ModTabViewModel.State.OK -> if (mods.isEmpty()) {
-                EmptyPage(Modifier.fillMaxSize()) {
-                    Text("当前分包内没有已安装的模组")
-                }
-            } else {
-                Box(Modifier.fillMaxSize()) {
+            is ModTabViewModel.State.OK -> Box(Modifier.fillMaxSize()) {
+                if (mods.isEmpty()) {
+                    EmptyPage(Modifier.fillMaxSize()) {
+                        Text("当前分包内没有已安装的模组")
+                    }
+                } else {
                     LazyColumn(
                         contentPadding = PaddingValues(top = 8.dp, bottom = 64.dp)
                     ) {
@@ -77,15 +77,15 @@ internal fun ModTab(vm: ModTabViewModel) {
                             )
                         }
                     }
-                    ExtendedFloatingActionButton(
-                        modifier = Modifier
-                            .padding(16.dp)
-                            .align(Alignment.BottomEnd),
-                        icon = { Icon(imageVector = Icons.Filled.Add, contentDescription = null) },
-                        text = { Text("安装") },
-                        onClick = { vm.install(context) }
-                    )
                 }
+                ExtendedFloatingActionButton(
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .align(Alignment.BottomEnd),
+                    icon = { Icon(imageVector = Icons.Filled.Add, contentDescription = null) },
+                    text = { Text("安装") },
+                    onClick = onAddModClicked
+                )
             }
         }
         ps?.let {

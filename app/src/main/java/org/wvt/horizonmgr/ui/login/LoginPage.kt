@@ -28,12 +28,8 @@ fun LoginPage(
 ) {
     val (accountFocus, passwordFocus) = FocusRequester.createRefs()
 
-    var account by remember {
-        mutableStateOf(TextFieldValue())
-    }
-    var password by remember {
-        mutableStateOf(TextFieldValue())
-    }
+    var account by remember { mutableStateOf(TextFieldValue()) }
+    var password by remember { mutableStateOf(TextFieldValue()) }
 
     Box(Modifier.fillMaxSize()) {
         Column(
@@ -85,7 +81,6 @@ fun LoginPage(
                         imeAction = ImeAction.Done
                     ),
                     keyboardActions = KeyboardActions(onDone = {
-//                        softwareKeyboardController?.hideSoftwareKeyboard()
                         passwordFocus.freeFocus()
                         onLoginClicked(account.text, password.text)
                     })

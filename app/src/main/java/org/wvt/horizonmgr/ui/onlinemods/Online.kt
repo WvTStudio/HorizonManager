@@ -20,7 +20,7 @@ import org.wvt.horizonmgr.legacyservice.WebAPI
 import org.wvt.horizonmgr.ui.components.ErrorPage
 import org.wvt.horizonmgr.ui.components.NetworkImage
 import org.wvt.horizonmgr.ui.components.ProgressDialog
-import org.wvt.horizonmgr.ui.main.AmbientSelectedPackageUUID
+import org.wvt.horizonmgr.ui.main.LocalSelectedPackageUUID
 
 @Composable
 fun Online(
@@ -32,7 +32,7 @@ fun Online(
     val options by vm.options.collectAsState()
     val downloadState by vm.downloadState.collectAsState()
     val installState by vm.installState.collectAsState()
-    val selectedPackageUUID = AmbientSelectedPackageUUID.current
+    val selectedPackageUUID = LocalSelectedPackageUUID.current
 
     DisposableEffect(enable) {
         vm.setEnable(enable)
@@ -179,7 +179,7 @@ private fun ModItem(
                     .fillMaxWidth(),
                 horizontalArrangement = Arrangement.End
             ) {
-                Providers(AmbientContentColor provides MaterialTheme.colors.primary) {
+                Providers(LocalContentColor provides MaterialTheme.colors.primary) {
                     // Install Button
                     IconButton(onClick = onInstallClick) {
                         Icon(Icons.Filled.Extension, contentDescription = "安装")

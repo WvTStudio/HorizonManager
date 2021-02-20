@@ -1,321 +1,172 @@
 package org.wvt.horizonmgr.ui.main
 
-import androidx.compose.animation.Crossfade
-import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.tween
-import androidx.compose.foundation.InteractionState
-import androidx.compose.foundation.LocalIndication
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.indication
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
+import androidx.compose.material.Text
+import androidx.compose.material.TextButton
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import org.wvt.horizonmgr.dependenciesViewModel
-import org.wvt.horizonmgr.legacyservice.LocalCache
 import org.wvt.horizonmgr.ui.components.MyAlertDialog
-import org.wvt.horizonmgr.ui.components.NetworkImage
-import org.wvt.horizonmgr.ui.downloaded.DownloadedMods
-import org.wvt.horizonmgr.ui.modulemanager.ModuleManager
-import org.wvt.horizonmgr.ui.news.News
-import org.wvt.horizonmgr.ui.onlinemods.Online
-import org.wvt.horizonmgr.ui.pacakgemanager.PackageManager
+import org.wvt.horizonmgr.ui.theme.AndroidHorizonManagerTheme
 import org.wvt.horizonmgr.ui.theme.PreviewTheme
-
-val AmbientSelectedPackageUUID = staticCompositionLocalOf<String?>()
-val AmbientDrawerState = staticCompositionLocalOf<DrawerState>()
-
-private val anim = tween<Float>(300, 0, LinearEasing)
 
 @Composable
 fun App(
-    userInfo: LocalCache.CachedUserInfo?,
-    requestLogin: () -> Unit,
-    requestLogout: () -> Unit,
-    selectedPackageUUID: String?,
-    selectedPackageChange: (uuid: String?) -> Unit,
-    community: () -> Unit,
-    openGame: () -> Unit,
-    joinGroup: () -> Unit,
-    donate: () -> Unit,
-    settings: () -> Unit
+    viewModel: MainViewModel,
+    homeViewModel: HomeViewModel,
+    onRequestPermission: () -> Unit,
+    navigateToLogin: () -> Unit,
+    navigateToJoinGroup: () -> Unit,
+    navigateToCommunity: () -> Unit,
+    navigateToDonate: () -> Unit,
+    navigateToSettings: () -> Unit,
+    navigateToOnlineInstall: () -> Unit,
+    navigateToPackageInfo: (uuid: String) -> Unit,
+    requestOpenGame: () -> Unit,
+    selectFileForMod: () -> Unit,
+    selectFileForPackage: () -> Unit
 ) {
-    val vm = dependenciesViewModel<AppViewModel>()
-    val cs by vm.currentScreen.collectAsState()
+    val userInfo by viewModel.userInfo.collectAsState()
+    val selectedPackage by viewModel.selectedPackage.collectAsState()
+    val showPermissionDialog by viewModel.showPermissionDialog.collectAsState()
 
-    val drawerState = rememberDrawerState(DrawerValue.Closed)
-    val screens by remember { mutableStateOf(AppViewModel.Screen.values()) }
+    val newVersion by viewModel.newVersion.collectAsState()
+    var displayNewVersionDialog by rememberSaveable { mutableStateOf(false) }
 
-    Drawer(
-        state = drawerState,
-        header = {
-            DrawerHeader(
-                userInfo = userInfo,
-                requestLogin = requestLogin,
-                requestLogout = requestLogout
-            )
-        },
-        tabs = {
-            DrawerTabs(screens = screens, currentScreen = cs, onChange = {
-                vm.navigate(it)
-                drawerState.close()
-            })
-        },
-        items = {
-            DrawerItems(
-                community = community,
-                openGame = openGame,
-                joinGroup = joinGroup,
-                donate = donate
-            )
-        },
-        setting = {
-            NavigationItem(
-                checked = false, onCheckedChange = { settings() },
-                text = "设置", icon = Icons.Filled.Settings
-            )
+    DisposableEffect(newVersion) {
+        if (newVersion != null) {
+            displayNewVersionDialog = true
         }
-    ) {
-        Providers(
-            AmbientDrawerState provides drawerState,
-            AmbientSelectedPackageUUID provides selectedPackageUUID
-        ) {
-            Crossfade(targetState = cs, animationSpec = anim) { cs ->
-                when (cs) {
-                    AppViewModel.Screen.HOME -> News(
-                        onNavClick = { drawerState.open() }
-                    )
-                    AppViewModel.Screen.LOCAL_MANAGE -> ModuleManager(
-                        onNavClicked = { drawerState.open() }
-                    )
-                    AppViewModel.Screen.PACKAGE_MANAGE -> PackageManager(
-                        onPackageSelect = selectedPackageChange,
-                        onNavClick = { drawerState.open() }
-                    )
-                    AppViewModel.Screen.ONLINE_DOWNLOAD -> Online(
-                        enable = userInfo != null,
-                        onNavClicked = { drawerState.open() }
-                    )
-                    AppViewModel.Screen.DOWNLOADED_MOD -> DownloadedMods(
-                        onNavClicked = { drawerState.open() }
-                    )
-                }
-            }
+        onDispose {}
+    }
+
+    DisposableEffect(Unit) {
+        viewModel.checkUpdate()
+        onDispose {
+            // TODO: 2021/2/6 添加 Cancel 逻辑
         }
     }
-}
 
-@Composable
-private fun DrawerTabs(
-    screens: Array<AppViewModel.Screen>,
-    currentScreen: AppViewModel.Screen,
-    onChange: (AppViewModel.Screen) -> Unit,
-) {
-    screens.forEach {
-        NavigationItem(
-            checked = currentScreen == it,
-            onCheckedChange = { checked -> if (checked) onChange(it) },
-            text = it.label, icon = it.icon
-        )
-    }
-}
-
-@Composable
-private fun DrawerItems(
-    community: () -> Unit,
-    openGame: () -> Unit,
-    joinGroup: () -> Unit,
-    donate: () -> Unit
-) {
-    NavigationItem(
-        checked = false, onCheckedChange = { community() },
-        text = "中文社区", icon = Icons.Filled.Forum
-    )
-    NavigationItem(
-        checked = false, onCheckedChange = { openGame() },
-        text = "进入游戏", icon = Icons.Filled.Gamepad
-    )
-    NavigationItem(
-        checked = false, onCheckedChange = { joinGroup() },
-        text = "加入群组", icon = Icons.Filled.Group
-    )
-    NavigationItem(
-        checked = false, onCheckedChange = { donate() },
-        text = "捐赠作者", icon = Icons.Filled.AttachMoney
-    )
-}
-
-@Composable
-private fun Drawer(
-    state: DrawerState,
-    header: @Composable () -> Unit,
-    tabs: @Composable () -> Unit,
-    items: @Composable () -> Unit,
-    setting: @Composable () -> Unit,
-    content: @Composable () -> Unit
-) {
-    ModalDrawerLayout(
-        drawerState = state,
-        drawerContent = {
-            Column(modifier = Modifier.fillMaxSize()) {
-                LazyColumn(modifier = Modifier.weight(1f)) {
-                    item {
-                        header()
-                        Divider(Modifier.padding(top = 16.dp))
-                        Column(Modifier.padding(vertical = 8.dp)) { tabs() }
-                        Divider()
-                        Column(Modifier.padding(vertical = 8.dp)) { items() }
-                    }
-                }
-                Divider()
-                // Settings
-                Column(Modifier.padding(vertical = 8.dp)) { setting() }
-            }
-        },
-        bodyContent = content
-    )
-}
-
-@Composable
-private fun DrawerHeader(
-    userInfo: LocalCache.CachedUserInfo?,
-    requestLogin: () -> Unit,
-    requestLogout: () -> Unit
-) {
-    var showDialog by remember { mutableStateOf(false) }
-    if (showDialog) {
-        MyAlertDialog(
-            modifier = Modifier.shadow(16.dp, clip = false),
-            onDismissRequest = { showDialog = false },
-            confirmButton = {
-                TextButton(onClick = {
-                    showDialog = false
-                    requestLogout()
-                }) {
-                    Text("注销")
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showDialog = false }) { Text("取消") }
-            }, title = {
-                Text("是否注销登录？")
-            }, text = {
-                Text("注销后需要重新登录才能使用在线下载功能")
-            }
-        )
-    }
-    // Avatar
-    Column(Modifier.padding(16.dp)) {
-        // TODO: 2021/2/15 Remove Indication
-        val interactionState = remember { InteractionState() }
-        Surface(
-            modifier = Modifier
-                .size(48.dp)
-                .clickable(
-                    onClick = {
-                        if (userInfo == null) requestLogin()
-                        else showDialog = true
-                    },
-                    interactionState = interactionState, indication = null
-                ),
-            shape = RoundedCornerShape(percent = 50),
-            color = MaterialTheme.colors.onSurface.copy(alpha = 0.12f)
-        ) {
-            userInfo?.let {
-                NetworkImage(
-                    url = it.avatarUrl,
-                    contentDescription = "头像",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .indication(
-                            interactionState,
-                            LocalIndication.current
+    AndroidHorizonManagerTheme {
+        Surface(color = MaterialTheme.colors.background) {
+            if (viewModel.initialized) Home(
+                viewModel = homeViewModel,
+                userInfo = remember(userInfo) {
+                    userInfo?.let {
+                        UserInformation(
+                            it.name,
+                            it.account,
+                            it.avatarUrl
                         )
-                        .fillMaxSize()
-                )
-            }
-        }
-        Text(
-            if (userInfo == null) "欢迎！点击头像登录" else userInfo.name + "，欢迎！",
-            modifier = Modifier.padding(top = 16.dp),
-            style = MaterialTheme.typography.h5
-        )
-        Text(
-            userInfo?.account ?: "WvT工作室制作",
-            modifier = Modifier.padding(top = 8.dp),
-            color = MaterialTheme.colors.onSurface.copy(alpha = 0.3f),
-            style = MaterialTheme.typography.subtitle1
-        )
-    }
-}
-
-@Composable
-private fun NavigationItem(
-    checked: Boolean,
-    onCheckedChange: (Boolean) -> Unit,
-    text: String,
-    icon: ImageVector
-) {
-    // TODO: 2021/2/15 Remove InteractionState
-    val interactionState = remember { InteractionState() }
-    Surface(
-        shape = RoundedCornerShape(4.dp),
-        color = animateColorAsState(if (checked) MaterialTheme.colors.primary.copy(alpha = 0.12f) else Color.Transparent).value,
-        contentColor = animateColorAsState(if (checked) MaterialTheme.colors.primary else MaterialTheme.colors.onSurface).value,
-        modifier = Modifier
-            .height(48.dp)
-            .fillMaxWidth()
-            .padding(horizontal = 8.dp, vertical = 2.dp)
-    ) {
-        Providers(LocalContentAlpha provides ContentAlpha.high) {
-            Row(
-                Modifier.fillMaxSize()
-                    .clickable { onCheckedChange(!checked) },
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    imageVector = icon,
-                    modifier = Modifier.padding(start = 8.dp),
-                    contentDescription = null
-                )
-                Text(
-                    text = text,
-                    modifier = Modifier.padding(start = 24.dp, end = 8.dp),
-                    fontWeight = FontWeight.Medium
-                )
-            }
-        }
-    }
-}
-
-@Composable
-@Preview
-private fun DrawerPreview() {
-    PreviewTheme {
-        val state = rememberDrawerState(DrawerValue.Open)
-        Drawer(state = state, header = {
-            DrawerHeader(userInfo = null, requestLogin = {}, requestLogout = {})
-        }, tabs = {
-            DrawerTabs(
-                screens = AppViewModel.Screen.values(),
-                currentScreen = AppViewModel.Screen.HOME,
-                onChange = {}
+                    }
+                },
+                requestLogin = navigateToLogin,
+                requestLogout = viewModel::logOut,
+                selectedPackageUUID = selectedPackage,
+                selectedPackageChange = viewModel::setSelectedPackage,
+                openGame = requestOpenGame,
+                community = navigateToCommunity,
+                joinGroup = navigateToJoinGroup,
+                donate = navigateToDonate,
+                settings = navigateToSettings,
+                requestOnlineInstall = navigateToOnlineInstall,
+                onAddModClicked = selectFileForMod,
+                onAddPackageClicked = selectFileForPackage,
+                navigateToPackageInfo = navigateToPackageInfo
             )
-        }, items = {
-            DrawerItems(community = {}, openGame = {}, joinGroup = {}, donate = {})
-        }, setting = {}) {}
+        }
+
+        if (showPermissionDialog) {
+            RequestPermissionDialog {
+                viewModel.dismiss()
+                onRequestPermission()
+            }
+        }
+
+        val theNewVersion = newVersion
+
+        if (theNewVersion != null && displayNewVersionDialog) {
+            NewVersionDialog(
+                versionName = theNewVersion.versionName,
+                versionCode = theNewVersion.versionCode,
+                changelog = theNewVersion.changelog,
+                onConfirm = { displayNewVersionDialog = false },
+                onIgnore = {
+                    viewModel.ignoreVersion(theNewVersion.versionCode)
+                    displayNewVersionDialog = false
+                }
+            )
+        }
+    }
+}
+
+@Composable
+private fun RequestPermissionDialog(
+    onConfirm: () -> Unit
+) {
+    MyAlertDialog(
+        onDismissRequest = { },
+        confirmButton = { TextButton(onClick = onConfirm) { Text(text = "授权") } },
+        title = { Text("需要权限") },
+        text = { Text("本应用需要拥有网络权限及对内置存储的完全访问权限。\n如果您的系统版本为 Android R 及以上，您需要在弹出的系统设置中授予完全访问权限") }
+    )
+}
+
+@Composable
+private fun NewVersionDialog(
+    versionName: String,
+    versionCode: Int,
+    changelog: String,
+    onConfirm: () -> Unit,
+    onIgnore: () -> Unit
+) {
+    MyAlertDialog(
+        title = { Text("发现新版本") },
+        text = {
+            LazyColumn(Modifier.fillMaxHeight(0.6f)) {
+                item {
+                    Text(
+                        """
+                        |版本名：${versionName}
+                        |版本号：${versionCode}
+                        |更新日志：
+                        |${changelog}
+                        """.trimMargin()
+                    )
+                }
+            }
+        },
+        onDismissRequest = onConfirm,
+        confirmButton = {
+            TextButton(onClick = onConfirm) {
+                Text("确定")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onIgnore) {
+                Text("忽略该版本")
+            }
+        }
+    )
+}
+
+@Preview
+@Composable
+private fun NewVersionDialogPreview() {
+    PreviewTheme {
+        Surface(Modifier.fillMaxSize()) {
+            NewVersionDialog(
+                versionName = "2.0.0",
+                versionCode = 100,
+                changelog = "test",
+                onConfirm = {},
+                onIgnore = {}
+            )
+        }
     }
 }

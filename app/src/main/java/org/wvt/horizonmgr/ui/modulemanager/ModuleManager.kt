@@ -17,11 +17,16 @@ import androidx.compose.ui.util.fastForEachIndexed
 import androidx.compose.ui.zIndex
 import org.wvt.horizonmgr.dependenciesViewModel
 import org.wvt.horizonmgr.ui.components.HorizonDivider
-import org.wvt.horizonmgr.ui.main.AmbientSelectedPackageUUID
+import org.wvt.horizonmgr.ui.main.LocalSelectedPackageUUID
 
 @Composable
 fun ModuleManager(
-    onNavClicked: () -> Unit
+/*    managerViewModel: ModuleManagerViewModel,
+    moduleViewModel: ModTabViewModel,
+    icLevelViewModel: ICLevelTabViewModel,
+    mcLevelViewModel: MCLevelTabViewModel,*/
+    onNavClicked: () -> Unit,
+    onAddModClicked: () -> Unit
 ) {
     val vm = dependenciesViewModel<ModuleManagerViewModel>()
     val selectedTab by vm.selectedTab.collectAsState()
@@ -29,7 +34,7 @@ fun ModuleManager(
     val icMapVm = dependenciesViewModel<ICLevelTabViewModel>()
     val mcMapVm = dependenciesViewModel<MCLevelTabViewModel>()
 
-    val pkgId = AmbientSelectedPackageUUID.current
+    val pkgId = LocalSelectedPackageUUID.current
 
     DisposableEffect(pkgId) {
         modVm.setSelectedUUID(pkgId)
@@ -50,7 +55,7 @@ fun ModuleManager(
         Box(Modifier.fillMaxSize()) {
             Crossfade(selectedTab) {
                 when (it) {
-                    ModuleManagerViewModel.Tabs.MOD -> ModTab(modVm)
+                    ModuleManagerViewModel.Tabs.MOD -> ModTab(modVm, onAddModClicked)
                     ModuleManagerViewModel.Tabs.IC_MAP -> ICLevelTab(icMapVm)
                     ModuleManagerViewModel.Tabs.MC_MAP -> MCLevelTab(mcMapVm)
                     ModuleManagerViewModel.Tabs.IC_TEXTURE -> MCResTab()

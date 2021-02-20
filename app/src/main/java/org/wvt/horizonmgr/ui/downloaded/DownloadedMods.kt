@@ -14,14 +14,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import org.wvt.horizonmgr.dependenciesViewModel
 import org.wvt.horizonmgr.ui.components.ProgressDialog
-import org.wvt.horizonmgr.ui.main.AmbientSelectedPackageUUID
+import org.wvt.horizonmgr.ui.main.LocalSelectedPackageUUID
 
 @Composable
 fun DownloadedMods(onNavClicked: () -> Unit) {
     val vm = dependenciesViewModel<DMViewModel>()
     val mods by vm.mods.collectAsState()
     val progressState by vm.progressState.collectAsState()
-    val selected = AmbientSelectedPackageUUID.current
+    val selected = LocalSelectedPackageUUID.current
 
     DisposableEffect(selected) {
         vm.setSelectedPackage(selected)
@@ -62,7 +62,7 @@ fun DownloadedMods(onNavClicked: () -> Unit) {
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
                         name = item.name,
                         description = item.description,
-                        icon = emptyContent(),
+                        icon = {},
                         onInstallClicked = { vm.install(item) },
                         onDeleteClicked = { vm.delete(item) }
                     )

@@ -13,3 +13,8 @@
 .externalNativeBuild
 .cxx
 local.properties
+alpha
+build
+app/build
+webapi/build
+service/build

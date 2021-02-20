@@ -4,6 +4,8 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.InteractionState
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
@@ -12,11 +14,10 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.gesture.tapGestureFilter
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.Measurable
-import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
@@ -50,13 +51,12 @@ fun Donate(
             Surface(
                 color = if (light) alipayColor else MaterialTheme.colors.background,
                 modifier = Modifier.weight(1f).fillMaxWidth()
-                    .tapGestureFilter {  onAlipayClicked() }
-//                    .clickable(onClick = onAlipayClicked, indication = null)
+                    .clickable(interactionState = remember{ InteractionState() }, indication = null, onClick = onAlipayClicked)
             ) {
                 Box(Modifier.fillMaxSize()) {
                     Icon(
                         modifier = Modifier.align(Alignment.Center),
-                        imageVector = vectorResource(id = R.drawable.ic_alipay),
+                        painter = painterResource(id = R.drawable.ic_alipay),
                         tint = if (light) Color.White else alipayColor,
                         contentDescription = "支付宝支付"
                     )
@@ -66,13 +66,12 @@ fun Donate(
             Surface(
                 color = if (light) wechatColor else MaterialTheme.colors.background,
                 modifier = Modifier.weight(1f).fillMaxWidth()
-                    .tapGestureFilter { onWechatPayClicked() }
-//                    .clickable(onClick = onWechatPayClicked, indication = null)
+                    .clickable(interactionState = remember{ InteractionState() }, indication = null, onClick = onWechatPayClicked)
             ) {
                 Box(Modifier.fillMaxSize()) {
                     Icon(
                         modifier = Modifier.align(Alignment.Center),
-                        imageVector = vectorResource(id = R.drawable.ic_wechatpay),
+                        painter = painterResource(id = R.drawable.ic_wechatpay),
                         tint = if (light) Color.White else wechatColor,
                         contentDescription = "微信支付"
                     )

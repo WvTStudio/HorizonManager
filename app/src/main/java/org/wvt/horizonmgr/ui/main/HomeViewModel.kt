@@ -2,15 +2,16 @@ package org.wvt.horizonmgr.ui.main
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import org.wvt.horizonmgr.DependenciesContainer
 
-@OptIn(ExperimentalCoroutinesApi::class)
-class AppViewModel(
+class HomeViewModel(
     private val dependencies: DependenciesContainer
 ) : ViewModel() {
 
@@ -25,12 +26,12 @@ class AppViewModel(
         DOWNLOADED_MOD("本地资源", Icons.Filled.Storage)
     }
 
-    private val _currentScreen = MutableStateFlow(Screen.LOCAL_MANAGE)
-    val currentScreen: StateFlow<Screen> = _currentScreen
+    var currentScreen by mutableStateOf(Screen.LOCAL_MANAGE)
+        private set
 
     val selectedPackageUUID = MutableStateFlow<String?>(null)
 
     fun navigate(screen: Screen) {
-        _currentScreen.value = screen
+        currentScreen = screen
     }
 }

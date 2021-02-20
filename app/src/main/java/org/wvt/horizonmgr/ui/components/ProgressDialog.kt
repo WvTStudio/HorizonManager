@@ -25,7 +25,6 @@ fun ProgressDialog(
     onCloseRequest: () -> Unit,
     state: ProgressDialogState
 ) {
-
     Dialog(onDismissRequest = {
         // 加载过程中不可关闭
         if (state is ProgressDialogState.Failed || state is ProgressDialogState.Finished)

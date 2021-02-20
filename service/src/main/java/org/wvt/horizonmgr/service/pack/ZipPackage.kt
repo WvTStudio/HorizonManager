@@ -12,16 +12,21 @@ class ZipPackage private constructor(
 ) {
     companion object {
         open class NotZipPackageException : Exception()
-        class MissingManifestException: NotZipPackageException()
+        class MissingManifestException : NotZipPackageException()
 
         fun isZipPackage(zipFile: File): Boolean {
-            // TODO: 2020/11/13
-            TODO()
+            // TODO: 2021/2/20 测试是否能使用
+            try {
+                ZipPackage(zipFile)
+            } catch (e: NotZipPackageException) {
+                return false
+            }
+            return true
         }
 
         fun parse(zipFile: File): ZipPackage {
-            // TODO: 2020/11/13
-            TODO()
+            // TODO: 2021/2/20 测试是否能使用
+            return ZipPackage(zipFile)
         }
     }
 
@@ -42,7 +47,7 @@ class ZipPackage private constructor(
         val zip = ZipFile(zipFile)
 
         // TODO: 2020/10/30 当压缩包内还有一个根目录文件夹时
-        val jsonEntry = zip.getEntry("manifest.json") ?: error("Missing manifest.json")
+        val jsonEntry = zip.getEntry("manifest.json") ?: throw MissingManifestException()
         val jsonStr = zip.getInputStream(jsonEntry).reader().readText()
 
         with(JSONObject(jsonStr)) {
