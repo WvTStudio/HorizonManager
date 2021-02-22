@@ -1,6 +1,10 @@
 package org.wvt.horizonmgr.ui.joingroup
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -8,34 +12,39 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.runtime.*
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.setContent
-import kotlinx.coroutines.launch
-import org.wvt.horizonmgr.dependenciesViewModel
+import org.wvt.horizonmgr.HorizonManagerApplication
 import org.wvt.horizonmgr.ui.components.ErrorPage
 import org.wvt.horizonmgr.ui.theme.AndroidHorizonManagerTheme
 
 class JoinGroupActivity : AppCompatActivity() {
+    private val vm by viewModels<JoinGroupViewModel> {
+        (application as HorizonManagerApplication).dependenciesVMFactory
+    }
+
     @OptIn(ExperimentalMaterialApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        vm.refresh()
+
         setContent {
-            val vm = dependenciesViewModel<JoinGroupViewModel>()
             val groups by vm.groups.collectAsState()
             val isLoading by vm.isLoading.collectAsState()
             val loadError by vm.loadError.collectAsState()
-            val startError = vm.startQQError.collectAsState().value
+            val startError by vm.startQQError.collectAsState()
             val snackbar = remember { SnackbarHostState() }
 
-            val scope = rememberCoroutineScope()
-
             LaunchedEffect(startError) {
-                if (startError != null) {
-                    vm.handledError()
-                    scope.launch {
+                if (startError) {
+                    try {
                         snackbar.showSnackbar("启动 QQ 失败")
+                    } finally {
+                        vm.handledError()
                     }
                 }
             }
@@ -61,9 +70,7 @@ class JoinGroupActivity : AppCompatActivity() {
                                     }
                                 }
                                 !isLoading && loadError == null -> GroupList(groups,
-                                    onGroupSelect = {
-                                        vm.joinGroup(it.url, this@JoinGroupActivity)
-                                    }
+                                    onGroupSelect = { openURL(it.url) }
                                 )
                                 !isLoading && loadError != null -> {
                                     ErrorPage(
@@ -81,6 +88,16 @@ class JoinGroupActivity : AppCompatActivity() {
                     }
                 }
             }
+        }
+    }
+
+    private fun openURL(url: String) {
+        try {
+            val intent = Intent()
+            intent.data = Uri.parse(url)
+            startActivity(intent)
+        } catch (e: Exception) {
+            vm.startQQFailed()
         }
     }
 }

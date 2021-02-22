@@ -8,10 +8,10 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.Settings
+import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.animation.*
-import androidx.compose.ui.platform.setContent
 import org.wvt.horizonmgr.HorizonManagerApplication
 import org.wvt.horizonmgr.R
 import org.wvt.horizonmgr.ui.community.CommunityActivity

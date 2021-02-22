@@ -2,10 +2,10 @@ package org.wvt.horizonmgr.ui.community
 
 import android.app.DownloadManager
 import android.os.Bundle
+import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
-import androidx.compose.ui.platform.setContent
 import org.wvt.horizonmgr.ui.theme.AndroidHorizonManagerTheme
 
 class CommunityActivity : AppCompatActivity() {

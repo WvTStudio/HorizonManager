@@ -13,23 +13,22 @@ import org.wvt.horizonmgr.DependenciesContainer
 private const val TAG = "JoinGroupVMLogger"
 
 class JoinGroupViewModel(
-    private val dependencies: DependenciesContainer
+    dependencies: DependenciesContainer
 ) : ViewModel() {
+    private val mgrInfo = dependencies.mgrInfo
+
     val groups = MutableStateFlow<List<QQGroupEntry>>(emptyList())
     val isLoading = MutableStateFlow(true)
     val loadError = MutableStateFlow<Exception?>(null)
-    val startQQError = MutableStateFlow<Exception?>(null)
-
-    init {
-        refresh()
-    }
+    val startQQError = MutableStateFlow(false)
 
     fun refresh() {
         viewModelScope.launch {
-            isLoading.value = true
-            loadError.value = null
+            isLoading.emit(true)
+            loadError.emit(null)
+
             val data = try {
-                dependencies.mgrInfo.getQQGroupList().map {
+                mgrInfo.getQQGroupList().map {
                     QQGroupEntry(it.status, it.avatarUrl, it.name, it.description, it.urlLink)
                 }
             } catch (e: Exception) {
@@ -42,22 +41,16 @@ class JoinGroupViewModel(
         }
     }
 
-    fun joinGroup(intentUrl: String, context: Context) {
+    fun handledError() {
         viewModelScope.launch {
-            startQQError.value = null
-            val intent = Intent()
-            try {
-                intent.data = Uri.parse(intentUrl)
-                context.startActivity(intent)
-            } catch (e: Exception) {
-                startQQError.value = e
-                return@launch
-            }
+            loadError.emit(null)
+            startQQError.emit(false)
         }
     }
 
-    fun handledError() {
-        loadError.value = null
-        startQQError.value = null
+    fun startQQFailed() {
+        viewModelScope.launch {
+            startQQError.emit(true)
+        }
     }
 }

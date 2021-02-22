@@ -3,10 +3,10 @@ package org.wvt.horizonmgr.ui.pacakgemanager
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.material.Surface
-import androidx.compose.ui.platform.setContent
 import org.wvt.horizonmgr.HorizonManagerApplication
 import org.wvt.horizonmgr.ui.theme.AndroidHorizonManagerTheme
 

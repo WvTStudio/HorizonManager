@@ -3,16 +3,11 @@ package org.wvt.horizonmgr.ui.fileselector
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContract
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.material.Surface
-import androidx.compose.ui.platform.setContent
-import kotlinx.coroutines.suspendCancellableCoroutine
-import org.wvt.horizonmgr.ui.login.LoginResult
 import org.wvt.horizonmgr.ui.theme.AndroidHorizonManagerTheme
-import kotlin.coroutines.resume
 
 sealed class FileSelectorResult {
     object Canceled : FileSelectorResult()
@@ -68,9 +63,7 @@ class FileSelectorActivity : AppCompatActivity() {
     }
 
     private fun onFileSelect(filePath: String) {
-        val intent = Intent().apply {
-            putExtra("file_path", filePath)
-        }
+        val intent = Intent().apply { putExtra("file_path", filePath) }
         setResult(SELECTED, intent)
         finish()
     }
