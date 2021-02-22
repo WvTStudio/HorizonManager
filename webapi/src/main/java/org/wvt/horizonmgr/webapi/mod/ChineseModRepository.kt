@@ -145,7 +145,11 @@ class ChineseMod internal constructor(
      * ```
      */
     suspend fun getDownloadURL(): DownloadURL {
-        val jsonStr = httpClient.get<String>("https://dev.adodoz.cn/api/mod/download?id=$id")
+        val jsonStr = try {
+            httpClient.get<String>("https://dev.adodoz.cn/api/mod/download?id=$id")
+        } catch (e: IOException) {
+            throw NetworkException()
+        }
 
         val fileName: String
         val path: String

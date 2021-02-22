@@ -23,6 +23,7 @@ class InstalledPackage constructor(
     }
 
     class PackageDoesNotExistsException() : Exception("Package does not exists.")
+    class MissingManifestFile(): Exception("Could not find the manifest file.")
 
     // TODO: 2020/11/1 使该 Package 始终能返回最新数据
     private val manifestFile = pkgDir.resolve("manifest.json")
@@ -49,7 +50,7 @@ class InstalledPackage constructor(
     }
 
     private fun parseManifest() {
-        if (!manifestFile.exists() || !manifestFile.isFile) error("Missing manifest.json file")
+        if (!manifestFile.exists() || !manifestFile.isFile) throw MissingManifestFile()
         val jsonStr = manifestFile.readText()
         with(JSONObject(jsonStr)) {
             game = getString("game")

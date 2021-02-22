@@ -11,6 +11,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -38,13 +39,16 @@ fun PackageInfo(
     onCloseClick: () -> Unit
 ) {
     val vm = dependenciesViewModel<PackageDetailViewModel>()
-    val pkgInfo = vm.pkgInfo.collectAsState().value
-    val manifest = vm.manifest.collectAsState().value
+    val info by vm.info.collectAsState()
+
+//    val pkgInfo = vm.pkgInfo.collectAsState().value
+//    val manifest = vm.manifest.collectAsState().value
     val pkgSize = vm.pkgSize.collectAsState().value
     val state = vm.state.collectAsState().value
 
     DisposableEffect(pkgId) {
-        vm.refresh(pkgId)
+        vm.load(pkgId)
+//        vm.refresh(pkgId)
         onDispose {
             // TODO: 2021/2/7 添加 Dispose 逻辑
         }
@@ -69,14 +73,15 @@ fun PackageInfo(
                     }
                 }
                 PackageDetailViewModel.State.FAILED -> {
-                    ErrorPage(message = { Text("获取分包详情失败") }, onRetryClick = { vm.refresh(pkgId) })
+                    ErrorPage(message = { Text("获取分包详情失败") }, onRetryClick = { vm.load(pkgId) })
                 }
                 PackageDetailViewModel.State.SUCCEED -> {
-                    LazyColumn {
-                        item {
-                            if (manifest != null && pkgInfo != null) {
-                                ManifestSection(manifest, pkgInfo.uuid, pkgInfo.packageUUID)
-                                FileSection(pkgInfo.path, remember(pkgSize) {
+                    val info = info
+                    if (info != null) {
+                        LazyColumn {
+                            item {
+                                ManifestSection(info = info)
+                                FileSection(path = info.installDir, packSize = remember(pkgSize) {
                                     when (pkgSize) {
                                         is PackageDetailViewModel.PackageSize.Succeed -> pkgSize.sizeStr + "  共 ${pkgSize.count} 个文件"
                                         is PackageDetailViewModel.PackageSize.Failed -> "计算出错"
@@ -95,9 +100,7 @@ fun PackageInfo(
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun ManifestSection(
-    manifest: HorizonManager.PackageManifest,
-    uuid: String,
-    packageUUID: String
+    info: PackageDetailViewModel.PackageInformation,
 ) {
     Text(
         text = "清单信息",
@@ -110,56 +113,56 @@ private fun ManifestSection(
     }, text = {
         Text("分包名称")
     }, secondaryText = {
-        Text(manifest.packName)
+        Text(info.packageName)
     })
     ListItem(icon = {
         Icon(Icons.Filled.Person, modifier = Modifier.padding(top = 4.dp), contentDescription = null)
     }, text = {
         Text("开发者")
     }, secondaryText = {
-        Text(manifest.developer)
+        Text(info.developer)
     })
     ListItem(icon = {
         Icon(Icons.Filled.Description, modifier = Modifier.padding(top = 4.dp), contentDescription = null)
     }, text = {
         Text("版本信息")
     }, secondaryText = {
-        Text(manifest.packVersionName)
+        Text(info.version)
     })
     ListItem(icon = {
         Icon(Icons.Filled.Description, modifier = Modifier.padding(top = 4.dp), contentDescription = null)
     }, text = {
         Text("版本号")
     }, secondaryText = {
-        Text(manifest.packVersionCode.toString())
+        Text(info.versionCode)
     })
     ListItem(icon = {
         Icon(Icons.Filled.Description, modifier = Modifier.padding(top = 4.dp), contentDescription = null)
     }, text = {
         Text("UUID")
     }, secondaryText = {
-        Text(uuid)
+        Text(info.installUUID)
     })
     ListItem(icon = {
         Icon(Icons.Filled.Description, modifier = Modifier.padding(top = 4.dp), contentDescription = null)
     }, text = {
         Text("分包 UUID")
     }, secondaryText = {
-        Text(packageUUID)
+        Text(info.packageUUID)
     })
     ListItem(icon = {
         Icon(Icons.Filled.Gamepad, modifier = Modifier.padding(top = 4.dp), contentDescription = null)
     }, text = {
         Text("游戏版本")
     }, secondaryText = {
-        Text(manifest.gameVersion)
+        Text(info.gameVersion)
     })
     ListItem(icon = {
         Icon(Icons.Filled.Notes, modifier = Modifier.padding(top = 4.dp), contentDescription = null)
     }, text = {
         Text("分包描述")
     }, secondaryText = {
-        Text(manifest.description)
+        Text(info.description)
     })
 }
 
