@@ -9,50 +9,20 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
-import org.wvt.horizonmgr.dependenciesViewModel
-import org.wvt.horizonmgr.legacyservice.HorizonManager
 import org.wvt.horizonmgr.ui.components.ErrorPage
-
-private data class Item(
-    val icon: ImageVector,
-    val title: String,
-    val content: String
-)
-
-private data class Section(
-    val title: String,
-    val items: List<Item>
-)
 
 @Composable
 fun PackageInfo(
-    pkgId: String,
+    vm: PackageDetailViewModel,
     onCloseClick: () -> Unit
 ) {
-    val vm = dependenciesViewModel<PackageDetailViewModel>()
     val info by vm.info.collectAsState()
-
-//    val pkgInfo = vm.pkgInfo.collectAsState().value
-//    val manifest = vm.manifest.collectAsState().value
-    val pkgSize = vm.pkgSize.collectAsState().value
+    val pkgSize by vm.pkgSize.collectAsState()
     val state = vm.state.collectAsState().value
-
-    DisposableEffect(pkgId) {
-        vm.load(pkgId)
-//        vm.refresh(pkgId)
-        onDispose {
-            // TODO: 2021/2/7 添加 Dispose 逻辑
-        }
-    }
 
     Column(Modifier.fillMaxSize()) {
         TopAppBar(title = {
@@ -73,7 +43,7 @@ fun PackageInfo(
                     }
                 }
                 PackageDetailViewModel.State.FAILED -> {
-                    ErrorPage(message = { Text("获取分包详情失败") }, onRetryClick = { vm.load(pkgId) })
+                    ErrorPage(message = { Text("获取分包详情失败") }, onRetryClick = { vm.load() })
                 }
                 PackageDetailViewModel.State.SUCCEED -> {
                     val info = info
@@ -82,7 +52,7 @@ fun PackageInfo(
                             item {
                                 ManifestSection(info = info)
                                 FileSection(path = info.installDir, packSize = remember(pkgSize) {
-                                    when (pkgSize) {
+                                    when (val pkgSize = pkgSize) {
                                         is PackageDetailViewModel.PackageSize.Succeed -> pkgSize.sizeStr + "  共 ${pkgSize.count} 个文件"
                                         is PackageDetailViewModel.PackageSize.Failed -> "计算出错"
                                         is PackageDetailViewModel.PackageSize.Loading -> "正在计算"
