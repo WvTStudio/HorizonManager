@@ -9,6 +9,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -24,8 +25,7 @@ fun NewsContent(
     vm: NewsContentViewModel,
     onNavClick: () -> Unit
 ) {
-    val news by vm.content
-//    val news by vm.newsContent.collectAsState()
+    val news by vm.content.collectAsState()
 
     Column {
         TopAppBar(
@@ -39,48 +39,50 @@ fun NewsContent(
             }, backgroundColor = MaterialTheme.colors.surface
         )
         Crossfade(news) {
-            when(it) {
+            when (it) {
                 NewsContentViewModel.Result.Loading -> Box(Modifier.fillMaxSize()) {
                     CircularProgressIndicator(Modifier.align(Alignment.Center))
                 }
-                is NewsContentViewModel.Result.Failure -> {
-                    val text = when (it.e) {
-                        is NewsContentViewModel.NetworkException -> "网络错误，请稍后再试"
-                        is NewsContentViewModel.NewsNotFoundException -> "该资讯可能已被删除"
-                        else -> "加载失败"
-                    }
-                    ErrorPage(message = {
-                        Text(text)
-                    }, onRetryClick = {
-                        vm.refresh()
-                    })
+                NewsContentViewModel.Result.NetworkError -> {
+                    ErrorPage(message = { Text("网络错误，请稍后再试") },
+                        onRetryClick = { vm.refresh() })
+                }
+                NewsContentViewModel.Result.NewsNotFound -> {
+                    ErrorPage(message = { Text("该资讯可能已被删除") },
+                        onRetryClick = { vm.refresh() })
+                }
+                NewsContentViewModel.Result.OtherError -> {
+                    ErrorPage(message = { Text("未知错误，请稍后再试") },
+                        onRetryClick = { vm.refresh() })
                 }
                 is NewsContentViewModel.Result.Succeed -> {
-                    val news = it.value
+                    val content = it.value
                     LazyColumn(modifier = Modifier.fillMaxSize()) {
                         item {
                             Column(Modifier.fillParentMaxWidth()) {
-                                NetworkImage(
-                                    modifier = Modifier
-                                        .padding(16.dp)
-                                        .fillParentMaxWidth()
-                                        .aspectRatio(16f / 9f)
-                                        .clip(RoundedCornerShape(4.dp)),
-                                    url = news.coverUrl,
-                                    contentDescription = "封面",
-                                    contentScale = ContentScale.Crop
-                                )
 
+                                if (content.coverUrl != null) {
+                                    NetworkImage(
+                                        modifier = Modifier
+                                            .padding(start = 16.dp, top = 16.dp, end = 16.dp)
+                                            .fillParentMaxWidth()
+                                            .aspectRatio(16f / 9f)
+                                            .clip(RoundedCornerShape(4.dp)),
+                                        url = content.coverUrl,
+                                        contentDescription = "封面",
+                                        contentScale = ContentScale.Crop
+                                    )
+                                }
 
                                 // Title
                                 SelectionContainer {
                                     Text(
                                         modifier = Modifier.padding(
                                             start = 16.dp,
-                                            end = 16.dp,
-                                            top = 8.dp
+                                            top = 16.dp,
+                                            end = 16.dp
                                         ),
-                                        text = news.title, style = MaterialTheme.typography.h5
+                                        text = content.title, style = MaterialTheme.typography.h5
                                     )
                                 }
 
@@ -92,7 +94,7 @@ fun NewsContent(
                                             end = 24.dp,
                                             top = 16.dp
                                         ),
-                                        text = news.brief,
+                                        text = content.brief,
                                         style = MaterialTheme.typography.body2,
                                         color = MaterialTheme.colors.onSurface.copy(0.54f)
                                     )
@@ -111,7 +113,7 @@ fun NewsContent(
                                         modifier = Modifier
                                             .padding(horizontal = 16.dp, vertical = 24.dp)
                                             .fillParentMaxWidth(),
-                                        text = news.content,
+                                        text = content.content,
                                         style = MaterialTheme.typography.body1,
                                         color = MaterialTheme.colors.onSurface.copy(0.74f)
                                     )

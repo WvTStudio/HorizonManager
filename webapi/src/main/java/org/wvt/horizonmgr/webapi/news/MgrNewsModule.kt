@@ -7,9 +7,12 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 import kotlinx.datetime.Instant
 import org.json.JSONArray
+import org.json.JSONException
 import org.json.JSONObject
+import org.wvt.horizonmgr.webapi.JsonParseException
+import org.wvt.horizonmgr.webapi.NetworkException
 import org.wvt.horizonmgr.webapi.forEachIndexed
-import org.wvt.horizonmgr.webapi.parseJson
+import java.io.IOException
 
 /**
  * 使用该类可以获取存储于 Adodoz 服务器上的新闻
@@ -39,12 +42,21 @@ class MgrNewsModule {
      * ```
      */
     suspend fun getNewsSuggestions(): List<NewsSuggestion> {
-        val response = client.get<String>("https://adodoz.cn/hzmgr/v1/news.json")
-        val result = mutableListOf<NewsSuggestion>()
+        val response = try {
+            client.get<String>("https://adodoz.cn/hzmgr/v1/news.json")
+        } catch (e: IOException) {
+            throw NetworkException("获取推荐资讯失败", e)
+        }
+        val result =
+            mutableListOf<NewsSuggestion>()
 
-        parseJson {
-            val json = JSONArray(response)
-            json.forEachIndexed<JSONObject> { index, item ->
+        val json = try {
+            JSONArray(response)
+        } catch (e: JSONException) {
+            throw JsonParseException(response, e)
+        }
+        json.forEachIndexed<JSONObject> { index, item ->
+            try {
                 val id = item.getInt("id")
                 val title = item.getString("title")
                 val cover = item.getString("cover")
@@ -60,6 +72,9 @@ class MgrNewsModule {
                         updateISOTime = updateTime
                     )
                 )
+            } catch (e: JSONException) {
+                // TODO: 2021/2/22 目前为直接跳过，在以后使该函数可以返回解析失败的文章列表
+                return@forEachIndexed
             }
         }
 
@@ -76,16 +91,27 @@ class MgrNewsModule {
      * }
      */
     suspend fun getNews(id: Int): News? {
-        val response = client.get<HttpResponse>("https://adodoz.cn/hzmgr/v1/news/${id}.json")
+        val response = try {
+            client.get<HttpResponse>("https://adodoz.cn/hzmgr/v1/news/${id}.json")
+        } catch (e: IOException) {
+            throw NetworkException("获取资讯 $id 失败", e)
+        }
         if (response.status == HttpStatusCode.OK) {
-            parseJson {
-                val json = JSONObject(response.readText())
+            val jsonStr = try {
+                response.readText()
+            } catch (e: IOException) {
+                throw NetworkException("接受资讯内容失败", e)
+            }
+            try {
+                val json = JSONObject(jsonStr)
                 val newsId = json.getInt("id")
                 val title = json.getString("title")
                 val brief = json.getString("brief")
                 val coverUrl = json.getString("coverUrl")
                 val content = json.getString("content")
                 return News(newsId, title, brief, coverUrl, content)
+            } catch (e: JSONException) {
+                throw JsonParseException(jsonStr, e)
             }
         } else {
             return null
