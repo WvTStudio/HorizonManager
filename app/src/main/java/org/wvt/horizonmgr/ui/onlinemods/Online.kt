@@ -120,10 +120,7 @@ private fun ModList(
         ) {
             itemsIndexed(mods) { _, item ->
                 ModItem(
-                    modifier = Modifier.padding(
-                        horizontal = 16.dp,
-                        vertical = 8.dp
-                    ),
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
                     title = item.name,
                     text = item.description,
                     imageUrl = item.iconUrl,

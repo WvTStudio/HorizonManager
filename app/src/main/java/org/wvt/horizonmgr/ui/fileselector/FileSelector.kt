@@ -5,6 +5,7 @@ import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.animateScrollBy
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -290,13 +291,15 @@ private fun PathTab(
         itemsIndexed(data.paths) { index, item ->
             Box(
                 modifier = Modifier
-                    .clickable { onSelectDepth(index) } // TODO: 2021/2/26 希望 Tab 的点击能有涟漪
-//                    .tapGestureFilter { onSelectDepth(index) }
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null
+                    ) { onSelectDepth(index) } // TODO: 2021/2/26 希望 Tab 的点击能有涟漪
+                    .padding(top = 16.dp, bottom = 16.dp)
                     .onGloballyPositioned { sizes.add(index, it.size.width) },
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    modifier = Modifier.padding(top = 16.dp, bottom = 16.dp),
                     text = item,
                     color = animateColorAsState(
                         if (data.depth == index) MaterialTheme.colors.onSurface
@@ -357,7 +360,7 @@ private fun PathList(
         Divider(Modifier.padding(top = 8.dp, bottom = 8.dp))
     }
 
-    Crossfade(entries) { entries->
+    Crossfade(entries) { entries ->
         if (entries.isEmpty()) {
             // 如果子文件是空的，那么 LazyColumnForIndex 不会触发，需要手动检测
             Column(modifier) {

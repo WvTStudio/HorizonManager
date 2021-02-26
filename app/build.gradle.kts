@@ -14,7 +14,7 @@ android {
         applicationId = "org.wvt.horizonmgr"
         minSdkVersion(21)
         targetSdkVersion(30)
-        versionCode = 11
+        versionCode = 13
         versionName = "2.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -38,7 +38,7 @@ android {
             )
 //            isShrinkResources = true
 //            isMinifyEnabled = true
-            versionNameSuffix = "-alpha9"
+            versionNameSuffix = "-alpha10"
         }
     }
     compileOptions {

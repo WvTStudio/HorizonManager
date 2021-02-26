@@ -63,9 +63,8 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private val onlineInstall = registerForActivityResult(InstallPackageResultContract()) {
-        packageManagerVM.loadPackages()
-    }
+    private val onlineInstall =
+        registerForActivityResult(InstallPackageResultContract()) { packageManagerVM.loadPackages() }
 
     private fun startDonateActivity() {
         startActivity<DonateActivity>()
@@ -177,17 +176,17 @@ class MainActivity : AppCompatActivity() {
                 mcLevelVM = mcLevelVM,
                 downloadedModVM = downloadedModVM,
                 onlineVM = onlineVM,
-                onRequestPermission = { requestPermission() },
+                onRequestPermission = ::requestPermission,
                 navigateToCommunity = ::startCommunityActivity,
                 navigateToDonate = ::startDonateActivity,
                 navigateToJoinGroup = ::startJoinGroupActivity,
                 navigateToLogin = ::startLoginActivity,
                 navigateToSettings = ::startSettingsActivity,
                 navigateToOnlineInstall = ::startOnlineInstallActivity,
+                navigateToPackageInfo = { PackageDetailActivity.start(this, it) },
                 requestOpenGame = ::openGame,
                 selectFileForMod = ::startSelectFileActivityForMod,
-                selectFileForPackage = ::startSelectFileActivityForPackage,
-                navigateToPackageInfo = { PackageDetailActivity.start(this, it) }
+                selectFileForPackage = ::startSelectFileActivityForPackage
             )
         }
 
