@@ -5,10 +5,10 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.*
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.Interaction
-import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -28,7 +28,6 @@ import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import org.wvt.horizonmgr.dependenciesViewModel
 import org.wvt.horizonmgr.ui.components.*
 import org.wvt.horizonmgr.ui.main.LocalSelectedPackageUUID
 import org.wvt.horizonmgr.ui.theme.PreviewTheme
@@ -44,6 +43,7 @@ data class PackageManagerItem(
 @OptIn(ExperimentalAnimationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun PackageManager(
+    viewModel: PackageManagerViewModel,
     onPackageSelect: (uuid: String?) -> Unit,
     navigateToPackageInfo: (uuid: String) -> Unit,
     onOnlineInstallClick: () -> Unit,
@@ -52,20 +52,18 @@ fun PackageManager(
 ) {
     val selectedPackageUUID = LocalSelectedPackageUUID.current
 
-    val vm = dependenciesViewModel<PackageManagerViewModel>()
-
     DisposableEffect(Unit) {
-        vm.loadPackages()
+        viewModel.loadPackages()
         onDispose { }
     }
 
     DisposableEffect(selectedPackageUUID) {
-        vm.setSelectedPackage(selectedPackageUUID)
+        viewModel.setSelectedPackage(selectedPackageUUID)
         onDispose {}
     }
 
-    val packages by vm.packages.collectAsState()
-    val progresstate by vm.progressState.collectAsState()
+    val packages by viewModel.packages.collectAsState()
+    val progresstate by viewModel.progressState.collectAsState()
 
     val snackbarHostState = remember { SnackbarHostState() }
     val confirmDeleteDialogHostState = remember { ConfirmDeleteDialogHostState() }
@@ -73,7 +71,7 @@ fun PackageManager(
     var fabExpand by rememberSaveable { mutableStateOf(false) }
 
     progresstate?.let {
-        ProgressDialog(onCloseRequest = vm::dismiss, state = it)
+        ProgressDialog(onCloseRequest = viewModel::dismiss, state = it)
     }
 
     Box {
@@ -99,7 +97,7 @@ fun PackageManager(
                         ) {
                             // Menu
                             DropdownMenuItem(onClick = {
-                                vm.loadPackages()
+                                viewModel.loadPackages()
                                 showMenu = false
                             }) { Text("刷新") }
                         }
@@ -124,13 +122,13 @@ fun PackageManager(
                         onClick = { onPackageSelect(item.uuid) },
                         onInfoClick = { navigateToPackageInfo(item.uuid) },
                         onDeleteClick = {
-                            vm.deletePackage(item.uuid,
+                            viewModel.deletePackage(item.uuid,
                                 confirmDeleteDialogHostState,
                                 { onPackageSelect(null) }
                             )
                         },
-                        onRenameClick = { vm.renamePackage(item.uuid, inputDialogHostState) },
-                        onCloneClick = { vm.clonePackage(item.uuid, inputDialogHostState) }
+                        onRenameClick = { viewModel.renamePackage(item.uuid, inputDialogHostState) },
+                        onCloneClick = { viewModel.clonePackage(item.uuid, inputDialogHostState) }
                     )
                 }
             }
@@ -302,7 +300,7 @@ private fun FABEntry(
                         .wrapContentWidth(),
                     elevation = 2.dp
                 ) {
-                    Providers(LocalContentAlpha provides ContentAlpha.medium) {
+                    CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
                         Box(
                             modifier = Modifier.padding(horizontal = 16.dp),
                             contentAlignment = Alignment.Center,
@@ -344,17 +342,17 @@ fun PackageItem(
     onCloneClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val interactionState = remember { InteractionState() }
+    val interactionSource = remember { MutableInteractionSource() }
+    val pressed by interactionSource.collectIsPressedAsState()
+
     Card(
         modifier = modifier,
-        elevation = animateDpAsState(
-            if (interactionState.contains(Interaction.Pressed)) 8.dp else 1.dp
-        ).value
+        elevation = animateDpAsState(if (pressed) 8.dp else 1.dp).value
     ) {
         Column(
             Modifier.clickable(
                 onClick = onClick,
-                interactionState = interactionState,
+                interactionSource = interactionSource,
                 indication = LocalIndication.current
             )
         ) {
@@ -378,7 +376,7 @@ fun PackageItem(
                     )
                 }
                 // Actions
-                Providers(LocalContentAlpha provides ContentAlpha.medium) {
+                CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
                     Row(Modifier.padding(top = 8.dp, end = 4.dp)) {
                         var dropdown by remember { mutableStateOf(false) }
                         Box {
@@ -431,7 +429,7 @@ fun PackageItem(
                     .heightIn(min = 32.dp),
                 verticalAlignment = Alignment.Bottom
             ) {
-                Providers(LocalContentColor provides MaterialTheme.colors.primary) {
+                CompositionLocalProvider(LocalContentColor provides MaterialTheme.colors.primary) {
                     AnimatedVisibility(
                         visible = selected,
                         enter = fadeIn(),
@@ -441,7 +439,7 @@ fun PackageItem(
                     }
                 }
                 Row(Modifier.weight(1f), horizontalArrangement = Arrangement.End) {
-                    Providers(LocalContentAlpha provides ContentAlpha.medium) {
+                    CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
                         Text(text = installTime, style = MaterialTheme.typography.caption)
                     }
                 }

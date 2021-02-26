@@ -1,4 +1,4 @@
-package org.wvt.horizonmgr.legacyservice
+package org.wvt.horizonmgr
 
 import android.content.Context
 import kotlinx.coroutines.CoroutineScope
@@ -22,8 +22,12 @@ class OfficialCDNPackageDownloader(context: Context) {
     private val downloadPacksDir = downloadDir.resolve("packs")
         get() = field.also { if (!it.exists()) it.mkdirs() }
 
+    data class DownloadResult(
+        val packageZipFile: File,
+        val graphicsFile: File
+    )
     fun download(pack: OfficialCDNPackage) =
-        object : ProgressDeferred<Float, Pair<File, File>> {
+        object : ProgressDeferred<Float, DownloadResult> {
             private val scope = CoroutineScope(EmptyCoroutineContext + Dispatchers.IO)
             private val channel = Channel<Float>(Channel.UNLIMITED)
             private val job = scope.async {
@@ -56,10 +60,10 @@ class OfficialCDNPackageDownloader(context: Context) {
                 graphicsJob.await()
                 packJob.await()
                 channel.close()
-                return@async zipFile to graphicsFile
+                return@async DownloadResult(zipFile, graphicsFile)
             }
 
-            override suspend fun await(): Pair<File, File> = job.await()
+            override suspend fun await(): DownloadResult = job.await()
 
             override suspend fun progressChannel(): ReceiveChannel<Float> = channel
         }

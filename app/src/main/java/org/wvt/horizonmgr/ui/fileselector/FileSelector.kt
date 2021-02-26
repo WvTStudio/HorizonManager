@@ -3,6 +3,8 @@ package org.wvt.horizonmgr.ui.fileselector
 import android.os.Environment
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.animateScrollBy
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -15,7 +17,6 @@ import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.gesture.tapGestureFilter
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.tooling.preview.Preview
@@ -202,19 +203,19 @@ fun FileSelector(onCancel: () -> Unit, onSelect: (String) -> Unit) {
             } else {
                 PathList(
                     modifier = Modifier.fillMaxSize(),
-                    pinedPath = fixedPaths.fastMap { PathListEntry.Folder(it.name) },
-                    entries = subPaths.fastMap {
-                        if (it.isDirectory) PathListEntry.Folder(it.name)
-                        else PathListEntry.File(it.name)
+                    pinedPath = fixedPaths.fastMap { file -> PathListEntry.Folder(file.name) },
+                    entries = subPaths.fastMap { file ->
+                        if (file.isDirectory) PathListEntry.Folder(file.name)
+                        else PathListEntry.File(file.name)
                     },
-                    onPinnedFolderSelect = {
-                        changeHolderPath(fixedPaths[it])
+                    onPinnedFolderSelect = { index ->
+                        changeHolderPath(fixedPaths[index])
                     },
-                    onFolderSelect = {
-                        changeHolderPath(subPaths[it])
+                    onFolderSelect = { index ->
+                        changeHolderPath(subPaths[index])
                     },
-                    onFileSelect = {
-                        onSelect(subPaths[it].absolutePath)
+                    onFileSelect = { index ->
+                        onSelect(subPaths[index].absolutePath)
                     }
                 )
             }
@@ -278,7 +279,7 @@ private fun PathTab(
                 value += sizes.getOrNull(i) ?: 0
             }
             value -= sizes.getOrNull(data.depth) ?: 0 / 2
-            scrollState.smoothScrollTo(value.toFloat())
+            scrollState.animateScrollBy(value.toFloat())
         }
     }
 
@@ -289,7 +290,8 @@ private fun PathTab(
         itemsIndexed(data.paths) { index, item ->
             Box(
                 modifier = Modifier
-                    .tapGestureFilter { onSelectDepth(index) }
+                    .clickable { onSelectDepth(index) } // TODO: 2021/2/26 希望 Tab 的点击能有涟漪
+//                    .tapGestureFilter { onSelectDepth(index) }
                     .onGloballyPositioned { sizes.add(index, it.size.width) },
                 contentAlignment = Alignment.Center
             ) {

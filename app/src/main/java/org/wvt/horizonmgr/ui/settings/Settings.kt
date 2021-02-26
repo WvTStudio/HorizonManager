@@ -1,6 +1,5 @@
 package org.wvt.horizonmgr.ui.settings
 
-import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -12,11 +11,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
-import org.wvt.horizonmgr.BuildConfig
 import org.wvt.horizonmgr.R
 import org.wvt.horizonmgr.ui.components.AnimateLogo
 import org.wvt.horizonmgr.ui.components.HorizonDivider
@@ -54,7 +50,7 @@ fun Settings(
                         )
                     )
                 }
-                Providers(LocalContentAlpha provides ContentAlpha.medium) {
+                CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
                     Text(
                         modifier = Modifier.padding(top = 4.dp),
                         text = versionName,

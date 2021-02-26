@@ -49,6 +49,7 @@ class InstalledMod internal constructor(
      * 该方法解析 `mod.info` 的信息和 `config.json` 中的 `enabled` 键
      */
     private suspend fun parse() {
+        // TODO: 2021/2/22 更换成 ModInfo
         // 只有在没有解析时才会重新解析
         if (!isParsed) {
             // Parse Info

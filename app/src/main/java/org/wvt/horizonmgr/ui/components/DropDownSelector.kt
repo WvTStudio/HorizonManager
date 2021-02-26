@@ -1,9 +1,9 @@
 package org.wvt.horizonmgr.ui.components
 
 import androidx.compose.animation.Crossfade
-import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.indication
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material.*
@@ -22,13 +22,14 @@ fun DropDownSelector(
     selectedIndex: Int,
     onSelected: (index: Int) -> Unit
 ) {
-    val sourceInteractionState = remember { InteractionState() }
+
+    val sourceInteractionState = remember { MutableInteractionSource() }
     var dropDown by remember { mutableStateOf(false) }
 
     Row(
         modifier = modifier.clickable(
             onClick = { dropDown = true },
-            interactionState = sourceInteractionState,
+            interactionSource = sourceInteractionState,
             indication = null
         ),
         verticalAlignment = Alignment.CenterVertically

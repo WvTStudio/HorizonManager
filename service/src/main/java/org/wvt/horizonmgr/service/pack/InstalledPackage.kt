@@ -3,7 +3,6 @@ package org.wvt.horizonmgr.service.pack
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
-import org.wvt.horizonmgr.service.HorizonManager
 import org.wvt.horizonmgr.service.mod.InstalledMod
 import org.wvt.horizonmgr.service.mod.ZipMod
 import org.wvt.horizonmgr.service.utils.translateToValidFile
@@ -16,14 +15,8 @@ import java.util.*
 class InstalledPackage constructor(
     private val pkgDir: File
 ) {
-    object ManifestParser {
-        fun parse() {
-
-        }
-    }
-
     class PackageDoesNotExistsException() : Exception("Package does not exists.")
-    class MissingManifestFile(): Exception("Could not find the manifest file.")
+    class MissingManifestFile() : Exception("Could not find the manifest file.")
 
     // TODO: 2020/11/1 使该 Package 始终能返回最新数据
     private val manifestFile = pkgDir.resolve("manifest.json")
@@ -50,6 +43,8 @@ class InstalledPackage constructor(
     }
 
     private fun parseManifest() {
+        // TODO: 2021/2/22  Use PackageManifest to instead
+
         if (!manifestFile.exists() || !manifestFile.isFile) throw MissingManifestFile()
         val jsonStr = manifestFile.readText()
         with(JSONObject(jsonStr)) {
@@ -68,6 +63,7 @@ class InstalledPackage constructor(
     }
 
     private fun parseInstallationInfo() {
+        // TODO: 2021/2/22  Use InstallationInfo to instead
         if (!installationInfoFile.exists() || !installationInfoFile.isFile) error("Missing .installation_info file")
         val jsonStr = installationInfoFile.readText()
         with(JSONObject(jsonStr)) {
@@ -176,7 +172,7 @@ class InstalledPackage constructor(
         pkgDir.copyRecursively(targetDir)
         InstalledPackage(targetDir)
 
-        val oldInfo = HorizonManager.InstallationInfo.fromJson(
+        val oldInfo = InstallationInfo.fromJson(
             targetDir.resolve(".installation_info").readText()
         ) ?: error("解析JSON失败")
 

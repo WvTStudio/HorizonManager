@@ -49,9 +49,9 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.0.0-alpha12"
+        kotlinCompilerExtensionVersion = "1.0.0-beta01"
     }
-    lintOptions {
+    lint {
         disable("InvalidFragmentVersionForActivityResult")
     }
     kotlinOptions {
@@ -87,7 +87,7 @@ dependencies {
     implementation("com.google.android.material:material:1.3.0")
 
 
-    val composeVersion = "1.0.0-alpha12"
+    val composeVersion = "1.0.0-beta01"
     implementation("androidx.compose.compiler:compiler:$composeVersion")
     implementation("androidx.compose.runtime:runtime:$composeVersion")
     implementation("androidx.compose.foundation:foundation:$composeVersion")

@@ -2,7 +2,11 @@ package org.wvt.horizonmgr.ui.news
 
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.foundation.*
+import androidx.compose.foundation.LocalIndication
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -19,22 +23,21 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import org.wvt.horizonmgr.dependenciesViewModel
 import org.wvt.horizonmgr.ui.components.ErrorPage
 import org.wvt.horizonmgr.ui.components.NetworkImage
 import org.wvt.horizonmgr.ui.theme.PreviewTheme
 
 @Composable
 fun News(
+    viewModel: NewsViewModel,
     onNavClick: () -> Unit
 ) {
-    val vm = dependenciesViewModel<NewsViewModel>()
-    val news by vm.news.collectAsState()
-    val state by vm.state.collectAsState()
+    val news by viewModel.news.collectAsState()
+    val state by viewModel.state.collectAsState()
     val context = LocalContext.current
 
-    DisposableEffect(vm) {
-        vm.refresh()
+    DisposableEffect(viewModel) {
+        viewModel.refresh()
         onDispose { }
     }
 
@@ -42,8 +45,8 @@ fun News(
         onNavClick = onNavClick,
         state = state,
         news = news,
-        onNewsClick = { if (it is NewsViewModel.News.Article) vm.newsDetail(context, it.id) },
-        onRefreshClick = { vm.refresh() }
+        onNewsClick = { if (it is NewsViewModel.News.Article) viewModel.newsDetail(context, it.id) },
+        onRefreshClick = { viewModel.refresh() }
     )
 }
 
@@ -127,18 +130,20 @@ private fun NewsItemNoCover(
     brief: String,
     onClick: () -> Unit
 ) {
-    val interactionState = remember { InteractionState() }
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+
     Card(
         modifier = modifier,
         elevation = animateDpAsState(
-            if (interactionState.contains(Interaction.Pressed)) 8.dp else 1.dp
+            if (isPressed) 8.dp else 1.dp
         ).value
     ) {
         Column(
             modifier = Modifier
                 .clickable(
                     onClick = onClick,
-                    interactionState = interactionState,
+                    interactionSource = interactionSource,
                     indication = LocalIndication.current
                 )
                 .wrapContentHeight()
@@ -172,15 +177,15 @@ private fun NewsItem(
     coverImage: @Composable () -> Unit,
     onClick: () -> Unit
 ) {
-    val interactionState = remember { InteractionState() }
-    Card(modifier = modifier, elevation = animateDpAsState(
-        if (interactionState.contains(Interaction.Pressed)) 8.dp else 1.dp
-    ).value) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+
+    Card(modifier = modifier, elevation = animateDpAsState(if (isPressed) 8.dp else 1.dp).value) {
         Box(
             Modifier
                 .clickable(
                     onClick = onClick,
-                    interactionState = interactionState,
+                    interactionSource = interactionSource,
                     indication = LocalIndication.current
                 )
                 .fillMaxWidth()

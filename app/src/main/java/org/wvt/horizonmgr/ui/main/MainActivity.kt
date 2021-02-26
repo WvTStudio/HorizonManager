@@ -11,48 +11,60 @@ import android.provider.Settings
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.animation.*
-import org.wvt.horizonmgr.HorizonManagerApplication
+import androidx.compose.animation.ExperimentalAnimationApi
 import org.wvt.horizonmgr.R
+import org.wvt.horizonmgr.defaultViewModelFactory
 import org.wvt.horizonmgr.ui.community.CommunityActivity
 import org.wvt.horizonmgr.ui.donate.DonateActivity
+import org.wvt.horizonmgr.ui.downloaded.DMViewModel
 import org.wvt.horizonmgr.ui.fileselector.FileSelectorResult
 import org.wvt.horizonmgr.ui.fileselector.FileSelectorResultContract
 import org.wvt.horizonmgr.ui.joingroup.JoinGroupActivity
 import org.wvt.horizonmgr.ui.login.LoginResultContract
+import org.wvt.horizonmgr.ui.modulemanager.ICLevelTabViewModel
+import org.wvt.horizonmgr.ui.modulemanager.MCLevelTabViewModel
 import org.wvt.horizonmgr.ui.modulemanager.ModTabViewModel
+import org.wvt.horizonmgr.ui.modulemanager.ModuleManagerViewModel
+import org.wvt.horizonmgr.ui.news.NewsViewModel
 import org.wvt.horizonmgr.ui.onlineinstall.InstallPackageResultContract
+import org.wvt.horizonmgr.ui.onlinemods.OnlineViewModel
 import org.wvt.horizonmgr.ui.pacakgemanager.PackageDetailActivity
 import org.wvt.horizonmgr.ui.pacakgemanager.PackageManagerViewModel
 import org.wvt.horizonmgr.ui.settings.SettingsActivity
 import org.wvt.horizonmgr.ui.startActivity
 
 class MainActivity : AppCompatActivity() {
+    private val factory by lazy { defaultViewModelFactory }
 
-    private val app: HorizonManagerApplication by lazy { application as HorizonManagerApplication }
-    private val mainViewModel: MainViewModel by viewModels { app.dependenciesVMFactory }
-    private val homeViewModel: HomeViewModel by viewModels { app.dependenciesVMFactory }
-    private val modTabViewModel: ModTabViewModel by viewModels { app.dependenciesVMFactory }
-    private val packageViewModel: PackageManagerViewModel by viewModels { app.dependenciesVMFactory }
+    private val mainVM: MainViewModel by viewModels { factory }
+    private val homeVM: HomeViewModel by viewModels { factory }
+    private val newsVM: NewsViewModel by viewModels { factory }
+    private val modTabVM: ModTabViewModel by viewModels { factory }
+    private val icLevelTabVM: ICLevelTabViewModel by viewModels { factory }
+    private val moduleManagerVM: ModuleManagerViewModel by viewModels { factory }
+    private val packageManagerVM: PackageManagerViewModel by viewModels { factory }
+    private val mcLevelVM: MCLevelTabViewModel by viewModels { factory }
+    private val downloadedModVM: DMViewModel by viewModels { factory }
+    private val onlineVM: OnlineViewModel by viewModels { factory }
 
     private val login = registerForActivityResult(LoginResultContract()) {
-        mainViewModel.setUserInfo(it)
+        mainVM.setUserInfo(it)
     }
 
     private val selectFileForPackage = registerForActivityResult(FileSelectorResultContract()) {
         if (it is FileSelectorResult.Succeed) {
-            packageViewModel.selectedFile(it.filePath)
+            packageManagerVM.selectedFile(it.filePath)
         }
     }
 
     private val selectFileForModule = registerForActivityResult(FileSelectorResultContract()) {
         if (it is FileSelectorResult.Succeed) {
-            modTabViewModel.fileSelected(it.filePath)
+            modTabVM.fileSelected(it.filePath)
         }
     }
 
     private val onlineInstall = registerForActivityResult(InstallPackageResultContract()) {
-        packageViewModel.loadPackages()
+        packageManagerVM.loadPackages()
     }
 
     private fun startDonateActivity() {
@@ -124,7 +136,7 @@ class MainActivity : AppCompatActivity() {
             return true
         }
         if (!check()) {
-            mainViewModel.showPermissionDialog()
+            mainVM.showPermissionDialog()
         }
     }
 
@@ -155,8 +167,16 @@ class MainActivity : AppCompatActivity() {
 
         setContent {
             App(
-                viewModel = mainViewModel,
-                homeViewModel = homeViewModel,
+                mainVM = mainVM,
+                homeVM = homeVM,
+                newsVM = newsVM,
+                modTabVM = modTabVM,
+                icLevelTabVM = icLevelTabVM,
+                moduleManagerVM = moduleManagerVM,
+                packageManagerVM = packageManagerVM,
+                mcLevelVM = mcLevelVM,
+                downloadedModVM = downloadedModVM,
+                onlineVM = onlineVM,
                 onRequestPermission = { requestPermission() },
                 navigateToCommunity = ::startCommunityActivity,
                 navigateToDonate = ::startDonateActivity,
@@ -172,6 +192,6 @@ class MainActivity : AppCompatActivity() {
         }
 
         this.checkPermission()
-        mainViewModel.checkUpdate()
+        mainVM.checkUpdate()
     }
 }

@@ -10,5 +10,10 @@ import java.util.zip.ZipFile
 class ZipMod internal constructor(
     private val zipFile: ZipFile
 ) {
+    companion object {
+        fun fromFile(zipFile: ZipFile): ZipFile {
+            TODO("TODO: 2021/2/23")
+        }
+    }
     // TODO: 2020/12/5  
 }

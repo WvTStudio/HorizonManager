@@ -4,6 +4,8 @@ import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.*
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -56,7 +58,7 @@ internal fun ModTab(
                     LazyColumn(
                         contentPadding = PaddingValues(top = 8.dp, bottom = 64.dp)
                     ) {
-                        itemsIndexed(items = mods) { index, item ->
+                        itemsIndexed(items = mods) { _, item ->
                             ModItem(
                                 modifier = Modifier.padding(
                                     horizontal = 16.dp,
@@ -108,23 +110,28 @@ private fun ModItem(
     onDeleteClick: () -> Unit,
     onEnabledChange: (enable: Boolean) -> Unit
 ) {
-    val interactionState = remember { InteractionState() }
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+
     Card(
         modifier = modifier,
         border = if (selected) BorderStroke(1.dp, MaterialTheme.colors.primary) else null,
-        elevation = animateDpAsState(targetValue = if (interactionState.contains(Interaction.Pressed)) 8.dp else 1.dp).value
+        elevation = animateDpAsState(targetValue = if (isPressed) 8.dp else 1.dp).value
     ) {
         Column(
-            Modifier.combinedClickable(
-                interactionState = interactionState,
-                indication = LocalIndication.current,
-                onClick = onClick, onLongClick = onLongClick
-            ).background(
-                animateColorAsState(
-                    if (selected) MaterialTheme.colors.primary.copy(0.12f)
-                    else Color.Transparent
-                ).value
-            ).padding(top = 16.dp, bottom = 4.dp, start = 16.dp, end = 16.dp)
+            Modifier
+                .combinedClickable(
+                    interactionSource = interactionSource,
+                    indication = LocalIndication.current,
+                    onClick = onClick, onLongClick = onLongClick
+                )
+                .background(
+                    animateColorAsState(
+                        if (selected) MaterialTheme.colors.primary.copy(0.12f)
+                        else Color.Transparent
+                    ).value
+                )
+                .padding(top = 16.dp, bottom = 4.dp, start = 16.dp, end = 16.dp)
         ) {
             Row {
                 Column(Modifier.weight(1f)) {

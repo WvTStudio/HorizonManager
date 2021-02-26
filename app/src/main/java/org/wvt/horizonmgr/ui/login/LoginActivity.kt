@@ -6,8 +6,10 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContract
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.material.Surface
+import org.wvt.horizonmgr.defaultViewModelFactory
 import org.wvt.horizonmgr.ui.theme.AndroidHorizonManagerTheme
 
 private const val TAG = "LoginActivity"
@@ -63,12 +65,14 @@ class LoginActivity : AppCompatActivity() {
         const val EXTRA_AVATAR = "avatar"
     }
 
+    private val viewModel by viewModels<LoginViewModel> { defaultViewModelFactory }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         this.setContent {
             AndroidHorizonManagerTheme {
                 Surface {
-                    Login(::onLoginSucceed, ::onCancel)
+                    Login(viewModel, ::onLoginSucceed, ::onCancel)
                 }
             }
         }

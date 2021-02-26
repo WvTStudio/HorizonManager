@@ -12,13 +12,29 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import org.wvt.horizonmgr.ui.components.MyAlertDialog
+import org.wvt.horizonmgr.ui.downloaded.DMViewModel
+import org.wvt.horizonmgr.ui.modulemanager.ICLevelTabViewModel
+import org.wvt.horizonmgr.ui.modulemanager.MCLevelTabViewModel
+import org.wvt.horizonmgr.ui.modulemanager.ModTabViewModel
+import org.wvt.horizonmgr.ui.modulemanager.ModuleManagerViewModel
+import org.wvt.horizonmgr.ui.news.NewsViewModel
+import org.wvt.horizonmgr.ui.onlinemods.OnlineViewModel
+import org.wvt.horizonmgr.ui.pacakgemanager.PackageManagerViewModel
 import org.wvt.horizonmgr.ui.theme.AndroidHorizonManagerTheme
 import org.wvt.horizonmgr.ui.theme.PreviewTheme
 
 @Composable
 fun App(
-    viewModel: MainViewModel,
-    homeViewModel: HomeViewModel,
+    mainVM: MainViewModel,
+    homeVM: HomeViewModel,
+    newsVM: NewsViewModel,
+    modTabVM: ModTabViewModel,
+    icLevelTabVM: ICLevelTabViewModel,
+    moduleManagerVM: ModuleManagerViewModel,
+    packageManagerVM: PackageManagerViewModel,
+    mcLevelVM: MCLevelTabViewModel,
+    downloadedModVM: DMViewModel,
+    onlineVM: OnlineViewModel,
     onRequestPermission: () -> Unit,
     navigateToLogin: () -> Unit,
     navigateToJoinGroup: () -> Unit,
@@ -31,11 +47,11 @@ fun App(
     selectFileForMod: () -> Unit,
     selectFileForPackage: () -> Unit
 ) {
-    val userInfo by viewModel.userInfo.collectAsState()
-    val selectedPackage by viewModel.selectedPackage.collectAsState()
-    val showPermissionDialog by viewModel.showPermissionDialog.collectAsState()
+    val userInfo by mainVM.userInfo.collectAsState()
+    val selectedPackage by mainVM.selectedPackage.collectAsState()
+    val showPermissionDialog by mainVM.showPermissionDialog.collectAsState()
 
-    val newVersion by viewModel.newVersion.collectAsState()
+    val newVersion by mainVM.newVersion.collectAsState()
     var displayNewVersionDialog by rememberSaveable { mutableStateOf(false) }
 
     DisposableEffect(newVersion) {
@@ -46,7 +62,7 @@ fun App(
     }
 
     DisposableEffect(Unit) {
-        viewModel.checkUpdate()
+        mainVM.checkUpdate()
         onDispose {
             // TODO: 2021/2/6 添加 Cancel 逻辑
         }
@@ -54,8 +70,16 @@ fun App(
 
     AndroidHorizonManagerTheme {
         Surface(color = MaterialTheme.colors.background) {
-            if (viewModel.initialized) Home(
-                viewModel = homeViewModel,
+            if (mainVM.initialized) Home(
+                homeVM = homeVM,
+                newsVM,
+                modTabVM,
+                icLevelTabVM,
+                moduleManagerVM,
+                packageManagerVM,
+                mcLevelVM,
+                downloadedModVM,
+                onlineVM,
                 userInfo = remember(userInfo) {
                     userInfo?.let {
                         UserInformation(
@@ -66,9 +90,9 @@ fun App(
                     }
                 },
                 requestLogin = navigateToLogin,
-                requestLogout = viewModel::logOut,
+                requestLogout = mainVM::logOut,
                 selectedPackageUUID = selectedPackage,
-                selectedPackageChange = viewModel::setSelectedPackage,
+                selectedPackageChange = mainVM::setSelectedPackage,
                 openGame = requestOpenGame,
                 community = navigateToCommunity,
                 joinGroup = navigateToJoinGroup,
@@ -83,7 +107,7 @@ fun App(
 
         if (showPermissionDialog) {
             RequestPermissionDialog {
-                viewModel.dismiss()
+                mainVM.dismiss()
                 onRequestPermission()
             }
         }
@@ -97,7 +121,7 @@ fun App(
                 changelog = theNewVersion.changelog,
                 onConfirm = { displayNewVersionDialog = false },
                 onIgnore = {
-                    viewModel.ignoreVersion(theNewVersion.versionCode)
+                    mainVM.ignoreVersion(theNewVersion.versionCode)
                     displayNewVersionDialog = false
                 }
             )

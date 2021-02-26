@@ -273,7 +273,7 @@ private fun SelectColorItem(
         }, animationSpec = if (pressed) shrinkTween else expandTween
     ).value
     Column(modifier) {
-        Providers(LocalContentAlpha provides ContentAlpha.medium) {
+        CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
             Text(text = text)
         }
         Surface(
@@ -319,7 +319,7 @@ private fun MaterialColorPalette(
                                 .padding(1.dp)
                                 .height(42.dp)
                         )
-                        Providers(LocalContentAlpha provides ContentAlpha.medium) {
+                        CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
                             for (i in colors) {
                                 Box(
                                     modifier = Modifier
@@ -338,7 +338,7 @@ private fun MaterialColorPalette(
                     }
                     Column {
                         Row {
-                            Providers(LocalContentAlpha provides ContentAlpha.medium) {
+                            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
                                 tags.forEach {
                                     Box(
                                         modifier = Modifier

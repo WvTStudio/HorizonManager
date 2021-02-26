@@ -22,17 +22,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.zIndex
-import org.wvt.horizonmgr.dependenciesViewModel
 import org.wvt.horizonmgr.utils.longSizeToString
 
 @Composable
-internal fun Community(onClose: () -> Unit) {
-    val vm = dependenciesViewModel<CommunityViewModel>()
+internal fun Community(
+    vm: CommunityViewModel,
+    onClose: () -> Unit
+) {
     val newtask by vm.newTask.collectAsState()
 
     var loading by remember { mutableStateOf(true) }
     var progress by remember { mutableStateOf(0f) }
-    val context = LocalContext.current
 
     Box(Modifier.fillMaxSize()) {
         Column(Modifier.fillMaxSize()) {
@@ -64,7 +64,7 @@ internal fun Community(onClose: () -> Unit) {
                 onProgressChanged = { progress = it },
                 onStateChanged = { loading = it },
                 newDownloadTask = { url, userAgent, contentDisposition, mimetype, contentLength ->
-                    vm.newTask(context, url, userAgent, contentDisposition, mimetype, contentLength)
+                    vm.newTask(url, userAgent, contentDisposition, mimetype, contentLength)
                 }, onClose = onClose
             )
         }
@@ -98,7 +98,7 @@ internal fun Community(onClose: () -> Unit) {
                                 .padding(top = 16.dp, bottom = 8.dp),
                             horizontalArrangement = Arrangement.End
                         ) {
-                            TextButton(onClick = { vm.download(context) }) {
+                            TextButton(onClick = { vm.download() }) {
                                 Text("下载")
                             }
                         }
@@ -122,7 +122,7 @@ private fun WebViewCompose(
 
     AndroidView(
         modifier = modifier,
-        viewBlock = {
+        factory = {
             WebView(it).apply {
                 settings.apply {
                     javaScriptEnabled = true

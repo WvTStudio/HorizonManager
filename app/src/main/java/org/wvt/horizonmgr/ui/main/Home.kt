@@ -19,22 +19,35 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.launch
 import org.wvt.horizonmgr.ui.components.MyAlertDialog
 import org.wvt.horizonmgr.ui.components.NetworkImage
+import org.wvt.horizonmgr.ui.downloaded.DMViewModel
 import org.wvt.horizonmgr.ui.downloaded.DownloadedMods
-import org.wvt.horizonmgr.ui.modulemanager.ModuleManager
+import org.wvt.horizonmgr.ui.modulemanager.*
 import org.wvt.horizonmgr.ui.news.News
+import org.wvt.horizonmgr.ui.news.NewsViewModel
 import org.wvt.horizonmgr.ui.onlinemods.Online
+import org.wvt.horizonmgr.ui.onlinemods.OnlineViewModel
 import org.wvt.horizonmgr.ui.pacakgemanager.PackageManager
+import org.wvt.horizonmgr.ui.pacakgemanager.PackageManagerViewModel
 import org.wvt.horizonmgr.ui.theme.PreviewTheme
 
 @Deprecated("Deprecated")
-val LocalSelectedPackageUUID = staticCompositionLocalOf<String?>()
-val LocalDrawerState = staticCompositionLocalOf<DrawerState>()
+val LocalSelectedPackageUUID = staticCompositionLocalOf<String?> { null }
+val LocalDrawerState = staticCompositionLocalOf<DrawerState> { error("No local drawer provided")}
 
 @Composable
 fun Home(
-    viewModel: HomeViewModel,
+    homeVM: HomeViewModel,
+    newsVM: NewsViewModel,
+    modTabVM: ModTabViewModel,
+    icLevelTabVM: ICLevelTabViewModel,
+    moduleManagerVM: ModuleManagerViewModel,
+    packageManagerVM: PackageManagerViewModel,
+    mcLevelVM: MCLevelTabViewModel,
+    downloadedModVM: DMViewModel,
+    onlineVM: OnlineViewModel,
     userInfo: UserInformation?,
     requestLogin: () -> Unit,
     requestLogout: () -> Unit,
@@ -50,6 +63,7 @@ fun Home(
     settings: () -> Unit,
     navigateToPackageInfo: (uuid: String) -> Unit
 ) {
+    val scope = rememberCoroutineScope()
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val screens by remember { mutableStateOf(HomeViewModel.Screen.values()) }
 
@@ -63,9 +77,9 @@ fun Home(
             )
         },
         tabs = {
-            DrawerTabs(screens = screens, currentScreen = viewModel.currentScreen, onChange = {
-                viewModel.navigate(it)
-                drawerState.close()
+            DrawerTabs(screens = screens, currentScreen = homeVM.currentScreen, onChange = {
+                homeVM.navigate(it)
+                scope.launch { drawerState.close() }
             })
         },
         items = {
@@ -93,32 +107,40 @@ fun Home(
             )
         }
     ) {
-        Providers(
+        CompositionLocalProvider(
             LocalDrawerState provides drawerState,
             LocalSelectedPackageUUID provides selectedPackageUUID
         ) {
-            Crossfade(targetState = viewModel.currentScreen) { cs ->
+            Crossfade(targetState = homeVM.currentScreen) { cs ->
                 when (cs) {
                     HomeViewModel.Screen.HOME -> News(
-                        onNavClick = { drawerState.open() }
+                        viewModel = newsVM,
+                        onNavClick = { scope.launch { drawerState.open()} }
                     )
                     HomeViewModel.Screen.LOCAL_MANAGE -> ModuleManager(
-                        onNavClicked = { drawerState.open() },
+                        onNavClicked = { scope.launch { drawerState.open() }},
                         onAddModClicked = onAddModClicked,
+                        managerViewModel = moduleManagerVM,
+                        icLevelViewModel = icLevelTabVM,
+                        moduleViewModel = modTabVM,
+                        mcLevelViewModel = mcLevelVM
                     )
                     HomeViewModel.Screen.PACKAGE_MANAGE -> PackageManager(
+                        viewModel = packageManagerVM,
                         onPackageSelect = selectedPackageChange,
-                        onNavClick = { drawerState.open() },
+                        onNavClick = { scope.launch {  drawerState.open() }},
                         onOnlineInstallClick = requestOnlineInstall,
                         onLocalInstallClick = onAddPackageClicked,
                         navigateToPackageInfo = navigateToPackageInfo
                     )
                     HomeViewModel.Screen.ONLINE_DOWNLOAD -> Online(
+                        viewModel = onlineVM,
                         enable = userInfo != null,
-                        onNavClicked = { drawerState.open() }
+                        onNavClicked = {scope.launch {  drawerState.open() }}
                     )
                     HomeViewModel.Screen.DOWNLOADED_MOD -> DownloadedMods(
-                        onNavClicked = { drawerState.open() }
+                        vm = downloadedModVM,
+                        onNavClicked = {scope.launch {  drawerState.open() }}
                     )
                 }
             }
@@ -150,7 +172,7 @@ private fun Drawer(
     setting: @Composable () -> Unit,
     content: @Composable () -> Unit
 ) {
-    ModalDrawerLayout(
+    ModalDrawer(
         drawerState = state,
         drawerContent = {
             Column(modifier = Modifier.fillMaxSize()) {
@@ -168,7 +190,7 @@ private fun Drawer(
                 Column(Modifier.padding(vertical = 8.dp)) { setting() }
             }
         },
-        bodyContent = content
+        content = content
     )
 }
 
@@ -213,10 +235,13 @@ private fun DrawerHeader(
             shape = RoundedCornerShape(percent = 50),
             color = MaterialTheme.colors.onSurface.copy(alpha = 0.12f)
         ) {
-            Box(Modifier.fillMaxSize().clickable {
-                if (userInfo == null) requestLogin()
-                else showDialog = true
-            }) {
+            Box(
+                Modifier
+                    .fillMaxSize()
+                    .clickable {
+                        if (userInfo == null) requestLogin()
+                        else showDialog = true
+                    }) {
                 userInfo?.let {
                     NetworkImage(
                         url = it.avatarUrl,
@@ -257,9 +282,10 @@ private fun NavigationItem(
             .fillMaxWidth()
             .padding(horizontal = 8.dp, vertical = 2.dp)
     ) {
-        Providers(LocalContentAlpha provides ContentAlpha.high) {
+        CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
             Row(
-                Modifier.fillMaxSize()
+                Modifier
+                    .fillMaxSize()
                     .clickable { onCheckedChange(!checked) },
                 verticalAlignment = Alignment.CenterVertically
             ) {

@@ -15,7 +15,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import org.wvt.horizonmgr.dependenciesViewModel
 import org.wvt.horizonmgr.legacyservice.WebAPI
 import org.wvt.horizonmgr.ui.components.ErrorPage
 import org.wvt.horizonmgr.ui.components.NetworkImage
@@ -24,40 +23,40 @@ import org.wvt.horizonmgr.ui.main.LocalSelectedPackageUUID
 
 @Composable
 fun Online(
+    viewModel: OnlineViewModel,
     enable: Boolean,
     onNavClicked: () -> Unit
 ) {
-    val vm = dependenciesViewModel<OnlineViewModel>()
-    val state by vm.state.collectAsState()
-    val options by vm.options.collectAsState()
-    val downloadState by vm.downloadState.collectAsState()
-    val installState by vm.installState.collectAsState()
+    val state by viewModel.state.collectAsState()
+    val options by viewModel.options.collectAsState()
+    val downloadState by viewModel.downloadState.collectAsState()
+    val installState by viewModel.installState.collectAsState()
     val selectedPackageUUID = LocalSelectedPackageUUID.current
 
     DisposableEffect(enable) {
-        vm.setEnable(enable)
+        viewModel.setEnable(enable)
         onDispose { }
     }
     DisposableEffect(selectedPackageUUID) {
-        vm.setSelectedUUID(selectedPackageUUID)
+        viewModel.setSelectedUUID(selectedPackageUUID)
         onDispose { }
     }
 
-    downloadState?.let { ProgressDialog(onCloseRequest = { vm.downloadFinish() }, state = it) }
-    installState?.let { ProgressDialog(onCloseRequest = { vm.installFinish() }, state = it) }
+    downloadState?.let { ProgressDialog(onCloseRequest = { viewModel.downloadFinish() }, state = it) }
+    installState?.let { ProgressDialog(onCloseRequest = { viewModel.installFinish() }, state = it) }
 
     Column(Modifier.fillMaxSize()) {
         // Top App Bar
         TuneAppBar(
             enable = enable,
             onNavClicked = onNavClicked,
-            onFilterValueConfirm = { vm.setFilterValue(it) },
-            vm.sources,
+            onFilterValueConfirm = { viewModel.setFilterValue(it) },
+            viewModel.sources,
             options.selectedSource,
-            vm::setSelectedSource,
-            vm.sortModes,
+            viewModel::setSelectedSource,
+            viewModel.sortModes,
             options.selectedSortMode,
-            vm::setSelectedSortMode
+            viewModel::setSelectedSortMode
         )
         // Content
         if (!enable) {
@@ -78,15 +77,15 @@ fun Online(
                     is OnlineViewModel.State.OK -> ModList(
                         modifier = Modifier.fillMaxSize(),
                         mods = state.modList,
-                        onDownloadClick = { vm.download(it) },
-                        onInstallClick = { vm.install(it) }
+                        onDownloadClick = { viewModel.download(it) },
+                        onInstallClick = { viewModel.install(it) }
                     )
                     is OnlineViewModel.State.Error -> ErrorPage(
                         modifier = Modifier.fillMaxSize(),
                         message = {
                             Text(state.message)
                         },
-                        onRetryClick = vm::refresh
+                        onRetryClick = viewModel::refresh
                     )
                 }
             }
@@ -179,7 +178,7 @@ private fun ModItem(
                     .fillMaxWidth(),
                 horizontalArrangement = Arrangement.End
             ) {
-                Providers(LocalContentColor provides MaterialTheme.colors.primary) {
+                CompositionLocalProvider(LocalContentColor provides MaterialTheme.colors.primary) {
                     // Install Button
                     IconButton(onClick = onInstallClick) {
                         Icon(Icons.Filled.Extension, contentDescription = "安装")

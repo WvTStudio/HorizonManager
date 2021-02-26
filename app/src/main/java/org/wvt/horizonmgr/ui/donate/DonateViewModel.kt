@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import org.wvt.horizonmgr.DependenciesContainer
 import org.wvt.horizonmgr.webapi.NetworkException
@@ -17,7 +18,7 @@ private const val TAG = "DonateVMLogger"
 class DonateViewModel(
     dependencies: DependenciesContainer
 ) : ViewModel() {
-    private val webApi = dependencies.mgrInfo
+    private val mgrInfo = dependencies.mgrInfo
 
     data class DonateItem(
         val name: String,
@@ -25,13 +26,13 @@ class DonateViewModel(
     )
 
     private val _donates = MutableStateFlow(emptySet<DonateItem>())
-    val donates: StateFlow<Set<DonateItem>> = _donates
+    val donates: StateFlow<Set<DonateItem>> = _donates.asStateFlow()
 
     fun refresh() {
         viewModelScope.launch {
             val result = mutableSetOf<DonateItem>()
             try {
-                webApi.getDonateList().forEach {
+                mgrInfo.getDonateList().forEach {
                     result.add(
                         DonateItem(
                             name = it.donorName,

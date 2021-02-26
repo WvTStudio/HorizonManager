@@ -7,7 +7,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -77,7 +77,7 @@ fun ProgressDialog(
 
 @Composable
 private fun Content(content: String) {
-    Providers(LocalContentAlpha provides ContentAlpha.high) {
+    CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
         Text(
             modifier = Modifier.padding(start = 32.dp, end = 16.dp),
             text = content

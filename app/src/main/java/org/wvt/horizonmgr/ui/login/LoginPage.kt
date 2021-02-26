@@ -39,7 +39,7 @@ fun LoginPage(
             Text(
                 text = "登录", color = MaterialTheme.colors.primary, fontSize = 64.sp
             )
-            Providers(LocalContentAlpha provides ContentAlpha.medium) {
+            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
                 Text(
                     modifier = Modifier.padding(top = 16.dp),
                     text = "使用 InnerCore 中文社区账号登录",

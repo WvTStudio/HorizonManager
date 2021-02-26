@@ -7,18 +7,22 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Extension
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import org.wvt.horizonmgr.dependenciesViewModel
 import org.wvt.horizonmgr.ui.components.ProgressDialog
 import org.wvt.horizonmgr.ui.main.LocalSelectedPackageUUID
 
 @Composable
-fun DownloadedMods(onNavClicked: () -> Unit) {
-    val vm = dependenciesViewModel<DMViewModel>()
+fun DownloadedMods(
+    vm: DMViewModel,
+    onNavClicked: () -> Unit
+) {
     val mods by vm.mods.collectAsState()
     val progressState by vm.progressState.collectAsState()
     val selected = LocalSelectedPackageUUID.current

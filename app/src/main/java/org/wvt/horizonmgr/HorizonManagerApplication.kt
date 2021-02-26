@@ -2,14 +2,10 @@ package org.wvt.horizonmgr
 
 import android.app.Application
 import android.content.Context
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.viewinterop.viewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import org.wvt.horizonmgr.legacyservice.HorizonManager
 import org.wvt.horizonmgr.legacyservice.LocalCache
-import org.wvt.horizonmgr.legacyservice.OfficialCDNPackageDownloader
 import org.wvt.horizonmgr.legacyservice.WebAPI
 import org.wvt.horizonmgr.webapi.iccn.ICCNModule
 import org.wvt.horizonmgr.webapi.mgrinfo.MgrInfoModule
@@ -19,8 +15,7 @@ import org.wvt.horizonmgr.webapi.news.MgrNewsModule
 import org.wvt.horizonmgr.webapi.pack.OfficialPackageCDNRepository
 
 class HorizonManagerApplication : Application() {
-    lateinit var container: DependenciesContainer
-        private set
+    private lateinit var container: DependenciesContainer
     lateinit var dependenciesVMFactory: ViewModelProvider.Factory
         private set
 
@@ -31,11 +26,8 @@ class HorizonManagerApplication : Application() {
     }
 }
 
-@Composable
-inline fun <reified T : ViewModel> dependenciesViewModel(): T {
-    val app = LocalContext.current.applicationContext as HorizonManagerApplication
-    return viewModel(factory = app.dependenciesVMFactory)
-}
+val Context.defaultViewModelFactory: ViewModelProvider.Factory
+    get() = (applicationContext as HorizonManagerApplication).dependenciesVMFactory
 
 private class DependenciesVMFactory(
     private val dependenciesContainer: DependenciesContainer

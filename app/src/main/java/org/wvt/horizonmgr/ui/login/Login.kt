@@ -23,18 +23,17 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import org.wvt.horizonmgr.R
-import org.wvt.horizonmgr.dependenciesViewModel
 
 private const val TAG = "ComposeLogin"
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun Login(
+    vm: LoginViewModel,
     onLoginSuccess: (account: String, avatar: String?, name: String, uid: String) -> Unit,
     onCancel: () -> Unit
 ) {
     // FIXME: 2021/2/19 修复齿轮不转的问题
-    val vm = dependenciesViewModel<LoginViewModel>()
     val context = LocalContext.current as ComponentActivity
     var rotation by remember { mutableStateOf(0f) }
 

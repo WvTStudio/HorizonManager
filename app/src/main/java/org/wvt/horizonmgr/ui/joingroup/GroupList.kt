@@ -10,7 +10,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -85,7 +85,7 @@ private fun GroupItem(
                 .wrapContentHeight()
         ) {
             // GroupName
-            Providers(LocalContentAlpha provides ContentAlpha.high) {
+            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
                 Box(Modifier.fillMaxWidth()) {
                     // GroupName
                     Text(
@@ -96,7 +96,7 @@ private fun GroupItem(
                 }
             }
             // Description
-            Providers(LocalContentAlpha provides ContentAlpha.medium) {
+            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
                 Text(
                     modifier = Modifier.padding(top = 8.dp),
                     text = description, style = MaterialTheme.typography.body2

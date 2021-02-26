@@ -1,9 +1,10 @@
 package org.wvt.horizonmgr.ui
 
-import androidx.compose.runtime.staticAmbientOf
+
+import androidx.compose.runtime.staticCompositionLocalOf
 
 @Deprecated("Not yet implemented.", level = DeprecationLevel.WARNING)
-val AmbientStringResources = staticAmbientOf<StringResources>()
+val LocalStringResources = staticCompositionLocalOf<StringResources> { error("No StringResources provided") }
 
 interface StringResources {
     val drawer_greeting: String

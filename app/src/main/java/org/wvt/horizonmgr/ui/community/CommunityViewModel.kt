@@ -11,10 +11,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
-import org.wvt.horizonmgr.DependenciesContainer
+
+fun interface ContextFactory {
+    fun get(): Context
+}
 
 class CommunityViewModel(
-    private val dependenciesContainer: DependenciesContainer
+    private val contextFactory: ContextFactory
 ) : ViewModel() {
     companion object {
         const val TAG = "CommunityVM"
@@ -32,7 +35,6 @@ class CommunityViewModel(
     val newTask = MutableStateFlow<DownloadTask?>(null)
 
     fun newTask(
-        context: Context,
         url: String,
         mimetype: String,
         userAgent: String,
@@ -44,33 +46,22 @@ class CommunityViewModel(
             "url: $url, mimetype: $mimetype, userAgent: $userAgent, contentDisposition: $contentDisposition, contentLength: $contentLength"
         )
 
-        newTask.value = DownloadTask(
-            filename = URLUtil.guessFileName(url, contentDisposition, mimetype),
-            url = url,
-            size = contentLength,
-            userAgent = userAgent,
-            contentDisposition = contentDisposition,
-            mimetype = mimetype
-        )
-
-        /*val request = DownloadManager.Request(Uri.parse(url)).apply {
-            setMimeType(mimetype)
-            val cookies = CookieManager.getInstance().getCookie(url)
-            addRequestHeader("cookie", cookies)
-            addRequestHeader("User-Agent", userAgent)
-            setDescription("正在下载...")
-            setTitle(URLUtil.guessFileName(url, contentDisposition, mimetype))
-            setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
-            setDestinationInExternalFilesDir(context, Environment.DIRECTORY_DOWNLOADS, URLUtil.guessFileName(url, contentDisposition, mimetype))
+        viewModelScope.launch {
+            newTask.emit(DownloadTask(
+                filename = URLUtil.guessFileName(url, contentDisposition, mimetype),
+                url = url,
+                size = contentLength,
+                userAgent = userAgent,
+                contentDisposition = contentDisposition,
+                mimetype = mimetype
+            ))
         }
-
-        val dm = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
-        dm.openDownloadedFile(dm.enqueue(request))*/
     }
 
-    fun download(context: Context) {
+    fun download() {
         val task = newTask.value ?: return
         viewModelScope.launch {
+            val context = contextFactory.get()
             val request = DownloadManager.Request(Uri.parse(task.url)).apply {
                 setMimeType(task.mimetype)
                 val cookies = CookieManager.getInstance().getCookie(task.url)
@@ -85,11 +76,13 @@ class CommunityViewModel(
             val dm = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
             dm.enqueue(request)
 
-            newTask.value = null
+            newTask.emit(null)
         }
     }
 
     fun clearDownloadTask() {
-        newTask.value = null
+        viewModelScope.launch {
+            newTask.emit(null)
+        }
     }
 }

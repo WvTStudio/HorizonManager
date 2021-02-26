@@ -4,7 +4,7 @@ import android.content.Context
 import android.os.Environment
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.json.JSONObject
+import org.wvt.horizonmgr.service.pack.InstallationInfo
 import org.wvt.horizonmgr.service.pack.InstalledPackage
 import org.wvt.horizonmgr.service.pack.ZipPackage
 import org.wvt.horizonmgr.service.utils.translateToValidFile
@@ -65,38 +65,5 @@ class HorizonManager constructor(context: Context) {
         }
         outDir.resolve(".installation_complete").createNewFile()
         return@withContext InstalledPackage(outDir)
-    }
-
-    data class InstallationInfo(
-        val packageId: String,
-        val timeStamp: Long,
-        val customName: String,
-        val internalId: String
-    ) {
-        companion object {
-            fun fromJson(jsonStr: String): InstallationInfo? {
-                return try {
-                    with(JSONObject(jsonStr)) {
-                        InstallationInfo(
-                            packageId = getString("uuid"),
-                            timeStamp = getLong("timestamp"),
-                            customName = getString("customName"),
-                            internalId = getString("internalId")
-                        )
-                    }
-                } catch (e: Exception) {
-                    null
-                }
-            }
-        }
-
-        fun toJson(): String {
-            return with(JSONObject()) {
-                put("uuid", packageId)
-                put("timestamp", timeStamp)
-                put("customName", customName)
-                put("internalId", internalId)
-            }.toString(4)
-        }
     }
 }

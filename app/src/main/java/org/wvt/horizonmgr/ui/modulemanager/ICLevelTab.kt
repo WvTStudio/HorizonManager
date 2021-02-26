@@ -49,7 +49,7 @@ internal fun ICLevelTab(
                     modifier = Modifier.fillMaxSize(),
                     contentPadding = PaddingValues(bottom = 64.dp)
                 ) {
-                    itemsIndexed(items = items) { index, item ->
+                    itemsIndexed(items = items) { _, item ->
                         LevelItem(
                             modifier = Modifier.padding(16.dp),
                             title = item.name,

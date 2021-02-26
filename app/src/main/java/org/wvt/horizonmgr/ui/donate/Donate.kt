@@ -4,8 +4,8 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
@@ -34,7 +34,7 @@ private data class DonateItem(
     val size: TextUnit
 )
 
-@OptIn(ExperimentalLayout::class, ExperimentalAnimationApi::class)
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun Donate(
     donates: Set<DonateViewModel.DonateItem>,
@@ -51,7 +51,7 @@ fun Donate(
             Surface(
                 color = if (light) alipayColor else MaterialTheme.colors.background,
                 modifier = Modifier.weight(1f).fillMaxWidth()
-                    .clickable(interactionState = remember{ InteractionState() }, indication = null, onClick = onAlipayClicked)
+                    .clickable(interactionSource = remember{ MutableInteractionSource() }, indication = null, onClick = onAlipayClicked)
             ) {
                 Box(Modifier.fillMaxSize()) {
                     Icon(
@@ -66,7 +66,7 @@ fun Donate(
             Surface(
                 color = if (light) wechatColor else MaterialTheme.colors.background,
                 modifier = Modifier.weight(1f).fillMaxWidth()
-                    .clickable(interactionState = remember{ InteractionState() }, indication = null, onClick = onWechatPayClicked)
+                    .clickable(interactionSource = remember{ MutableInteractionSource() }, indication = null, onClick = onWechatPayClicked)
             ) {
                 Box(Modifier.fillMaxSize()) {
                     Icon(

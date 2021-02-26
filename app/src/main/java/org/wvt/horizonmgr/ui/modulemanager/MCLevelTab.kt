@@ -28,7 +28,7 @@ internal fun MCLevelTab(
                 Text("当前还没有地图")
             }
         } else LazyColumn(contentPadding = PaddingValues(bottom = 64.dp)) {
-            itemsIndexed(items = items) { index, item ->
+            itemsIndexed(items = items) { _, item ->
                 LevelItem(
                     modifier = Modifier.padding(16.dp),
                     title = item.name,

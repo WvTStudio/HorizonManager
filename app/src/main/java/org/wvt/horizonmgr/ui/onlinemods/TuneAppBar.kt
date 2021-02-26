@@ -178,7 +178,7 @@ internal fun TuneAppBar(
             Box(
                 Modifier.wrapContentHeight().graphicsLayer(alpha = contentOpacity).layoutId("content")
             ) {
-                Providers(LocalContentAlpha provides ContentAlpha.medium) {
+                CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
                     Column(
                         Modifier.padding(top = 8.dp, start = 32.dp, end = 16.dp, bottom = 16.dp)
                     ) {

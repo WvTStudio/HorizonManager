@@ -5,13 +5,14 @@ import androidx.compose.material.Colors
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.Providers
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
 
-val LocalThemeController = staticCompositionLocalOf<ThemeController>()
-val LocalThemeConfig = staticCompositionLocalOf<ThemeConfig>()
+val LocalThemeController =
+    staticCompositionLocalOf<ThemeController> { error("No theme controller provided") }
+val LocalThemeConfig = staticCompositionLocalOf<ThemeConfig> { error("No theme config provided") }
 
 interface ThemeController {
     fun setFollowSystemDarkTheme(enable: Boolean)
@@ -55,7 +56,7 @@ fun HorizonManagerTheme(
         onError = animateColorAsState(targetColors.onError).value,
         isLight = targetColors.isLight
     )
-    Providers(
+    CompositionLocalProvider(
         LocalThemeController provides controller,
         LocalThemeConfig provides config
     ) {

@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.sp
 import org.wvt.horizonmgr.ui.components.FabState
 import org.wvt.horizonmgr.ui.components.StateFab
 
-@OptIn(ExperimentalMaterialApi::class, ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun RegisterPage(
     fabState: FabState,
@@ -42,7 +42,7 @@ fun RegisterPage(
         ) {
             item {
                 Text("注册", color = MaterialTheme.colors.primary, fontSize = 64.sp)
-                Providers(LocalContentAlpha provides ContentAlpha.medium) {
+                CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
                     Text(
                         modifier = Modifier.padding(top = 16.dp),
                         text = "注册到 InnerCore 中文社区 ",

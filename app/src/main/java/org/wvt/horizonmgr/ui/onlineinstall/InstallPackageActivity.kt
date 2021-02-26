@@ -6,6 +6,7 @@ import android.os.Bundle
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContract
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,7 +14,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import org.wvt.horizonmgr.dependenciesViewModel
+import org.wvt.horizonmgr.defaultViewModelFactory
 import org.wvt.horizonmgr.ui.theme.AndroidHorizonManagerTheme
 
 class InstallPackageResultContract : ActivityResultContract<Context, Boolean>() {
@@ -36,13 +37,13 @@ class InstallPackageActivity : AppCompatActivity() {
         const val SUCCEED = 1
     }
 
+    private val viewModel by viewModels<InstallPackageViewModel> { defaultViewModelFactory }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             AndroidHorizonManagerTheme {
-                // TODO 2021/1/18 重构这坨屎
-                val vm = dependenciesViewModel<InstallPackageViewModel>()
-                val packages by vm.packages.collectAsState()
+                val packages by viewModel.packages.collectAsState()
 
                 var screen: Int by remember { mutableStateOf(0) }
                 var chosenIndex by remember { mutableStateOf<Int>(-1) }
@@ -56,7 +57,7 @@ class InstallPackageActivity : AppCompatActivity() {
                             }
                         }
                     })
-                    vm.getPackages()
+                    viewModel.getPackages()
                     onDispose { }
                 }
 
@@ -66,7 +67,7 @@ class InstallPackageActivity : AppCompatActivity() {
                             0 -> ChoosePackage(
                                 onChoose = {
                                     chosenIndex = it
-                                    vm.selectPackage(packages[it].uuid)
+                                    viewModel.selectPackage(packages[it].uuid)
                                     screen = 1
                                 },
                                 onCancel = { finish() },
@@ -76,17 +77,17 @@ class InstallPackageActivity : AppCompatActivity() {
                                 packages[chosenIndex].name,
                                 packages[chosenIndex].version,
                                 onConfirm = {
-                                    vm.setCustomName(it)
-                                    vm.startInstall()
+                                    viewModel.setCustomName(it)
+                                    viewModel.startInstall()
                                     screen = 2
                                 },
                                 onCancel = { screen = 0 }
                             )
                             2 -> InstallProgress(
-                                totalProgress = vm.totalProgress.collectAsState().value,
-                                downloadState = vm.downloadState.collectAsState().value,
-                                installState = vm.installState.collectAsState().value,
-                                onCancelClick = { vm.cancelInstall() },
+                                totalProgress = viewModel.totalProgress.collectAsState().value,
+                                downloadState = viewModel.downloadState.collectAsState().value,
+                                installState = viewModel.installState.collectAsState().value,
+                                onCancelClick = { viewModel.cancelInstall() },
                                 onCompleteClick = { finishWithSucceed() }
                             )
                         }

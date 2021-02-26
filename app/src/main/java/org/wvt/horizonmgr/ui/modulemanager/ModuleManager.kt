@@ -2,7 +2,7 @@ package org.wvt.horizonmgr.ui.modulemanager
 
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.foundation.InteractionState
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.material.*
@@ -15,49 +15,48 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEachIndexed
 import androidx.compose.ui.zIndex
-import org.wvt.horizonmgr.dependenciesViewModel
 import org.wvt.horizonmgr.ui.components.HorizonDivider
 import org.wvt.horizonmgr.ui.main.LocalSelectedPackageUUID
 
 @Composable
 fun ModuleManager(
-/*    managerViewModel: ModuleManagerViewModel,
+    managerViewModel: ModuleManagerViewModel,
     moduleViewModel: ModTabViewModel,
     icLevelViewModel: ICLevelTabViewModel,
-    mcLevelViewModel: MCLevelTabViewModel,*/
+    mcLevelViewModel: MCLevelTabViewModel,
     onNavClicked: () -> Unit,
     onAddModClicked: () -> Unit
 ) {
-    val vm = dependenciesViewModel<ModuleManagerViewModel>()
-    val selectedTab by vm.selectedTab.collectAsState()
-    val modVm = dependenciesViewModel<ModTabViewModel>()
-    val icMapVm = dependenciesViewModel<ICLevelTabViewModel>()
-    val mcMapVm = dependenciesViewModel<MCLevelTabViewModel>()
-
+    val selectedTab by managerViewModel.selectedTab.collectAsState()
     val pkgId = LocalSelectedPackageUUID.current
 
     DisposableEffect(pkgId) {
-        modVm.setSelectedUUID(pkgId)
-        modVm.load()
+        moduleViewModel.setSelectedUUID(pkgId)
+        moduleViewModel.load()
 
-        icMapVm.setPackage(pkgId)
-        icMapVm.load()
+        icLevelViewModel.setPackage(pkgId)
+        icLevelViewModel.load()
         onDispose {}
+    }
+
+    DisposableEffect(Unit) {
+        mcLevelViewModel.load()
+        onDispose {  }
     }
 
     Column {
         CustomAppBar(
-            tabs = vm.tabs,
+            tabs = managerViewModel.tabs,
             selectedTab = selectedTab,
-            onTabSelected = vm::selectTab,
+            onTabSelected = managerViewModel::selectTab,
             onNavClicked = onNavClicked
         )
         Box(Modifier.fillMaxSize()) {
             Crossfade(selectedTab) {
                 when (it) {
-                    ModuleManagerViewModel.Tabs.MOD -> ModTab(modVm, onAddModClicked)
-                    ModuleManagerViewModel.Tabs.IC_MAP -> ICLevelTab(icMapVm)
-                    ModuleManagerViewModel.Tabs.MC_MAP -> MCLevelTab(mcMapVm)
+                    ModuleManagerViewModel.Tabs.MOD -> ModTab(moduleViewModel, onAddModClicked)
+                    ModuleManagerViewModel.Tabs.IC_MAP -> ICLevelTab(icLevelViewModel)
+                    ModuleManagerViewModel.Tabs.MC_MAP -> MCLevelTab(mcLevelViewModel)
                     ModuleManagerViewModel.Tabs.IC_TEXTURE -> MCResTab()
                     ModuleManagerViewModel.Tabs.MC_TEXTURE -> ICResTab()
                 }
@@ -110,12 +109,14 @@ private fun CustomAppBar(
 @Composable
 private fun TabItem(label: String, selected: Boolean, onTabSelected: () -> Unit) {
     Column(
-        modifier = Modifier.selectable(
-            selected = selected,
-            onClick = onTabSelected,
-            interactionState = remember { InteractionState() },
-            indication = null
-        ).fillMaxHeight(),
+        modifier = Modifier
+            .selectable(
+                selected = selected,
+                onClick = onTabSelected,
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null
+            )
+            .fillMaxHeight(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {

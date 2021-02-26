@@ -5,6 +5,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,13 +18,15 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.wvt.horizonmgr.R
-import org.wvt.horizonmgr.dependenciesViewModel
+import org.wvt.horizonmgr.defaultViewModelFactory
 import org.wvt.horizonmgr.ui.theme.AndroidHorizonManagerTheme
 
 class DonateActivity : AppCompatActivity() {
     companion object {
         const val aliPayCode = "fkx18184vir1w8crfl6vsa9"
     }
+
+    private val vm by viewModels<DonateViewModel> { defaultViewModelFactory }
 
     @OptIn(ExperimentalMaterialApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,10 +36,7 @@ class DonateActivity : AppCompatActivity() {
             val hostState = SnackbarHostState()
             val scope = rememberCoroutineScope()
             var job by remember { mutableStateOf<Job?>(null) }
-
-            val vm = dependenciesViewModel<DonateViewModel>()
             val mDonates by vm.donates.collectAsState()
-
 
             DisposableEffect(vm) {
                 vm.refresh()
