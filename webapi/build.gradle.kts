@@ -43,6 +43,7 @@ dependencies {
     implementation("androidx.appcompat:appcompat:1.2.0")
 
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.4.2")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.1.0")
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.1.1")
     implementation("io.ktor:ktor-client-cio:1.4.3")
 

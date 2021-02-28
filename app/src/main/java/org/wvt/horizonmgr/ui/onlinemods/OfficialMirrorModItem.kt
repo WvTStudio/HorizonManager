@@ -7,33 +7,35 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.Extension
-import androidx.compose.material.icons.filled.GetApp
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import org.wvt.horizonmgr.ui.theme.PreviewTheme
 
-data class ChineseModModel(
+@Stable
+data class OfficialMirrorModModel(
     val id: Int,
     val name: String,
     val description: String,
     val iconUrl: String,
-    val previewPictureURLs: List<String>,
-    val version: String,
-    val time: String,
-    val downloads: Int
+    val versionName: String,
+    val horizonOptimized: Boolean,
+    val lastUpdateTime: String?,
+    val multiplayer: Boolean,
+    val likes: Int,
+    val dislikes: Int,
 )
 
 @Composable
-internal fun ChineseModItem(
+internal fun OfficialMirrorModItem(
     modifier: Modifier,
-    model: ChineseModModel,
-    onClick: () -> Unit,
+    model: OfficialMirrorModModel,
     onInstallClick: () -> Unit,
+    onClick: () -> Unit
 ) {
     Card(modifier = modifier, elevation = 1.dp) {
         Column(
@@ -51,10 +53,10 @@ internal fun ChineseModItem(
                     // Title
                     Text(model.name, style = MaterialTheme.typography.h5)
                     // Version
-                    if (model.version.isNotBlank()) {
+                    if (model.versionName.isNotBlank()) {
                         Text(
                             modifier = Modifier.padding(top = 2.dp),
-                            text = model.version, style = MaterialTheme.typography.caption,
+                            text = model.versionName, style = MaterialTheme.typography.caption,
                             color = MaterialTheme.colors.onSurface.copy(alpha = ContentAlpha.medium)
                         )
                     }
@@ -62,7 +64,7 @@ internal fun ChineseModItem(
                     Text(
                         modifier = Modifier.padding(top = 8.dp),
                         text = model.description, style = MaterialTheme.typography.subtitle1,
-                        color = MaterialTheme.colors.onSurface.copy(alpha = 0.5f)
+                        color = MaterialTheme.colors.onSurface.copy(alpha = ContentAlpha.medium)
                     )
                 }
                 // Mod Icon
@@ -82,48 +84,28 @@ internal fun ChineseModItem(
             ) {
                 Row(Modifier.weight(1f)) {
                     CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+                        if (model.lastUpdateTime != null) {
+                            Icon(
+                                modifier = Modifier.size(18.dp),
+                                imageVector = Icons.Default.AccessTime, contentDescription = "Last update"
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(text = model.lastUpdateTime, style = MaterialTheme.typography.caption)
+                            Spacer(modifier = Modifier.width(16.dp))
+                        }
                         Icon(
                             modifier = Modifier.size(18.dp),
-                            imageVector = Icons.Default.AccessTime,
-                            contentDescription = "Last update"
+                            imageVector = Icons.Default.Favorite, contentDescription = "Likes"
                         )
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text(text = model.time, style = MaterialTheme.typography.caption)
-                        Spacer(modifier = Modifier.width(16.dp))
-                        Icon(
-                            modifier = Modifier.size(18.dp),
-                            imageVector = Icons.Default.GetApp, contentDescription = "Downloads"
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(
-                            text = model.downloads.toString(),
-                            style = MaterialTheme.typography.caption
-                        )
+                        Text(text = model.likes.toString(), style = MaterialTheme.typography.caption)
                     }
                 }
-                CompositionLocalProvider(LocalContentColor provides MaterialTheme.colors.primary) {
-                    // Install Button
-                    IconButton(onClick = onInstallClick) {
-                        Icon(Icons.Filled.Extension, contentDescription = "安装")
-                    }
+                // Install Button
+                IconButton(onClick = onInstallClick) {
+                    Icon(imageVector = Icons.Filled.Extension, contentDescription = "安装", tint = MaterialTheme.colors.primary)
                 }
             }
         }
-    }
-}
-
-@Preview
-@Composable
-private fun Preview() {
-    PreviewTheme {
-        ChineseModItem(
-            modifier = Modifier
-                .padding(16.dp)
-                .fillMaxWidth()
-                .wrapContentHeight(),
-            model = ChineseModModel(1, "Example", "Example", "", listOf(""), "1.0.0", "2020-2-2", 100),
-            onClick = { },
-            onInstallClick = { }
-        )
     }
 }

@@ -11,6 +11,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.layout.ContentScale
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 /**
  * 读取 [path] 图片，转换成 ImageBitmap 并显示
@@ -54,4 +56,19 @@ fun LocalImage(
             }
         }
     }
+}
+
+@Composable
+fun loadLocalImage(path: String): State<ImageBitmap?> {
+    val image = remember { mutableStateOf<ImageBitmap?>(null) }
+    LaunchedEffect(path) {
+        image.value = try {
+            withContext(Dispatchers.IO) {
+                BitmapFactory.decodeFile(path).asImageBitmap()
+            }
+        } catch (e: Exception) {
+            null
+        }
+    }
+    return image
 }

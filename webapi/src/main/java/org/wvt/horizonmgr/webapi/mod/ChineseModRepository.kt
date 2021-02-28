@@ -89,7 +89,8 @@ class ChineseModRepository {
                         versionName = getString("version"),
                         icon = getString("icon"),
                         pictures = pictures,
-                        time = getString("time")
+                        time = getString("time"),
+                        downloads = getInt("download")
                     )
                     result.add(data)
                 }
@@ -116,6 +117,7 @@ class ChineseMod internal constructor(
     val description: String,
     val versionName: String,
     val time: String,
+    val downloads: Int,
     icon: String,
     pictures: List<String>,
 ) {

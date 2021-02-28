@@ -6,6 +6,8 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import kotlinx.datetime.Instant
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.*
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
@@ -55,6 +57,7 @@ class MgrNewsModule {
         } catch (e: JSONException) {
             throw JsonParseException(response, e)
         }
+
         json.forEachIndexed<JSONObject> { index, item ->
             try {
                 val id = item.getInt("id")

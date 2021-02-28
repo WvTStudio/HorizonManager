@@ -35,6 +35,7 @@
 
 ### 功能
 
+- 支持编辑 Mod 的设置
 - 当分包、本地/在线模组解析失败时，显示成一个 “解析失败” 的卡片
 - 分包/MOD 更新功能
 - 关闭 Mod 图标的像素过滤，以正确显示低分辨率图标
@@ -43,11 +44,14 @@
 - 状态栏颜色随主题改变
 - 检测是否安装了 Horizon 和 Minecraft，没有则推荐安装
 - 使资讯支持 Markdown 格式
+- 在线模组每个卡片显示下载进度和安装状态
 
 ### Code
 
+- 使用 kotlinx.serialization 替代 org.json
 - 将 FileSelector 改为 ViewModel 方案，优化 FileSelector 性能
 - 重写 OnlineMod，消除 legacyservice.WebAPI 依赖
+- 完善 service 模块，并代替 legacyservice 包
 
 ## 已知 BUGs
 

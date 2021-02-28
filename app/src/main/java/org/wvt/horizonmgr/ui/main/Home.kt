@@ -27,7 +27,8 @@ import org.wvt.horizonmgr.ui.downloaded.DownloadedMods
 import org.wvt.horizonmgr.ui.modulemanager.*
 import org.wvt.horizonmgr.ui.news.News
 import org.wvt.horizonmgr.ui.news.NewsViewModel
-import org.wvt.horizonmgr.ui.onlinemods.Online
+import org.wvt.horizonmgr.ui.onlinemods.NewOnline
+import org.wvt.horizonmgr.ui.onlinemods.NewOnlineViewModel
 import org.wvt.horizonmgr.ui.onlinemods.OnlineViewModel
 import org.wvt.horizonmgr.ui.pacakgemanager.PackageManager
 import org.wvt.horizonmgr.ui.pacakgemanager.PackageManagerViewModel
@@ -35,7 +36,7 @@ import org.wvt.horizonmgr.ui.theme.PreviewTheme
 
 @Deprecated("Deprecated")
 val LocalSelectedPackageUUID = staticCompositionLocalOf<String?> { null }
-val LocalDrawerState = staticCompositionLocalOf<DrawerState> { error("No local drawer provided")}
+val LocalDrawerState = staticCompositionLocalOf<DrawerState> { error("No local drawer provided") }
 
 @Composable
 fun Home(
@@ -48,6 +49,7 @@ fun Home(
     mcLevelVM: MCLevelTabViewModel,
     downloadedModVM: DMViewModel,
     onlineVM: OnlineViewModel,
+    newOnlineVM: NewOnlineViewModel,
     userInfo: UserInformation?,
     requestLogin: () -> Unit,
     requestLogout: () -> Unit,
@@ -115,10 +117,10 @@ fun Home(
                 when (cs) {
                     HomeViewModel.Screen.HOME -> News(
                         viewModel = newsVM,
-                        onNavClick = { scope.launch { drawerState.open()} }
+                        onNavClick = { scope.launch { drawerState.open() } }
                     )
                     HomeViewModel.Screen.LOCAL_MANAGE -> ModuleManager(
-                        onNavClicked = { scope.launch { drawerState.open() }},
+                        onNavClicked = { scope.launch { drawerState.open() } },
                         onAddModClicked = onAddModClicked,
                         managerViewModel = moduleManagerVM,
                         icLevelViewModel = icLevelTabVM,
@@ -128,19 +130,19 @@ fun Home(
                     HomeViewModel.Screen.PACKAGE_MANAGE -> PackageManager(
                         viewModel = packageManagerVM,
                         onPackageSelect = selectedPackageChange,
-                        onNavClick = { scope.launch {  drawerState.open() }},
+                        onNavClick = { scope.launch { drawerState.open() } },
                         onOnlineInstallClick = requestOnlineInstall,
                         onLocalInstallClick = onAddPackageClicked,
                         navigateToPackageInfo = navigateToPackageInfo
                     )
-                    HomeViewModel.Screen.ONLINE_DOWNLOAD -> Online(
-                        viewModel = onlineVM,
-                        enable = userInfo != null,
-                        onNavClicked = {scope.launch {  drawerState.open() }}
+                    HomeViewModel.Screen.ONLINE_DOWNLOAD -> NewOnline(
+                        viewModel = newOnlineVM,
+                        isLogon = userInfo != null,
+                        onNavClick = { scope.launch { drawerState.open() } }
                     )
                     HomeViewModel.Screen.DOWNLOADED_MOD -> DownloadedMods(
                         vm = downloadedModVM,
-                        onNavClicked = {scope.launch {  drawerState.open() }}
+                        onNavClicked = { scope.launch { drawerState.open() } }
                     )
                 }
             }

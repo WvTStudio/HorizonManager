@@ -2,10 +2,10 @@ package org.wvt.horizonmgr.webapi
 
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
-import org.wvt.horizonmgr.webapi.mod.OfficialModCDNRepository
+import org.wvt.horizonmgr.webapi.mod.OfficialModMirrorRepository
 
-class OfficialModCDNRepositoryTest {
-    private val repository = OfficialModCDNRepository()
+class OfficialModMirrorRepositoryTest {
+    private val repository = OfficialModMirrorRepository()
 
     @Test
     fun testGetAllMods() = runBlocking {

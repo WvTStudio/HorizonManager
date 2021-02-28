@@ -14,13 +14,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.unit.dp
 import org.wvt.horizonmgr.legacyservice.WebAPI
-import org.wvt.horizonmgr.ui.components.ErrorPage
-import org.wvt.horizonmgr.ui.components.NetworkImage
-import org.wvt.horizonmgr.ui.components.ProgressDialog
+import org.wvt.horizonmgr.ui.components.*
 import org.wvt.horizonmgr.ui.main.LocalSelectedPackageUUID
 
+@Deprecated("Deprecated")
 @Composable
 fun Online(
     viewModel: OnlineViewModel,
@@ -42,7 +42,12 @@ fun Online(
         onDispose { }
     }
 
-    downloadState?.let { ProgressDialog(onCloseRequest = { viewModel.downloadFinish() }, state = it) }
+    downloadState?.let {
+        ProgressDialog(
+            onCloseRequest = { viewModel.downloadFinish() },
+            state = it
+        )
+    }
     installState?.let { ProgressDialog(onCloseRequest = { viewModel.installFinish() }, state = it) }
 
     Column(Modifier.fillMaxSize()) {
@@ -65,7 +70,7 @@ fun Online(
             // If do login, displays online mods list.
             Crossfade(
                 modifier = Modifier.fillMaxSize(),
-                targetState= state
+                targetState = state
             ) { state ->
                 when (state) {
                     is OnlineViewModel.State.Loading -> Box(
@@ -159,13 +164,11 @@ private fun ModItem(
                         color = MaterialTheme.colors.onSurface.copy(alpha = 0.5f)
                     )
                 }
-                // Image
-                NetworkImage(
-                    url = imageUrl,
-                    contentDescription = "模组图标",
-                    modifier = Modifier
-                        .size(80.dp)
-                        .clip(RoundedCornerShape(4.dp))
+                // Mod Icon
+                ModIcon(modifier = Modifier
+                    .size(80.dp)
+                    .clip(RoundedCornerShape(4.dp)),
+                    url = imageUrl
                 )
             }
             // Actions

@@ -11,9 +11,9 @@ import org.wvt.horizonmgr.webapi.NetworkException
 import org.wvt.horizonmgr.webapi.forEachIndexed
 
 /**
- * Horizon 官方 Mod 仓库的 ICCN CDN 镜像
+ * Horizon 官方 Mod 仓库的 ICCN 镜像
  */
-class OfficialModCDNRepository {
+class OfficialModMirrorRepository {
     private val client: HttpClient = HttpClient(CIO)
 
     /**
@@ -31,7 +31,7 @@ class OfficialModCDNRepository {
      *     "icon": <str>, // 格式如 1.png, 2.png, 3.png
      *     "version_name": <str>,
      *     "horizon_optimized": <int>,
-     *     "last_update": <str|null>, // 最后一次更新时间，如果存在，则格式为：[YYYY-MM-DD HH:MM:SS]，如 "2020-09-14 19:44:38"
+     *     "last_update": <str|null>, // 最后一次更新时间，如果存在，则格式为：[YYYY-MM-DD HH:MM:SS]，如 "2020-09-14 19:44:38",还可能是 "null"
      *     "vip": <int>,
      *     "pack": <int>,
      *     "multiplayer": <int>,
@@ -59,14 +59,14 @@ class OfficialModCDNRepository {
      * }
      * ```
      */
-    suspend fun getAllMods(): List<OfficialCDNMod> {
+    suspend fun getAllMods(): List<OfficialMirrorMod> {
         val jsonStr = try {
             client.get<String>("https://adodoz.cn/mods/allmodinfo.json")
         } catch (e: Exception) {
             throw NetworkException("Network error: ${e.message}", e)
         }
 
-        val result = mutableListOf<OfficialCDNMod>()
+        val result = mutableListOf<OfficialMirrorMod>()
         try {
             val jsonArray = JSONArray(jsonStr)
 
@@ -75,7 +75,7 @@ class OfficialModCDNRepository {
                     val id = getInt("id")
                     if (id < 0) return@forEachIndexed // 脏数据
 
-                    val mod = OfficialCDNMod(
+                    val mod = OfficialMirrorMod(
                         id = id,
                         title = getString("title"),
                         description = getString("description"),
@@ -83,7 +83,7 @@ class OfficialModCDNRepository {
                         versionName = getString("version_name"),
                         horizonOptimized = getInt("horizon_optimized") == 1,
                         lastUpdate = try {
-                            getString("last_update")
+                            getString("last_update").takeIf { it.isNotBlank() && it != "null" }
                         } catch (e: Exception) {
                             null
                         },
@@ -107,7 +107,7 @@ class OfficialModCDNRepository {
  * Mod 的下载地址为：`https://adodoz.cn/mods/` + Mod 的 ID + `.zip`
  * Icon Image 的 URL 为：`https://adodoz.cn/mods/img/` + `icon`
  */
-data class OfficialCDNMod internal constructor(
+data class OfficialMirrorMod internal constructor(
     val id: Int,
     val title: String,
     val description: String,

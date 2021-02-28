@@ -24,8 +24,7 @@ class MgrInfoModule {
     }
 
     /**
-     * TODO-Warning 服务器的 v1 API 返回的 money 是 String
-     * GET `请求 https://adodoz.cn/hzmgr/v1/donates.json` 获取捐赠列表
+     * GET `请求 https://adodoz.cn/hzmgr/v2/donates.json` 获取捐赠列表
      * 服务器返回如下的 Json 数据
      *
      * ```json
@@ -43,7 +42,6 @@ class MgrInfoModule {
         val json = try {
             client.get<String>("https://adodoz.cn/hzmgr/v2/donates.json")
         } catch (e: IOException) {
-            // TODO 检查异常的类型
             throw NetworkException("获取捐赠列表失败", e)
         }
 

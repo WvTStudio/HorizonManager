@@ -21,7 +21,7 @@ class InstallPackageViewModel(
     dependencies: DependenciesContainer
 ) : ViewModel() {
     private val packRepository = dependencies.packRepository
-    private val downloader = dependencies.downloader
+    private val downloader = dependencies.packageDownloader
     private val mgr = dependencies.manager
 
     sealed class State {

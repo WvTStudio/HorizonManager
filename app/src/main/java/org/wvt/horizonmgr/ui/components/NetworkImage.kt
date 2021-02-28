@@ -17,7 +17,9 @@ import androidx.compose.ui.platform.LocalContext
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withContext
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
@@ -32,18 +34,7 @@ fun NetworkImage(
     alpha: Float = DefaultAlpha,
     colorFilter: ColorFilter? = null
 ) {
-    var image by remember { mutableStateOf<ImageBitmap?>(null) }
-    val context = LocalContext.current
-
-    LaunchedEffect(url) {
-        image = try {
-            loadUrlImage(context, url)
-        } catch (e: Exception) {
-            e.printStackTrace()
-            // TODO: 2020/11/13 Error Image
-            null
-        }
-    }
+    val image by loadUrlImage(url = url)
 
     Surface(
         modifier = modifier,
@@ -51,10 +42,37 @@ fun NetworkImage(
     ) {
         Crossfade(image) {
             if (it != null) {
-                Image(it, contentDescription, Modifier.fillMaxSize(), alignment, contentScale, alpha, colorFilter)
+                Image(
+                    it,
+                    contentDescription,
+                    Modifier.fillMaxSize(),
+                    alignment,
+                    contentScale,
+                    alpha,
+                    colorFilter
+                )
             }
         }
     }
+}
+
+@Composable
+fun loadUrlImage(url: String): State<ImageBitmap?> {
+    val image = remember(url) { mutableStateOf<ImageBitmap?>(null) }
+    val context = LocalContext.current
+
+    LaunchedEffect(url) {
+        val result = try {
+            withContext(Dispatchers.IO) {
+                loadUrlImage(context, url)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+        image.value = result
+    }
+    return image
 }
 
 private suspend fun loadUrlImage(context: Context, url: String): ImageBitmap =
