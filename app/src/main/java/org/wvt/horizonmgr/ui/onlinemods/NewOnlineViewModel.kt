@@ -53,7 +53,10 @@ class NewOnlineViewModel(
     }
 
     enum class ChineseSortMode {
-        DEFAULT, TIME_ASC, TIME_DSC, NAME_ASC, NAME_DSC
+        DEFAULT,
+        TIME_ASC, TIME_DSC,
+        NAME_ASC, NAME_DSC,
+        DOWNLOAD_ASC, DOWNLOAD_DSC
     }
 
     enum class Repository {
@@ -276,6 +279,8 @@ class NewOnlineViewModel(
             ChineseSortMode.TIME_DSC -> sortedBy { it.id }
             ChineseSortMode.NAME_ASC -> sortedBy { it.name }
             ChineseSortMode.NAME_DSC -> sortedByDescending { it.name }
+            ChineseSortMode.DOWNLOAD_ASC -> sortedByDescending { it.downloads }
+            ChineseSortMode.DOWNLOAD_DSC -> sortedBy { it.downloads }
         }
     }
 }

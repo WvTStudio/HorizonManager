@@ -45,6 +45,8 @@ private val chineseSortModes = listOf(
     "推荐排序" to NewOnlineViewModel.ChineseSortMode.DEFAULT,
     "最新发布" to NewOnlineViewModel.ChineseSortMode.TIME_ASC,
     "最早发布" to NewOnlineViewModel.ChineseSortMode.TIME_DSC,
+    "最热门" to NewOnlineViewModel.ChineseSortMode.DOWNLOAD_ASC,
+    "最冷门" to NewOnlineViewModel.ChineseSortMode.DOWNLOAD_DSC,
     "名称正序" to NewOnlineViewModel.ChineseSortMode.NAME_ASC,
     "名称倒序" to NewOnlineViewModel.ChineseSortMode.NAME_DSC,
 )

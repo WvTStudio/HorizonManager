@@ -84,14 +84,6 @@ internal fun ChineseModItem(
                     CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
                         Icon(
                             modifier = Modifier.size(18.dp),
-                            imageVector = Icons.Default.AccessTime,
-                            contentDescription = "Last update"
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(text = model.time, style = MaterialTheme.typography.caption)
-                        Spacer(modifier = Modifier.width(16.dp))
-                        Icon(
-                            modifier = Modifier.size(18.dp),
                             imageVector = Icons.Default.GetApp, contentDescription = "Downloads"
                         )
                         Spacer(modifier = Modifier.width(4.dp))
@@ -99,6 +91,14 @@ internal fun ChineseModItem(
                             text = model.downloads.toString(),
                             style = MaterialTheme.typography.caption
                         )
+                        Spacer(modifier = Modifier.width(16.dp))
+                        Icon(
+                            modifier = Modifier.size(18.dp),
+                            imageVector = Icons.Default.AccessTime,
+                            contentDescription = "Last update"
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(text = model.time, style = MaterialTheme.typography.caption)
                     }
                 }
                 CompositionLocalProvider(LocalContentColor provides MaterialTheme.colors.primary) {

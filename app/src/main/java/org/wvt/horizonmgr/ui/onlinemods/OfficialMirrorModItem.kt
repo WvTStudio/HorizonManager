@@ -84,21 +84,21 @@ internal fun OfficialMirrorModItem(
             ) {
                 Row(Modifier.weight(1f)) {
                     CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-                        if (model.lastUpdateTime != null) {
-                            Icon(
-                                modifier = Modifier.size(18.dp),
-                                imageVector = Icons.Default.AccessTime, contentDescription = "Last update"
-                            )
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text(text = model.lastUpdateTime, style = MaterialTheme.typography.caption)
-                            Spacer(modifier = Modifier.width(16.dp))
-                        }
                         Icon(
                             modifier = Modifier.size(18.dp),
                             imageVector = Icons.Default.Favorite, contentDescription = "Likes"
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(text = model.likes.toString(), style = MaterialTheme.typography.caption)
+                        if (model.lastUpdateTime != null) {
+                            Spacer(modifier = Modifier.width(16.dp))
+                            Icon(
+                                modifier = Modifier.size(18.dp),
+                                imageVector = Icons.Default.AccessTime, contentDescription = "Last update"
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(text = model.lastUpdateTime, style = MaterialTheme.typography.caption)
+                        }
                     }
                 }
                 // Install Button
