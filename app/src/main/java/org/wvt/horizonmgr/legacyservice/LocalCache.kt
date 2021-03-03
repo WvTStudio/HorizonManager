@@ -128,6 +128,3 @@ class LocalCache private constructor(context: Context) {
         }
     }
 }
-
-fun WebAPI.UserInfo.mapToCachedUserInfo() =
-    LocalCache.CachedUserInfo(id.toString(), name, account, avatarUrl)
