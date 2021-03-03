@@ -28,7 +28,6 @@ import org.wvt.horizonmgr.ui.modulemanager.ModuleManagerViewModel
 import org.wvt.horizonmgr.ui.news.NewsViewModel
 import org.wvt.horizonmgr.ui.onlineinstall.InstallPackageResultContract
 import org.wvt.horizonmgr.ui.onlinemods.NewOnlineViewModel
-import org.wvt.horizonmgr.ui.onlinemods.OnlineViewModel
 import org.wvt.horizonmgr.ui.pacakgemanager.PackageDetailActivity
 import org.wvt.horizonmgr.ui.pacakgemanager.PackageManagerViewModel
 import org.wvt.horizonmgr.ui.settings.SettingsActivity
@@ -46,7 +45,6 @@ class MainActivity : AppCompatActivity() {
     private val packageManagerVM: PackageManagerViewModel by viewModels { factory }
     private val mcLevelVM: MCLevelTabViewModel by viewModels { factory }
     private val downloadedModVM: DMViewModel by viewModels { factory }
-    private val onlineVM: OnlineViewModel by viewModels { factory }
     private val newOnlineVM: NewOnlineViewModel by viewModels { factory }
 
     private val login = registerForActivityResult(LoginResultContract()) {
@@ -177,7 +175,6 @@ class MainActivity : AppCompatActivity() {
                 packageManagerVM = packageManagerVM,
                 mcLevelVM = mcLevelVM,
                 downloadedModVM = downloadedModVM,
-                onlineVM = onlineVM,
                 newOnlineVM = newOnlineVM,
                 onRequestPermission = ::requestPermission,
                 navigateToCommunity = ::startCommunityActivity,

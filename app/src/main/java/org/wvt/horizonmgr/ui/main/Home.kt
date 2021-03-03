@@ -29,7 +29,6 @@ import org.wvt.horizonmgr.ui.news.News
 import org.wvt.horizonmgr.ui.news.NewsViewModel
 import org.wvt.horizonmgr.ui.onlinemods.NewOnline
 import org.wvt.horizonmgr.ui.onlinemods.NewOnlineViewModel
-import org.wvt.horizonmgr.ui.onlinemods.OnlineViewModel
 import org.wvt.horizonmgr.ui.pacakgemanager.PackageManager
 import org.wvt.horizonmgr.ui.pacakgemanager.PackageManagerViewModel
 import org.wvt.horizonmgr.ui.theme.PreviewTheme
@@ -48,7 +47,6 @@ fun Home(
     packageManagerVM: PackageManagerViewModel,
     mcLevelVM: MCLevelTabViewModel,
     downloadedModVM: DMViewModel,
-    onlineVM: OnlineViewModel,
     newOnlineVM: NewOnlineViewModel,
     userInfo: UserInformation?,
     requestLogin: () -> Unit,
