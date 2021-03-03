@@ -19,36 +19,36 @@ import org.wvt.horizonmgr.ui.components.ErrorPage
 import org.wvt.horizonmgr.ui.components.ProgressDialog
 
 private val repositories = listOf(
-    "官方镜像源" to NewOnlineViewModel.Repository.OfficialMirror,
-    "汉化组源" to NewOnlineViewModel.Repository.Chinese,
+    "官方镜像源" to OnlineModsViewModel.Repository.OfficialMirror,
+    "汉化组源" to OnlineModsViewModel.Repository.Chinese,
 )
 
 private val repositoryNames = repositories.map { it.first }
 private val repositoryEnums = repositories.map { it.second }
 
 private val mirrorSortModes = listOf(
-    "推荐排序" to NewOnlineViewModel.MirrorSortMode.DEFAULT,
-    "最热门" to NewOnlineViewModel.MirrorSortMode.FAVORITE_ASC,
-    "最冷门" to NewOnlineViewModel.MirrorSortMode.FAVORITE_DSC,
-    "近日发布" to NewOnlineViewModel.MirrorSortMode.TIME_ASC,
-    "最早发布" to NewOnlineViewModel.MirrorSortMode.TIME_DSC,
-    "近日更新" to NewOnlineViewModel.MirrorSortMode.UPDATE_TIME_ASC,
-    "最早更新" to NewOnlineViewModel.MirrorSortMode.UPDATE_TIME_DSC,
-    "名称排序" to NewOnlineViewModel.MirrorSortMode.NAME_ASC,
-    "名称倒序" to NewOnlineViewModel.MirrorSortMode.NAME_DSC,
+    "推荐排序" to OnlineModsViewModel.MirrorSortMode.DEFAULT,
+    "最热门" to OnlineModsViewModel.MirrorSortMode.FAVORITE_ASC,
+    "最冷门" to OnlineModsViewModel.MirrorSortMode.FAVORITE_DSC,
+    "近日发布" to OnlineModsViewModel.MirrorSortMode.TIME_ASC,
+    "最早发布" to OnlineModsViewModel.MirrorSortMode.TIME_DSC,
+    "近日更新" to OnlineModsViewModel.MirrorSortMode.UPDATE_TIME_ASC,
+    "最早更新" to OnlineModsViewModel.MirrorSortMode.UPDATE_TIME_DSC,
+    "名称排序" to OnlineModsViewModel.MirrorSortMode.NAME_ASC,
+    "名称倒序" to OnlineModsViewModel.MirrorSortMode.NAME_DSC,
 )
 
 private val mirrorSortModeNames = mirrorSortModes.map { it.first }
 private val mirrorSortModeEnums = mirrorSortModes.map { it.second }
 
 private val chineseSortModes = listOf(
-    "推荐排序" to NewOnlineViewModel.ChineseSortMode.DEFAULT,
-    "最新发布" to NewOnlineViewModel.ChineseSortMode.TIME_ASC,
-    "最早发布" to NewOnlineViewModel.ChineseSortMode.TIME_DSC,
-    "最热门" to NewOnlineViewModel.ChineseSortMode.DOWNLOAD_ASC,
-    "最冷门" to NewOnlineViewModel.ChineseSortMode.DOWNLOAD_DSC,
-    "名称正序" to NewOnlineViewModel.ChineseSortMode.NAME_ASC,
-    "名称倒序" to NewOnlineViewModel.ChineseSortMode.NAME_DSC,
+    "推荐排序" to OnlineModsViewModel.ChineseSortMode.DEFAULT,
+    "最新发布" to OnlineModsViewModel.ChineseSortMode.TIME_ASC,
+    "最早发布" to OnlineModsViewModel.ChineseSortMode.TIME_DSC,
+    "最热门" to OnlineModsViewModel.ChineseSortMode.DOWNLOAD_ASC,
+    "最冷门" to OnlineModsViewModel.ChineseSortMode.DOWNLOAD_DSC,
+    "名称正序" to OnlineModsViewModel.ChineseSortMode.NAME_ASC,
+    "名称倒序" to OnlineModsViewModel.ChineseSortMode.NAME_DSC,
 )
 
 private val chineseSortModeNames = chineseSortModes.map { it.first }
@@ -56,8 +56,8 @@ private val chineseSortModeEnums = chineseSortModes.map { it.second }
 
 
 @Composable
-fun NewOnline(
-    viewModel: NewOnlineViewModel,
+fun OnlineMods(
+    viewModel: OnlineModsViewModel,
     isLogon: Boolean,
     onNavClick: () -> Unit
 ) {
@@ -81,7 +81,7 @@ fun NewOnline(
 
     Column(Modifier.fillMaxSize()) {
         // Top App Bar
-        NewTuneAppBar(
+        TuneAppBar(
             enable = isLogon,
             onNavClicked = onNavClick,
             filterText = filterText,
@@ -89,18 +89,18 @@ fun NewOnline(
             repositories = repositoryNames,
             selectedRepository = repositoryEnums.indexOf(selectedRepository),
             onRepositorySelect = { viewModel.setSelectedRepository(repositoryEnums[it]) },
-            sortModes = if (selectedRepository == NewOnlineViewModel.Repository.OfficialMirror) {
+            sortModes = if (selectedRepository == OnlineModsViewModel.Repository.OfficialMirror) {
                 mirrorSortModeNames
             } else {
                 chineseSortModeNames
             },
-            selectedSortMode = if (selectedRepository == NewOnlineViewModel.Repository.OfficialMirror) {
+            selectedSortMode = if (selectedRepository == OnlineModsViewModel.Repository.OfficialMirror) {
                 mirrorSortModeEnums.indexOf(selectedMirrorSortMode)
             } else {
                 chineseSortModeEnums.indexOf(selectedChineseSortMode)
             },
             onSortModeSelect = {
-                if (selectedRepository == NewOnlineViewModel.Repository.OfficialMirror) {
+                if (selectedRepository == OnlineModsViewModel.Repository.OfficialMirror) {
                     viewModel.setSelectedMirrorSortMode(mirrorSortModeEnums[it])
                 } else {
                     viewModel.setSelectedCNSortMode(chineseSortModeEnums[it])
@@ -111,7 +111,7 @@ fun NewOnline(
         if (isLogon) {
             Crossfade((state to selectedRepository)) { (state, selectedRepository) ->
                 when (state) {
-                    NewOnlineViewModel.State.Loading -> {
+                    OnlineModsViewModel.State.Loading -> {
                         Box(
                             modifier = Modifier.fillMaxSize(),
                             contentAlignment = Alignment.Center
@@ -119,15 +119,15 @@ fun NewOnline(
                             CircularProgressIndicator()
                         }
                     }
-                    is NewOnlineViewModel.State.Error -> {
+                    is OnlineModsViewModel.State.Error -> {
                         ErrorPage(message = {
                             Text(state.message)
                         }, onRetryClick = {
                             viewModel.load()
                         })
                     }
-                    NewOnlineViewModel.State.Succeed -> when (selectedRepository) {
-                        NewOnlineViewModel.Repository.OfficialMirror -> {
+                    OnlineModsViewModel.State.Succeed -> when (selectedRepository) {
+                        OnlineModsViewModel.Repository.OfficialMirror -> {
                             if (mirrorMods.isEmpty()) {
                                 EmptyPage(Modifier.fillMaxSize()) {
                                     Text("什么模组都没有")
@@ -143,7 +143,7 @@ fun NewOnline(
                                 )
                             }
                         }
-                        NewOnlineViewModel.Repository.Chinese -> {
+                        OnlineModsViewModel.Repository.Chinese -> {
                             if (chineseMods.isEmpty()) {
                                 EmptyPage(Modifier.fillMaxSize()) {
                                     Text("什么模组都没有")

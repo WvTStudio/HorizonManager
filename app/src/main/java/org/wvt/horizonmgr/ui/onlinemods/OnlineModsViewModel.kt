@@ -17,7 +17,7 @@ import org.wvt.horizonmgr.webapi.mod.ChineseMod
 import org.wvt.horizonmgr.webapi.mod.OfficialMirrorMod
 import java.util.*
 
-class NewOnlineViewModel(
+class OnlineModsViewModel(
     dependencies: DependenciesContainer
 ) : ViewModel() {
     private val chineseModRepository = dependencies.chineseModRepository

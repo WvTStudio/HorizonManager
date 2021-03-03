@@ -27,8 +27,8 @@ import org.wvt.horizonmgr.ui.downloaded.DownloadedMods
 import org.wvt.horizonmgr.ui.modulemanager.*
 import org.wvt.horizonmgr.ui.news.News
 import org.wvt.horizonmgr.ui.news.NewsViewModel
-import org.wvt.horizonmgr.ui.onlinemods.NewOnline
-import org.wvt.horizonmgr.ui.onlinemods.NewOnlineViewModel
+import org.wvt.horizonmgr.ui.onlinemods.OnlineMods
+import org.wvt.horizonmgr.ui.onlinemods.OnlineModsViewModel
 import org.wvt.horizonmgr.ui.pacakgemanager.PackageManager
 import org.wvt.horizonmgr.ui.pacakgemanager.PackageManagerViewModel
 import org.wvt.horizonmgr.ui.theme.PreviewTheme
@@ -47,7 +47,7 @@ fun Home(
     packageManagerVM: PackageManagerViewModel,
     mcLevelVM: MCLevelTabViewModel,
     downloadedModVM: DMViewModel,
-    newOnlineVM: NewOnlineViewModel,
+    onlineModsVM: OnlineModsViewModel,
     userInfo: UserInformation?,
     requestLogin: () -> Unit,
     requestLogout: () -> Unit,
@@ -133,8 +133,8 @@ fun Home(
                         onLocalInstallClick = onAddPackageClicked,
                         navigateToPackageInfo = navigateToPackageInfo
                     )
-                    HomeViewModel.Screen.ONLINE_DOWNLOAD -> NewOnline(
-                        viewModel = newOnlineVM,
+                    HomeViewModel.Screen.ONLINE_DOWNLOAD -> OnlineMods(
+                        viewModel = onlineModsVM,
                         isLogon = userInfo != null,
                         onNavClick = { scope.launch { drawerState.open() } }
                     )

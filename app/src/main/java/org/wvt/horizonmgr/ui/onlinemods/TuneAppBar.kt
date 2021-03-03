@@ -50,7 +50,7 @@ private val tuneExpand = tween<Float>(275, 40, FastOutSlowInEasing) // Expand to
 private val tuneShrink = tween<Float>(225, 0, FastOutSlowInEasing) // Shrink to exit
 
 @Composable
-internal fun NewTuneAppBar(
+internal fun TuneAppBar(
     enable: Boolean,
     onNavClicked: () -> Unit,
     filterText: String,

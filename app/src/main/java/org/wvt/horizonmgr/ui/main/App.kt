@@ -18,7 +18,7 @@ import org.wvt.horizonmgr.ui.modulemanager.MCLevelTabViewModel
 import org.wvt.horizonmgr.ui.modulemanager.ModTabViewModel
 import org.wvt.horizonmgr.ui.modulemanager.ModuleManagerViewModel
 import org.wvt.horizonmgr.ui.news.NewsViewModel
-import org.wvt.horizonmgr.ui.onlinemods.NewOnlineViewModel
+import org.wvt.horizonmgr.ui.onlinemods.OnlineModsViewModel
 import org.wvt.horizonmgr.ui.pacakgemanager.PackageManagerViewModel
 import org.wvt.horizonmgr.ui.theme.AndroidHorizonManagerTheme
 import org.wvt.horizonmgr.ui.theme.PreviewTheme
@@ -34,7 +34,7 @@ fun App(
     packageManagerVM: PackageManagerViewModel,
     mcLevelVM: MCLevelTabViewModel,
     downloadedModVM: DMViewModel,
-    newOnlineVM: NewOnlineViewModel,
+    onlineModsVM: OnlineModsViewModel,
     onRequestPermission: () -> Unit,
     navigateToLogin: () -> Unit,
     navigateToJoinGroup: () -> Unit,
@@ -79,7 +79,7 @@ fun App(
                 packageManagerVM,
                 mcLevelVM,
                 downloadedModVM,
-                newOnlineVM,
+                onlineModsVM,
                 userInfo = remember(userInfo) {
                     userInfo?.let {
                         UserInformation(
