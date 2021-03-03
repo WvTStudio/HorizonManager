@@ -6,12 +6,17 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.wvt.horizonmgr.DependenciesContainer
-import org.wvt.horizonmgr.legacyservice.HorizonManager
+import org.wvt.horizonmgr.service.level.LevelInfo
+import org.wvt.horizonmgr.service.level.MCLevel
+import org.wvt.horizonmgr.service.pack.InstalledPackage
 
-class ICLevelTabViewModel(
-    dependenciesContainer: DependenciesContainer
-) : ViewModel() {
+private const val TAG = "ICLevelTabVM"
+
+class ICLevelTabViewModel(dependencies: DependenciesContainer) : ViewModel() {
+    private val manager = dependencies.manager
+
     sealed class State {
         object Loading : State()
         object PackageNotSelected : State()
@@ -20,47 +25,64 @@ class ICLevelTabViewModel(
 
     val state = MutableStateFlow<State>(State.Loading)
 
-    private val hzmgr = dependenciesContainer.horizonManager
+    val levels = MutableStateFlow<List<LevelInfo>>(emptyList())
+    private var cachedLevels = emptyMap<LevelInfo, MCLevel>()
 
-    val levels = MutableStateFlow<List<HorizonManager.LevelInfo>>(emptyList())
-
-    private var packageUUID: String? = null
+    private var pack: InstalledPackage? = null
 
     fun setPackage(uuid: String?) {
-        Log.d("ICLevelTabVM", "new package: $uuid")
+        Log.d(TAG, "New package: $uuid")
         if (uuid == null) {
             state.value = State.PackageNotSelected
-        }
-        packageUUID = uuid
-    }
-
-    fun getPackage(): String? {
-        return packageUUID
-    }
-
-    fun load() {
-        viewModelScope.launch(Dispatchers.IO) {
-            packageUUID?.let {
-                state.value = State.Loading
-                try {
-                    levels.value = hzmgr.getICLevels(it)
-                } catch (e: Exception) {
-                    // TODO 显示错误信息
-                    e.printStackTrace()
+        } else {
+            viewModelScope.launch(Dispatchers.IO) {
+                pack = manager.getInstalledPackages().find {
+                    it.getInstallUUID() == uuid
                 }
-                state.value = State.OK
-            } ?: run {
-                levels.value = emptyList()
             }
         }
     }
 
-    suspend fun deleteLevel(path: String) {
-        hzmgr.deleteLevelByPath(path)
+    fun load() {
+        viewModelScope.launch(Dispatchers.IO) {
+            pack?.let { pack ->
+                state.value = State.Loading
+                val result = try {
+                    pack.getLevels()
+                } catch (e: Exception) {
+                    // TODO 显示错误信息
+                    Log.e(TAG, "获取 IC 存档失败", e)
+                    return@launch
+                }
+
+                val mapped = mutableMapOf<LevelInfo, MCLevel>().apply {
+                    try {
+                        result.forEach {
+                            put(it.getInfo(), it)
+                        }
+                    } catch (e: Exception) {
+                        Log.e(TAG, "获取存档信息失败", e)
+                        // TODO: 2021/3/3 显示错误信息
+                        return@launch
+                    }
+                }.toMap()
+                cachedLevels = mapped
+                levels.emit(mapped.keys.toList())
+                state.value = State.OK
+            }
+        }
     }
 
-    suspend fun renameLevel(path: String, newname: String) {
-        hzmgr.renameLevelNameByPath(path, newname)
+    suspend fun deleteLevel(level: LevelInfo) {
+        withContext(Dispatchers.IO) {
+            cachedLevels[level]?.delete()
+        }
+    }
+
+    suspend fun renameLevel(level: LevelInfo, newName: String) {
+        withContext(Dispatchers.IO) {
+            cachedLevels[level]?.rename(newName)
+        }
     }
 }
 

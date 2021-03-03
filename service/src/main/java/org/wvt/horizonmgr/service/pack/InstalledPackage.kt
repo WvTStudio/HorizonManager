@@ -3,6 +3,7 @@ package org.wvt.horizonmgr.service.pack
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
+import org.wvt.horizonmgr.service.level.MCLevel
 import org.wvt.horizonmgr.service.mod.InstalledMod
 import org.wvt.horizonmgr.service.mod.ZipMod
 import org.wvt.horizonmgr.service.utils.translateToValidFile
@@ -182,5 +183,19 @@ class InstalledPackage constructor(
         )
         targetDir.resolve(".installation_info").writeText(newInfo.toJson())
         return@withContext newInfo
+    }
+
+    fun getLevels(): List<MCLevel> {
+        val result = mutableListOf<MCLevel>()
+        val worlds = pkgDir.resolve("worlds").listFiles() ?: return emptyList()
+        for (file in worlds) {
+            val level = try {
+                MCLevel.parseByDirectory(file)
+            } catch (e: Exception) {
+                continue
+            }
+            result.add(level)
+        }
+        return result
     }
 }

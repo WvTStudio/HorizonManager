@@ -18,10 +18,10 @@ import org.wvt.horizonmgr.ui.components.*
 
 @Composable
 internal fun ICLevelTab(
-    vm: ICLevelTabViewModel
+    viewModel: ICLevelTabViewModel
 ) {
-    val items by vm.levels.collectAsState()
-    val state by vm.state.collectAsState()
+    val levels by viewModel.levels.collectAsState()
+    val state by viewModel.state.collectAsState()
 
     val scope = rememberCoroutineScope()
     var progressDialogState by remember { mutableStateOf<ProgressDialogState?>(null) }
@@ -41,7 +41,7 @@ internal fun ICLevelTab(
                 }
             }
             ICLevelTabViewModel.State.OK -> {
-                if (items.isEmpty()) {
+                if (levels.isEmpty()) {
                     EmptyPage(Modifier.fillMaxSize()) {
                         Text("当前还没有地图")
                     }
@@ -49,7 +49,7 @@ internal fun ICLevelTab(
                     modifier = Modifier.fillMaxSize(),
                     contentPadding = PaddingValues(bottom = 64.dp)
                 ) {
-                    itemsIndexed(items = items) { _, item ->
+                    itemsIndexed(items = levels) { _, item ->
                         LevelItem(
                             modifier = Modifier.padding(16.dp),
                             title = item.name,
@@ -61,7 +61,7 @@ internal fun ICLevelTab(
                                     if (result is InputDialogHostState.DialogResult.Confirm) {
                                         progressDialogState = ProgressDialogState.Loading("正在重命名")
                                         try {
-                                            vm.renameLevel(item.path, result.input)
+                                            viewModel.renameLevel(item, result.input)
                                         } catch (e: Exception) {
                                             e.printStackTrace()
                                             progressDialogState =
@@ -72,7 +72,7 @@ internal fun ICLevelTab(
                                             return@launch
                                         }
                                         progressDialogState = ProgressDialogState.Finished("重命名成功")
-                                        vm.load()
+                                        viewModel.load()
                                     }
                                 }
                             },
@@ -80,7 +80,7 @@ internal fun ICLevelTab(
                                 scope.launch {
                                     progressDialogState = ProgressDialogState.Loading("正在删除")
                                     try {
-                                        vm.deleteLevel(item.path)
+                                        viewModel.deleteLevel(item)
                                     } catch (e: Exception) {
                                         progressDialogState =
                                             ProgressDialogState.Failed(
@@ -90,7 +90,7 @@ internal fun ICLevelTab(
                                         return@launch
                                     }
                                     progressDialogState = ProgressDialogState.Finished("删除完成")
-                                    vm.load()
+                                    viewModel.load()
                                 }
                             }
                         )

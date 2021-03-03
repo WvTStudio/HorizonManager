@@ -15,9 +15,9 @@ import org.wvt.horizonmgr.ui.components.*
 
 @Composable
 internal fun MCLevelTab(
-    vm: MCLevelTabViewModel
+    viewModel: MCLevelTabViewModel
 ) {
-    val items by vm.levels.collectAsState()
+    val items by viewModel.levels.collectAsState()
     val scope = rememberCoroutineScope()
     var progressDialogState by remember { mutableStateOf<ProgressDialogState?>(null) }
     val inputDialogState = remember { InputDialogHostState() }
@@ -40,7 +40,7 @@ internal fun MCLevelTab(
                             if (result is InputDialogHostState.DialogResult.Confirm) {
                                 progressDialogState = ProgressDialogState.Loading("正在重命名")
                                 try {
-                                    vm.renameLevel(item.path, result.input)
+                                    viewModel.renameLevel(item, result.input)
                                 } catch (e: Exception) {
                                     e.printStackTrace()
                                     progressDialogState =
@@ -51,6 +51,7 @@ internal fun MCLevelTab(
                                     return@launch
                                 }
                                 progressDialogState = ProgressDialogState.Finished("重命名成功")
+                                viewModel.load()
                             }
                         }
                     },
@@ -58,14 +59,14 @@ internal fun MCLevelTab(
                         scope.launch {
                             progressDialogState = ProgressDialogState.Loading("正在删除")
                             try {
-                                vm.deleteLevel(item.path)
+                                viewModel.deleteLevel(item)
                             } catch (e: Exception) {
                                 progressDialogState =
                                     ProgressDialogState.Failed("删除失败", e.localizedMessage ?: "")
                                 return@launch
                             }
                             progressDialogState = ProgressDialogState.Finished("删除完成")
-                            vm.load()
+                            viewModel.load()
                         }
                     }
                 )
