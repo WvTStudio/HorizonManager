@@ -27,6 +27,10 @@ internal fun ICLevelTab(
     var progressDialogState by remember { mutableStateOf<ProgressDialogState?>(null) }
     val inputDialogState = remember { InputDialogHostState() }
 
+    DisposableEffect(Unit) {
+        viewModel.load()
+        onDispose {  }
+    }
 
     Crossfade(state) {
         when (it) {
@@ -57,7 +61,11 @@ internal fun ICLevelTab(
                             onRenameClicked = {
                                 scope.launch {
                                     val result: InputDialogHostState.DialogResult =
-                                        inputDialogState.showDialog("New-${item.name}","请输入新名称", "新名称")
+                                        inputDialogState.showDialog(
+                                            "New-${item.name}",
+                                            "请输入新名称",
+                                            "新名称"
+                                        )
                                     if (result is InputDialogHostState.DialogResult.Confirm) {
                                         progressDialogState = ProgressDialogState.Loading("正在重命名")
                                         try {
@@ -97,6 +105,11 @@ internal fun ICLevelTab(
                     }
                 }
             }
+            is ICLevelTabViewModel.State.Error -> ErrorPage(
+                modifier = Modifier.fillMaxSize(),
+                message = { Text("出现错误") },
+                onRetryClick = { viewModel.load() }
+            )
         }
     }
 

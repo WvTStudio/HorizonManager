@@ -21,6 +21,7 @@ class ICLevelTabViewModel(dependencies: DependenciesContainer) : ViewModel() {
         object Loading : State()
         object PackageNotSelected : State()
         object OK : State()
+        class Error(val e: Throwable?) : State()
     }
 
     val state = MutableStateFlow<State>(State.Loading)
@@ -32,12 +33,14 @@ class ICLevelTabViewModel(dependencies: DependenciesContainer) : ViewModel() {
 
     fun setPackage(uuid: String?) {
         Log.d(TAG, "New package: $uuid")
-        if (uuid == null) {
-            state.value = State.PackageNotSelected
-        } else {
-            viewModelScope.launch(Dispatchers.IO) {
-                pack = manager.getInstalledPackages().find {
-                    it.getInstallUUID() == uuid
+        viewModelScope.launch {
+            if (uuid == null) {
+                state.emit(State.PackageNotSelected)
+            } else {
+                viewModelScope.launch(Dispatchers.IO) {
+                    pack = manager.getInstalledPackages().find {
+                        it.getInstallUUID() == uuid
+                    }
                 }
             }
         }
@@ -46,7 +49,7 @@ class ICLevelTabViewModel(dependencies: DependenciesContainer) : ViewModel() {
     fun load() {
         viewModelScope.launch(Dispatchers.IO) {
             pack?.let { pack ->
-                state.value = State.Loading
+                state.emit(State.Loading)
                 val result = try {
                     pack.getLevels()
                 } catch (e: Exception) {
@@ -63,12 +66,13 @@ class ICLevelTabViewModel(dependencies: DependenciesContainer) : ViewModel() {
                     } catch (e: Exception) {
                         Log.e(TAG, "获取存档信息失败", e)
                         // TODO: 2021/3/3 显示错误信息
+                        state.emit(State.Error(e))
                         return@launch
                     }
                 }.toMap()
                 cachedLevels = mapped
                 levels.emit(mapped.keys.toList())
-                state.value = State.OK
+                state.emit(State.OK)
             }
         }
     }

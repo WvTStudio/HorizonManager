@@ -22,6 +22,11 @@ internal fun MCLevelTab(
     var progressDialogState by remember { mutableStateOf<ProgressDialogState?>(null) }
     val inputDialogState = remember { InputDialogHostState() }
 
+    DisposableEffect(Unit) {
+        viewModel.load()
+        onDispose { }
+    }
+    
     Box(Modifier.fillMaxSize()) {
         if (items.isEmpty()) {
             EmptyPage(Modifier.matchParentSize()) {
