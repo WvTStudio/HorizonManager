@@ -6,6 +6,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -14,6 +15,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.paint
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.drawscope.rotate
@@ -35,41 +37,21 @@ fun Login(
 ) {
     // FIXME: 2021/2/19 修复齿轮不转的问题
     val context = LocalContext.current as ComponentActivity
-    var rotation by remember { mutableStateOf(0f) }
-
     val fabState by vm.fabState.collectAsState()
 
     val snackbarHostState = remember { SnackbarHostState() }
     var screen by remember { mutableStateOf(0) }
     val gearResource = painterResource(id = R.drawable.ic_gear_full)
 
-    LaunchedEffect(Unit) {
-        animate(
-            initialValue = 0f, targetValue = 360f,
-            animationSpec = infiniteRepeatable(
-                tween(durationMillis = 5000, easing = LinearEasing),
-                RepeatMode.Reverse
-            )
-        ) { value, velocity ->
-            rotation = value
-            Log.d(TAG, "aRotation: $value")
-        }
-    }
-/*
-
-    val transition = rememberInfiniteTransition()
-
-    val gearRotation by transition.animateFloat(
-        initialValue = 0f, targetValue = 360f,
-        animationSpec = infiniteRepeatable(
+    val gearRotation by rememberInfiniteTransition().animateFloat(
+        initialValue = 120f, targetValue = 360f,
+        animationSpec = InfiniteRepeatableSpec(
             tween(durationMillis = 5000, easing = LinearEasing),
             RepeatMode.Reverse
         )
     )
 
-
     Log.d(TAG, "rotation: $gearRotation")
-*/
 
     DisposableEffect(Unit) {
         context.onBackPressedDispatcher.addCallback(object : OnBackPressedCallback(true) {
@@ -96,22 +78,21 @@ fun Login(
                 .offset(x = 128.dp)
                 .align(Alignment.TopEnd)
         ) {
-            Canvas(modifier = Modifier.matchParentSize(), onDraw = {
-                rotate(rotation) {
-                    with(gearResource) {
-                        draw(
-                            Size(256.dp.toPx(), 256.dp.toPx()),
-                            colorFilter = ColorFilter.tint(gearColor)
-                        )
-                    }
-                }
-            })
+            Image(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .rotate(gearRotation),
+                painter = gearResource,
+                contentDescription = null,
+                colorFilter = ColorFilter.tint(gearColor)
+            )
         }
+
         Box(
             Modifier
                 .size(256.dp)
                 .offset(x = (-128).dp)
-                .graphicsLayer(rotationZ = rotation)
+                .graphicsLayer(rotationZ = gearRotation)
                 .align(Alignment.BottomStart)
         ) {
             Box(

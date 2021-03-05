@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import org.wvt.horizonmgr.legacyservice.HorizonManager
 import org.wvt.horizonmgr.legacyservice.LocalCache
-import org.wvt.horizonmgr.legacyservice.WebAPI
 import org.wvt.horizonmgr.service.level.MCLevelManager
 import org.wvt.horizonmgr.webapi.iccn.ICCNModule
 import org.wvt.horizonmgr.webapi.mgrinfo.MgrInfoModule
@@ -48,11 +47,6 @@ class DependenciesContainer internal constructor(private val context: Context) {
 
     val localCache: LocalCache by lazy {
         LocalCache.createInstance(context)
-    }
-
-    @Deprecated("Deprecated")
-    val webapi: WebAPI by lazy {
-        WebAPI.createInstance(context)
     }
 
     val manager by lazy {
