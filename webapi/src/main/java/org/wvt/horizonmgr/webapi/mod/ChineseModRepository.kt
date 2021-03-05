@@ -17,6 +17,7 @@ import java.io.IOException
  */
 class ChineseModRepository {
     private val client: HttpClient = HttpClient(CIO)
+
     /**
      * 获取所有模组信息
      *
@@ -62,7 +63,7 @@ class ChineseModRepository {
     suspend fun getAllMods(): List<ChineseMod> {
         val jsonStr = try {
             client.get<String>("https://dev.adodoz.cn/api/mod/list")
-        }catch (e: IOException) {
+        } catch (e: IOException) {
             throw NetworkException("获取汉化源 Mod 列表失败", e)
         }
         val result = mutableListOf<ChineseMod>()

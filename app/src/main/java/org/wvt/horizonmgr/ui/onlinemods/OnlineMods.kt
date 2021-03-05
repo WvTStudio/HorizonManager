@@ -120,11 +120,14 @@ fun OnlineMods(
                         }
                     }
                     is OnlineModsViewModel.State.Error -> {
-                        ErrorPage(message = {
-                            Text(state.message)
-                        }, onRetryClick = {
-                            viewModel.load()
-                        })
+                        ErrorPage(
+                            modifier = Modifier.fillMaxSize(),
+                            message = {
+                                Text(state.message)
+                            }, onRetryClick = {
+                                viewModel.load()
+                            }
+                        )
                     }
                     OnlineModsViewModel.State.Succeed -> when (selectedRepository) {
                         OnlineModsViewModel.Repository.OfficialMirror -> {

@@ -1,5 +1,6 @@
 package org.wvt.horizonmgr.ui.onlinemods
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Job
@@ -16,6 +17,8 @@ import org.wvt.horizonmgr.webapi.NetworkException
 import org.wvt.horizonmgr.webapi.mod.ChineseMod
 import org.wvt.horizonmgr.webapi.mod.OfficialMirrorMod
 import java.util.*
+
+private const val TAG = "OnlineModsVM"
 
 class OnlineModsViewModel(
     dependencies: DependenciesContainer
@@ -170,6 +173,7 @@ class OnlineModsViewModel(
                 return@launch
             } catch (e: Exception) {
                 state.emit(State.Error("未知错误，请稍后重试"))
+                Log.e(TAG, "获取 Mod 列表失败", e)
                 return@launch
             }
             state.emit(State.Succeed)
@@ -190,12 +194,7 @@ class OnlineModsViewModel(
     }
 
     private suspend fun loadMirrorMods(sortMode: MirrorSortMode, filterText: String?) {
-        val mods = try {
-            cdnModRepository.getAllMods()
-        } catch (e: NetworkException) {
-            // TODO: 2021/2/27 显示网络错误信息
-            return
-        }
+        val mods = cdnModRepository.getAllMods()
         cachedMirrorMods = mods
         var processed = mods.sorted(sortMode)
         if (filterText != null) {
@@ -224,12 +223,7 @@ class OnlineModsViewModel(
     }
 
     private suspend fun loadChineseMods(sortMode: ChineseSortMode, filterText: String?) {
-        val mods = try {
-            chineseModRepository.getAllMods()
-        } catch (e: NetworkException) {
-            // TODO: 2021/2/27 显示网络错误信息
-            return
-        }
+        val mods = chineseModRepository.getAllMods()
         cachedChineseMods = mods
         var processed = mods.sorted(sortMode)
         if (filterText != null) {
