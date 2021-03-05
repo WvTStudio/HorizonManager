@@ -1,5 +1,6 @@
 package org.wvt.horizonmgr.ui.fileselector
 
+import android.util.Log
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
@@ -31,6 +32,12 @@ import androidx.compose.ui.util.lerp
 import kotlinx.coroutines.launch
 import org.wvt.horizonmgr.ui.theme.PreviewTheme
 
+private const val TAG = "FolderItem"
+
+private enum class SwipeState {
+    YES, NO
+}
+
 /**
  * 带左滑收藏功能的文件夹列表项
  */
@@ -43,14 +50,20 @@ internal fun FolderItem(
     onStarChange: (isStared: Boolean) -> Unit,
 ) {
     val swipePoint = with(LocalDensity.current) { 74.dp.toPx() }
-    val anchors = mapOf(0f to 0, -swipePoint to 1)
+    val anchors = mapOf(0f to SwipeState.NO, -swipePoint to SwipeState.YES)
 
-    val state = rememberSwipeableState(0) {
-        onStarChange(isStared)
+    val state = rememberSwipeableState(SwipeState.NO) {
+        Log.d(TAG, "confirm change: ${it}")
+        if (it == SwipeState.YES) {
+            onStarChange(!isStared)
+        }
         false
     }
 
-    val starState = (state.offset.value > -swipePoint - 10) xor !isStared
+    val starState = remember(state.offset.value, swipePoint, isStared) {
+        val offset = if(state.offset.value.isNaN()) 0f else state.offset.value
+        (offset > -swipePoint - 10) xor !isStared
+    }
 
     Box(
         Modifier
@@ -123,39 +136,43 @@ private fun ToggleBackgroundWithIcon(
     iconInactiveColor: Color = contentColorFor(inactiveColor)
 ) {
     val scope = rememberCoroutineScope()
-    // 当动画结束时，checkState 才会被实际应用成 check，背景色将根据此状态，在动画结束时改变
-    var checkState by remember { mutableStateOf(check) }
+    var initialized by remember { mutableStateOf(false) }
     val ripples = remember { mutableSetOf<Ripple>() }
+    var backgroundColor by remember { mutableStateOf(if (check) activeColor else inactiveColor) }
 
     DisposableEffect(check) {
-        scope.launch {
-            val animatable = Animatable(0f)
-            val ripple = Ripple(check, animatable)
-            ripples.add(ripple)
-            try {
-                animatable.animateTo(1f, tween())
-                animatable.snapTo(0f)
-                checkState = check
-            } finally {
-                ripples.remove(ripple)
+        Log.d(TAG, "Check: $check")
+        if (initialized) {
+            scope.launch {
+                val animatable = Animatable(0f)
+                val ripple = Ripple(check, animatable)
+                ripples.add(ripple)
+                try {
+                    animatable.animateTo(1f, tween())
+                    backgroundColor = if (check) activeColor else inactiveColor
+                } finally {
+                    ripples.remove(ripple)
+                }
             }
+        } else {
+            initialized = true
         }
         onDispose { }
     }
 
     Box(
         modifier.background(
-            if (checkState) activeColor
-            else inactiveColor
+            backgroundColor
         )
     ) {
         // Ripple
         BoxWithConstraints {
             for (ripple in ripples) {
+                val fraction = ripple.animatable.asState().value
                 val rippleSizePx = lerp(
                     0,
                     (constraints.maxHeight + constraints.maxWidth) * 2,
-                    ripple.animatable.value
+                    fraction
                 )
                 val padding = 40.dp
                 Layout(

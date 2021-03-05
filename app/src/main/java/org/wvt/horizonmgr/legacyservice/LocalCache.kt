@@ -2,10 +2,12 @@ package org.wvt.horizonmgr.legacyservice
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.util.Log
 import androidx.core.content.edit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
+private const val TAG = "LocalCache"
 class LocalCache private constructor(context: Context) {
     private val fixedFoldersPref: SharedPreferences =
         context.getSharedPreferences(FIXED_FOLDERS, Context.MODE_PRIVATE)
@@ -96,20 +98,24 @@ class LocalCache private constructor(context: Context) {
     }
 
     fun addFixedFolder(name: String, path: String) {
+        Log.d(TAG, "Star folder, name: $name, path: $path.")
         fixedFoldersPref.edit {
             putString(name, path)
         }
     }
 
     fun removeFixedFolder(path: String) {
+        Log.d(TAG, "Remove star folder: $path")
+
         for (entry in fixedFoldersPref.all) {
             if (entry.value.toString() == path) {
                 fixedFoldersPref.edit {
                     remove(entry.key)
                 }
-                break
+                return
             }
         }
+        Log.d(TAG, "Folder is not in the favorite list.")
     }
 
     fun getIgnoreVersion(): Int? {

@@ -12,7 +12,7 @@ import androidx.compose.ui.Modifier
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-internal fun FileEntry(name: String, onClick: () -> Unit) {
+internal fun FileItem(name: String, onClick: () -> Unit) {
     ListItem(
         modifier = Modifier.clickable(onClick = onClick),
         icon = { Icon(Icons.Filled.InsertDriveFile, contentDescription = "文件") },

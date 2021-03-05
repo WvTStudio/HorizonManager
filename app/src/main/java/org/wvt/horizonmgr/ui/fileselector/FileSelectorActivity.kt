@@ -5,8 +5,12 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContract
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Surface
+import androidx.compose.ui.Modifier
+import org.wvt.horizonmgr.defaultViewModelFactory
 import org.wvt.horizonmgr.ui.theme.AndroidHorizonManagerTheme
 
 sealed class FileSelectorResult {
@@ -25,7 +29,8 @@ class FileSelectorResultContract : ActivityResultContract<Context, FileSelectorR
                 if (intent == null) return FileSelectorResult.Canceled
                 return with(intent) {
                     FileSelectorResult.Succeed(
-                        getStringExtra(FileSelectorActivity.FILE_PATH) ?: error("The key 'file_path' was not specified.")
+                        getStringExtra(FileSelectorActivity.FILE_PATH)
+                            ?: error("The key 'file_path' was not specified.")
                     )
                 }
             }
@@ -43,14 +48,16 @@ class FileSelectorActivity : AppCompatActivity() {
         const val FILE_PATH = "file_path"
     }
 
+    private val viewModel by viewModels<FileSelectorViewModel> { defaultViewModelFactory }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             AndroidHorizonManagerTheme {
                 Surface {
                     FileSelector(
-                        onCancel = ::onCancel,
-                        onSelect = ::onFileSelect
+                        modifier = Modifier.fillMaxSize(),
+                        viewModel = viewModel, onSelect = ::onFileSelect, onClose = ::onCancel
                     )
                 }
             }
