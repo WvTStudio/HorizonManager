@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.InlineTextContent
+import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
@@ -15,8 +17,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.Placeholder
+import androidx.compose.ui.text.PlaceholderVerticalAlign
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import org.wvt.horizonmgr.ui.components.NetworkImage
 import org.wvt.horizonmgr.ui.theme.PreviewTheme
 
@@ -75,8 +81,6 @@ private fun GroupItem(
                 url = avatarUrl,
                 contentDescription = "头像"
             )
-            // Tag
-            StatusTag(modifier = Modifier.padding(top = 8.dp), text = tag)
         }
         // Information
         Column(
@@ -87,11 +91,20 @@ private fun GroupItem(
             // GroupName
             CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
                 Box(Modifier.fillMaxWidth()) {
+                    // TODO: 2021/3/5 效果还不理想
                     // GroupName
                     Text(
-                        modifier = Modifier.align(Alignment.CenterStart),
-                        text = groupName,
-                        style = MaterialTheme.typography.body1
+                        text = buildAnnotatedString {
+                            append(groupName)
+                            appendInlineContent("tag", "TAG")
+                        },
+                        inlineContent = mapOf("tag" to InlineTextContent(
+                            Placeholder(54.sp, 26.sp, PlaceholderVerticalAlign.TextCenter)
+                        ) {
+                            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.CenterStart) {
+                                StatusTag(modifier = Modifier.wrapContentSize(), text = tag)
+                            }
+                        })
                     )
                 }
             }
