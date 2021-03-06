@@ -23,9 +23,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import org.wvt.horizonmgr.ui.components.EmptyPage
-import org.wvt.horizonmgr.ui.components.LocalImage
-import org.wvt.horizonmgr.ui.components.ProgressDialog
+import org.wvt.horizonmgr.ui.components.*
 
 @Composable
 internal fun ModTab(
@@ -113,6 +111,8 @@ private fun ModItem(
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
 
+    val icon = iconPath?.let { loadLocalImage(path = iconPath) }
+
     Card(
         modifier = modifier,
         border = if (selected) BorderStroke(1.dp, MaterialTheme.colors.primary) else null,
@@ -147,12 +147,11 @@ private fun ModItem(
                 }
                 Spacer(modifier = Modifier.width(8.dp))
                 // Mod Icon
-                LocalImage(
+                ModIcon(
                     modifier = Modifier
                         .size(80.dp)
                         .clip(RoundedCornerShape(4.dp)),
-                    path = iconPath,
-                    contentDescription = "模组图标"
+                    image = icon?.value
                 )
             }
             // Footer controller buttons

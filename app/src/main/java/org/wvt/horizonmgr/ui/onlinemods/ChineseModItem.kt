@@ -10,11 +10,14 @@ import androidx.compose.material.icons.filled.Extension
 import androidx.compose.material.icons.filled.GetApp
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import org.wvt.horizonmgr.ui.components.ModIcon
+import org.wvt.horizonmgr.ui.components.loadUrlImage
 import org.wvt.horizonmgr.ui.theme.PreviewTheme
 
 data class ChineseModModel(
@@ -35,6 +38,7 @@ internal fun ChineseModItem(
     onClick: () -> Unit,
     onInstallClick: () -> Unit,
 ) {
+    val modIcon by loadUrlImage(url = model.iconUrl)
     Card(modifier = modifier, elevation = 1.dp) {
         Column(
             Modifier
@@ -70,7 +74,7 @@ internal fun ChineseModItem(
                     modifier = Modifier
                         .size(80.dp)
                         .clip(RoundedCornerShape(4.dp)),
-                    url = model.iconUrl
+                    image = modIcon
                 )
             }
             // Actions
