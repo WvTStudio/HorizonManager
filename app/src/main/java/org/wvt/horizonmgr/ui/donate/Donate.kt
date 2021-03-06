@@ -23,7 +23,6 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEach
 import org.wvt.horizonmgr.R
-import org.wvt.horizonmgr.ui.components.MyAlertDialog
 import kotlin.random.Random
 
 private val alipayColor = Color(0xFF1678FF)
@@ -50,8 +49,14 @@ fun Donate(
             // Alipay
             Surface(
                 color = if (light) alipayColor else MaterialTheme.colors.background,
-                modifier = Modifier.weight(1f).fillMaxWidth()
-                    .clickable(interactionSource = remember{ MutableInteractionSource() }, indication = null, onClick = onAlipayClicked)
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null,
+                        onClick = onAlipayClicked
+                    )
             ) {
                 Box(Modifier.fillMaxSize()) {
                     Icon(
@@ -65,8 +70,14 @@ fun Donate(
             // Wechat
             Surface(
                 color = if (light) wechatColor else MaterialTheme.colors.background,
-                modifier = Modifier.weight(1f).fillMaxWidth()
-                    .clickable(interactionSource = remember{ MutableInteractionSource() }, indication = null, onClick = onWechatPayClicked)
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null,
+                        onClick = onWechatPayClicked
+                    )
             ) {
                 Box(Modifier.fillMaxSize()) {
                     Icon(
@@ -95,7 +106,9 @@ fun Donate(
                 enter = fadeIn(),
                 exit = fadeOut()
             ) {
-                RandomPlaceLayout(modifier = Modifier.fillMaxSize().padding(top = 16.dp)) {
+                RandomPlaceLayout(modifier = Modifier
+                    .fillMaxSize()
+                    .padding(top = 16.dp)) {
                     donates.forEach {
                         Text(
                             fontSize = it.size,
@@ -107,7 +120,10 @@ fun Donate(
                 }
             }
         }
-        Row(Modifier.align(Alignment.BottomEnd).padding(16.dp)) {
+        Row(
+            Modifier
+                .align(Alignment.BottomEnd)
+                .padding(16.dp)) {
             TextButton(onClick = { displayDialog = true }) {
                 Text(
                     text = "关于",
@@ -117,7 +133,7 @@ fun Donate(
         }
 
         if (displayDialog) {
-            MyAlertDialog(
+            AlertDialog(
                 onDismissRequest = { displayDialog = false },
                 title = { Text("关于捐赠") },
                 text = {
@@ -138,9 +154,9 @@ fun RandomPlaceLayout(modifier: Modifier, content: @Composable () -> Unit) {
     Layout(
         modifier = modifier,
         content = content
-    ) { list: List<Measurable>, constraints: Constraints ->
+    ) { measurables: List<Measurable>, constraints: Constraints ->
         val childrenConstraints = constraints.copy(minWidth = 0, minHeight = 0)
-        val placeables = list.map {
+        val placeables = measurables.map {
             it.measure(childrenConstraints)
         }
         layout(constraints.maxWidth, constraints.maxHeight) {

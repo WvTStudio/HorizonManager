@@ -5,7 +5,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
@@ -16,13 +15,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.paint
 import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.drawscope.rotate
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.imageResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import org.wvt.horizonmgr.R
 
@@ -41,10 +41,10 @@ fun Login(
 
     val snackbarHostState = remember { SnackbarHostState() }
     var screen by remember { mutableStateOf(0) }
-    val gearResource = painterResource(id = R.drawable.ic_gear_full)
+    val gearResource = ImageVector.vectorResource(id = R.drawable.ic_gear_full)
 
     val gearRotation by rememberInfiniteTransition().animateFloat(
-        initialValue = 120f, targetValue = 360f,
+        initialValue = 0f, targetValue = 360f,
         animationSpec = InfiniteRepeatableSpec(
             tween(durationMillis = 5000, easing = LinearEasing),
             RepeatMode.Reverse
@@ -75,14 +75,14 @@ fun Login(
         Box(
             Modifier
                 .size(256.dp)
+                .graphicsLayer()
                 .offset(x = 128.dp)
+                .rotate(gearRotation)
                 .align(Alignment.TopEnd)
         ) {
             Image(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .rotate(gearRotation),
-                painter = gearResource,
+                modifier = Modifier.fillMaxSize(),
+                imageVector = gearResource,
                 contentDescription = null,
                 colorFilter = ColorFilter.tint(gearColor)
             )
@@ -95,14 +95,11 @@ fun Login(
                 .graphicsLayer(rotationZ = gearRotation)
                 .align(Alignment.BottomStart)
         ) {
-            Box(
-                Modifier
-                    .fillMaxSize()
-                    .paint(
-                        painter = gearResource,
-                        contentScale = ContentScale.Fit,
-                        colorFilter = ColorFilter.tint(gearColor)
-                    )
+            Image(
+                modifier = Modifier.fillMaxSize(),
+                imageVector = gearResource,
+                contentDescription = null,
+                colorFilter = ColorFilter.tint(gearColor)
             )
         }
 

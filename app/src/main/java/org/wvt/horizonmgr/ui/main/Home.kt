@@ -20,7 +20,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
-import org.wvt.horizonmgr.ui.components.MyAlertDialog
 import org.wvt.horizonmgr.ui.components.NetworkImage
 import org.wvt.horizonmgr.ui.downloaded.DMViewModel
 import org.wvt.horizonmgr.ui.downloaded.DownloadedMods
@@ -208,7 +207,7 @@ private fun DrawerHeader(
 ) {
     var showDialog by remember { mutableStateOf(false) }
     if (showDialog) {
-        MyAlertDialog(
+        AlertDialog(
             modifier = Modifier.shadow(16.dp, clip = false),
             onDismissRequest = { showDialog = false },
             confirmButton = {

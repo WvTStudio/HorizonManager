@@ -3,15 +3,11 @@ package org.wvt.horizonmgr.ui.main
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
-import androidx.compose.material.TextButton
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import org.wvt.horizonmgr.ui.components.MyAlertDialog
 import org.wvt.horizonmgr.ui.downloaded.DMViewModel
 import org.wvt.horizonmgr.ui.modulemanager.ICLevelTabViewModel
 import org.wvt.horizonmgr.ui.modulemanager.MCLevelTabViewModel
@@ -133,7 +129,7 @@ fun App(
 private fun RequestPermissionDialog(
     onConfirm: () -> Unit
 ) {
-    MyAlertDialog(
+    AlertDialog(
         onDismissRequest = { },
         confirmButton = { TextButton(onClick = onConfirm) { Text(text = "授权") } },
         title = { Text("需要权限") },
@@ -149,7 +145,7 @@ private fun NewVersionDialog(
     onConfirm: () -> Unit,
     onIgnore: () -> Unit
 ) {
-    MyAlertDialog(
+    AlertDialog(
         title = { Text("发现新版本") },
         text = {
             LazyColumn(Modifier.fillMaxHeight(0.6f)) {

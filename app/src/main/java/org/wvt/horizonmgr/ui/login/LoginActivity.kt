@@ -8,7 +8,10 @@ import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContract
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
+import androidx.compose.ui.Modifier
 import org.wvt.horizonmgr.defaultViewModelFactory
 import org.wvt.horizonmgr.ui.theme.AndroidHorizonManagerTheme
 
@@ -71,7 +74,7 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         this.setContent {
             AndroidHorizonManagerTheme {
-                Surface {
+                Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.background) {
                     Login(viewModel, ::onLoginSucceed, ::onCancel)
                 }
             }

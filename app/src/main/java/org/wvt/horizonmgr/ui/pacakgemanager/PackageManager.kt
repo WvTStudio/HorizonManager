@@ -486,7 +486,7 @@ class ConfirmDeleteDialogHostState {
 fun ConfirmDeleteDialogHost(state: ConfirmDeleteDialogHostState) {
     val data = state.currentData
     if (data != null) {
-        MyAlertDialog(onDismissRequest = {
+        AlertDialog(onDismissRequest = {
             data.dismiss()
         }, title = {
             Text("是否确认删除")
