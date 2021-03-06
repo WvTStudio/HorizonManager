@@ -16,6 +16,7 @@ private const val TAG = "ICLevelTabVM"
 
 class ICLevelTabViewModel(dependencies: DependenciesContainer) : ViewModel() {
     private val manager = dependencies.manager
+    private val levelTransporter = dependencies.levelTransporter
 
     sealed class State {
         object Loading : State()
@@ -86,6 +87,22 @@ class ICLevelTabViewModel(dependencies: DependenciesContainer) : ViewModel() {
     suspend fun renameLevel(level: LevelInfo, newName: String) {
         withContext(Dispatchers.IO) {
             cachedLevels[level]?.rename(newName)
+        }
+    }
+
+    suspend fun copyToMC(level: LevelInfo) {
+        withContext(Dispatchers.IO){
+            cachedLevels[level]?.let {
+                levelTransporter.copyToMC(it)
+            }
+        }
+    }
+
+    suspend fun moveToMC(level: LevelInfo) {
+        withContext(Dispatchers.IO){
+            cachedLevels[level]?.let {
+                levelTransporter.moveToMC(it)
+            }
         }
     }
 }

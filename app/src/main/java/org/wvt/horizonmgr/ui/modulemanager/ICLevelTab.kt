@@ -29,7 +29,7 @@ internal fun ICLevelTab(
 
     DisposableEffect(Unit) {
         viewModel.load()
-        onDispose {  }
+        onDispose { }
     }
 
     Crossfade(state) {
@@ -56,7 +56,7 @@ internal fun ICLevelTab(
                     itemsIndexed(items = levels) { _, item ->
                         LevelItem(
                             modifier = Modifier.padding(16.dp),
-                            title = item.name,
+                            levelName = item.name,
                             screenshot = item.screenshot,
                             onRenameClicked = {
                                 scope.launch {
@@ -98,6 +98,31 @@ internal fun ICLevelTab(
                                         return@launch
                                     }
                                     progressDialogState = ProgressDialogState.Finished("删除完成")
+                                    viewModel.load()
+                                }
+                            },
+                            onCopyClick = {
+                                scope.launch {
+                                    progressDialogState = ProgressDialogState.Loading("正在复制存档到 MC")
+                                    try {
+                                        viewModel.copyToMC(item)
+                                    } catch (e: Exception) {
+                                        progressDialogState = ProgressDialogState.Failed("复制失败", e.message ?: "未知错误")
+                                        return@launch
+                                    }
+                                    progressDialogState = ProgressDialogState.Finished("复制成功")
+                                }
+                            },
+                            onMoveClick = {
+                                scope.launch {
+                                    progressDialogState = ProgressDialogState.Loading("正在复制存档到 MC")
+                                    try {
+                                        viewModel.moveToMC(item)
+                                    } catch (e: Exception) {
+                                        progressDialogState = ProgressDialogState.Failed("复制失败", e.message ?: "未知错误")
+                                        return@launch
+                                    }
+                                    progressDialogState = ProgressDialogState.Finished("复制成功")
                                     viewModel.load()
                                 }
                             }

@@ -26,7 +26,7 @@ internal fun MCLevelTab(
         viewModel.load()
         onDispose { }
     }
-    
+
     Box(Modifier.fillMaxSize()) {
         if (items.isEmpty()) {
             EmptyPage(Modifier.matchParentSize()) {
@@ -36,7 +36,7 @@ internal fun MCLevelTab(
             itemsIndexed(items = items) { _, item ->
                 LevelItem(
                     modifier = Modifier.padding(16.dp),
-                    title = item.name,
+                    levelName = item.name,
                     screenshot = item.screenshot,
                     onRenameClicked = {
                         scope.launch {
@@ -51,7 +51,7 @@ internal fun MCLevelTab(
                                     progressDialogState =
                                         ProgressDialogState.Failed(
                                             "重命名失败",
-                                            e.localizedMessage ?: ""
+                                            e.localizedMessage ?: "未知错误"
                                         )
                                     return@launch
                                 }
@@ -67,11 +67,38 @@ internal fun MCLevelTab(
                                 viewModel.deleteLevel(item)
                             } catch (e: Exception) {
                                 progressDialogState =
-                                    ProgressDialogState.Failed("删除失败", e.localizedMessage ?: "")
+                                    ProgressDialogState.Failed("删除失败", e.localizedMessage ?: "未知错误")
                                 return@launch
                             }
                             progressDialogState = ProgressDialogState.Finished("删除完成")
                             viewModel.load()
+                        }
+                    },
+                    onMoveClick = {
+                        scope.launch {
+                            progressDialogState = ProgressDialogState.Loading("正在移动存档动到 Horizon")
+                            try {
+                                viewModel.moveToHZ(item)
+                            } catch (e: Exception) {
+                                progressDialogState =
+                                    ProgressDialogState.Failed("移动失败", e.localizedMessage ?: "未知错误")
+                                return@launch
+                            }
+                            progressDialogState = ProgressDialogState.Finished("移动完成")
+                            viewModel.load()
+                        }
+                    },
+                    onCopyClick = {
+                        scope.launch {
+                            progressDialogState = ProgressDialogState.Loading("正在复制存档动到 Horizon")
+                            try {
+                                viewModel.copyToHZ(item)
+                            } catch (e: Exception) {
+                                progressDialogState =
+                                    ProgressDialogState.Failed("复制失败", e.localizedMessage ?: "未知错误")
+                                return@launch
+                            }
+                            progressDialogState = ProgressDialogState.Finished("复制完成")
                         }
                     }
                 )
