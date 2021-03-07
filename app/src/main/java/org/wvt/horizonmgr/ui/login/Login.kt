@@ -13,15 +13,11 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.paint
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import org.wvt.horizonmgr.R
@@ -35,7 +31,7 @@ fun Login(
     onLoginSuccess: (account: String, avatar: String?, name: String, uid: String) -> Unit,
     onCancel: () -> Unit
 ) {
-    // FIXME: 2021/2/19 修复齿轮不转的问题
+    // FIXME: 2021/3/7 动画时长要改为 5000，但当 durationMillis >= 4295 时动画失效
     val context = LocalContext.current as ComponentActivity
     val fabState by vm.fabState.collectAsState()
 
@@ -46,8 +42,8 @@ fun Login(
     val gearRotation by rememberInfiniteTransition().animateFloat(
         initialValue = 0f, targetValue = 360f,
         animationSpec = InfiniteRepeatableSpec(
-            tween(durationMillis = 5000, easing = LinearEasing),
-            RepeatMode.Reverse
+            tween(durationMillis = 4000, easing = LinearEasing),
+            RepeatMode.Restart
         )
     )
 
@@ -117,6 +113,7 @@ fun Login(
             Icon(Icons.Filled.ArrowBack, contentDescription = "返回")
         }
 
+        // FIXME: 2021/3/7 1.0.0 beta1 卡
         // Login Page
         AnimatedVisibility(
             visible = screen == 0,

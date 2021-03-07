@@ -74,7 +74,10 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         this.setContent {
             AndroidHorizonManagerTheme {
-                Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.background) {
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colors.background
+                ) {
                     Login(viewModel, ::onLoginSucceed, ::onCancel)
                 }
             }
