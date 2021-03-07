@@ -2,9 +2,7 @@ package org.wvt.horizonmgr.service.level
 
 import java.io.File
 
-class MCLevel internal constructor(
-    val directory: File
-) {
+class MCLevel internal constructor(val directory: File) {
     companion object {
         internal fun parseByDirectory(directory: File): MCLevel {
             return MCLevel(directory)

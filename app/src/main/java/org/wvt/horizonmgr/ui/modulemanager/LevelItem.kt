@@ -47,7 +47,7 @@ internal fun LevelItem(
             Box(
                 Modifier
                     .padding(8.dp)
-                    .align(Alignment.TopEnd)
+                    .align(Alignment.BottomEnd)
             ) {
                 IconButton(
                     onClick = { dropdownExpand = true }

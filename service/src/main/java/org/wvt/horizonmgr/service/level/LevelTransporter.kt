@@ -1,6 +1,6 @@
 package org.wvt.horizonmgr.service.level
 
-import org.wvt.horizonmgr.service.pack.InstalledPackage
+import org.wvt.horizonmgr.service.hzpack.InstalledPackage
 import java.io.File
 import java.io.IOException
 

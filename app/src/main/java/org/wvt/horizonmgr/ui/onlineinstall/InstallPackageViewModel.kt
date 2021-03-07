@@ -10,8 +10,8 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.receiveAsFlow
 import org.wvt.horizonmgr.DependenciesContainer
-import org.wvt.horizonmgr.service.pack.PackageManifest
-import org.wvt.horizonmgr.service.pack.ZipPackage
+import org.wvt.horizonmgr.service.hzpack.PackageManifest
+import org.wvt.horizonmgr.service.hzpack.ZipPackage
 import org.wvt.horizonmgr.webapi.NetworkException
 import org.wvt.horizonmgr.webapi.pack.OfficialCDNPackage
 

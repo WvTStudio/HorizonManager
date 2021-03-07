@@ -21,10 +21,7 @@ import org.wvt.horizonmgr.ui.fileselector.FileSelectorResult
 import org.wvt.horizonmgr.ui.fileselector.FileSelectorResultContract
 import org.wvt.horizonmgr.ui.joingroup.JoinGroupActivity
 import org.wvt.horizonmgr.ui.login.LoginResultContract
-import org.wvt.horizonmgr.ui.modulemanager.ICLevelTabViewModel
-import org.wvt.horizonmgr.ui.modulemanager.MCLevelTabViewModel
-import org.wvt.horizonmgr.ui.modulemanager.ModTabViewModel
-import org.wvt.horizonmgr.ui.modulemanager.ModuleManagerViewModel
+import org.wvt.horizonmgr.ui.modulemanager.*
 import org.wvt.horizonmgr.ui.news.NewsViewModel
 import org.wvt.horizonmgr.ui.onlineinstall.InstallPackageResultContract
 import org.wvt.horizonmgr.ui.onlinemods.OnlineModsViewModel
@@ -46,6 +43,7 @@ class MainActivity : AppCompatActivity() {
     private val mcLevelVM: MCLevelTabViewModel by viewModels { factory }
     private val downloadedModVM: DMViewModel by viewModels { factory }
     private val onlineModsVM: OnlineModsViewModel by viewModels { factory }
+    private val mcResVM: MCResTabViewModel by viewModels { factory }
 
     private val login = registerForActivityResult(LoginResultContract()) {
         mainVM.setUserInfo(it)
@@ -174,6 +172,7 @@ class MainActivity : AppCompatActivity() {
                 moduleManagerVM = moduleManagerVM,
                 packageManagerVM = packageManagerVM,
                 mcLevelVM = mcLevelVM,
+                mcResVM = mcResVM,
                 downloadedModVM = downloadedModVM,
                 onlineModsVM = onlineModsVM,
                 onRequestPermission = ::requestPermission,

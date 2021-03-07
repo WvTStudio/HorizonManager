@@ -24,6 +24,7 @@ fun ModuleManager(
     moduleViewModel: ModTabViewModel,
     icLevelViewModel: ICLevelTabViewModel,
     mcLevelViewModel: MCLevelTabViewModel,
+    mcResViewModel: MCResTabViewModel,
     onNavClicked: () -> Unit,
     onAddModClicked: () -> Unit
 ) {
@@ -57,8 +58,8 @@ fun ModuleManager(
                     ModuleManagerViewModel.Tabs.MOD -> ModTab(moduleViewModel, onAddModClicked)
                     ModuleManagerViewModel.Tabs.IC_MAP -> ICLevelTab(icLevelViewModel)
                     ModuleManagerViewModel.Tabs.MC_MAP -> MCLevelTab(mcLevelViewModel)
-                    ModuleManagerViewModel.Tabs.IC_TEXTURE -> MCResTab()
-                    ModuleManagerViewModel.Tabs.MC_TEXTURE -> ICResTab()
+                    ModuleManagerViewModel.Tabs.IC_TEXTURE -> ICResTab()
+                    ModuleManagerViewModel.Tabs.MC_TEXTURE -> MCResTab(mcResViewModel)
                 }
             }
         }

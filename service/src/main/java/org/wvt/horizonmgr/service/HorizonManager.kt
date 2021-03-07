@@ -4,9 +4,9 @@ import android.content.Context
 import android.os.Environment
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.wvt.horizonmgr.service.pack.InstallationInfo
-import org.wvt.horizonmgr.service.pack.InstalledPackage
-import org.wvt.horizonmgr.service.pack.ZipPackage
+import org.wvt.horizonmgr.service.hzpack.InstallationInfo
+import org.wvt.horizonmgr.service.hzpack.InstalledPackage
+import org.wvt.horizonmgr.service.hzpack.ZipPackage
 import org.wvt.horizonmgr.service.utils.translateToValidFile
 import java.io.File
 import java.util.*

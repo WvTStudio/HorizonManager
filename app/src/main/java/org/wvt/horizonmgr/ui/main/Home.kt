@@ -45,6 +45,7 @@ fun Home(
     moduleManagerVM: ModuleManagerViewModel,
     packageManagerVM: PackageManagerViewModel,
     mcLevelVM: MCLevelTabViewModel,
+    mcResVM: MCResTabViewModel,
     downloadedModVM: DMViewModel,
     onlineModsVM: OnlineModsViewModel,
     userInfo: UserInformation?,
@@ -122,7 +123,8 @@ fun Home(
                         managerViewModel = moduleManagerVM,
                         icLevelViewModel = icLevelTabVM,
                         moduleViewModel = modTabVM,
-                        mcLevelViewModel = mcLevelVM
+                        mcLevelViewModel = mcLevelVM,
+                        mcResViewModel = mcResVM
                     )
                     HomeViewModel.Screen.PACKAGE_MANAGE -> PackageManager(
                         viewModel = packageManagerVM,

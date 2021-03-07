@@ -8,8 +8,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import org.wvt.horizonmgr.DependenciesContainer
-import org.wvt.horizonmgr.service.pack.InstalledPackage
-import org.wvt.horizonmgr.service.pack.ZipPackage
+import org.wvt.horizonmgr.service.hzpack.InstalledPackage
+import org.wvt.horizonmgr.service.hzpack.ZipPackage
 import org.wvt.horizonmgr.ui.components.InputDialogHostState
 import org.wvt.horizonmgr.ui.components.ProgressDialogState
 import java.io.File

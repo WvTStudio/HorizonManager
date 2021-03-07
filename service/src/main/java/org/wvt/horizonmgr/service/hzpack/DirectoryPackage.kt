@@ -1,4 +1,4 @@
-package org.wvt.horizonmgr.service.pack
+package org.wvt.horizonmgr.service.hzpack
 
 import java.io.File
 

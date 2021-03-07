@@ -9,10 +9,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import org.wvt.horizonmgr.ui.downloaded.DMViewModel
-import org.wvt.horizonmgr.ui.modulemanager.ICLevelTabViewModel
-import org.wvt.horizonmgr.ui.modulemanager.MCLevelTabViewModel
-import org.wvt.horizonmgr.ui.modulemanager.ModTabViewModel
-import org.wvt.horizonmgr.ui.modulemanager.ModuleManagerViewModel
+import org.wvt.horizonmgr.ui.modulemanager.*
 import org.wvt.horizonmgr.ui.news.NewsViewModel
 import org.wvt.horizonmgr.ui.onlinemods.OnlineModsViewModel
 import org.wvt.horizonmgr.ui.pacakgemanager.PackageManagerViewModel
@@ -29,6 +26,7 @@ fun App(
     moduleManagerVM: ModuleManagerViewModel,
     packageManagerVM: PackageManagerViewModel,
     mcLevelVM: MCLevelTabViewModel,
+    mcResVM: MCResTabViewModel,
     downloadedModVM: DMViewModel,
     onlineModsVM: OnlineModsViewModel,
     onRequestPermission: () -> Unit,
@@ -68,14 +66,15 @@ fun App(
         Surface(color = MaterialTheme.colors.background) {
             if (mainVM.initialized) Home(
                 homeVM = homeVM,
-                newsVM,
-                modTabVM,
-                icLevelTabVM,
-                moduleManagerVM,
-                packageManagerVM,
-                mcLevelVM,
-                downloadedModVM,
-                onlineModsVM,
+                newsVM = newsVM,
+                modTabVM = modTabVM,
+                icLevelTabVM = icLevelTabVM,
+                moduleManagerVM = moduleManagerVM,
+                packageManagerVM = packageManagerVM,
+                mcLevelVM = mcLevelVM,
+                downloadedModVM = downloadedModVM,
+                onlineModsVM = onlineModsVM,
+                mcResVM = mcResVM,
                 userInfo = remember(userInfo) {
                     userInfo?.let {
                         UserInformation(

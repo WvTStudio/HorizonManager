@@ -9,6 +9,7 @@ import org.wvt.horizonmgr.legacyservice.HorizonManager
 import org.wvt.horizonmgr.legacyservice.LocalCache
 import org.wvt.horizonmgr.service.level.LevelTransporter
 import org.wvt.horizonmgr.service.level.MCLevelManager
+import org.wvt.horizonmgr.service.respack.ResourcePackManager
 import org.wvt.horizonmgr.webapi.iccn.ICCNModule
 import org.wvt.horizonmgr.webapi.mgrinfo.MgrInfoModule
 import org.wvt.horizonmgr.webapi.mod.ChineseModRepository
@@ -43,49 +44,33 @@ private class DependenciesVMFactory(
 
 class DependenciesContainer internal constructor(private val context: Context) {
     @Deprecated("Deprecated")
-    val horizonManager: HorizonManager by lazy {
-        HorizonManager.getOrCreateInstance(context)
-    }
-
-    val localCache: LocalCache by lazy {
-        LocalCache.createInstance(context)
-    }
-
-    val manager by lazy {
-        org.wvt.horizonmgr.service.HorizonManager(context)
-    }
-
-    val packRepository by lazy {
-        OfficialPackageCDNRepository()
-    }
-
-    val chineseModRepository by lazy {
-        ChineseModRepository()
-    }
-
-    val mirrorModRepository by lazy {
-        OfficialModMirrorRepository()
-    }
-
-    val mgrInfo by lazy {
-        MgrInfoModule()
-    }
-
-    val iccn by lazy {
-        ICCNModule()
-    }
-
-    val news by lazy {
-        MgrNewsModule()
-    }
-
+    val horizonManager by lazy { HorizonManager.getOrCreateInstance(context) }
+    val localCache by lazy { LocalCache.createInstance(context) }
+    val manager by lazy { org.wvt.horizonmgr.service.HorizonManager(context) }
+    val packRepository by lazy { OfficialPackageCDNRepository() }
+    val chineseModRepository by lazy { ChineseModRepository() }
+    val mirrorModRepository by lazy { OfficialModMirrorRepository() }
+    val mgrInfo by lazy { MgrInfoModule() }
+    val iccn by lazy { ICCNModule() }
+    val news by lazy { MgrNewsModule() }
     val packageDownloader by lazy { OfficialCDNPackageDownloader(context) }
     val modDownloader by lazy { ModDownloader(context) }
     val mcLevelManager by lazy { MCLevelManager() }
     val levelTransporter by lazy {
         LevelTransporter(
-            Environment.getExternalStorageDirectory().resolve("games").resolve("com.mojang")
+            Environment.getExternalStorageDirectory()
+                .resolve("games")
+                .resolve("com.mojang")
                 .resolve("minecraftWorlds").absolutePath
+        )
+    }
+
+    val mcResourcePackManager by lazy {
+        ResourcePackManager(
+            Environment.getExternalStorageDirectory()
+                .resolve("games")
+                .resolve("com.mojang")
+                .resolve("resource_packs")
         )
     }
 }
