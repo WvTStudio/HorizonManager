@@ -53,3 +53,4 @@
 ## 已知 BUGs
 
 - AnimatedVisibility 的动画异常
+- FileSelector 当快速左滑文件夹时，即使没有达到临界点也会被判定为触发成功
