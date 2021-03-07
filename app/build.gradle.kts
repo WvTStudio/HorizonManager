@@ -78,12 +78,12 @@ dependencies {
     implementation(project(":service"))
 
     implementation("androidx.core:core-ktx:1.3.2")
-    implementation("androidx.activity:activity-ktx:1.3.0-alpha02")
-    implementation("androidx.activity:activity-compose:1.3.0-alpha02")
+    implementation("androidx.activity:activity-ktx:1.3.0-alpha03")
+    implementation("androidx.activity:activity-compose:1.3.0-alpha03")
 
     implementation("androidx.appcompat:appcompat:1.2.0")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.0")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:1.0.0-alpha01")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:1.0.0-alpha02")
     implementation("com.google.android.material:material:1.3.0")
 
 
