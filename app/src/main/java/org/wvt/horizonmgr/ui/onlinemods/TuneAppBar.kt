@@ -13,6 +13,8 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.Measurable
@@ -77,6 +79,8 @@ internal fun TuneAppBar(
         if (expand) 1f else 0f,
         if (expand) contentAppear else contentDisappear
     )
+
+    val searchTextfieldFocus = remember { FocusRequester() }
 
     Surface(
         modifier = Modifier
@@ -146,7 +150,9 @@ internal fun TuneAppBar(
                             )
                             // TextField
                             BasicTextField(
-                                modifier = Modifier.align(Alignment.CenterStart),
+                                modifier = Modifier
+                                    .align(Alignment.CenterStart)
+                                    .focusRequester(searchTextfieldFocus),
                                 value = filterValue,
                                 onValueChange = {
                                     if (!it.text.contains('\n')) {
@@ -159,6 +165,7 @@ internal fun TuneAppBar(
                                 ),
                                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
                                 keyboardActions = KeyboardActions(onSearch = {
+                                    searchTextfieldFocus.freeFocus()
                                     onFilterValueConfirm(filterValue.text)
                                 })
                             )
@@ -178,8 +185,12 @@ internal fun TuneAppBar(
                         .padding(end = 4.dp + offset)
                         .graphicsLayer(alpha = actionOpacity),
                         onClick = {
-                            if (expand) onFilterValueConfirm(filterValue.text)
-                            else expand = true
+                            if (expand) { // Search
+                                searchTextfieldFocus.freeFocus()
+                                onFilterValueConfirm(filterValue.text)
+                            } else { // Expand
+                                expand = true
+                            }
                         }
                     ) {
                         Crossfade(targetState = expand, animationSpec = iconFade) {
