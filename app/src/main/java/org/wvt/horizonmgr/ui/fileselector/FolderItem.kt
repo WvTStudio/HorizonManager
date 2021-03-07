@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
 import kotlinx.coroutines.launch
 import org.wvt.horizonmgr.ui.theme.PreviewTheme
+import kotlin.math.roundToInt
 
 private const val TAG = "FolderItem"
 
@@ -53,7 +54,7 @@ internal fun FolderItem(
     val anchors = mapOf(0f to SwipeState.NO, -swipePoint to SwipeState.YES)
 
     val state = rememberSwipeableState(SwipeState.NO) {
-        Log.d(TAG, "confirm change: ${it}")
+        Log.d(TAG, "confirm change: $it")
         if (it == SwipeState.YES) {
             onStarChange(!isStared)
         }
@@ -73,7 +74,7 @@ internal fun FolderItem(
                 state = state,
                 anchors = anchors,
                 orientation = Orientation.Horizontal,
-                thresholds = { _, _ -> FractionalThreshold(0.2f) }
+                thresholds = { _, _ -> FixedThreshold(74.dp) }
             )
     ) {
         ToggleBackgroundWithIcon(
@@ -89,7 +90,7 @@ internal fun FolderItem(
         ListItem(
             modifier = Modifier
                 .clickable(onClick = onClick)
-                .offset(offset = { IntOffset(x = state.offset.value.toInt(), y = 0) })
+                .offset(offset = { IntOffset(x = state.offset.value.roundToInt(), y = 0) })
                 .background(MaterialTheme.colors.surface),
             icon = { Icon(Icons.Filled.Folder, contentDescription = "文件夹") },
             text = { Text(name) }
