@@ -37,6 +37,7 @@
 
 - P1 检测是否安装了 Horizon 和 Minecraft，没有则推荐安装
 - P1 使资讯支持 Markdown 格式
+- P1 各分包和 Minecraft 本身的资源包管理功能
 - P2 在线资源的 Mod 详情页面
 - P3 支持编辑 Mod 的设置
 - P3 分包/MOD 更新功能
