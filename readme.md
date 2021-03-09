@@ -37,7 +37,6 @@
 
 ### 功能
 
-- P1 检测是否安装了 Horizon 和 Minecraft，没有则推荐安装
 - P1 使资讯支持 Markdown 格式
 - P1 各分包和 Minecraft 本身的资源包管理功能
 - P2 在线资源的 Mod 详情页面
@@ -50,6 +49,7 @@
 ### Code
 
 - P1 完善 service 模块，并代替 legacyservice 包
+- P1 将所有与 package manifest 关联的用例换成 PackageManifest, mod.info 用例换成 ModInfo
 - P4 使用 kotlinx.serialization 替代 org.json
 
 ## 已知 BUGs
