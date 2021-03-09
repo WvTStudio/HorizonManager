@@ -29,6 +29,8 @@ fun App(
     mcResVM: MCResTabViewModel,
     downloadedModVM: DMViewModel,
     onlineModsVM: OnlineModsViewModel,
+    onInstallHZClick: () -> Unit,
+    onInstallMCClick: () -> Unit,
     onRequestPermission: () -> Unit,
     navigateToLogin: () -> Unit,
     navigateToJoinGroup: () -> Unit,
@@ -47,6 +49,9 @@ fun App(
 
     val newVersion by mainVM.newVersion.collectAsState()
     var displayNewVersionDialog by rememberSaveable { mutableStateOf(false) }
+
+    val showGameNotInstall by mainVM.gameNotInstalled.collectAsState()
+    val showHZNotInstall by mainVM.hzNotInstalled.collectAsState()
 
     DisposableEffect(newVersion) {
         if (newVersion != null) {
@@ -118,6 +123,45 @@ fun App(
                 onIgnore = {
                     mainVM.ignoreVersion(theNewVersion.versionCode)
                     displayNewVersionDialog = false
+                }
+            )
+        }
+
+        if (showHZNotInstall) {
+            AlertDialog(
+                onDismissRequest = { mainVM.dismissGameNotInstallDialog() },
+                confirmButton = {
+                    TextButton(onClick = {
+                        onInstallHZClick()
+                        mainVM.dismissHZNotInstallDialog()
+                    }) { Text("前往酷安") }
+                },
+                dismissButton = {
+                    TextButton(onClick = {
+                        mainVM.dismissHZNotInstallDialog()
+                    }) { Text("取消") }
+                },
+                title = { Text("您还未安装 Horizon，是否前往酷安安装？") }
+            )
+        }
+
+        if (showGameNotInstall) {
+            AlertDialog(
+                title = { Text("您还未安装 Minecraft 游戏本体") },
+                text = {
+                       Text("尽管 Horizon 已经内嵌了 Minecraft，但需要您安装游戏本体，以验证您是否为正版玩家。")
+                },
+                onDismissRequest = { mainVM.dismissGameNotInstallDialog() },
+                confirmButton = {
+                    TextButton(onClick = {
+                        onInstallMCClick()
+                        mainVM.dismissGameNotInstallDialog()
+                    }) { Text("前往 Google Play") }
+                },
+                dismissButton = {
+                    TextButton(onClick = {
+                        mainVM.dismissGameNotInstallDialog()
+                    }) { Text("取消") }
                 }
             )
         }

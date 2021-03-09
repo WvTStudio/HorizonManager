@@ -1,10 +1,5 @@
 package org.wvt.horizonmgr.ui.main
 
-import android.Manifest
-import android.app.Activity
-import android.content.pm.PackageManager
-import android.os.Build
-import android.os.Environment
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -29,15 +24,6 @@ class MainViewModel(
 
     var initialized by mutableStateOf(false)
         private set
-    var ui by mutableStateOf<LocalCache.CachedUserInfo?>(null)
-        private set
-    var sp by mutableStateOf<String?>(null)
-        private set
-    var spd by mutableStateOf<Boolean>(false)
-        private set
-    var nv by mutableStateOf<NewVersion?>(null)
-        private set
-
     val userInfo: MutableStateFlow<LocalCache.CachedUserInfo?> = MutableStateFlow(null)
     val selectedPackage: MutableStateFlow<String?> = MutableStateFlow(null)
     val showPermissionDialog: MutableStateFlow<Boolean> = MutableStateFlow(false)
@@ -51,6 +37,10 @@ class MainViewModel(
     val newVersion: MutableStateFlow<NewVersion?> = MutableStateFlow(null)
 
     private var ignoreVersion: Int? = null
+
+    val gameNotInstalled = MutableStateFlow(false)
+
+    val hzNotInstalled = MutableStateFlow(false)
 
     init {
         viewModelScope.launch {
@@ -147,27 +137,6 @@ class MainViewModel(
         }
     }
 
-    fun checkPermission(context: Activity) {
-        fun check(): Boolean {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                return Environment.isExternalStorageManager()
-            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                listOf<String>(
-                    Manifest.permission.READ_EXTERNAL_STORAGE,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                    Manifest.permission.ACCESS_NETWORK_STATE,
-                    Manifest.permission.INTERNET
-                ).forEach {
-                    if (context.checkSelfPermission(it) == PackageManager.PERMISSION_DENIED) return false
-                }
-            }
-            return true
-        }
-        viewModelScope.launch {
-            showPermissionDialog.value = !check()
-        }
-    }
-
     fun dismiss() {
         showPermissionDialog.value = false
     }
@@ -181,6 +150,30 @@ class MainViewModel(
     fun ignoreVersion(versionCode: Int) {
         viewModelScope.launch {
             localCache.setIgnoreVersion(versionCode)
+        }
+    }
+
+    fun showGameNotInstallDialog() {
+        viewModelScope.launch {
+            gameNotInstalled.emit(true)
+        }
+    }
+
+    fun dismissGameNotInstallDialog() {
+        viewModelScope.launch {
+            gameNotInstalled.emit(false)
+        }
+    }
+
+    fun showHZNotInstallDialog() {
+        viewModelScope.launch {
+            hzNotInstalled.emit(true)
+        }
+    }
+
+    fun dismissHZNotInstallDialog() {
+        viewModelScope.launch {
+            hzNotInstalled.emit(false)
         }
     }
 }

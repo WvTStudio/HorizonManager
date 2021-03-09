@@ -4,6 +4,7 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
@@ -11,7 +12,6 @@ import android.provider.Settings
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.animation.ExperimentalAnimationApi
 import org.wvt.horizonmgr.R
 import org.wvt.horizonmgr.defaultViewModelFactory
 import org.wvt.horizonmgr.ui.community.CommunityActivity
@@ -29,6 +29,8 @@ import org.wvt.horizonmgr.ui.pacakgemanager.PackageDetailActivity
 import org.wvt.horizonmgr.ui.pacakgemanager.PackageManagerViewModel
 import org.wvt.horizonmgr.ui.settings.SettingsActivity
 import org.wvt.horizonmgr.ui.startActivity
+
+private const val TAG = "MainActivity"
 
 class MainActivity : AppCompatActivity() {
     private val factory by lazy { defaultViewModelFactory }
@@ -157,7 +159,39 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    @OptIn(ExperimentalAnimationApi::class)
+    private fun checkGameInstalled() {
+        val apps = packageManager.getInstalledApplications(PackageManager.GET_ACTIVITIES)
+        var hasMC = false
+        var hasHZ = false
+
+        for (app in apps) {
+            when (app.packageName) {
+                "com.mojang.minecraftpe" -> hasMC = true
+                "com.zheka.horizon" -> hasHZ = true
+            }
+        }
+        if (!hasMC) {
+            mainVM.showGameNotInstallDialog()
+        }
+        if (!hasHZ) {
+            mainVM.showHZNotInstallDialog()
+        }
+    }
+
+    private fun openCoolapkURL() {
+        val intent =
+            Intent(Intent.ACTION_VIEW, Uri.parse("https://www.coolapk.com/game/com.zheka.horizon"))
+        startActivity(intent)
+    }
+
+    private fun openMCGooglePlay() {
+        val intent = Intent(
+            Intent.ACTION_VIEW,
+            Uri.parse("https://play.google.com/store/apps/details?id=com.mojang.minecraftpe")
+        )
+        startActivity(intent)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme(R.style.Theme_HorizonManagerCompose_NoActionBar) // cancel the slash theme
@@ -185,11 +219,14 @@ class MainActivity : AppCompatActivity() {
                 navigateToPackageInfo = { PackageDetailActivity.start(this, it) },
                 requestOpenGame = ::openGame,
                 selectFileForMod = ::startSelectFileActivityForMod,
-                selectFileForPackage = ::startSelectFileActivityForPackage
+                selectFileForPackage = ::startSelectFileActivityForPackage,
+                onInstallHZClick = { openCoolapkURL() },
+                onInstallMCClick = { openMCGooglePlay() }
             )
         }
 
         this.checkPermission()
         mainVM.checkUpdate()
+        checkGameInstalled()
     }
 }
