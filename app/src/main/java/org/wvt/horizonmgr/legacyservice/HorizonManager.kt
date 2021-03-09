@@ -16,9 +16,10 @@ import java.util.zip.ZipFile
  * 在线下载的 Mod 先解压、解析、生成解析文件
  * 手动导入的 Mod，先解压
  */
+@Deprecated("Deprecated", level = DeprecationLevel.ERROR)
 class HorizonManager private constructor(context: Context) {
 
-    companion object {
+/*    companion object {
         private var instance: WeakReference<HorizonManager?> = WeakReference(null)
 
         fun createInstance(context: Context): HorizonManager {
@@ -34,7 +35,7 @@ class HorizonManager private constructor(context: Context) {
         fun getInstance(): HorizonManager {
             return instance.get()!!
         }
-    }
+    }*/
 
     private val downloadDir = context.filesDir.resolve("downloads")
         get() = field.also { if (!it.exists()) it.mkdirs() }

@@ -1,5 +1,6 @@
 package org.wvt.horizonmgr.service.mod
 
+import java.io.File
 import java.util.zip.ZipFile
 
 /**
@@ -8,12 +9,26 @@ import java.util.zip.ZipFile
  *
  */
 class ZipMod internal constructor(
-    private val zipFile: ZipFile
+    internal val file: File
 ) {
+    private val zipFile = ZipFile(file)
+
     companion object {
-        fun fromFile(zipFile: ZipFile): ZipFile {
-            TODO("TODO: 2021/2/23")
+        fun fromFile(file: File): ZipMod {
+            return ZipMod(file)
         }
     }
-    // TODO: 2020/12/5  
+
+    class ModInfoNotFoundException() : Exception()
+
+    fun getModInfo(): ModInfo {
+        val entry = zipFile.entries().asSequence().find {
+            it.name.endsWith("mod.info")
+        } ?: throw ModInfoNotFoundException()
+
+        val input = zipFile.getInputStream(entry)
+        val modInfoStr = input.bufferedReader().use { it.readText() }
+
+        return ModInfo.fromJson(modInfoStr)
+    }
 }

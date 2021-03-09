@@ -32,7 +32,6 @@ fun ModuleManager(
     val pkgId = LocalSelectedPackageUUID.current
 
     DisposableEffect(pkgId) {
-        moduleViewModel.setSelectedUUID(pkgId)
         moduleViewModel.load()
 
         icLevelViewModel.setPackage(pkgId)

@@ -33,7 +33,7 @@ internal fun ModTab(
     val ps by vm.progressState.collectAsState()
     val state by vm.state.collectAsState()
     val mods by vm.mods.collectAsState()
-    val enabledMods by vm.enabledMods.collectAsState()
+    val enabledMods by vm.newEnabledMods.collectAsState()
 
     Crossfade(state) { state ->
         when (state) {
@@ -62,7 +62,7 @@ internal fun ModTab(
                                     horizontal = 16.dp,
                                     vertical = 8.dp
                                 ),
-                                enable = enabledMods.contains(item.id),
+                                enable = enabledMods.contains(item),
                                 title = item.name,
                                 text = item.description,
                                 iconPath = item.iconPath,

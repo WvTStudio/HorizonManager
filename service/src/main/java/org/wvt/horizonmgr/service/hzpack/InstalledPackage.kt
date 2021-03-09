@@ -3,6 +3,7 @@ package org.wvt.horizonmgr.service.hzpack
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
+import org.wvt.horizonmgr.service.CoroutineZip
 import org.wvt.horizonmgr.service.level.MCLevel
 import org.wvt.horizonmgr.service.mod.InstalledMod
 import org.wvt.horizonmgr.service.mod.ZipMod
@@ -23,6 +24,7 @@ class InstalledPackage constructor(
     private val manifestFile = pkgDir.resolve("manifest.json")
     private val installationInfoFile = pkgDir.resolve(".installation_info")
     private val graphicsFile = pkgDir.resolve(".cached_graphics")
+    private val modDir = pkgDir.resolve("innercore").resolve("mods")
 
     private lateinit var game: String
     private lateinit var gameVersion: String
@@ -135,8 +137,9 @@ class InstalledPackage constructor(
     /**
      * 安装 Mod 到该 Package
      */
-    fun installMod(mod: ZipMod) {
-        TODO("2020/10/29")
+    suspend fun installMod(mod: ZipMod) {
+        val task = CoroutineZip.unzip(mod.file, modDir, createContainerDir = true, autoUnbox = true)
+        task.await()
     }
 
     /**

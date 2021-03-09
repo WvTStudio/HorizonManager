@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.launch
 import org.wvt.horizonmgr.DependenciesContainer
+import org.wvt.horizonmgr.service.mod.ZipMod
 import org.wvt.horizonmgr.ui.components.ProgressDialogState
 import org.wvt.horizonmgr.webapi.NetworkException
 import org.wvt.horizonmgr.webapi.mod.ChineseMod
@@ -26,8 +27,8 @@ class OnlineModsViewModel(
     private val chineseModRepository = dependencies.chineseModRepository
     private val cdnModRepository = dependencies.mirrorModRepository
     private val modDownloader = dependencies.modDownloader
-    private val legacyMgr = dependencies.horizonManager // TODO: 2021/2/28 使用新的 Manager 替代
     private val localCache = dependencies.localCache
+    private val manager = dependencies.manager
 
     private var cachedMirrorMods: List<OfficialMirrorMod> = emptyList()
     val cdnMods = MutableStateFlow<List<OfficialMirrorModModel>>(emptyList())
@@ -102,8 +103,9 @@ class OnlineModsViewModel(
     fun installChineseMod(id: Int) {
         viewModelScope.launch {
             try {
-                val pkg =
-                    localCache.getSelectedPackageUUID()
+                val pkg = localCache.getSelectedPackageUUID()?.let { uuid ->
+                    manager.getInstalledPackages().find { it.getInstallUUID() == uuid }
+                }
                 if (pkg == null) {
                     installState.emit(ProgressDialogState.Failed("安装失败", "您还未选择分包"))
                     return@launch
@@ -122,7 +124,7 @@ class OnlineModsViewModel(
                 }
                 val modFile = task.await()
                 receiveTask.cancelAndJoin()
-                legacyMgr.installMod(pkg, modFile)
+                pkg.installMod(ZipMod.fromFile(modFile))
                 installState.emit(ProgressDialogState.Finished("安装完成"))
             } catch (e: Exception) {
                 installState.emit(ProgressDialogState.Failed("安装失败", e.message ?: "未知错误"))
@@ -133,7 +135,9 @@ class OnlineModsViewModel(
     fun installMirrorMod(id: Int) {
         viewModelScope.launch {
             try {
-                val pkg = localCache.getSelectedPackageUUID()
+                val pkg = localCache.getSelectedPackageUUID()?.let { uuid ->
+                    manager.getInstalledPackages().find { it.getInstallUUID() == uuid }
+                }
                 if (pkg == null) {
                     installState.emit(ProgressDialogState.Failed("安装失败", "您还未选择分包"))
                     return@launch
@@ -151,7 +155,7 @@ class OnlineModsViewModel(
                 }
                 val modFile = task.await()
                 receiveTask.cancelAndJoin()
-                legacyMgr.installMod(pkg, modFile)
+                pkg.installMod(ZipMod.fromFile(modFile))
                 installState.emit(ProgressDialogState.Finished("安装完成"))
             } catch (e: Exception) {
                 installState.emit(ProgressDialogState.Failed("安装失败", e.message ?: "未知错误"))

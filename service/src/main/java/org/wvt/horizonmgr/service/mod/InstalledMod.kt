@@ -1,5 +1,7 @@
 package org.wvt.horizonmgr.service.mod
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import java.io.File
 import java.io.InputStream
@@ -28,10 +30,8 @@ import java.io.InputStream
  * `config.json` JSON 格式，该文件存放 MOD 的所有设置，用户可以修改。
  * 该 Json 中必定有 `enabled` 键，Horizon 将通过该键来判断 Mod 是否启用。
  */
-class InstalledMod internal constructor(
-    private val modDir: File
-) {
-    private val iconFile = modDir.resolve("mod_icon.png")
+class InstalledMod internal constructor(val modDir: File) {
+    val iconFile = modDir.resolve("mod_icon.png").takeIf { it.exists() }
     private val infoFile = modDir.resolve("mod.info")
     private val configFile = modDir.resolve("config.json")
 
@@ -42,6 +42,7 @@ class InstalledMod internal constructor(
     private var isEnabled: Boolean = false
 
     // TODO-Proposal 使用 FileObserver 监听文件更改，一旦更改则将 isParsed 设为 false
+    // TODO: 2021/2/22 更换成 ModInfo
 
     private var isParsed = false
 
@@ -49,7 +50,6 @@ class InstalledMod internal constructor(
      * 该方法解析 `mod.info` 的信息和 `config.json` 中的 `enabled` 键
      */
     private suspend fun parse() {
-        // TODO: 2021/2/22 更换成 ModInfo
         // 只有在没有解析时才会重新解析
         if (!isParsed) {
             // Parse Info
@@ -76,7 +76,7 @@ class InstalledMod internal constructor(
 
     suspend fun getGraphics(): InputStream? {
         parse()
-        return iconFile.takeIf { it.exists() }?.inputStream()
+        return iconFile?.inputStream()
     }
 
     suspend fun getAuthor(): String {
@@ -116,7 +116,7 @@ class InstalledMod internal constructor(
         changeEnabled(false)
     }
 
-    private suspend fun changeEnabled(enabled: Boolean) {
+    private suspend fun changeEnabled(enabled: Boolean) = withContext(Dispatchers.IO) {
         val configStr = configFile.takeIf { it.exists() }?.readText()
         val json = configStr?.let {
             JSONObject(configStr)

@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.withContext
-import org.wvt.horizonmgr.service.mod.ModInfo
+import org.wvt.horizonmgr.service.mod.ZipMod
 import org.wvt.horizonmgr.utils.CoroutineDownloader
 import org.wvt.horizonmgr.utils.ProgressDeferred
 import java.io.File
@@ -22,21 +22,16 @@ class ModDownloader(context: Context) {
     private val downloadModsDir = downloadDir.resolve("mods")
         get() = field.also { if (!it.exists()) it.mkdirs() }
 
-    suspend fun getDownloadedMods(): List<ModInfo> = withContext(Dispatchers.IO) {
-        val result = mutableListOf<ModInfo>()
+    data class DownloadedMod(
+        val path: String,
+        val zipMod: ZipMod
+    )
+
+    suspend fun getDownloadedMods(): List<DownloadedMod> = withContext(Dispatchers.IO) {
+        val result = mutableListOf<DownloadedMod>()
         downloadModsDir.listFiles()!!.forEach { file ->
-            val zipFile = try {
-                ZipFile(file)
-            } catch (e: Exception) {
-                return@forEach
-            }
-            val entry = zipFile.entries().asSequence().find {
-                it.name.endsWith("mod.info")
-            } ?: return@forEach
-            val input = zipFile.getInputStream(entry)
-            val modInfoStr = input.bufferedReader().use { it.readText() }
             try {
-                result.add(ModInfo.fromJson(modInfoStr))
+                result.add(DownloadedMod(file.absolutePath, ZipMod.fromFile(file)))
             } catch (e: Exception) {
                 // TODO: 2021/2/23 使该函数可以返回失败列表
                 return@forEach
