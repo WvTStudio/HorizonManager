@@ -2,8 +2,7 @@
 
 ## alpha10
 
-错误页面
-- 将重试按钮换为 OutlinedButton 样式
+- 支持状态栏着色
 
 ## alpha9
 

@@ -30,6 +30,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import org.wvt.horizonmgr.ui.components.*
 import org.wvt.horizonmgr.ui.main.LocalSelectedPackageUUID
+import org.wvt.horizonmgr.ui.theme.AppBarBackgroundColor
 import org.wvt.horizonmgr.ui.theme.PreviewTheme
 import kotlin.coroutines.resume
 
@@ -84,7 +85,7 @@ fun PackageManager(
                     Text("分包管理")
                 }, navigationIcon = {
                     IconButton(onClick = onNavClick) { Icon(Icons.Filled.Menu, "菜单") }
-                }, backgroundColor = MaterialTheme.colors.surface,
+                }, backgroundColor = AppBarBackgroundColor,
                 actions = {
                     Box {
                         // Menu Icon

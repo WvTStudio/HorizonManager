@@ -21,13 +21,13 @@ import androidx.compose.ui.Modifier
 import org.wvt.horizonmgr.HorizonManagerApplication
 import org.wvt.horizonmgr.ui.components.ErrorPage
 import org.wvt.horizonmgr.ui.theme.AndroidHorizonManagerTheme
+import org.wvt.horizonmgr.ui.theme.AppBarBackgroundColor
 
 class JoinGroupActivity : AppCompatActivity() {
     private val vm by viewModels<JoinGroupViewModel> {
         (application as HorizonManagerApplication).dependenciesVMFactory
     }
 
-    @OptIn(ExperimentalMaterialApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         vm.refresh()
@@ -56,13 +56,15 @@ class JoinGroupActivity : AppCompatActivity() {
                 ) {
                     Box(Modifier.fillMaxSize()) {
                         Column(Modifier.fillMaxSize()) {
-                            TopAppBar(title = {
-                                Text("加入群组")
-                            }, navigationIcon = {
-                                IconButton(onClick = { finish() }) {
-                                    Icon(Icons.Filled.ArrowBack, contentDescription = "返回")
-                                }
-                            }, backgroundColor = MaterialTheme.colors.surface)
+                            TopAppBar(
+                                title = { Text("加入群组") },
+                                navigationIcon = {
+                                    IconButton(onClick = { finish() }) {
+                                        Icon(Icons.Filled.ArrowBack, contentDescription = "返回")
+                                    }
+                                },
+                                backgroundColor = AppBarBackgroundColor
+                            )
                             when {
                                 isLoading && loadError == null -> {
                                     Box(Modifier.fillMaxSize(), Alignment.Center) {

@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.zIndex
+import org.wvt.horizonmgr.ui.theme.AppBarBackgroundColor
 import org.wvt.horizonmgr.utils.longSizeToString
 
 @Composable
@@ -50,7 +51,7 @@ internal fun Community(
                     IconButton(onClick = onClose) {
                         Icon(Icons.Filled.Close, "关闭")
                     }
-                }, backgroundColor = MaterialTheme.colors.surface, actions = {
+                }, backgroundColor = AppBarBackgroundColor, actions = {
                     Crossfade(loading) {
                         if (it) CircularProgressIndicator(
                             modifier = Modifier.size(36.dp),

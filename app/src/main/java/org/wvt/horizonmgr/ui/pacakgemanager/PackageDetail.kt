@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.wvt.horizonmgr.ui.components.ErrorPage
+import org.wvt.horizonmgr.ui.theme.AppBarBackgroundColor
 
 @Composable
 fun PackageInfo(
@@ -31,7 +32,7 @@ fun PackageInfo(
             IconButton(onClick = onCloseClick) {
                 Icon(Icons.Filled.ArrowBack, "返回")
             }
-        }, backgroundColor = MaterialTheme.colors.surface)
+        }, backgroundColor = AppBarBackgroundColor)
         Crossfade(
             modifier = Modifier.weight(1f),
             targetState = state

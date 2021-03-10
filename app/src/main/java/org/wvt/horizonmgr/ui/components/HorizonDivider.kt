@@ -5,6 +5,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.LocalContentAlpha
+import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -15,7 +17,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun HorizonDivider(
     modifier: Modifier = Modifier,
-    color: Color = MaterialTheme.colors.onSurface.copy(alpha = DividerAlpha),
+    color: Color = LocalContentColor.current,
     thickness: Dp = 1.dp,
     startIndent: Dp = 0.dp
 ) {
@@ -28,7 +30,7 @@ fun HorizonDivider(
         modifier.then(indentMod)
             .width(thickness)
             .fillMaxHeight()
-            .background(color = color)
+            .background(color = color.copy(DividerAlpha))
     )
 }
 

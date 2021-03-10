@@ -16,6 +16,7 @@ import androidx.compose.runtime.State
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import org.wvt.horizonmgr.ui.theme.AppBarBackgroundColor
 
 sealed class StepState {
     @Stable
@@ -48,7 +49,7 @@ fun InstallProgress(
                 }
             }, navigationIcon = {
                 // 安装目前不可被取消
-            }, backgroundColor = MaterialTheme.colors.surface)
+            }, backgroundColor = AppBarBackgroundColor)
             Row(
                 Modifier
                     .height(2.dp)

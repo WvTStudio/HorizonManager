@@ -30,6 +30,8 @@ import org.wvt.horizonmgr.ui.onlinemods.OnlineMods
 import org.wvt.horizonmgr.ui.onlinemods.OnlineModsViewModel
 import org.wvt.horizonmgr.ui.pacakgemanager.PackageManager
 import org.wvt.horizonmgr.ui.pacakgemanager.PackageManagerViewModel
+import org.wvt.horizonmgr.ui.theme.AppBarBackgroundColor
+import org.wvt.horizonmgr.ui.theme.LocalThemeConfig
 import org.wvt.horizonmgr.ui.theme.PreviewTheme
 
 @Deprecated("Deprecated")
@@ -180,9 +182,9 @@ private fun Drawer(
                 LazyColumn(modifier = Modifier.weight(1f)) {
                     item {
                         header()
-                        Divider(Modifier.padding(top = 16.dp))
+                        Divider(Modifier.fillParentMaxWidth())
                         Column(Modifier.padding(vertical = 8.dp)) { tabs() }
-                        Divider()
+                        Divider(Modifier.fillParentMaxWidth())
                         Column(Modifier.padding(vertical = 8.dp)) { items() }
                     }
                 }
@@ -229,41 +231,48 @@ private fun DrawerHeader(
             }
         )
     }
-    // Avatar
-    Column(Modifier.padding(16.dp)) {
-        Surface(
-            modifier = Modifier.size(48.dp),
-            shape = RoundedCornerShape(percent = 50),
-            color = MaterialTheme.colors.onSurface.copy(alpha = 0.12f)
-        ) {
-            Box(
-                Modifier
-                    .fillMaxSize()
-                    .clickable {
-                        if (userInfo == null) requestLogin()
-                        else showDialog = true
-                    }) {
-                userInfo?.let {
-                    NetworkImage(
-                        url = it.avatarUrl,
-                        contentDescription = "头像",
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier.fillMaxSize()
-                    )
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        color = AppBarBackgroundColor
+    ) {
+        val contentColor = LocalContentColor.current
+
+        Column(Modifier.padding(16.dp)) {
+            // Avatar
+            Surface(
+                modifier = Modifier.size(48.dp),
+                shape = RoundedCornerShape(percent = 50),
+                color = MaterialTheme.colors.onSurface.copy(alpha = 0.12f)
+            ) {
+                Box(
+                    Modifier
+                        .fillMaxSize()
+                        .clickable {
+                            if (userInfo == null) requestLogin()
+                            else showDialog = true
+                        }) {
+                    userInfo?.let {
+                        NetworkImage(
+                            url = it.avatarUrl,
+                            contentDescription = "头像",
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    }
                 }
             }
+            Text(
+                if (userInfo == null) "欢迎！点击头像登录" else userInfo.name + "，欢迎！",
+                modifier = Modifier.padding(top = 16.dp),
+                style = MaterialTheme.typography.h5
+            )
+            Text(
+                userInfo?.account ?: "WvT工作室制作",
+                modifier = Modifier.padding(top = 8.dp),
+                color = contentColor.copy(alpha = ContentAlpha.medium),
+                style = MaterialTheme.typography.subtitle1
+            )
         }
-        Text(
-            if (userInfo == null) "欢迎！点击头像登录" else userInfo.name + "，欢迎！",
-            modifier = Modifier.padding(top = 16.dp),
-            style = MaterialTheme.typography.h5
-        )
-        Text(
-            userInfo?.account ?: "WvT工作室制作",
-            modifier = Modifier.padding(top = 8.dp),
-            color = MaterialTheme.colors.onSurface.copy(alpha = 0.3f),
-            style = MaterialTheme.typography.subtitle1
-        )
     }
 }
 

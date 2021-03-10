@@ -9,6 +9,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 
 val LocalThemeController =
     staticCompositionLocalOf<ThemeController> { error("No theme controller provided") }
@@ -21,6 +22,16 @@ interface ThemeController {
     fun setDarkColor(color: Colors)
     fun setAppbarAccent(enable: Boolean)
 }
+
+val AppBarBackgroundColor: Color
+    @Composable get() {
+        val config = LocalThemeConfig.current
+        return if (config.appbarAccent && !config.isDark) {
+            MaterialTheme.colors.primary
+        } else {
+            MaterialTheme.colors.surface
+        }
+    }
 
 @Immutable
 data class ThemeConfig(

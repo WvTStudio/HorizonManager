@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import org.wvt.horizonmgr.ui.components.ErrorPage
 import org.wvt.horizonmgr.ui.components.NetworkImage
+import org.wvt.horizonmgr.ui.theme.AppBarBackgroundColor
 import org.wvt.horizonmgr.ui.theme.PreviewTheme
 
 @Composable
@@ -69,7 +70,7 @@ private fun NewsUI(
                     Icon(imageVector = Icons.Filled.Menu, contentDescription = "菜单")
                 }
             },
-            backgroundColor = MaterialTheme.colors.surface
+            backgroundColor = AppBarBackgroundColor
         )
         Crossfade(state) {
             when (it) {

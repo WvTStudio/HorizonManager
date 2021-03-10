@@ -10,6 +10,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import org.wvt.horizonmgr.ui.theme.AppBarBackgroundColor
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -32,7 +33,7 @@ fun EditName(
             },
             title = {
                 Text("输入分包的名字")
-            }, backgroundColor = MaterialTheme.colors.surface
+            }, backgroundColor = AppBarBackgroundColor
         )
         TextField(
             modifier = Modifier

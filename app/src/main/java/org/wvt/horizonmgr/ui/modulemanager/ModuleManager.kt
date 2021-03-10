@@ -17,6 +17,7 @@ import androidx.compose.ui.util.fastForEachIndexed
 import androidx.compose.ui.zIndex
 import org.wvt.horizonmgr.ui.components.HorizonDivider
 import org.wvt.horizonmgr.ui.main.LocalSelectedPackageUUID
+import org.wvt.horizonmgr.ui.theme.AppBarBackgroundColor
 
 @Composable
 fun ModuleManager(
@@ -79,21 +80,22 @@ private fun CustomAppBar(
                 modifier = Modifier.fillMaxHeight(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                HorizonDivider(Modifier.height(32.dp))
+                HorizonDivider(modifier = Modifier.height(32.dp))
                 ScrollableTabRow(
                     modifier = Modifier.fillMaxHeight(),
                     selectedTabIndex = tabs.indexOf(selectedTab),
                     edgePadding = 0.dp,
                     backgroundColor = Color.Transparent,
+                    contentColor = contentColorFor(AppBarBackgroundColor),
                     indicator = {},
                     divider = {}
                 ) {
                     tabs.fastForEachIndexed { index, tab ->
                         val selected = tab == selectedTab
-                        TabItem(label = tab.label,
-                            selected = selected, onTabSelected = {
-                                onTabSelected(tab)
-                            }
+                        TabItem(
+                            label = tab.label,
+                            selected = selected,
+                            onTabSelected = { onTabSelected(tab) }
                         )
                     }
                 }
@@ -102,7 +104,7 @@ private fun CustomAppBar(
             IconButton(onClick = onNavClicked, content = {
                 Icon(Icons.Filled.Menu, contentDescription = "菜单")
             })
-        }, backgroundColor = MaterialTheme.colors.surface
+        }, backgroundColor = AppBarBackgroundColor
     )
 }
 
@@ -120,11 +122,12 @@ private fun TabItem(label: String, selected: Boolean, onTabSelected: () -> Unit)
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
+        val color = LocalContentColor.current
         Text(
             text = label,
             color = animateColorAsState(
-                if (selected) MaterialTheme.colors.onSurface
-                else MaterialTheme.colors.onSurface.copy(0.44f)
+                if (selected) color
+                else color.copy(ContentAlpha.disabled)
             ).value
         )
     }

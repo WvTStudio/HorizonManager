@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import org.wvt.horizonmgr.ui.components.ErrorPage
 import org.wvt.horizonmgr.ui.components.NetworkImage
+import org.wvt.horizonmgr.ui.theme.AppBarBackgroundColor
 
 @Composable
 fun NewsContent(
@@ -36,7 +37,7 @@ fun NewsContent(
                 }
             }, title = {
                 Text("资讯正文")
-            }, backgroundColor = MaterialTheme.colors.surface
+            }, backgroundColor = AppBarBackgroundColor
         )
         Crossfade(news) {
             when (it) {

@@ -21,10 +21,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import org.wvt.horizonmgr.ui.theme.HorizonManagerTheme
-import org.wvt.horizonmgr.ui.theme.LocalThemeConfig
-import org.wvt.horizonmgr.ui.theme.LocalThemeController
-import org.wvt.horizonmgr.ui.theme.MaterialColors
+import org.wvt.horizonmgr.ui.theme.*
 
 private enum class CheckedColorType {
     LIGHT_PRIMARY, LIGHT_PRIMARY_VARIANT,
@@ -76,6 +73,8 @@ fun CustomTheme(requestClose: () -> Unit) {
         )
     }
 
+    var accentColor by remember { mutableStateOf(themeConfig.appbarAccent) }
+
     fun getColor(color: Pair<String, Int>): Color {
         return Color(colors[color.first]!![color.second]!!)
     }
@@ -88,7 +87,7 @@ fun CustomTheme(requestClose: () -> Unit) {
                 }
             }, title = {
                 Text("自定义主题")
-            }, backgroundColor = MaterialTheme.colors.surface)
+            }, backgroundColor = AppBarBackgroundColor)
 
             MaterialColorPalette(
                 modifier = Modifier.height(256.dp),
@@ -167,6 +166,18 @@ fun CustomTheme(requestClose: () -> Unit) {
                                 }
                             )
                         }
+                        Row(
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(top = 16.dp, start = 42.dp, end = 42.dp)
+                        ) {
+                            Checkbox(
+                                checked = accentColor,
+                                onCheckedChange = { accentColor = it }
+                            )
+                            Spacer(Modifier.width(8.dp))
+                            Text("状态栏着色")
+                        }
                         Divider(
                             Modifier
                                 .padding(vertical = 16.dp)
@@ -236,6 +247,7 @@ fun CustomTheme(requestClose: () -> Unit) {
                         onSecondary = MaterialColors.contentColorFor(getColor(darkColor.secondary))
                     )
                 )
+                themeController.setAppbarAccent(accentColor)
             }
         ) {
             Icon(imageVector = Icons.Filled.Check, "保存")
@@ -284,7 +296,9 @@ private fun SelectColorItem(
                     detectTapGestures(onPress = {
                         pressed = true
                         val succeed = tryAwaitRelease()
-                        if (succeed) { onSelect() }
+                        if (succeed) {
+                            onSelect()
+                        }
                         pressed = false
                     })
                 }

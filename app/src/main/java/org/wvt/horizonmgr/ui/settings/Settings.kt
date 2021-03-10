@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import org.wvt.horizonmgr.R
 import org.wvt.horizonmgr.ui.components.AnimateLogo
 import org.wvt.horizonmgr.ui.components.HorizonDivider
+import org.wvt.horizonmgr.ui.theme.AppBarBackgroundColor
 import org.wvt.horizonmgr.ui.theme.LocalThemeConfig
 import org.wvt.horizonmgr.ui.theme.LocalThemeController
 
@@ -30,12 +31,14 @@ fun Settings(
     val themeConfig = LocalThemeConfig.current
 
     Column(Modifier.fillMaxSize()) {
-        TopAppBar(title = {}, navigationIcon = {
+        TopAppBar(title = {
+            Text("设置")
+        }, navigationIcon = {
             IconButton(onClick = onNavClick) {
                 Icon(Icons.Filled.ArrowBack, "返回")
             }
-        }, backgroundColor = Color.Transparent, elevation = 0.dp)
-        Row(Modifier.padding(top = 8.dp, start = 54.dp)) {
+        }, backgroundColor = AppBarBackgroundColor, elevation = 4.dp)
+        Row(Modifier.padding(top = 32.dp, start = 54.dp)) {
             AnimateLogo(Modifier.padding(top = 8.dp))
             Column(Modifier.padding(start = 24.dp)) {
                 Text(text = "Horizon 管理器", style = MaterialTheme.typography.h5)

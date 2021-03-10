@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import org.wvt.horizonmgr.ui.theme.AppBarBackgroundColor
 
 @Composable
 internal fun CustomAppBar(
@@ -19,7 +20,8 @@ internal fun CustomAppBar(
 ) {
     Surface(
         modifier = Modifier.zIndex(4.dp.value),
-        elevation = 4.dp
+        elevation = 4.dp,
+        color = AppBarBackgroundColor
     ) {
         Column {
             TopAppBar(
@@ -32,11 +34,11 @@ internal fun CustomAppBar(
                         )
                     }
                 },
-                backgroundColor = Color.Transparent,
+                backgroundColor = AppBarBackgroundColor,
                 elevation = 0.dp
             )
             // 路径指示器
-            Surface(modifier = Modifier.fillMaxWidth(), color = Color.Transparent) {
+            Surface(modifier = Modifier.fillMaxWidth(), color = AppBarBackgroundColor) {
                 PathTab(data, onSelectDepth)
             }
         }

@@ -12,6 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import org.wvt.horizonmgr.ui.theme.AppBarBackgroundColor
 
 data class ChoosePackageItem(
     val uuid: String,
@@ -37,7 +38,7 @@ fun ChoosePackage(
                     )
                 }
             },
-            title = { Text("在线安装分包") }, backgroundColor = MaterialTheme.colors.surface
+            title = { Text("在线安装分包") }, backgroundColor = AppBarBackgroundColor
         )
         if (items.isEmpty()) {
             Box(Modifier.fillMaxSize()) {

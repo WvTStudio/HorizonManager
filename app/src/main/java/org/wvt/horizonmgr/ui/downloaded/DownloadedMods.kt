@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import org.wvt.horizonmgr.ui.components.ProgressDialog
 import org.wvt.horizonmgr.ui.main.LocalSelectedPackageUUID
+import org.wvt.horizonmgr.ui.theme.AppBarBackgroundColor
 
 @Composable
 fun DownloadedMods(
@@ -43,7 +44,7 @@ fun DownloadedMods(
                 IconButton(onClick = onNavClicked, content = {
                     Icon(Icons.Filled.Menu, "菜单")
                 })
-            }, backgroundColor = MaterialTheme.colors.surface
+            }, backgroundColor = AppBarBackgroundColor
         )
 
         if (mods.isEmpty()) {

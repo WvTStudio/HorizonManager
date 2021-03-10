@@ -11,6 +11,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.Icon
+import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
@@ -48,6 +49,8 @@ internal fun PathTab(
         }
     }
 
+    val contentColor = LocalContentColor.current
+
     LazyRow(
         verticalAlignment = Alignment.CenterVertically,
         contentPadding = PaddingValues(start = 72.dp, end = 32.dp)
@@ -66,8 +69,8 @@ internal fun PathTab(
                 Text(
                     text = item,
                     color = animateColorAsState(
-                        if (data.depth == index) MaterialTheme.colors.onSurface
-                        else MaterialTheme.colors.onSurface.copy(alpha = 0.5f)
+                        if (data.depth == index) contentColor
+                        else contentColor.copy(alpha = 0.5f)
                     ).value // 选中高亮
                 )
             }

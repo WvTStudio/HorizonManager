@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.util.lerp
 import androidx.compose.ui.zIndex
 import org.wvt.horizonmgr.ui.components.DropDownSelector
+import org.wvt.horizonmgr.ui.theme.AppBarBackgroundColor
 
 private val iconFade = tween<Float>(durationMillis = 120, easing = FastOutSlowInEasing)
 
@@ -87,7 +88,8 @@ internal fun TuneAppBar(
             .fillMaxWidth()
             .wrapContentHeight()
             .zIndex(4.dp.value),
-        elevation = 4.dp
+        elevation = 4.dp,
+        color = AppBarBackgroundColor
     ) {
         AppBarLayout(expand = expand) {
             // SearchBox Background
