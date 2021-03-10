@@ -13,6 +13,7 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.graphicsLayer
@@ -98,7 +99,8 @@ internal fun TuneAppBar(
                     .layoutId("searchbox_bg")
                     .fillMaxWidth()
                     .padding(top = offset, start = offset, end = offset)
-                    .height(56.dp),
+                    .height(56.dp)
+                    .alpha(contentOpacity),
                 shape = RoundedCornerShape(4.dp),
                 elevation = 4.dp,
                 content = {}
@@ -126,7 +128,8 @@ internal fun TuneAppBar(
                     Crossfade(targetState = expand, animationSpec = iconFade) {
                         if (it) Icon(
                             imageVector = Icons.Filled.ArrowBack,
-                            contentDescription = "关闭"
+                            contentDescription = "关闭",
+                            tint = MaterialTheme.colors.onSurface
                         )
                         else Icon(imageVector = Icons.Filled.Menu, contentDescription = "菜单")
                     }
@@ -198,7 +201,8 @@ internal fun TuneAppBar(
                         Crossfade(targetState = expand, animationSpec = iconFade) {
                             if (it) Icon(
                                 imageVector = Icons.Filled.Search,
-                                contentDescription = "搜索"
+                                contentDescription = "搜索",
+                                tint = MaterialTheme.colors.onSurface
                             )
                             else Icon(imageVector = Icons.Filled.Tune, contentDescription = "过滤选项")
                         }
