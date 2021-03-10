@@ -85,7 +85,7 @@ internal fun PathTab(
                 Icon(
                     modifier = Modifier.padding(start = 8.dp, end = 8.dp),
                     imageVector = Icons.Filled.ChevronRight,
-                    tint = MaterialTheme.colors.onSurface.copy(alpha = 0.5f),
+                    tint = contentColor.copy(alpha = 0.5f),
                     contentDescription = null
                 )
             }
