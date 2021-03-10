@@ -38,18 +38,28 @@
 ### 功能
 
 - P1 使资讯支持 Markdown 格式
+- P1 支持安装存档、资源包、行为包到 MC
 - P1 各分包和 Minecraft 本身的资源包管理功能
+    - P1 支持查看存档的基本信息
+    - P2 支持浏览存档使用的行为包和资源包
+    - P2 支持调整设置，导出存档
+- P2 支持分包的打包导出功能
 - P2 在线资源的 Mod 详情页面
 - P3 支持编辑 Mod 的设置
 - P3 分包/MOD 更新功能
 - P3 在线模组每个卡片显示下载进度和安装状态
 - P4 当分包、本地/在线模组解析失败时，显示成一个 “解析失败” 的卡片
+- P4 FileSelector 收藏功能的更多细节
+    - P1 收藏后立刻
 
 ### Code
 
 - P1 完善 service 模块，并代替 legacyservice 包
 - P1 将所有与 package manifest 关联的用例换成 PackageManifest, mod.info 用例换成 ModInfo
-- P4 使用 kotlinx.serialization 替代 org.json
+- P2 使用 kotlinx.serialization 替代 org.json
+- P3 优化 FileSelector 的代码
+- P3 重写 Custom Theme 的 UI 和 Controller 代码
+- P3 查看所有组件的 ContentColor CompositionProvider 层级，防止出错
 
 ## 已知 BUGs
 
