@@ -21,7 +21,7 @@ android {
                 file("proguard-rules.pro")
             )
         }
-        create("beta") {
+        create("alpha") {
             proguardFiles = mutableListOf(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 file("proguard-rules.pro")
