@@ -14,15 +14,19 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
+        create("beta") {
+            proguardFiles = mutableListOf(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                file("proguard-rules.pro")
+            )
+        }
         create("alpha") {
-            isMinifyEnabled = true
             proguardFiles = mutableListOf(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 file("proguard-rules.pro")
             )
         }
         getByName("release") {
-            isMinifyEnabled = true
             proguardFiles = mutableListOf(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 file("proguard-rules.pro")

@@ -14,7 +14,7 @@ android {
         applicationId = "org.wvt.horizonmgr"
         minSdkVersion(21)
         targetSdkVersion(30)
-        versionCode = 13
+        versionCode = 14
         versionName = "2.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -31,14 +31,19 @@ android {
         getByName("debug") {
             versionNameSuffix = "-debug"
         }
+        create("beta") {
+            proguardFiles = mutableListOf(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                file("proguard-rules.pro")
+            )
+            versionNameSuffix = "-beta1"
+        }
         create("alpha") {
             proguardFiles = mutableListOf(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 file("proguard-rules.pro")
             )
-//            isShrinkResources = true
-//            isMinifyEnabled = true
-            versionNameSuffix = "-alpha10"
+            versionNameSuffix = "-alpha12"
         }
     }
     compileOptions {
