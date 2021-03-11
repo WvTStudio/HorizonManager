@@ -16,7 +16,6 @@ class SettingsActivity : AppCompatActivity() {
 
         setContent {
             AndroidHorizonManagerTheme {
-                SideEffectStatusBar()
                 Surface {
                     Settings(
                         versionName = version,

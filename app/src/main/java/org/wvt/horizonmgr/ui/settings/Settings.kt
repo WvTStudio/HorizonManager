@@ -10,6 +10,7 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import org.wvt.horizonmgr.R
@@ -36,10 +37,10 @@ fun Settings(
             IconButton(onClick = onNavClick) {
                 Icon(Icons.Filled.ArrowBack, "返回")
             }
-        }, backgroundColor = AppBarBackgroundColor, elevation = 4.dp)
-        Row(Modifier.padding(top = 32.dp, start = 54.dp)) {
+        }, backgroundColor = Color.Transparent, elevation = 0.dp)
+        Row(Modifier.padding(top = 24.dp, start = 54.dp)) {
             AnimateLogo(Modifier.padding(top = 8.dp))
-            Column(Modifier.padding(start = 24.dp)) {
+            Column(Modifier.padding(start = 32.dp)) {
                 Text(text = "Horizon 管理器", style = MaterialTheme.typography.h5)
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text("By")
