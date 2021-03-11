@@ -5,7 +5,7 @@ import android.content.Context
 import android.os.Environment
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import org.wvt.horizonmgr.legacyservice.LocalCache
+import org.wvt.horizonmgr.service.HorizonManager
 import org.wvt.horizonmgr.service.level.LevelTransporter
 import org.wvt.horizonmgr.service.level.MCLevelManager
 import org.wvt.horizonmgr.service.respack.ResourcePackManager
@@ -42,8 +42,8 @@ private class DependenciesVMFactory(
 }
 
 class DependenciesContainer internal constructor(private val context: Context) {
-    val localCache by lazy { LocalCache.createInstance(context) }
-    val manager by lazy { org.wvt.horizonmgr.service.HorizonManager(context) }
+    val localCache by lazy { LocalCache(context) }
+    val manager by lazy { HorizonManager(context) }
     val packRepository by lazy { OfficialPackageCDNRepository() }
     val chineseModRepository by lazy { ChineseModRepository() }
     val mirrorModRepository by lazy { OfficialModMirrorRepository() }

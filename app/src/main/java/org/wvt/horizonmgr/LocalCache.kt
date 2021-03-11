@@ -1,4 +1,4 @@
-package org.wvt.horizonmgr.legacyservice
+package org.wvt.horizonmgr
 
 import android.content.Context
 import android.content.SharedPreferences
@@ -8,7 +8,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 private const val TAG = "LocalCache"
-class LocalCache private constructor(context: Context) {
+class LocalCache constructor(context: Context) {
     private val fixedFoldersPref: SharedPreferences =
         context.getSharedPreferences(FIXED_FOLDERS, Context.MODE_PRIVATE)
     private val userInfoPref: SharedPreferences = context.getSharedPreferences(USER_INFO, Context.MODE_PRIVATE)
@@ -21,17 +21,6 @@ class LocalCache private constructor(context: Context) {
         private const val FIXED_FOLDERS = "fixed_folders"
         private const val SELECTED_PACKAGE = "selected_package"
         private const val OPTIONS = "options"
-
-        private var instance: LocalCache? = null
-
-        fun getInstance(): LocalCache {
-            return instance!!
-        }
-
-        fun createInstance(context: Context): LocalCache {
-            instance = LocalCache(context)
-            return instance!!
-        }
     }
 
     data class CachedUserInfo(

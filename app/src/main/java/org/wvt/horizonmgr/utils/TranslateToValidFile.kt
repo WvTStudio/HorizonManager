@@ -1,4 +1,4 @@
-package org.wvt.horizonmgr.legacyservice
+package org.wvt.horizonmgr.utils
 
 import java.io.File
 
