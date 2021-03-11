@@ -65,10 +65,4 @@ class NewsViewModel(
             state.emit(State.Succeed)
         }
     }
-
-    fun newsDetail(context: Context, id: Int) {
-        context.startActivity(Intent(context, NewsContentActivity::class.java).also {
-            it.putExtra("id", id)
-        })
-    }
 }

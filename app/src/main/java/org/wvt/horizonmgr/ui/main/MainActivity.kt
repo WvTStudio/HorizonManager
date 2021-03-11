@@ -22,6 +22,7 @@ import org.wvt.horizonmgr.ui.fileselector.FileSelectorResultContract
 import org.wvt.horizonmgr.ui.joingroup.JoinGroupActivity
 import org.wvt.horizonmgr.ui.login.LoginResultContract
 import org.wvt.horizonmgr.ui.modulemanager.*
+import org.wvt.horizonmgr.ui.news.NewsContentActivityContract
 import org.wvt.horizonmgr.ui.news.NewsViewModel
 import org.wvt.horizonmgr.ui.onlineinstall.InstallPackageResultContract
 import org.wvt.horizonmgr.ui.onlinemods.OnlineModsViewModel
@@ -46,6 +47,8 @@ class MainActivity : AppCompatActivity() {
     private val downloadedModVM: DMViewModel by viewModels { factory }
     private val onlineModsVM: OnlineModsViewModel by viewModels { factory }
     private val mcResVM: MCResTabViewModel by viewModels { factory }
+
+    private val newsDetail = registerForActivityResult(NewsContentActivityContract()) {}
 
     private val login = registerForActivityResult(LoginResultContract()) {
         mainVM.setUserInfo(it)
@@ -80,10 +83,6 @@ class MainActivity : AppCompatActivity() {
 
     private fun startSettingsActivity() {
         startActivity<SettingsActivity>()
-    }
-
-    private fun startLoginActivity() {
-        login.launch(this)
     }
 
     private fun startSelectFileActivityForPackage() {
@@ -213,7 +212,7 @@ class MainActivity : AppCompatActivity() {
                 navigateToCommunity = ::startCommunityActivity,
                 navigateToDonate = ::startDonateActivity,
                 navigateToJoinGroup = ::startJoinGroupActivity,
-                navigateToLogin = ::startLoginActivity,
+                navigateToLogin = { login.launch(Unit) },
                 navigateToSettings = ::startSettingsActivity,
                 navigateToOnlineInstall = ::startOnlineInstallActivity,
                 navigateToPackageInfo = { PackageDetailActivity.start(this, it) },
@@ -221,7 +220,8 @@ class MainActivity : AppCompatActivity() {
                 selectFileForMod = ::startSelectFileActivityForMod,
                 selectFileForPackage = ::startSelectFileActivityForPackage,
                 onInstallHZClick = { openCoolapkURL() },
-                onInstallMCClick = { openMCGooglePlay() }
+                onInstallMCClick = { openMCGooglePlay() },
+                navigateToNewsDetail = { newsDetail.launch(it) }
             )
         }
 

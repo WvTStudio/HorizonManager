@@ -39,6 +39,7 @@ fun App(
     navigateToSettings: () -> Unit,
     navigateToOnlineInstall: () -> Unit,
     navigateToPackageInfo: (uuid: String) -> Unit,
+    navigateToNewsDetail: (newsId: Int) -> Unit,
     requestOpenGame: () -> Unit,
     selectFileForMod: () -> Unit,
     selectFileForPackage: () -> Unit
@@ -101,7 +102,8 @@ fun App(
                 requestOnlineInstall = navigateToOnlineInstall,
                 onAddModClicked = selectFileForMod,
                 onAddPackageClicked = selectFileForPackage,
-                navigateToPackageInfo = navigateToPackageInfo
+                navigateToPackageInfo = navigateToPackageInfo,
+                navigateToNewsDetail = navigateToNewsDetail
             )
         }
 
@@ -149,7 +151,7 @@ fun App(
             AlertDialog(
                 title = { Text("您还未安装 Minecraft 游戏本体") },
                 text = {
-                       Text("尽管 Horizon 已经内嵌了 Minecraft，但需要您安装游戏本体，以验证您是否为正版玩家。")
+                    Text("尽管 Horizon 已经内嵌了 Minecraft，但需要您安装游戏本体，以验证您是否为正版玩家。")
                 },
                 onDismissRequest = { mainVM.dismissGameNotInstallDialog() },
                 confirmButton = {

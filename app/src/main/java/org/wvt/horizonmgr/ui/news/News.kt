@@ -18,7 +18,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -31,11 +30,11 @@ import org.wvt.horizonmgr.ui.theme.PreviewTheme
 @Composable
 fun News(
     viewModel: NewsViewModel,
-    onNavClick: () -> Unit
+    onNavClick: () -> Unit,
+    onNewsClick: (NewsViewModel.News) -> Unit
 ) {
     val news by viewModel.news.collectAsState()
     val state by viewModel.state.collectAsState()
-    val context = LocalContext.current
 
     DisposableEffect(viewModel) {
         viewModel.refresh()
@@ -46,7 +45,7 @@ fun News(
         onNavClick = onNavClick,
         state = state,
         news = news,
-        onNewsClick = { if (it is NewsViewModel.News.Article) viewModel.newsDetail(context, it.id) },
+        onNewsClick = { onNewsClick(it) },
         onRefreshClick = { viewModel.refresh() }
     )
 }

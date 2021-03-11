@@ -63,7 +63,8 @@ fun Home(
     joinGroup: () -> Unit,
     donate: () -> Unit,
     settings: () -> Unit,
-    navigateToPackageInfo: (uuid: String) -> Unit
+    navigateToPackageInfo: (uuid: String) -> Unit,
+    navigateToNewsDetail: (newsId: Int) -> Unit
 ) {
     val scope = rememberCoroutineScope()
     val drawerState = rememberDrawerState(DrawerValue.Closed)
@@ -117,7 +118,10 @@ fun Home(
                 when (cs) {
                     HomeViewModel.Screen.HOME -> News(
                         viewModel = newsVM,
-                        onNavClick = { scope.launch { drawerState.open() } }
+                        onNavClick = { scope.launch { drawerState.open() } },
+                        onNewsClick = {  if (it is NewsViewModel.News.Article) {
+                            navigateToNewsDetail(it.id)
+                        } }
                     )
                     HomeViewModel.Screen.LOCAL_MANAGE -> ModuleManager(
                         onNavClicked = { scope.launch { drawerState.open() } },
