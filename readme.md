@@ -35,6 +35,8 @@
 
 ## TODO
 
+### 界面
+
 ### 功能
 
 - P1 使资讯支持 Markdown 格式
@@ -54,7 +56,6 @@
 
 ### Code
 
-- P1 完善 service 模块，并代替 legacyservice 包
 - P1 将所有与 package manifest 关联的用例换成 PackageManifest, mod.info 用例换成 ModInfo
 - P2 使用 kotlinx.serialization 替代 org.json
 - P3 优化 FileSelector 的代码
@@ -65,3 +66,5 @@
 
 - AnimatedVisibility 的动画异常
 - FileSelector 当快速左滑文件夹时，即使没有达到临界点也会被判定为触发成功
+- 在线资源的调整按钮第二次点击不显示内容
+- 切换 AppBar 的颜色不是自然过渡，并且会先闪烁成 primaryColor 再切换成 surface Color
