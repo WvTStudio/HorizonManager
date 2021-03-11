@@ -21,14 +21,15 @@
     <application
         android:name=".HorizonManagerApplication"
         android:allowBackup="true"
+        android:fullBackupContent="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:requestLegacyExternalStorage="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.HorizonManagerCompose.NoActionBar"
-        tools:targetApi="donut"
-        tools:ignore="RtlEnabled">
+        tools:ignore="RtlEnabled"
+        tools:targetApi="donut">
         <activity
             android:name=".ui.main.MainActivity"
             android:exported="true"
