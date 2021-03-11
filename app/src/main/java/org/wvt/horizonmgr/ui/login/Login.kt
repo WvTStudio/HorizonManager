@@ -1,8 +1,6 @@
 package org.wvt.horizonmgr.ui.login
 
-import android.util.Log
-import androidx.activity.ComponentActivity
-import androidx.activity.OnBackPressedCallback
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Image
@@ -17,7 +15,6 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import org.wvt.horizonmgr.R
@@ -31,8 +28,6 @@ fun Login(
     onLoginSuccess: (account: String, avatar: String?, name: String, uid: String) -> Unit,
     onCancel: () -> Unit
 ) {
-    // FIXME: 2021/3/7 动画时长要改为 5000，但当 durationMillis >= 4295 时动画失效
-    val context = LocalContext.current as ComponentActivity
     val fabState by vm.fabState.collectAsState()
 
     val snackbarHostState = remember { SnackbarHostState() }
@@ -42,27 +37,18 @@ fun Login(
     val gearRotation by rememberInfiniteTransition().animateFloat(
         initialValue = 0f, targetValue = 360f,
         animationSpec = InfiniteRepeatableSpec(
-            tween(durationMillis = 4000, easing = LinearEasing),
+            tween(durationMillis = 5000, easing = LinearEasing),
             RepeatMode.Restart
         )
     )
 
-    Log.d(TAG, "rotation: $gearRotation")
-
-    DisposableEffect(Unit) {
-        context.onBackPressedDispatcher.addCallback(object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                if (screen == 1) {
-                    screen = 0
-                } else if (screen == 0) {
-                    onCancel()
-                }
-            }
-        })
-        onDispose {
-            // TODO: 2021/2/7 添加 Dispose 逻辑
+    BackHandler(onBack = {
+        if (screen == 1) {
+            screen = 0
+        } else if (screen == 0) {
+            onCancel()
         }
-    }
+    })
 
     Box(Modifier.fillMaxSize()) {
         val gearColor = MaterialTheme.colors.onSurface.copy(0.12f)
@@ -118,8 +104,8 @@ fun Login(
         AnimatedVisibility(
             visible = screen == 0,
             initiallyVisible = true,
-            enter = fadeIn() + slideInHorizontally({ -80 }),
-            exit = fadeOut() + slideOutHorizontally({ -80 })
+            enter = remember { fadeIn() + slideInHorizontally({ -80 }) },
+            exit = remember { fadeOut() + slideOutHorizontally({ -80 }) }
         ) {
             LoginPage(onLoginClicked = { account, password ->
                 vm.login(account, password, snackbarHostState, onLoginSuccess)
@@ -132,8 +118,8 @@ fun Login(
         AnimatedVisibility(
             visible = screen == 1,
             initiallyVisible = false,
-            enter = fadeIn() + slideInHorizontally({ 80 }),
-            exit = fadeOut() + slideOutHorizontally({ 80 })
+            enter = remember { fadeIn() + slideInHorizontally({ 80 }) },
+            exit = remember { fadeOut() + slideOutHorizontally({ 80 }) }
         ) {
             RegisterPage(
                 fabState = fabState,

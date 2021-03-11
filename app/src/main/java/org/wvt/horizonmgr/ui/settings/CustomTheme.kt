@@ -172,17 +172,21 @@ fun CustomTheme(requestClose: () -> Unit) {
                         val interactionSource = remember { MutableInteractionSource() }
                         Row(
                             Modifier
-                                .fillMaxWidth()
-                                .padding(top = 16.dp, start = 42.dp, end = 42.dp)
                                 .clickable(
                                     indication = null,
                                     interactionSource = interactionSource,
                                     onClick = { accentColor = !accentColor })
+                                .fillMaxWidth()
+                                .padding(top = 16.dp, start = 42.dp, end = 42.dp),
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
                             Checkbox(
-                                modifier = Modifier.indication(interactionSource, rememberRipple(bounded = false, radius = 24.dp)),
+                                modifier = Modifier.indication(
+                                    interactionSource,
+                                    rememberRipple(bounded = false, radius = 24.dp)
+                                ),
                                 checked = accentColor,
-                                onCheckedChange = { }
+                                onCheckedChange = { accentColor = it }
                             )
                             Spacer(Modifier.width(8.dp))
                             Text("强调色状态栏")

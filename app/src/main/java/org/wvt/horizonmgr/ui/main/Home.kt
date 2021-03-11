@@ -2,7 +2,11 @@ package org.wvt.horizonmgr.ui.main
 
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -12,14 +16,20 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
+import org.wvt.horizonmgr.R
 import org.wvt.horizonmgr.ui.components.NetworkImage
 import org.wvt.horizonmgr.ui.downloaded.DMViewModel
 import org.wvt.horizonmgr.ui.downloaded.DownloadedMods
@@ -118,9 +128,11 @@ fun Home(
                     HomeViewModel.Screen.HOME -> News(
                         viewModel = newsVM,
                         onNavClick = { scope.launch { drawerState.open() } },
-                        onNewsClick = {  if (it is NewsViewModel.News.Article) {
-                            navigateToNewsDetail(it.id)
-                        } }
+                        onNewsClick = {
+                            if (it is NewsViewModel.News.Article) {
+                                navigateToNewsDetail(it.id)
+                            }
+                        }
                     )
                     HomeViewModel.Screen.LOCAL_MANAGE -> ModuleManager(
                         onNavClicked = { scope.launch { drawerState.open() } },
@@ -239,42 +251,72 @@ private fun DrawerHeader(
         color = AppBarBackgroundColor
     ) {
         val contentColor = LocalContentColor.current
+        val gear = painterResource(id = R.drawable.ic_gear_full)
 
-        Column(Modifier.padding(16.dp)) {
-            // Avatar
-            Surface(
-                modifier = Modifier.size(48.dp),
-                shape = RoundedCornerShape(percent = 50),
-                color = MaterialTheme.colors.onSurface.copy(alpha = 0.12f)
-            ) {
-                Box(
-                    Modifier
-                        .fillMaxSize()
-                        .clickable {
-                            if (userInfo == null) requestLogin()
-                            else showDialog = true
-                        }) {
-                    userInfo?.let {
-                        NetworkImage(
-                            url = it.avatarUrl,
-                            contentDescription = "头像",
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier.fillMaxSize()
-                        )
+        val gearRotation = remember { Animatable(0f) }
+
+        Box {
+            BoxWithConstraints(Modifier.matchParentSize()) {
+                val size = with(LocalDensity.current) { constraints.maxHeight.toDp() }
+                Image(
+                    modifier = Modifier
+                        .size(size, size)
+                        .align(Alignment.CenterEnd)
+                        .offset(x = size * 0.35f, y = -size * 0.35f)
+                        .rotate(gearRotation.value)
+                        .pointerInput(Unit) {
+                            detectTapGestures(onPress = {
+                                awaitRelease()
+                                try {
+                                    gearRotation.animateTo(720f, tween(1000))
+                                } finally {
+                                    gearRotation.snapTo(0f)
+                                }
+                            })
+                        },
+                    painter = gear,
+                    alpha = 0.12f,
+                    colorFilter = ColorFilter.tint(contentColor),
+                    contentDescription = null
+                )
+            }
+
+            Column(Modifier.padding(16.dp)) {
+                // Avatar
+                Surface(
+                    modifier = Modifier.size(48.dp),
+                    shape = RoundedCornerShape(percent = 50),
+                    color = MaterialTheme.colors.onSurface.copy(alpha = 0.12f)
+                ) {
+                    Box(
+                        Modifier
+                            .fillMaxSize()
+                            .clickable {
+                                if (userInfo == null) requestLogin()
+                                else showDialog = true
+                            }) {
+                        userInfo?.let {
+                            NetworkImage(
+                                url = it.avatarUrl,
+                                contentDescription = "头像",
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier.fillMaxSize()
+                            )
+                        }
                     }
                 }
+                Text(
+                    if (userInfo == null) "欢迎！点击头像登录" else userInfo.name + "，欢迎！",
+                    modifier = Modifier.padding(top = 16.dp),
+                    style = MaterialTheme.typography.h5
+                )
+                Text(
+                    userInfo?.account ?: "WvT工作室制作",
+                    modifier = Modifier.padding(top = 8.dp),
+                    color = contentColor.copy(alpha = ContentAlpha.medium),
+                    style = MaterialTheme.typography.subtitle1
+                )
             }
-            Text(
-                if (userInfo == null) "欢迎！点击头像登录" else userInfo.name + "，欢迎！",
-                modifier = Modifier.padding(top = 16.dp),
-                style = MaterialTheme.typography.h5
-            )
-            Text(
-                userInfo?.account ?: "WvT工作室制作",
-                modifier = Modifier.padding(top = 8.dp),
-                color = contentColor.copy(alpha = ContentAlpha.medium),
-                style = MaterialTheme.typography.subtitle1
-            )
         }
     }
 }
