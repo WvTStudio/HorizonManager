@@ -4,6 +4,8 @@ import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.indication
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -12,6 +14,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -166,17 +169,23 @@ fun CustomTheme(requestClose: () -> Unit) {
                                 }
                             )
                         }
+                        val interactionSource = remember { MutableInteractionSource() }
                         Row(
                             Modifier
                                 .fillMaxWidth()
                                 .padding(top = 16.dp, start = 42.dp, end = 42.dp)
+                                .clickable(
+                                    indication = null,
+                                    interactionSource = interactionSource,
+                                    onClick = { accentColor = !accentColor })
                         ) {
                             Checkbox(
+                                modifier = Modifier.indication(interactionSource, rememberRipple(bounded = false, radius = 24.dp)),
                                 checked = accentColor,
-                                onCheckedChange = { accentColor = it }
+                                onCheckedChange = { }
                             )
                             Spacer(Modifier.width(8.dp))
-                            Text("状态栏着色")
+                            Text("强调色状态栏")
                         }
                         Divider(
                             Modifier

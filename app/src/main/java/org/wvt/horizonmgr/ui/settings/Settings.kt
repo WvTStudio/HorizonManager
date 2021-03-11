@@ -109,7 +109,7 @@ fun Settings(
         ListItem(
             modifier = Modifier.clickable(onClick = requestCustomTheme),
             icon = { Icon(imageVector = Icons.Filled.FormatPaint, null) },
-            text = { Text("自定义主题色") }
+            text = { Text("自定义主题") }
         )
 
         Text(
