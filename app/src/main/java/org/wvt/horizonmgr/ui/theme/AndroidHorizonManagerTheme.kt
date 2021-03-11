@@ -57,6 +57,21 @@ private fun clearLightStatusBar(window: Window) {
 fun AndroidHorizonManagerTheme(content: @Composable () -> Unit) {
     val context = LocalContext.current.applicationContext
     val theController = remember(context) { AndroidThemeController(context) }
+
+    DisposableEffect(isSystemInDarkTheme()) {
+        theController.update()
+        onDispose { }
+    }
+
+    HorizonManagerTheme(
+        controller = theController,
+        config = config.value,
+        content = content
+    )
+}
+
+@Composable
+fun SideEffectStatusBar() {
     val activity = (LocalContext.current as Activity)
 
     DisposableEffect(config.value) {
@@ -90,17 +105,6 @@ fun AndroidHorizonManagerTheme(content: @Composable () -> Unit) {
 
         onDispose { }
     }
-
-    DisposableEffect(isSystemInDarkTheme()) {
-        theController.update()
-        onDispose { }
-    }
-
-    HorizonManagerTheme(
-        controller = theController,
-        config = config.value,
-        content = content
-    )
 }
 
 private class LocalConfig(context: Context) {

@@ -8,6 +8,7 @@ import androidx.compose.runtime.remember
 import org.wvt.horizonmgr.BuildConfig
 import org.wvt.horizonmgr.ui.startActivity
 import org.wvt.horizonmgr.ui.theme.AndroidHorizonManagerTheme
+import org.wvt.horizonmgr.ui.theme.SideEffectStatusBar
 
 class SettingsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -16,6 +17,7 @@ class SettingsActivity : AppCompatActivity() {
 
         setContent {
             AndroidHorizonManagerTheme {
+                SideEffectStatusBar()
                 Surface {
                     Settings(
                         versionName = version,

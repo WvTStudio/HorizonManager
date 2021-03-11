@@ -11,10 +11,11 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import org.wvt.horizonmgr.HorizonManagerApplication
 import org.wvt.horizonmgr.ui.theme.AndroidHorizonManagerTheme
+import org.wvt.horizonmgr.ui.theme.SideEffectStatusBar
 
 class NewsContentActivityContract : ActivityResultContract<Int, Unit>() {
     override fun createIntent(context: Context, input: Int): Intent {
-        return Intent(context, AppCompatActivity::class.java).apply {
+        return Intent(context, NewsContentActivity::class.java).apply {
             putExtra("id", input)
         }
     }
@@ -38,6 +39,7 @@ class NewsContentActivity : AppCompatActivity() {
 
         setContent {
             AndroidHorizonManagerTheme {
+                SideEffectStatusBar()
                 Surface(color = MaterialTheme.colors.background) {
                     NewsContent(vm, ::finish)
                 }

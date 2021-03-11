@@ -12,6 +12,7 @@ import androidx.compose.material.Surface
 import androidx.compose.ui.Modifier
 import org.wvt.horizonmgr.defaultViewModelFactory
 import org.wvt.horizonmgr.ui.theme.AndroidHorizonManagerTheme
+import org.wvt.horizonmgr.ui.theme.SideEffectStatusBar
 
 sealed class FileSelectorResult {
     object Canceled : FileSelectorResult()
@@ -54,6 +55,7 @@ class FileSelectorActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             AndroidHorizonManagerTheme {
+                SideEffectStatusBar()
                 Surface {
                     FileSelector(
                         modifier = Modifier.fillMaxSize(),

@@ -15,6 +15,7 @@ import org.wvt.horizonmgr.ui.onlinemods.OnlineModsViewModel
 import org.wvt.horizonmgr.ui.pacakgemanager.PackageManagerViewModel
 import org.wvt.horizonmgr.ui.theme.AndroidHorizonManagerTheme
 import org.wvt.horizonmgr.ui.theme.PreviewTheme
+import org.wvt.horizonmgr.ui.theme.SideEffectStatusBar
 
 @Composable
 fun App(
@@ -69,6 +70,7 @@ fun App(
     }
 
     AndroidHorizonManagerTheme {
+        SideEffectStatusBar()
         Surface(color = MaterialTheme.colors.background) {
             if (mainVM.initialized) Home(
                 homeVM = homeVM,

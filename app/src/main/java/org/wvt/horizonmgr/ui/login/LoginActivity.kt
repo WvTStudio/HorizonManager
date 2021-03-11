@@ -29,9 +29,9 @@ sealed class LoginResult {
 }
 
 
-class LoginResultContract : ActivityResultContract<Context, LoginResult>() {
-    override fun createIntent(context: Context, input: Context): Intent {
-        return Intent(input, LoginActivity::class.java)
+class LoginResultContract : ActivityResultContract<Unit, LoginResult>() {
+    override fun createIntent(context: Context, input: Unit): Intent {
+        return Intent(context, LoginActivity::class.java)
     }
 
     override fun parseResult(resultCode: Int, intent: Intent?): LoginResult {

@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Surface
 import androidx.compose.ui.Modifier
 import org.wvt.horizonmgr.ui.theme.AndroidHorizonManagerTheme
+import org.wvt.horizonmgr.ui.theme.SideEffectStatusBar
 
 class CustomThemeActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -14,6 +15,7 @@ class CustomThemeActivity : AppCompatActivity() {
 
         setContent {
             AndroidHorizonManagerTheme {
+                SideEffectStatusBar()
                 Surface(Modifier.fillMaxSize()) {
                     CustomTheme { finish() }
                 }

@@ -16,6 +16,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import org.wvt.horizonmgr.defaultViewModelFactory
 import org.wvt.horizonmgr.ui.theme.AndroidHorizonManagerTheme
+import org.wvt.horizonmgr.ui.theme.SideEffectStatusBar
 
 class InstallPackageResultContract : ActivityResultContract<Context, Boolean>() {
     override fun createIntent(context: Context, input: Context?): Intent {
@@ -43,6 +44,8 @@ class InstallPackageActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             AndroidHorizonManagerTheme {
+                SideEffectStatusBar()
+
                 val packages by viewModel.packages.collectAsState()
 
                 var screen: Int by remember { mutableStateOf(0) }
