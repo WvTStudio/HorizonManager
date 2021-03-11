@@ -31,7 +31,6 @@ import org.wvt.horizonmgr.ui.onlinemods.OnlineModsViewModel
 import org.wvt.horizonmgr.ui.pacakgemanager.PackageManager
 import org.wvt.horizonmgr.ui.pacakgemanager.PackageManagerViewModel
 import org.wvt.horizonmgr.ui.theme.AppBarBackgroundColor
-import org.wvt.horizonmgr.ui.theme.LocalThemeConfig
 import org.wvt.horizonmgr.ui.theme.PreviewTheme
 
 @Deprecated("Deprecated")

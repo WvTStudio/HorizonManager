@@ -14,7 +14,6 @@ import org.wvt.horizonmgr.service.mod.ZipMod
 import org.wvt.horizonmgr.utils.CoroutineDownloader
 import org.wvt.horizonmgr.utils.ProgressDeferred
 import java.io.File
-import java.util.zip.ZipFile
 
 class ModDownloader(context: Context) {
     private val downloadDir = context.filesDir.resolve("downloads")

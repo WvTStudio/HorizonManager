@@ -1,8 +1,6 @@
 package org.wvt.horizonmgr.webapi
 
 import kotlinx.coroutines.runBlocking
-import org.junit.After
-import org.junit.Before
 import org.junit.Test
 import org.wvt.horizonmgr.webapi.mgrinfo.MgrInfoModule
 import java.math.BigDecimal

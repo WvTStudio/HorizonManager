@@ -9,7 +9,6 @@ import kotlinx.coroutines.launch
 import org.wvt.horizonmgr.DependenciesContainer
 import org.wvt.horizonmgr.ModDownloader
 import org.wvt.horizonmgr.service.hzpack.InstalledPackage
-import org.wvt.horizonmgr.service.mod.ZipMod
 import org.wvt.horizonmgr.ui.components.ProgressDialogState
 import java.io.File
 

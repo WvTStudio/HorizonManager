@@ -16,8 +16,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import org.wvt.horizonmgr.ui.components.loadUrlImage
 import org.wvt.horizonmgr.ui.components.ModIcon
+import org.wvt.horizonmgr.ui.components.loadUrlImage
 
 @Stable
 data class OfficialMirrorModModel(

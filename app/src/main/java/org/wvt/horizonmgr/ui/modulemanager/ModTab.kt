@@ -23,7 +23,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import org.wvt.horizonmgr.ui.components.*
+import org.wvt.horizonmgr.ui.components.EmptyPage
+import org.wvt.horizonmgr.ui.components.ModIcon
+import org.wvt.horizonmgr.ui.components.ProgressDialog
+import org.wvt.horizonmgr.ui.components.loadLocalImage
 
 @Composable
 internal fun ModTab(

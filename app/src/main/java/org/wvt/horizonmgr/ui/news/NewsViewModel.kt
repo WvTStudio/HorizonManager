@@ -1,7 +1,5 @@
 package org.wvt.horizonmgr.ui.news
 
-import android.content.Context
-import android.content.Intent
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
