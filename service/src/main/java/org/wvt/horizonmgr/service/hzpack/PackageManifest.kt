@@ -3,12 +3,33 @@ package org.wvt.horizonmgr.service.hzpack
 import org.json.JSONObject
 
 data class PackageManifest(
+    /**
+     * MC 游戏名
+     */
     val game: String,
+    /**
+     * MC 游戏版本
+     */
     val gameVersion: String,
+    /**
+     * 分包的名称
+     */
     val pack: String,
+    /**
+     * 分包的版本命
+     */
     val packVersion: String,
+    /**
+     * 分包的版本号
+     */
     val packVersionCode: Int,
+    /**
+     * 开发者
+     */
     val developer: String,
+    /**
+     * 分包的描述，key 为语言，如 "en"
+     */
     val descriptions: Map<String, String>,
 ) {
     companion object {
@@ -40,9 +61,16 @@ data class PackageManifest(
                 put("packVersionCode", packVersionCode)
                 put("developer", developer)
                 put("descriptions", JSONObject().apply {
-                    for ((k, v) in descriptions) { put(k, v) }
+                    for ((k, v) in descriptions) {
+                        put(k, v)
+                    }
                 })
             }.toString(4)
         }
     }
+}
+
+fun PackageManifest.recommendDescription(): String {
+    return this.descriptions["zh"] ?: this.descriptions["en"]
+    ?: this.descriptions.asIterable().firstOrNull()?.value ?: "No description"
 }

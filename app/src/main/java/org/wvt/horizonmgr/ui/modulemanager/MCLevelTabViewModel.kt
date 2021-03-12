@@ -50,7 +50,7 @@ class MCLevelTabViewModel(dependencies: DependenciesContainer) : ViewModel() {
             }
             launch {
                 val uuid = localCache.getSelectedPackageUUID() ?: return@launch
-                currentPackage = manager.getInstalledPackages().find { it.getInstallUUID() == uuid }
+                currentPackage = manager.getInstalledPackages().find { it.getInstallationInfo().internalId == uuid }
             }
         }
     }

@@ -33,19 +33,27 @@ class HorizonManager constructor(val horizonDir: File) {
 
     /**
      * 将 ZipPackage 安装到本机
+     * 安装步骤：
+     * 在 packDir 中创建文件夹
+     *  创建 .installation_started
+     *  将分包压缩包解压到文件夹
+     *  创建 .installation_info
+     *  将 graphics zip 改名为 .cached_graphics 并复制到文件夹
+     *  创建 .installation_complete
      */
     suspend fun installPackage(
         zipPackage: ZipPackage,
         graphicsZip: File?
     ): InstalledPackage = withContext(Dispatchers.IO) {
+        val manifest = zipPackage.getManifest()
         if (packDir.exists().not()) packDir.mkdirs()
         // 根据指定分包名称生成目录
         val outDir =
-            packDir.resolve(zipPackage.getName()).translateToValidFile().also { it.mkdirs() }
+            packDir.resolve(manifest.pack).translateToValidFile().also { it.mkdirs() }
         // 创建开始安装的文件标志
         outDir.resolve(".installation_started").createNewFile()
         // 直接解压到 packs 文件夹
-        CoroutineZip.unzip(zipPackage.getPackageFile(), outDir).await()
+        CoroutineZip.unzip(zipPackage.zipFile, outDir).await()
         // TODO: 2021/2/20 测试如果没有 graphics 是否能运行
         // 预览图压缩包直接复制改名
         graphicsZip?.copyTo(outDir.resolve(".cached_graphics"))
@@ -55,7 +63,7 @@ class HorizonManager constructor(val horizonDir: File) {
                 packageId = UUID.randomUUID().toString().toLowerCase(Locale.ROOT),
                 internalId = uuid,
                 timeStamp = Date().time,
-                customName = zipPackage.getName()
+                customName = manifest.pack
             ).toJson()
             it.write(jsonStr)
         }

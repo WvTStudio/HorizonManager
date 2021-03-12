@@ -28,10 +28,7 @@ import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import org.wvt.horizonmgr.ui.components.EmptyPage
-import org.wvt.horizonmgr.ui.components.InputDialogHost
-import org.wvt.horizonmgr.ui.components.InputDialogHostState
-import org.wvt.horizonmgr.ui.components.ProgressDialog
+import org.wvt.horizonmgr.ui.components.*
 import org.wvt.horizonmgr.ui.main.LocalSelectedPackageUUID
 import org.wvt.horizonmgr.ui.theme.AppBarBackgroundColor
 import org.wvt.horizonmgr.ui.theme.PreviewTheme
@@ -69,6 +66,8 @@ fun PackageManager(
     val packages by viewModel.packages.collectAsState()
     val progresstate by viewModel.progressState.collectAsState()
 
+    val errors by viewModel.errors.collectAsState()
+
     val snackbarHostState = remember { SnackbarHostState() }
     val confirmDeleteDialogHostState = remember { ConfirmDeleteDialogHostState() }
     val inputDialogHostState = remember { InputDialogHostState() }
@@ -76,6 +75,36 @@ fun PackageManager(
 
     progresstate?.let {
         ProgressDialog(onCloseRequest = viewModel::dismiss, state = it)
+    }
+
+    var displayBanner by remember(errors) { mutableStateOf(errors.isNotEmpty()) }
+    var displayErrorDialog by remember { mutableStateOf(false) }
+
+    val banner = @Composable {
+        MaterialBanner(modifier = Modifier.fillMaxWidth(), visible = displayBanner, text = {
+            Text(text = "解析分包时发生 ${errors.size} 个错误")
+        }, dismissButton = {
+            TextButton(onClick = { displayBanner = false }) {
+                Text(text = "关闭")
+            }
+        }, confirmButton = {
+            TextButton(onClick = { displayErrorDialog = true }) {
+                Text(text = "详情")
+            }
+        })
+    }
+
+    if (displayErrorDialog) {
+        AlertDialog(onDismissRequest = { displayErrorDialog = false }, text = {
+            // TODO: 2021/3/12 显示更详细的信息
+            Text(errors.fold("") { acc, e ->
+                acc + "\n" + e.message
+            })
+        }, confirmButton = {
+            TextButton(onClick = { displayErrorDialog = false }) {
+                Text(text = "确定")
+            }
+        })
     }
 
     Box {
@@ -112,10 +141,10 @@ fun PackageManager(
             if (packages.isNullOrEmpty()) {
                 // Tips when there was no package installed.
                 EmptyPage(Modifier.fillMaxSize()) { Text("你还没有安装分包") }
-            } else LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(top = 8.dp, bottom = 64.dp)
-            ) {
+                banner()
+            } else LazyColumn(modifier = Modifier.fillMaxSize()) {
+                item { banner() }
+                item { Spacer(Modifier.height(8.dp)) }
                 itemsIndexed(packages) { index, item ->
                     PackageItem(
                         modifier = Modifier.padding(16.dp, 8.dp),
@@ -131,10 +160,16 @@ fun PackageManager(
                                 { onPackageSelect(null) }
                             )
                         },
-                        onRenameClick = { viewModel.renamePackage(item.uuid, inputDialogHostState) },
+                        onRenameClick = {
+                            viewModel.renamePackage(
+                                item.uuid,
+                                inputDialogHostState
+                            )
+                        },
                         onCloneClick = { viewModel.clonePackage(item.uuid, inputDialogHostState) }
                     )
                 }
+                item { Spacer(Modifier.height(64.dp)) }
             }
         }
 

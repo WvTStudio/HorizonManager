@@ -72,7 +72,7 @@ object FileTypeGuesser {
     }
 
     fun isHZPackage(file: File): Boolean {
-        return ZipPackage.isZipPackage(file)
+        return ZipPackage(file).isZipPackage()
     }
 
     /**

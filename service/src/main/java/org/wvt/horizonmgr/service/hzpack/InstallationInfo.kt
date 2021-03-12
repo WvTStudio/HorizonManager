@@ -3,24 +3,29 @@ package org.wvt.horizonmgr.service.hzpack
 import org.json.JSONObject
 
 data class InstallationInfo(
+    /**
+     * 分包的 UUID
+     */
     val packageId: String,
     val timeStamp: Long,
-    val customName: String,
+    /**
+     * 用户自定义的名称
+     */
+    val customName: String?,
+    /**
+     * 分包安装时创建的 UUID，用于区别设备内安装的分包
+     */
     val internalId: String
 ) {
     companion object {
-        fun fromJson(jsonStr: String): InstallationInfo? {
-            return try {
-                with(JSONObject(jsonStr)) {
-                    InstallationInfo(
-                        packageId = getString("uuid"),
-                        timeStamp = getLong("timestamp"),
-                        customName = getString("customName"),
-                        internalId = getString("internalId")
-                    )
-                }
-            } catch (e: Exception) {
-                null
+        fun fromJson(jsonStr: String): InstallationInfo {
+            return with(JSONObject(jsonStr)) {
+                InstallationInfo(
+                    packageId = getString("uuid"),
+                    timeStamp = getLong("timestamp"),
+                    customName = optString("customName"),
+                    internalId = getString("internalId")
+                )
             }
         }
     }

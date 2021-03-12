@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import org.wvt.horizonmgr.DependenciesContainer
+import org.wvt.horizonmgr.service.hzpack.recommendDescription
 import org.wvt.horizonmgr.service.utils.calcSize
 import org.wvt.horizonmgr.utils.longSizeToString
 import java.text.SimpleDateFormat
@@ -62,29 +63,32 @@ class PackageDetailViewModel(
             packageUUID?.let { pkgId ->
                 state.emit(State.LOADING)
                 pkgSize.emit(PackageSize.Loading)
-                val pkg = manager.getInstalledPackages().find { it.getInstallUUID() == pkgId }
+                val pkg = manager.getInstalledPackages()
+                    .find { it.getInstallationInfo().internalId == pkgId }
                 if (pkg == null) {
                     // TODO: 2021/2/22 添加错误信息
                     return@launch
                 }
+                val manifest = pkg.getManifest()
+                val installationInfo = pkg.getInstallationInfo()
                 val formatter = SimpleDateFormat.getDateInstance()
                 val information = PackageInformation(
-                    customName = pkg.getCustomName() ?: "Undefined",
-                    packageName = pkg.getName(),
-                    description = pkg.getDescription()["en"] ?: "No Description",
-                    developer = pkg.getDeveloper(),
-                    version = pkg.getVersion(),
-                    versionCode = pkg.getVersionCode().toString(),
-                    game = pkg.getGame(),
-                    gameVersion = pkg.getGameVersion(),
-                    installDir = pkg.getInstallDir().absolutePath,
-                    installUUID = pkg.getInstallUUID(),
-                    installTime = formatter.format(Date(pkg.getInstallTimeStamp())),
-                    packageUUID = pkg.getPackageUUID()
+                    customName = installationInfo.customName ?: "Undefined",
+                    packageName = manifest.pack,
+                    description = manifest.recommendDescription(),
+                    developer = manifest.developer,
+                    version = manifest.packVersion,
+                    versionCode = manifest.packVersionCode.toString(),
+                    game = manifest.game,
+                    gameVersion = manifest.gameVersion,
+                    installDir = pkg.packageDirectory.absolutePath,
+                    installUUID = installationInfo.internalId,
+                    installTime = formatter.format(Date(installationInfo.timeStamp)),
+                    packageUUID = installationInfo.packageId
                 )
                 info.emit(information)
                 state.emit(State.SUCCEED)
-                val result = pkg.getInstallDir().calcSize()
+                val result = pkg.packageDirectory.calcSize()
                 pkgSize.emit(PackageSize.Succeed(result.totalSize, result.fileCount))
             }
         }

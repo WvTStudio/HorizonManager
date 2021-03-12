@@ -35,7 +35,7 @@ class DMViewModel(dependencies: DependenciesContainer) : ViewModel() {
     fun setSelectedPackage(uuid: String?) {
         viewModelScope.launch {
             selectedUUID = uuid
-            selectedPackage = manager.getInstalledPackages().find { it.getInstallUUID() == uuid }
+            selectedPackage = manager.getInstalledPackages().find { it.getInstallationInfo().internalId == uuid }
         }
     }
 

@@ -104,7 +104,7 @@ class OnlineModsViewModel(
         viewModelScope.launch {
             try {
                 val pkg = localCache.getSelectedPackageUUID()?.let { uuid ->
-                    manager.getInstalledPackages().find { it.getInstallUUID() == uuid }
+                    manager.getInstalledPackages().find { it.getInstallationInfo().internalId == uuid }
                 }
                 if (pkg == null) {
                     installState.emit(ProgressDialogState.Failed("安装失败", "您还未选择分包"))
@@ -136,7 +136,7 @@ class OnlineModsViewModel(
         viewModelScope.launch {
             try {
                 val pkg = localCache.getSelectedPackageUUID()?.let { uuid ->
-                    manager.getInstalledPackages().find { it.getInstallUUID() == uuid }
+                    manager.getInstalledPackages().find { it.getInstallationInfo().internalId == uuid }
                 }
                 if (pkg == null) {
                     installState.emit(ProgressDialogState.Failed("安装失败", "您还未选择分包"))

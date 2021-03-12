@@ -40,7 +40,7 @@ class LevelTransporter(
     private fun transportToHZ(mcLevel: MCLevel, hzPackage: InstalledPackage, deleteSource: Boolean): TransportResult {
         val mcLevelDir = mcLevel.directory
         val levelDirName = mcLevelDir.name
-        val hzPackageDir = hzPackage.getInstallDir()
+        val hzPackageDir = hzPackage.packageDirectory
         val hzLevelDir = hzPackageDir.resolve("worlds").resolve(levelDirName)
         val result = TransportResultImpl()
 

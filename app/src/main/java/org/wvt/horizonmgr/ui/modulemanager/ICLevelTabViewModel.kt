@@ -40,7 +40,7 @@ class ICLevelTabViewModel(dependencies: DependenciesContainer) : ViewModel() {
             } else {
                 viewModelScope.launch(Dispatchers.IO) {
                     pack = manager.getInstalledPackages().find {
-                        it.getInstallUUID() == uuid
+                        it.getInstallationInfo().internalId == uuid
                     }
                 }
             }

@@ -8,8 +8,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import org.wvt.horizonmgr.DependenciesContainer
-import org.wvt.horizonmgr.service.hzpack.InstalledPackage
-import org.wvt.horizonmgr.service.hzpack.ZipPackage
+import org.wvt.horizonmgr.service.hzpack.*
 import org.wvt.horizonmgr.ui.components.InputDialogHostState
 import org.wvt.horizonmgr.ui.components.ProgressDialogState
 import java.io.File
@@ -32,26 +31,50 @@ class PackageManagerViewModel(
     private var selectedPackage: InstalledPackage? = null
     private var selectedPackageUUID: String? = null
 
+    var state = MutableStateFlow<State>(State.Loading)
+
+    sealed class State {
+        object Loading : State()
+        class Error(val message: String, val detail: String?) : State()
+        object OK : State()
+    }
+
+    val errors = MutableStateFlow<List<Exception>>(emptyList())
+
     fun loadPackages() {
         viewModelScope.launch {
+            state.emit(State.Loading)
             val dateFormatter = SimpleDateFormat.getDateInstance()
-            val result = try {
-                cachedPackages = mgr.getInstalledPackages()
-                Log.d(TAG, "获取到 ${cachedPackages.size} 个分包")
-                cachedPackages.map {
-                    PackageManagerItem(
-                        uuid = it.getInstallUUID(),
-                        name = it.getCustomName() ?: it.getName(),
-                        timeStr = dateFormatter.format(Date(it.getInstallTimeStamp())),
-                        description = it.getDescription()["en"] ?: "无描述"
-                    )
-                }
+            val packs = try {
+                mgr.getInstalledPackages()
             } catch (e: Exception) {
                 Log.e(TAG, "获取分包失败", e)
-                // TODO: 2021/2/20 Displays error message
+                state.emit(State.Error("获取分包失败", e.message))
                 return@launch
             }
+            Log.d(TAG, "获取到 ${packs.size} 个分包")
+            val exceptions = mutableListOf<Exception>()
+            val result = packs.mapNotNull {
+                val installInfo: InstallationInfo
+                val manifest: PackageManifest
+                try {
+                    installInfo = it.getInstallationInfo()
+                    manifest = it.getManifest()
+                } catch (e: Exception) {
+                    exceptions.add(e)
+                    return@mapNotNull null
+                }
+                PackageManagerItem(
+                    uuid = installInfo.internalId,
+                    name = installInfo.customName ?: manifest.pack,
+                    timeStr = dateFormatter.format(Date(installInfo.timeStamp)),
+                    description = manifest.recommendDescription()
+                )
+            }
+            cachedPackages = packs
             _packages.emit(result)
+            errors.emit(exceptions)
+            state.emit(State.OK)
         }
     }
 
@@ -61,7 +84,12 @@ class PackageManagerViewModel(
                 selectedPackageUUID = null
                 selectedPackage = null
             } else {
-                selectedPackage = mgr.getInstalledPackages().find { it.getInstallUUID() == uuid }
+                try {
+                    mgr.getInstalledPackages().find { it.getInstallationInfo().internalId == uuid }
+                } catch (e: Exception) {
+                    state.emit(State.Error("获取分包失败", e.message))
+                    return@launch
+                }
                 selectedPackageUUID = uuid
             }
         }
@@ -78,9 +106,7 @@ class PackageManagerViewModel(
             ) {
                 _progressState.emit(ProgressDialogState.Loading("正在删除"))
                 try {
-                    cachedPackages.find {
-                        it.getInstallUUID() == uuid
-                    }?.delete()
+                    cachedPackages.find { it.getInstallationInfo().internalId == uuid }?.delete()
                 } catch (e: Exception) {
                     Log.e(TAG, "删除分包失败", e)
                     _progressState.emit(
@@ -97,12 +123,23 @@ class PackageManagerViewModel(
 
     fun renamePackage(uuid: String, inputDialogHostState: InputDialogHostState) {
         viewModelScope.launch {
-            val pkg = cachedPackages.find {
-                it.getInstallUUID() == uuid
-            } ?: return@launch
+            val pkg =
+                cachedPackages.find { it.getInstallationInfo().internalId == uuid } ?: return@launch
+            val (manifest, installationInfo) = try {
+                pkg.getManifest() to pkg.getInstallationInfo()
+            } catch (e: Exception) {
+                _progressState.emit(
+                    ProgressDialogState.Failed("获取分包信息失败", e.localizedMessage ?: "")
+                )
+                return@launch
+            }
 
             val result =
-                inputDialogHostState.showDialog(pkg.getCustomName() ?: pkg.getName(), "重命名", "请输入新名称")
+                inputDialogHostState.showDialog(
+                    installationInfo.customName ?: manifest.pack,
+                    "重命名",
+                    "请输入新名称"
+                )
             if (result is InputDialogHostState.DialogResult.Confirm) {
                 _progressState.emit(ProgressDialogState.Loading("正在重命名"))
                 try {
@@ -122,11 +159,21 @@ class PackageManagerViewModel(
 
     fun clonePackage(uuid: String, inputDialogHostState: InputDialogHostState) {
         viewModelScope.launch {
-            val pkg = cachedPackages.find {
-                it.getInstallUUID() == uuid
-            } ?: return@launch
-
-            val result = inputDialogHostState.showDialog(pkg.getCustomName() ?: pkg.getName(), "克隆", "请输入新名称")
+            val pkg =
+                cachedPackages.find { it.getInstallationInfo().internalId == uuid } ?: return@launch
+            val (manifest, installationInfo) = try {
+                pkg.getManifest() to pkg.getInstallationInfo()
+            } catch (e: Exception) {
+                _progressState.emit(
+                    ProgressDialogState.Failed("获取分包信息失败", e.localizedMessage ?: "")
+                )
+                return@launch
+            }
+            val result = inputDialogHostState.showDialog(
+                installationInfo.customName ?: manifest.pack,
+                "克隆",
+                "请输入新名称"
+            )
             if (result is InputDialogHostState.DialogResult.Confirm) {
                 _progressState.emit(ProgressDialogState.Loading("正在克隆"))
                 try {
@@ -155,7 +202,7 @@ class PackageManagerViewModel(
         viewModelScope.launch {
             _progressState.emit(ProgressDialogState.Loading("正在安装"))
             try {
-                mgr.installPackage(ZipPackage.parse(File(filePath)), null)
+                mgr.installPackage(ZipPackage(File(filePath)), null)
             } catch (e: Exception) {
                 _progressState.emit(ProgressDialogState.Failed("安装失败", "安装失败，请检查文件格式是否正确"))
             }

@@ -14,90 +14,26 @@ import java.util.*
 /**
  * 该类代表一个已经安装的分包
  */
-class InstalledPackage constructor(
-    private val pkgDir: File
-) {
+class InstalledPackage(val packageDirectory: File) {
     class PackageDoesNotExistsException() : Exception("Package does not exists.")
     class MissingManifestFile() : Exception("Could not find the manifest file.")
+    class MissingInstallationInfoFile(): Exception("Could not find .installation_info file")
 
     // TODO: 2020/11/1 使该 Package 始终能返回最新数据
-    private val manifestFile = pkgDir.resolve("manifest.json")
-    private val installationInfoFile = pkgDir.resolve(".installation_info")
-    private val graphicsFile = pkgDir.resolve(".cached_graphics")
-    private val modDir = pkgDir.resolve("innercore").resolve("mods")
+    private val manifestFile = packageDirectory.resolve("manifest.json")
+    private val installationInfoFile = packageDirectory.resolve(".installation_info")
+    private val graphicsFile = packageDirectory.resolve(".cached_graphics")
+    private val modDir = packageDirectory.resolve("innercore").resolve("mods")
 
-    private lateinit var game: String
-    private lateinit var gameVersion: String
-    private lateinit var pack: String
-    private lateinit var packVersion: String
-    private var packVersionCode = -1
-    private lateinit var developer: String
-    private lateinit var description: MutableMap<String, String>
-
-    private var customName: String? = null
-    private lateinit var packageUUID: String
-    private var installTimestamp: Long = -1
-    private lateinit var installUUID: String
-
-    init {
-        // Parse information
-        parseInstallationInfo()
-        parseManifest()
-    }
-
-    private fun parseManifest() {
-        // TODO: 2021/2/22  Use PackageManifest to instead
-
+    fun getManifest(): PackageManifest {
         if (!manifestFile.exists() || !manifestFile.isFile) throw MissingManifestFile()
-        val jsonStr = manifestFile.readText()
-        with(JSONObject(jsonStr)) {
-            game = getString("game")
-            gameVersion = getString("gameVersion")
-            pack = getString("pack")
-            packVersion = getString("packVersion")
-            packVersionCode = getInt("packVersionCode")
-            developer = getString("developer")
-            val desJson = getJSONObject("description")
-            description = mutableMapOf()
-            desJson.keys().forEach {
-                description[it] = desJson.getString(it)
-            }
-        }
+        return PackageManifest.fromJson(manifestFile.readText())
     }
 
-    private fun parseInstallationInfo() {
-        // TODO: 2021/2/22  Use InstallationInfo to instead
-        if (!installationInfoFile.exists() || !installationInfoFile.isFile) error("Missing .installation_info file")
-        val jsonStr = installationInfoFile.readText()
-        with(JSONObject(jsonStr)) {
-            packageUUID = getString("uuid")
-            installUUID = getString("internalId") // 该 UUID 用于唯一标识
-            installTimestamp = getLong("timestamp")
-            customName = optString("customName").takeIf { it.isNotEmpty() } // customName 是可选的
-        }
+    fun getInstallationInfo(): InstallationInfo {
+        if (!installationInfoFile.exists() || !installationInfoFile.isFile) throw MissingInstallationInfoFile()
+        return InstallationInfo.fromJson(installationInfoFile.readText())
     }
-
-
-    /**
-     * 获取分包的安装路径
-     */
-    fun getInstallDir(): File = pkgDir
-
-    /**
-     * 获取分包的名称
-     */
-    fun getName(): String = pack
-
-    /**
-     * 获取分包的描述
-     */
-    fun getDescription(): Map<String, String> = description
-
-    fun getVersion() = packVersion
-    fun getVersionCode() = packVersionCode
-    fun getGame() = game
-    fun getGameVersion() = gameVersion
-    fun getDeveloper() = developer
 
     /**
      * 重命名
@@ -110,26 +46,6 @@ class InstalledPackage constructor(
     }
 
     /**
-     * 获取分包的 UUID
-     */
-    fun getPackageUUID(): String = packageUUID
-
-    /**
-     * 获取分包的自定义名称
-     */
-    fun getCustomName(): String? = customName
-
-    /**
-     * 获取安装时的时间戳
-     */
-    fun getInstallTimeStamp(): Long = installTimestamp
-
-    /**
-     * 获取安装时的 UUID
-     */
-    fun getInstallUUID(): String = installUUID
-
-    /**
      * 获取图像压缩包
      */
     fun getCachedGraphics(): File = graphicsFile
@@ -139,7 +55,12 @@ class InstalledPackage constructor(
      */
     suspend fun installMod(mod: ZipMod) {
         val modInfo = mod.getModInfo()
-        val task = CoroutineZip.unzip(mod.file, modDir.resolve(modInfo.name), createContainerDir = true, autoUnbox = true)
+        val task = CoroutineZip.unzip(
+            mod.file,
+            modDir.resolve(modInfo.name),
+            createContainerDir = true,
+            autoUnbox = true
+        )
         task.await()
     }
 
@@ -149,7 +70,7 @@ class InstalledPackage constructor(
     suspend fun getMods(): List<InstalledMod> = withContext(Dispatchers.IO) {
         val result = mutableListOf<InstalledMod>()
 
-        val modsDir = pkgDir.resolve("innercore").resolve("mods")
+        val modsDir = packageDirectory.resolve("innercore").resolve("mods")
         if (!modsDir.exists()) modsDir.mkdirs()
 
         for (dir in modsDir.listFiles()!!) {
@@ -167,18 +88,18 @@ class InstalledPackage constructor(
 
     suspend fun delete() {
         withContext(Dispatchers.IO) {
-            pkgDir.deleteRecursively()
+            packageDirectory.deleteRecursively()
         }
     }
 
     suspend fun clone(newName: String) = withContext(Dispatchers.IO) {
-        val targetDir = pkgDir.parentFile!!.resolve(newName).translateToValidFile()
-        pkgDir.copyRecursively(targetDir)
+        val targetDir = packageDirectory.parentFile!!.resolve(newName).translateToValidFile()
+        packageDirectory.copyRecursively(targetDir)
         InstalledPackage(targetDir)
 
         val oldInfo = InstallationInfo.fromJson(
             targetDir.resolve(".installation_info").readText()
-        ) ?: error("解析JSON失败")
+        )
 
         val newInfo = oldInfo.copy(
             customName = newName,
@@ -190,7 +111,7 @@ class InstalledPackage constructor(
 
     fun getLevels(): List<MCLevel> {
         val result = mutableListOf<MCLevel>()
-        val worlds = pkgDir.resolve("worlds").listFiles() ?: return emptyList()
+        val worlds = packageDirectory.resolve("worlds").listFiles() ?: return emptyList()
         for (file in worlds) {
             val level = try {
                 MCLevel.parseByDirectory(file)

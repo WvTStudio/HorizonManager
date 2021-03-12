@@ -38,6 +38,7 @@ class ModTabViewModel(dependencies: DependenciesContainer) : ViewModel() {
     private var map: Map<ModEntry, InstalledMod> = emptyMap()
     val newEnabledMods = MutableStateFlow<Set<ModEntry>>(emptySet())
 
+    // TODO: 2021/3/12 考虑细分错误类型
     val errors = MutableStateFlow<List<Exception>>(emptyList())
 
     sealed class State {
@@ -54,7 +55,7 @@ class ModTabViewModel(dependencies: DependenciesContainer) : ViewModel() {
         viewModelScope.launch {
             _state.emit(State.Loading)
             val pkg = localCache.getSelectedPackageUUID()?.let { uuid ->
-                manager.getInstalledPackages().find { it.getInstallUUID() == uuid }
+                manager.getInstalledPackages().find { it.getInstallationInfo().internalId == uuid }
             }
             if (pkg != null) {
                 val mods = try {

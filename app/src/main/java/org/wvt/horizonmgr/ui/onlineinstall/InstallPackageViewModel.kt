@@ -101,7 +101,7 @@ class InstallPackageViewModel(
                 downloadState.emit(StepState.Complete)
                 installState.emit(StepState.Running(mutableStateOf(0f)))
                 try {
-                    mgr.installPackage(ZipPackage.parse(result.packageZipFile), graphicsZip = result.graphicsFile)
+                    mgr.installPackage(ZipPackage(result.packageZipFile), graphicsZip = result.graphicsFile)
                 } catch (e: Exception) {
                     Log.e(TAG, "安装分包失败", e)
                     installState.emit(StepState.Error(e))
