@@ -61,6 +61,7 @@
 - P3 优化 FileSelector 的代码
 - P3 重写 Custom Theme 的 UI 和 Controller 代码
 - P3 查看所有组件的 ContentColor CompositionProvider 层级，防止出错
+- P3 使 webapi 和 service 模块不依赖于 android
 
 ## 已知 BUGs
 
