@@ -13,20 +13,15 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import org.wvt.horizonmgr.ui.components.EmptyPage
-import org.wvt.horizonmgr.ui.components.ModIcon
-import org.wvt.horizonmgr.ui.components.ProgressDialog
-import org.wvt.horizonmgr.ui.components.loadLocalImage
+import org.wvt.horizonmgr.ui.components.*
 
 @Composable
 internal fun ModTab(
@@ -37,6 +32,36 @@ internal fun ModTab(
     val state by vm.state.collectAsState()
     val mods by vm.mods.collectAsState()
     val enabledMods by vm.newEnabledMods.collectAsState()
+    val errors by vm.errors.collectAsState()
+
+    var displayErrorBanner by rememberSaveable(errors) { mutableStateOf(errors.isNotEmpty()) }
+    var displayErrorDialog by remember { mutableStateOf(false) }
+
+    if (displayErrorDialog) {
+        AlertDialog(
+            onDismissRequest = { displayErrorDialog = false },
+            text = {
+                Text(text = errors.fold("") { acc, e ->
+                    acc + "\n" + e.localizedMessage
+                })
+            },
+            confirmButton = {
+                TextButton(onClick = { displayErrorDialog = false }) { Text("确定") }
+            }
+        )
+    }
+
+    val banner = @Composable {
+        MaterialBanner(
+            modifier = Modifier.fillMaxWidth(),
+            visible = displayErrorBanner,
+            text = { Text("解析模组时发生 ${errors.size} 个错误") },
+            dismissButton = { TextButton(onClick = { displayErrorBanner = false }) { Text("关闭") } },
+            confirmButton = {
+                TextButton(onClick = { displayErrorDialog = true }) { Text("详情") }
+            }
+        )
+    }
 
     Crossfade(state) { state ->
         when (state) {
@@ -55,10 +80,11 @@ internal fun ModTab(
                     EmptyPage(Modifier.fillMaxSize()) {
                         Text("当前分包内没有已安装的模组")
                     }
+                    banner()
                 } else {
-                    LazyColumn(
-                        contentPadding = PaddingValues(top = 8.dp, bottom = 64.dp)
-                    ) {
+                    LazyColumn {
+                        item { banner() }
+                        item { Spacer(Modifier.height(8.dp)) }
                         itemsIndexed(items = mods) { _, item ->
                             ModItem(
                                 modifier = Modifier.padding(
@@ -79,6 +105,7 @@ internal fun ModTab(
                                 onDeleteClick = { vm.deleteMod(item) }
                             )
                         }
+                        item { Spacer(Modifier.height(64.dp)) }
                     }
                 }
                 ExtendedFloatingActionButton(
@@ -90,6 +117,10 @@ internal fun ModTab(
                     onClick = onAddModClicked
                 )
             }
+            is ModTabViewModel.State.Error -> ErrorPage(
+                message = { Text("解析模组列表失败") },
+                onRetryClick = { vm.load() }
+            )
         }
         ps?.let {
             ProgressDialog(onCloseRequest = vm::dismiss, state = it)

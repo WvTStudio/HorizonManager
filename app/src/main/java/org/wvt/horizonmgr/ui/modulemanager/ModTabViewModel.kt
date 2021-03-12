@@ -38,11 +38,13 @@ class ModTabViewModel(dependencies: DependenciesContainer) : ViewModel() {
     private var map: Map<ModEntry, InstalledMod> = emptyMap()
     val newEnabledMods = MutableStateFlow<Set<ModEntry>>(emptySet())
 
+    val errors = MutableStateFlow<List<Exception>>(emptyList())
+
     sealed class State {
         object Loading : State()
         object PackageNotSelected : State()
         object OK : State()
-        class Error(val message: String): State()
+        class Error(val message: String) : State()
     }
 
     private val _state = MutableStateFlow<State>(State.Loading)
@@ -66,6 +68,8 @@ class ModTabViewModel(dependencies: DependenciesContainer) : ViewModel() {
                 val result = mutableListOf<ModEntry>()
                 val mMap = mutableMapOf<ModEntry, InstalledMod>()
 
+                val exceptions = mutableListOf<Exception>()
+
                 mods.forEach { mod ->
                     try {
                         val entry = ModEntry(
@@ -80,7 +84,7 @@ class ModTabViewModel(dependencies: DependenciesContainer) : ViewModel() {
                             enabled.add(entry)
                         }
                     } catch (e: Exception) {
-                        // TODO: 2021/3/12 给用户返回信息
+                        exceptions.add(e)
                         Log.e(TAG, "Mod 解析错误", e)
                     }
                 }
@@ -88,6 +92,7 @@ class ModTabViewModel(dependencies: DependenciesContainer) : ViewModel() {
                 newEnabledMods.emit(enabled)
                 map = mMap
                 _state.emit(State.OK)
+                errors.emit(exceptions)
             } else {
                 _state.emit(State.PackageNotSelected)
             }
