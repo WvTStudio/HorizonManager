@@ -25,4 +25,17 @@ class ICCNModuleTest {
         val user = module.login("hzmgr010102@adodoz.cn", "hzmgrtestpassword")
         println(user)
     }
+
+    @Test
+    fun register() = runBlocking {
+        val user = try {
+            module.register("hzmgr010106", "hzmgr010103@adodoz.cn", "hzmgrtestpassword")
+        } catch (e: ICCNModule.RegisterFailedException) {
+            e.errors.forEach {
+                println(it)
+            }
+            return@runBlocking
+        }
+        println(user)
+    }
 }

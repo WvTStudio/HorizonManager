@@ -6,11 +6,13 @@ import io.ktor.client.features.*
 import io.ktor.client.request.*
 import io.ktor.client.request.forms.*
 import io.ktor.client.statement.*
-import io.ktor.content.*
 import io.ktor.http.*
 import io.ktor.utils.io.errors.*
-import org.json.JSONException
-import org.json.JSONObject
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.SerializationException
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.*
 import org.wvt.horizonmgr.webapi.*
 
 /**
@@ -18,11 +20,7 @@ import org.wvt.horizonmgr.webapi.*
  * 目前仅提供登录和注册功能，登录功能可以获取用户的一些基本信息
  */
 class ICCNModule {
-    private val client = HttpClient(CIO) {
-        install(HttpCallValidator) {
-            validateResponse {} // 禁用 response 有效性检查
-        }
-    }
+    private val client = HttpClient(CIO)
 
     class LoginFailedException : ServiceException("登录失败")
 
@@ -33,7 +31,7 @@ class ICCNModule {
      *
      * ```json
      * {
-     *   ...
+     *   "status": <int>,
      *   "user_info": {
      *     "user_id": <int>,
      *     "user_name": <str>,
@@ -57,15 +55,18 @@ class ICCNModule {
             )
         } catch (e: IOException) {
             throw NetworkException("发送登录数据失败", e)
+        } catch (e: Exception) {
+            throw UnexpectedException(e)
         }
+
         val json = try {
-            JSONObject(jsonStr)
-        } catch (e: JSONException) {
+            Json.parseToJsonElement(jsonStr).jsonObject
+        } catch (e: SerializationException) {
             throw JsonParseException(jsonStr, e)
         }
         val status = try {
-            json.getInt("status")
-        } catch (e: JSONException) {
+            json["status"]?.jsonPrimitive?.intOrNull ?: throw MissingJsonField("status", jsonStr)
+        } catch (e: SerializationException) {
             throw LoginFailedException()
         }
         if (status != 2) throw LoginFailedException()
@@ -75,12 +76,15 @@ class ICCNModule {
         val avatarUrl: String
 
         try {
-            with(json.getJSONObject("user_info")) {
-                id = getInt("user_id")
-                username = getString("user_name")
-                avatarUrl = getString("user_avatar")
-            }
-        } catch (e: JSONException) {
+            val userInfo = json["user_info"]?.jsonObject
+                ?: throw MissingJsonField("user_info", jsonStr)
+            id = userInfo["user_id"]?.jsonPrimitive?.intOrNull
+                ?: throw MissingJsonField("user_id", jsonStr)
+            username = userInfo["user_name"]?.jsonPrimitive?.toString()
+                ?: throw MissingJsonField("user_name", jsonStr)
+            avatarUrl = userInfo["user_avatar"]?.jsonPrimitive?.toString()
+                ?: throw MissingJsonField("user_avatar", jsonStr)
+        } catch (e: SerializationException) {
             throw JsonParseException(jsonStr, e)
         }
 
@@ -90,6 +94,15 @@ class ICCNModule {
     data class RegisterErrorEntry(val status: String, val code: String, val detail: String)
     class RegisterFailedException(val errors: List<RegisterErrorEntry>) :
         ServiceException("注册失败", null)
+
+
+    @Serializable
+    data class RegisterJson(
+        @SerialName("username")
+        val userName: String,
+        val email: String,
+        val password: String
+    )
 
     /**
      * 注册一个账号。
@@ -154,7 +167,10 @@ class ICCNModule {
             client.get<HttpResponse>("https://adodoz.cn")
         } catch (e: IOException) {
             throw NetworkException("获取 ICCN 主页失败", e)
+        } catch (e: Exception) {
+            throw UnexpectedException(e)
         }
+
         session = homePageResponse.headers["set-cookie"]
             ?.takeIf { it.contains("flarum_session") }
             ?: throw ServerException("session not found")
@@ -164,56 +180,55 @@ class ICCNModule {
         // Step 2 - Register
         val regResponse = try {
             client.post<HttpResponse>("https://adodoz.cn/register") {
-                body = TextContent(
-                    contentType = ContentType.Application.Json,
-                    text = JSONObject().apply {
-                        put("username", username)
-                        put("email", email)
-                        put("password", password)
-                    }.toString()
-                )
                 headers {
                     set("referer", "https://adodoz.cn/")
                     set("cookie", session)
                     set("user-agent", "Horizon Manager")
                     set("x-csrf-token", token)
                 }
+                contentType(ContentType.Application.Json)
+                body = Json.encodeToString(RegisterJson(username, email, password))
             }
         } catch (e: IOException) {
             throw NetworkException("发送注册数据失败", e)
+        } catch (e: ClientRequestException) {
+            val responseContent = e.response.readText()
+            // error
+            val errors = mutableListOf<RegisterErrorEntry>()
+            // see response_reg_422.json
+            val json = try {
+                Json.parseToJsonElement(responseContent).jsonObject
+            } catch (e: SerializationException) {
+                throw JsonParseException(responseContent, e)
+            }
+            json["errors"]?.jsonArray?.forEach {
+                val error = it.jsonObject
+                val entry = RegisterErrorEntry(
+                    status = error["status"]?.jsonPrimitive?.toString()
+                        ?: throw MissingJsonField("status", responseContent),
+                    code = error["code"]?.jsonPrimitive?.toString()
+                        ?: throw MissingJsonField("code", responseContent),
+                    detail = error["detail"]?.jsonPrimitive?.toString()
+                        ?: throw MissingJsonField("detail", responseContent)
+                )
+                errors.add(entry)
+            }
+            throw RegisterFailedException(errors)
+        } catch (e: Exception) {
+            throw UnexpectedException(e)
         }
 
         // Step3 - Parse register result
         val responseContent = regResponse.readText()
-        if (regResponse.status.value == 201) {
-            // succeed
-            return try {
-                JSONObject(responseContent)
-                    .getJSONObject("data")
-                    .getString("id")
-            } catch (e: JSONException) {
-                // Generally, the cause is that "id" does not exist.
-                throw JsonParseException(responseContent, e)
-            }
-        } else {
-            // error
-            val errors = mutableListOf<RegisterErrorEntry>()
-            // see response_reg_422.json
-            try {
-                JSONObject(responseContent).getJSONArray("errors")
-                    .forEach<JSONObject> {
-                        val entry = RegisterErrorEntry(
-                            status = it.getString("status"),
-                            code = it.getString("code"),
-                            detail = it.getString("detail")
-                        )
-                        errors.add(entry)
-                    }
-            } catch (e: JSONException) {
-                throw JsonParseException(responseContent, e)
-            }
-            throw RegisterFailedException(errors)
+        // succeed
+        val json = try {
+            Json.parseToJsonElement(responseContent).jsonObject
+        } catch (e: SerializationException) {
+            throw JsonParseException(responseContent, e)
         }
+        val data = json["data"]?.jsonObject ?: throw MissingJsonField("data", responseContent)
+        return data["id"]?.jsonPrimitive?.toString()
+            ?: throw MissingJsonField("data -> id", responseContent)
     }
 }
 
