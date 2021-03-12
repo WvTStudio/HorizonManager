@@ -80,9 +80,9 @@ class ICCNModule {
                 ?: throw MissingJsonField("user_info", jsonStr)
             id = userInfo["user_id"]?.jsonPrimitive?.intOrNull
                 ?: throw MissingJsonField("user_id", jsonStr)
-            username = userInfo["user_name"]?.jsonPrimitive?.toString()
+            username = userInfo["user_name"]?.jsonPrimitive?.content
                 ?: throw MissingJsonField("user_name", jsonStr)
-            avatarUrl = userInfo["user_avatar"]?.jsonPrimitive?.toString()
+            avatarUrl = userInfo["user_avatar"]?.jsonPrimitive?.content
                 ?: throw MissingJsonField("user_avatar", jsonStr)
         } catch (e: SerializationException) {
             throw JsonParseException(jsonStr, e)
@@ -204,11 +204,11 @@ class ICCNModule {
             json["errors"]?.jsonArray?.forEach {
                 val error = it.jsonObject
                 val entry = RegisterErrorEntry(
-                    status = error["status"]?.jsonPrimitive?.toString()
+                    status = error["status"]?.jsonPrimitive?.content
                         ?: throw MissingJsonField("status", responseContent),
-                    code = error["code"]?.jsonPrimitive?.toString()
+                    code = error["code"]?.jsonPrimitive?.content
                         ?: throw MissingJsonField("code", responseContent),
-                    detail = error["detail"]?.jsonPrimitive?.toString()
+                    detail = error["detail"]?.jsonPrimitive?.content
                         ?: throw MissingJsonField("detail", responseContent)
                 )
                 errors.add(entry)
@@ -227,7 +227,7 @@ class ICCNModule {
             throw JsonParseException(responseContent, e)
         }
         val data = json["data"]?.jsonObject ?: throw MissingJsonField("data", responseContent)
-        return data["id"]?.jsonPrimitive?.toString()
+        return data["id"]?.jsonPrimitive?.content
             ?: throw MissingJsonField("data -> id", responseContent)
     }
 }
