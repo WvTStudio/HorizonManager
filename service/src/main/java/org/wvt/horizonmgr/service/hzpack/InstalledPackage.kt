@@ -138,7 +138,8 @@ class InstalledPackage constructor(
      * 安装 Mod 到该 Package
      */
     suspend fun installMod(mod: ZipMod) {
-        val task = CoroutineZip.unzip(mod.file, modDir, createContainerDir = true, autoUnbox = true)
+        val modInfo = mod.getModInfo()
+        val task = CoroutineZip.unzip(mod.file, modDir.resolve(modInfo.name), createContainerDir = true, autoUnbox = true)
         task.await()
     }
 
@@ -146,7 +147,6 @@ class InstalledPackage constructor(
      * 获取该分包的所有 Mod
      */
     suspend fun getMods(): List<InstalledMod> = withContext(Dispatchers.IO) {
-        // TODO: 2020/11/13
         val result = mutableListOf<InstalledMod>()
 
         val modsDir = pkgDir.resolve("innercore").resolve("mods")

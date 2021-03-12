@@ -67,16 +67,21 @@ class ModTabViewModel(dependencies: DependenciesContainer) : ViewModel() {
                 val mMap = mutableMapOf<ModEntry, InstalledMod>()
 
                 mods.forEach { mod ->
-                    val entry = ModEntry(
-                        mod.modDir.absolutePath,
-                        mod.getName(),
-                        mod.getDescription(),
-                        mod.iconFile?.absolutePath
-                    )
-                    result.add(entry)
-                    mMap[entry] = mod
-                    if (mod.isEnabled()) {
-                        enabled.add(entry)
+                    try {
+                        val entry = ModEntry(
+                            mod.modDir.absolutePath,
+                            mod.getName(),
+                            mod.getDescription(),
+                            mod.iconFile?.absolutePath
+                        )
+                        result.add(entry)
+                        mMap[entry] = mod
+                        if (mod.isEnabled()) {
+                            enabled.add(entry)
+                        }
+                    } catch (e: Exception) {
+                        // TODO: 2021/3/12 给用户返回信息
+                        Log.e(TAG, "Mod 解析错误", e)
                     }
                 }
                 _mods.emit(result)
