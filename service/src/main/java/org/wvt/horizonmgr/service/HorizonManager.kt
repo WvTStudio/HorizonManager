@@ -1,7 +1,5 @@
 package org.wvt.horizonmgr.service
 
-import android.content.Context
-import android.os.Environment
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.wvt.horizonmgr.service.hzpack.InstallationInfo
@@ -11,9 +9,7 @@ import org.wvt.horizonmgr.service.utils.translateToValidFile
 import java.io.File
 import java.util.*
 
-class HorizonManager constructor(context: Context) {
-    private val horizonDir =
-        Environment.getExternalStorageDirectory().resolve("games").resolve("horizon")
+class HorizonManager constructor(val horizonDir: File) {
     private val packDir = horizonDir.resolve("packs")
 
     /**

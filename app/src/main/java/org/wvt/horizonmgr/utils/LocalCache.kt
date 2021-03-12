@@ -1,4 +1,4 @@
-package org.wvt.horizonmgr
+package org.wvt.horizonmgr.utils
 
 import android.content.Context
 import android.content.SharedPreferences

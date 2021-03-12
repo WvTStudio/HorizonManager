@@ -10,8 +10,8 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.wvt.horizonmgr.BuildConfig
 import org.wvt.horizonmgr.DependenciesContainer
-import org.wvt.horizonmgr.LocalCache
 import org.wvt.horizonmgr.ui.login.LoginResult
+import org.wvt.horizonmgr.utils.LocalCache
 import org.wvt.horizonmgr.webapi.NetworkException
 
 private const val TAG = "MainActivityVM"

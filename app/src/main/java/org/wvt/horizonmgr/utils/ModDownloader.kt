@@ -1,4 +1,4 @@
-package org.wvt.horizonmgr
+package org.wvt.horizonmgr.utils
 
 import android.content.Context
 import kotlinx.coroutines.CoroutineScope
@@ -10,9 +10,8 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.withContext
+import org.wvt.horizonmgr.service.ProgressDeferred
 import org.wvt.horizonmgr.service.mod.ZipMod
-import org.wvt.horizonmgr.utils.CoroutineDownloader
-import org.wvt.horizonmgr.utils.ProgressDeferred
 import java.io.File
 
 class ModDownloader(context: Context) {

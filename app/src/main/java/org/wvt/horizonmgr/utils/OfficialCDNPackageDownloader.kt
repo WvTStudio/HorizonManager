@@ -1,4 +1,4 @@
-package org.wvt.horizonmgr
+package org.wvt.horizonmgr.utils
 
 import android.content.Context
 import kotlinx.coroutines.CoroutineScope
@@ -9,8 +9,6 @@ import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.receiveAsFlow
-import org.wvt.horizonmgr.utils.CoroutineDownloader
-import org.wvt.horizonmgr.utils.ProgressDeferred
 import org.wvt.horizonmgr.webapi.pack.OfficialCDNPackage
 import java.io.File
 import kotlin.coroutines.EmptyCoroutineContext
@@ -27,7 +25,7 @@ class OfficialCDNPackageDownloader(context: Context) {
         val graphicsFile: File
     )
     fun download(pack: OfficialCDNPackage) =
-        object : ProgressDeferred<Float, DownloadResult> {
+        object : org.wvt.horizonmgr.service.ProgressDeferred<Float, DownloadResult> {
             private val scope = CoroutineScope(EmptyCoroutineContext + Dispatchers.IO)
             private val channel = Channel<Float>(Channel.UNLIMITED)
             private val job = scope.async {

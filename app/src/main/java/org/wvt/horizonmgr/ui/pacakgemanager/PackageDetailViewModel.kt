@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import org.wvt.horizonmgr.DependenciesContainer
-import org.wvt.horizonmgr.utils.calcSize
+import org.wvt.horizonmgr.service.utils.calcSize
 import org.wvt.horizonmgr.utils.longSizeToString
 import java.text.SimpleDateFormat
 import java.util.*
@@ -84,8 +84,8 @@ class PackageDetailViewModel(
                 )
                 info.emit(information)
                 state.emit(State.SUCCEED)
-                val (count, size) = pkg.getInstallDir().calcSize()
-                pkgSize.emit(PackageSize.Succeed(size, count))
+                val result = pkg.getInstallDir().calcSize()
+                pkgSize.emit(PackageSize.Succeed(result.totalSize, result.fileCount))
             }
         }
     }

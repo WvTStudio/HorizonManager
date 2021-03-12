@@ -9,6 +9,9 @@ import org.wvt.horizonmgr.service.HorizonManager
 import org.wvt.horizonmgr.service.level.LevelTransporter
 import org.wvt.horizonmgr.service.level.MCLevelManager
 import org.wvt.horizonmgr.service.respack.ResourcePackManager
+import org.wvt.horizonmgr.utils.LocalCache
+import org.wvt.horizonmgr.utils.ModDownloader
+import org.wvt.horizonmgr.utils.OfficialCDNPackageDownloader
 import org.wvt.horizonmgr.webapi.iccn.ICCNModule
 import org.wvt.horizonmgr.webapi.mgrinfo.MgrInfoModule
 import org.wvt.horizonmgr.webapi.mod.ChineseModRepository
@@ -43,7 +46,9 @@ private class DependenciesVMFactory(
 
 class DependenciesContainer internal constructor(private val context: Context) {
     val localCache by lazy { LocalCache(context) }
-    val manager by lazy { HorizonManager(context) }
+    val manager by lazy {
+        HorizonManager(Environment.getExternalStorageDirectory().resolve("games").resolve("horizon"))
+    }
     val packRepository by lazy { OfficialPackageCDNRepository() }
     val chineseModRepository by lazy { ChineseModRepository() }
     val mirrorModRepository by lazy { OfficialModMirrorRepository() }
