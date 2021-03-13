@@ -1,10 +1,14 @@
 package org.wvt.horizonmgr.service.mod
 
-import org.json.JSONObject
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 /**
  * mod.info 文件
  */
+@Serializable
 data class ModInfo(
     val name: String,
     val author: String,
@@ -12,24 +16,17 @@ data class ModInfo(
     val description: String
 ) {
     companion object {
+        private val json = Json {
+            prettyPrint = true
+            ignoreUnknownKeys = true
+        }
+
         fun fromJson(jsonStr: String): ModInfo {
-            return with(JSONObject(jsonStr)) {
-                ModInfo(
-                    name = getString("name"),
-                    author = getString("author"),
-                    version = getString("version"),
-                    description = getString("description")
-                )
-            }
+            return json.decodeFromString(jsonStr)
         }
 
         fun ModInfo.toJson(): String {
-            return JSONObject().apply {
-                put("name", name)
-                put("author", author)
-                put("version", version)
-                put("description", description)
-            }.toString(4)
+            return json.encodeToString(this)
         }
     }
 }
