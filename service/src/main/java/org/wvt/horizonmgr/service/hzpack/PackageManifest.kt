@@ -1,7 +1,12 @@
 package org.wvt.horizonmgr.service.hzpack
 
-import org.json.JSONObject
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
+@Serializable
 data class PackageManifest(
     /**
      * MC 游戏名
@@ -30,42 +35,21 @@ data class PackageManifest(
     /**
      * 分包的描述，key 为语言，如 "en"
      */
+    @SerialName("description")
     val descriptions: Map<String, String>,
 ) {
     companion object {
+        private val json = Json {
+            prettyPrint = true
+            ignoreUnknownKeys = true
+        }
+
         fun fromJson(jsonStr: String): PackageManifest {
-            return with(JSONObject(jsonStr)) {
-                val desJson = getJSONObject("description")
-                val description = mutableMapOf<String, String>()
-                desJson.keys().forEach {
-                    description[it] = desJson.getString(it)
-                }
-                PackageManifest(
-                    game = getString("game"),
-                    gameVersion = getString("gameVersion"),
-                    pack = getString("pack"),
-                    packVersion = getString("packVersion"),
-                    packVersionCode = getInt("packVersionCode"),
-                    developer = getString("developer"),
-                    descriptions = description
-                )
-            }
+            return json.decodeFromString(jsonStr)
         }
 
         fun PackageManifest.toJson(): String {
-            return JSONObject().apply {
-                put("game", game)
-                put("gameVersion", gameVersion)
-                put("pack", pack)
-                put("packVersion", packVersion)
-                put("packVersionCode", packVersionCode)
-                put("developer", developer)
-                put("descriptions", JSONObject().apply {
-                    for ((k, v) in descriptions) {
-                        put(k, v)
-                    }
-                })
-            }.toString(4)
+            return json.encodeToString(this)
         }
     }
 }
