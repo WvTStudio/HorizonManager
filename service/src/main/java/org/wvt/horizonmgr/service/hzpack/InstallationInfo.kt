@@ -1,12 +1,19 @@
 package org.wvt.horizonmgr.service.hzpack
 
-import org.json.JSONObject
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
+@Serializable
 data class InstallationInfo(
     /**
      * 分包的 UUID
      */
+    @SerialName("uuid")
     val packageId: String,
+    @SerialName("timestamp")
     val timeStamp: Long,
     /**
      * 用户自定义的名称
@@ -18,24 +25,17 @@ data class InstallationInfo(
     val internalId: String
 ) {
     companion object {
+        private val json = Json {
+            prettyPrint = true
+            ignoreUnknownKeys = true
+        }
+
         fun fromJson(jsonStr: String): InstallationInfo {
-            return with(JSONObject(jsonStr)) {
-                InstallationInfo(
-                    packageId = getString("uuid"),
-                    timeStamp = getLong("timestamp"),
-                    customName = optString("customName"),
-                    internalId = getString("internalId")
-                )
-            }
+            return json.decodeFromString(jsonStr)
         }
     }
 
     fun toJson(): String {
-        return with(JSONObject()) {
-            put("uuid", packageId)
-            put("timestamp", timeStamp)
-            put("customName", customName)
-            put("internalId", internalId)
-        }.toString(4)
+        return json.encodeToString(this)
     }
 }
