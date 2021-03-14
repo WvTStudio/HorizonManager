@@ -1,10 +1,8 @@
 package org.wvt.horizonmgr.service.mod
 
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import org.json.JSONObject
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.*
 import java.io.File
-import java.io.InputStream
 
 /**
  * 该类代表一个已经由 Horizon 安装的 Mod。已安装的 Mod 在设备上以文件夹的形式存在。该文件夹的结构是这样的：
@@ -35,63 +33,20 @@ class InstalledMod internal constructor(val modDir: File) {
     private val infoFile = modDir.resolve("mod.info")
     private val configFile = modDir.resolve("config.json")
 
-    private var name: String = ""
-    private var author: String = ""
-    private var description: String = ""
-    private var versionName: String = ""
-    private var isEnabled: Boolean = false
-
     // TODO-Proposal 使用 FileObserver 监听文件更改，一旦更改则将 isParsed 设为 false
-    // TODO: 2021/2/22 更换成 ModInfo
 
-    private var isParsed = false
-
-    /**
-     * 该方法解析 `mod.info` 的信息和 `config.json` 中的 `enabled` 键
-     */
-    private suspend fun parse() {
-        // 只有在没有解析时才会重新解析
-        if (!isParsed) {
-            // Parse Info
-            val infoStr = infoFile.readText()
-            with(JSONObject(infoStr)) {
-                name = getString("name")
-                author = getString("author")
-                description = getString("description")
-                versionName = getString("version")
-            }
-
-            // Parse Config
-            val configStr = configFile.takeIf { it.exists() }?.readText()
-            isEnabled = configStr?.let { JSONObject(it).getBoolean("enabled") } ?: false
-
-            isParsed = true
-        }
+    fun getModInfo(): ModInfo {
+        val infoStr = infoFile.readText()
+        return ModInfo.fromJson(infoStr)
     }
 
-    suspend fun isEnabled(): Boolean {
-        parse()
-        return isEnabled
-    }
-
-    suspend fun getGraphics(): InputStream? {
-        parse()
-        return iconFile?.inputStream()
-    }
-
-    suspend fun getAuthor(): String {
-        parse()
-        return author
-    }
-
-    suspend fun getDescription(): String {
-        parse()
-        return description
-    }
-
-    suspend fun getName(): String {
-        parse()
-        return name
+    fun isEnabled(): Boolean {
+        // Parse Config
+        val configStr =
+            configFile.takeIf { it.exists() }?.readText() ?: error("Could not find config.json.")
+        return Json.parseToJsonElement(configStr)
+            .jsonObject["enabled"]
+            ?.jsonPrimitive?.boolean ?: false
     }
 
     /**
@@ -101,7 +56,7 @@ class InstalledMod internal constructor(val modDir: File) {
      *
      * 如果 `config.json` 不存在，将会自动创建一个
      */
-    suspend fun enable() {
+    fun enable() {
         changeEnabled(true)
     }
 
@@ -112,17 +67,22 @@ class InstalledMod internal constructor(val modDir: File) {
      *
      * 如果 `config.json` 不存在，将会自动创建一个
      */
-    suspend fun disable() {
+    fun disable() {
         changeEnabled(false)
     }
 
-    private suspend fun changeEnabled(enabled: Boolean) = withContext(Dispatchers.IO) {
-        val configStr = configFile.takeIf { it.exists() }?.readText()
-        val json = configStr?.let {
-            JSONObject(configStr)
-        } ?: JSONObject()
-        json.put("enabled", enabled)
-        configFile.writeText(json.toString(4))
+    private fun changeEnabled(enabled: Boolean) {
+        val configStr = configFile.takeIf { it.exists() }?.readText() ?: "{}"
+        val json = Json.parseToJsonElement(configStr).jsonObject
+        val entries = json.entries.mapNotNull {
+            return@mapNotNull if (it.key == "enabled") null
+            else it.key to it.value
+        }.toTypedArray()
+
+        val jsonPrinter = Json { prettyPrint = true }
+        val result = JsonObject(mapOf("enabled" to JsonPrimitive(enabled), *entries))
+        val jsonString = jsonPrinter.encodeToString(result)
+        configFile.writeText(jsonString)
     }
 
     /**
@@ -130,7 +90,7 @@ class InstalledMod internal constructor(val modDir: File) {
      *
      * 该方法直接将整个 MOD 文件夹删除
      */
-    suspend fun delete() {
+    fun delete() {
         modDir.deleteRecursively()
     }
 }

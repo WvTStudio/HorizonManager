@@ -3,6 +3,7 @@ package org.wvt.horizonmgr.ui.modulemanager
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -52,7 +53,7 @@ class ModTabViewModel(dependencies: DependenciesContainer) : ViewModel() {
     val state: StateFlow<State> = _state
 
     fun load() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             _state.emit(State.Loading)
             val pkg = localCache.getSelectedPackageUUID()?.let { uuid ->
                 manager.getInstalledPackages().find { it.getInstallationInfo().internalId == uuid }
@@ -73,10 +74,11 @@ class ModTabViewModel(dependencies: DependenciesContainer) : ViewModel() {
 
                 mods.forEach { mod ->
                     try {
+                        val modInfo = mod.getModInfo()
                         val entry = ModEntry(
                             mod.modDir.absolutePath,
-                            mod.getName(),
-                            mod.getDescription(),
+                            modInfo.name,
+                            modInfo.description,
                             mod.iconFile?.absolutePath
                         )
                         result.add(entry)
