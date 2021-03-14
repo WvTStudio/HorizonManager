@@ -17,7 +17,7 @@ import java.util.*
 class InstalledPackage(val packageDirectory: File) {
     class PackageDoesNotExistsException() : Exception("Package does not exists.")
     class MissingManifestFile() : Exception("Could not find the manifest file.")
-    class MissingInstallationInfoFile(): Exception("Could not find .installation_info file")
+    class MissingInstallationInfoFile() : Exception("Could not find .installation_info file")
 
     // TODO: 2020/11/1 使该 Package 始终能返回最新数据
     private val manifestFile = packageDirectory.resolve("manifest.json")
@@ -56,9 +56,8 @@ class InstalledPackage(val packageDirectory: File) {
     suspend fun installMod(mod: ZipMod) {
         val modInfo = mod.getModInfo()
         val task = CoroutineZip.unzip(
-            mod.file,
-            modDir.resolve(modInfo.name),
-            createContainerDir = true,
+            zipFile = mod.file,
+            outDir = modDir.resolve(modInfo.name).translateToValidFile(),
             autoUnbox = true
         )
         task.await()
