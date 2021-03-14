@@ -27,7 +27,7 @@ class InstalledPackage(val packageDirectory: File) {
 
     fun getManifest(): PackageManifest {
         if (!manifestFile.exists() || !manifestFile.isFile) throw MissingManifestFile()
-        return PackageManifest.fromJson(manifestFile.readText())
+        return PackageManifestWrapper.fromJson(manifestFile.readText())
     }
 
     fun getInstallationInfo(): InstallationInfo {

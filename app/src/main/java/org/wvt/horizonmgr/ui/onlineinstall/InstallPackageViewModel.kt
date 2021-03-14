@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.receiveAsFlow
 import org.wvt.horizonmgr.DependenciesContainer
-import org.wvt.horizonmgr.service.hzpack.PackageManifest
+import org.wvt.horizonmgr.service.hzpack.PackageManifestWrapper
 import org.wvt.horizonmgr.service.hzpack.ZipPackage
 import org.wvt.horizonmgr.webapi.NetworkException
 import org.wvt.horizonmgr.webapi.pack.OfficialCDNPackage
@@ -56,7 +56,7 @@ class InstallPackageViewModel(
 
             val mappedPacks = packs.map {
                 val manifestStr = it.getManifest()
-                val manifest = PackageManifest.fromJson(manifestStr)
+                val manifest = PackageManifestWrapper.fromJson(manifestStr)
                 ChoosePackageItem(
                     it.uuid,
                     manifest.pack,
@@ -101,7 +101,10 @@ class InstallPackageViewModel(
                 downloadState.emit(StepState.Complete)
                 installState.emit(StepState.Running(mutableStateOf(0f)))
                 try {
-                    mgr.installPackage(ZipPackage(result.packageZipFile), graphicsZip = result.graphicsFile)
+                    mgr.installPackage(
+                        ZipPackage(result.packageZipFile),
+                        graphicsZip = result.graphicsFile
+                    )
                 } catch (e: Exception) {
                     Log.e(TAG, "安装分包失败", e)
                     installState.emit(StepState.Error(e))

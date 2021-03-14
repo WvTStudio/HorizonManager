@@ -22,7 +22,7 @@ class ZipPackage(val zipFile: File) {
         val jsonEntry = zip.getEntry("manifest.json") ?: throw MissingManifestException()
         val jsonStr = zip.getInputStream(jsonEntry).reader().readText()
 
-        return PackageManifest.fromJson(jsonStr)
+        return PackageManifestWrapper.fromJson(jsonStr)
     }
 
     fun isZipPackage(): Boolean {

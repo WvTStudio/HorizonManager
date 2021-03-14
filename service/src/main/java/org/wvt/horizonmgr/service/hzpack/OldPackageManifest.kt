@@ -1,13 +1,12 @@
 package org.wvt.horizonmgr.service.hzpack
 
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 @Serializable
-data class PackageManifest(
+data class OldPackageManifest(
     /**
      * MC 游戏名
      */
@@ -35,8 +34,7 @@ data class PackageManifest(
     /**
      * 分包的描述，key 为语言，如 "en"
      */
-    @SerialName("description")
-    val descriptions: Map<String, String>,
+    val description: String
 ) {
     companion object {
         private val json = Json {
@@ -44,19 +42,16 @@ data class PackageManifest(
             ignoreUnknownKeys = true
         }
 
-        fun fromJson(jsonStr: String): PackageManifest {
+        fun fromJson(jsonStr: String): OldPackageManifest {
             return json.decodeFromString(jsonStr)
         }
 
-        fun PackageManifest.toJson(): String {
+        fun OldPackageManifest.toJson(): String {
             return json.encodeToString(this)
         }
 
-        fun PackageManifest.recommendDescription(): String {
-            return descriptions["zh"] ?: descriptions["en"] ?: descriptions["gb"]
-            ?: descriptions["ru"]
-            ?: descriptions.asIterable().firstOrNull()?.value
-            ?: "No description"
+        fun OldPackageManifest.toPackageManifest(): PackageManifest {
+            return PackageManifest(game, gameVersion, pack, packVersion, packVersionCode, developer, mapOf("gb" to description))
         }
     }
 }
