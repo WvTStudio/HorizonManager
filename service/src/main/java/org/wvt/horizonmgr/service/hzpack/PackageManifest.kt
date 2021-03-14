@@ -51,12 +51,12 @@ data class PackageManifest(
         fun PackageManifest.toJson(): String {
             return json.encodeToString(this)
         }
-
-        fun PackageManifest.recommendDescription(): String {
-            return descriptions["zh"] ?: descriptions["en"] ?: descriptions["gb"]
-            ?: descriptions["ru"]
-            ?: descriptions.asIterable().firstOrNull()?.value
-            ?: "No description"
-        }
     }
+}
+
+fun PackageManifest.recommendDescription(): String {
+    return descriptions["zh"] ?: descriptions["en"] ?: descriptions["gb"]
+    ?: descriptions["ru"]
+    ?: descriptions.asIterable().firstOrNull()?.value
+    ?: "No description"
 }
