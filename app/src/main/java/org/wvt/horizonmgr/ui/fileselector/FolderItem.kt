@@ -74,7 +74,7 @@ internal fun FolderItem(
                 state = state,
                 anchors = anchors,
                 orientation = Orientation.Horizontal,
-                thresholds = { _, _ -> FixedThreshold(74.dp) }
+                thresholds = { _, _ -> FractionalThreshold(1f) }
             )
     ) {
         ToggleBackgroundWithIcon(
