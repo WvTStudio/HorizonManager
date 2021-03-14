@@ -14,7 +14,7 @@ android {
         applicationId = "org.wvt.horizonmgr"
         minSdkVersion(21)
         targetSdkVersion(30)
-        versionCode = 14
+        versionCode = 15
         versionName = "2.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -36,7 +36,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 file("proguard-rules.pro")
             )
-            versionNameSuffix = "-beta1"
+            versionNameSuffix = "-beta2"
         }
         create("alpha") {
             proguardFiles = mutableListOf(
