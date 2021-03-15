@@ -42,7 +42,7 @@ class InstallPackageViewModel(
     private var customName: String? = null
 
     fun getPackages() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             packs = try {
                 packRepository.getAllPackages()
             } catch (e: NetworkException) {
@@ -79,7 +79,7 @@ class InstallPackageViewModel(
     }
 
     fun startInstall() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             selectedPackage?.let { pack ->
                 val downloadProgress = mutableStateOf(0f)
                 downloadState.emit(StepState.Running(downloadProgress))

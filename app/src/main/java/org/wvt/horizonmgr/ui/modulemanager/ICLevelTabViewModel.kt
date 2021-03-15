@@ -38,7 +38,7 @@ class ICLevelTabViewModel(dependencies: DependenciesContainer) : ViewModel() {
             if (uuid == null) {
                 state.emit(State.PackageNotSelected)
             } else {
-                viewModelScope.launch(Dispatchers.IO) {
+                withContext(Dispatchers.IO) {
                     pack = manager.getInstalledPackages().find {
                         it.getInstallationInfo().internalId == uuid
                     }

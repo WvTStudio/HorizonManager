@@ -2,6 +2,7 @@ package org.wvt.horizonmgr.ui.pacakgemanager
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import org.wvt.horizonmgr.DependenciesContainer
@@ -59,7 +60,7 @@ class PackageDetailViewModel(
     }
 
     fun load() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             packageUUID?.let { pkgId ->
                 state.emit(State.LOADING)
                 pkgSize.emit(PackageSize.Loading)

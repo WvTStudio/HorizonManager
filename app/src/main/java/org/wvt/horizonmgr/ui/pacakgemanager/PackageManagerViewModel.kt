@@ -3,10 +3,12 @@ package org.wvt.horizonmgr.ui.pacakgemanager
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.wvt.horizonmgr.DependenciesContainer
 import org.wvt.horizonmgr.service.hzpack.*
 import org.wvt.horizonmgr.ui.components.InputDialogHostState
@@ -42,7 +44,7 @@ class PackageManagerViewModel(
     val errors = MutableStateFlow<List<Exception>>(emptyList())
 
     fun loadPackages() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             state.emit(State.Loading)
             val dateFormatter = SimpleDateFormat.getDateInstance()
             val packs = try {
@@ -79,7 +81,7 @@ class PackageManagerViewModel(
     }
 
     fun setSelectedPackage(uuid: String?) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             if (uuid == null) {
                 selectedPackageUUID = null
                 selectedPackage = null
@@ -100,7 +102,7 @@ class PackageManagerViewModel(
         confirmDeleteDialogHostState: ConfirmDeleteDialogHostState,
         onSucceed: () -> Unit
     ) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             if (confirmDeleteDialogHostState.showDialog() ==
                 ConfirmDeleteDialogHostState.DialogResult.CONFIRM
             ) {
@@ -122,7 +124,7 @@ class PackageManagerViewModel(
     }
 
     fun renamePackage(uuid: String, inputDialogHostState: InputDialogHostState) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             val pkg =
                 cachedPackages.find { it.getInstallationInfo().internalId == uuid } ?: return@launch
             val (manifest, installationInfo) = try {
@@ -158,7 +160,7 @@ class PackageManagerViewModel(
     }
 
     fun clonePackage(uuid: String, inputDialogHostState: InputDialogHostState) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             val pkg =
                 cachedPackages.find { it.getInstallationInfo().internalId == uuid } ?: return@launch
             val (manifest, installationInfo) = try {
@@ -202,7 +204,7 @@ class PackageManagerViewModel(
         viewModelScope.launch {
             _progressState.emit(ProgressDialogState.Loading("正在安装"))
             try {
-                mgr.installPackage(ZipPackage(File(filePath)), null)
+                withContext(Dispatchers.IO) { mgr.installPackage(ZipPackage(File(filePath)), null) }
             } catch (e: Exception) {
                 _progressState.emit(ProgressDialogState.Failed("安装失败", "安装失败，请检查文件格式是否正确"))
             }

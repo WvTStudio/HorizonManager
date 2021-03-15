@@ -3,6 +3,7 @@ package org.wvt.horizonmgr.ui.news
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import org.wvt.horizonmgr.DependenciesContainer
@@ -43,7 +44,7 @@ class NewsViewModel(
     fun refresh() {
         state.value = State.Loading
 
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             val result = try {
                 newsModule.getNewsSuggestions().map {
                     News.Article(

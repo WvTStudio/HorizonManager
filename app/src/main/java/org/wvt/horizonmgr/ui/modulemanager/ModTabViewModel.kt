@@ -7,6 +7,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.wvt.horizonmgr.DependenciesContainer
 import org.wvt.horizonmgr.service.hzpack.InstalledPackage
 import org.wvt.horizonmgr.service.mod.InstalledMod
@@ -105,7 +106,7 @@ class ModTabViewModel(dependencies: DependenciesContainer) : ViewModel() {
     fun enableMod(mod: ModEntry) {
         viewModelScope.launch {
             try {
-                map[mod]?.enable()
+                withContext(Dispatchers.IO) { map[mod]?.enable() }
             } catch (e: Exception) {
                 Log.e(TAG, "enableMod: Error", e)
                 return@launch
@@ -117,7 +118,7 @@ class ModTabViewModel(dependencies: DependenciesContainer) : ViewModel() {
     fun disableMod(mod: ModEntry) {
         viewModelScope.launch {
             try {
-                map[mod]?.disable()
+                withContext(Dispatchers.IO) { map[mod]?.disable() }
             } catch (e: Exception) {
                 Log.e(TAG, "disableMod: Error", e)
                 return@launch
@@ -130,7 +131,7 @@ class ModTabViewModel(dependencies: DependenciesContainer) : ViewModel() {
         viewModelScope.launch {
             _progressState.value = ProgressDialogState.Loading("正在删除")
             try {
-                map[mod]?.delete()
+                withContext(Dispatchers.IO) { map[mod]?.delete() }
             } catch (e: Exception) {
                 Log.e(TAG, "deleteMod: Error", e)
                 return@launch
@@ -152,13 +153,13 @@ class ModTabViewModel(dependencies: DependenciesContainer) : ViewModel() {
             if (pkg != null) {
                 _progressState.emit(ProgressDialogState.Loading("正在安装"))
                 val zipMod = try {
-                    ZipMod.fromFile(File(path))
+                    withContext(Dispatchers.IO) { ZipMod.fromFile(File(path)) }
                 } catch (e: Exception) {
                     _progressState.emit(ProgressDialogState.Failed("安装失败", "您选择的文件可能不是一个正确的模组"))
                     return@launch
                 }
                 try {
-                    pkg.installMod(zipMod)
+                    withContext(Dispatchers.IO) { pkg.installMod(zipMod) }
                 } catch (e: Exception) {
                     // TODO: 2021/3/9 更详细的错误分类
                     _progressState.emit(ProgressDialogState.Failed("安装失败", "安装过程中出现错误"))

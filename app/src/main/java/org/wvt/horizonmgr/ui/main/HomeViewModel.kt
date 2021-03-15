@@ -10,9 +10,7 @@ import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.wvt.horizonmgr.DependenciesContainer
 
-class HomeViewModel(
-    private val dependencies: DependenciesContainer
-) : ViewModel() {
+class HomeViewModel(private val dependencies: DependenciesContainer) : ViewModel() {
 
     enum class Screen(
         val label: String,
@@ -27,8 +25,6 @@ class HomeViewModel(
 
     var currentScreen by mutableStateOf(Screen.LOCAL_MANAGE)
         private set
-
-    val selectedPackageUUID = MutableStateFlow<String?>(null)
 
     fun navigate(screen: Screen) {
         currentScreen = screen

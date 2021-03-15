@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.wvt.horizonmgr.DependenciesContainer
 import java.io.File
 import java.util.*
@@ -67,7 +68,7 @@ class FileSelectorViewModel(dependencies: DependenciesContainer) : ViewModel() {
     }
 
     fun refresh() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Default) {
             state.emit(State.Loading)
             val file = mTabList[currentPathDepth.value]
             try {
@@ -89,7 +90,7 @@ class FileSelectorViewModel(dependencies: DependenciesContainer) : ViewModel() {
     }
 
     fun selectPathDepth(depth: Int) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Default) {
             state.emit(State.Loading)
             val file = mTabList[depth]
             currentPathDepth.emit(depth)
@@ -111,7 +112,7 @@ class FileSelectorViewModel(dependencies: DependenciesContainer) : ViewModel() {
     }
 
     fun enterFavoriteFolder(index: Int) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Default) {
             state.emit(State.Loading)
             val file = mFavoriteFolders[index]
             try {
@@ -133,7 +134,7 @@ class FileSelectorViewModel(dependencies: DependenciesContainer) : ViewModel() {
     }
 
     fun enterListFolder(index: Int) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Default) {
             state.emit(State.Loading)
             val file = mListFiles[index]
             try {
@@ -180,7 +181,7 @@ class FileSelectorViewModel(dependencies: DependenciesContainer) : ViewModel() {
     }
 
     private suspend fun loadFavoriteFolders() {
-        val fixedFolders = localCache.getFixedFolders()
+        val fixedFolders = withContext(Dispatchers.IO) { localCache.getFixedFolders() }
         mFavoriteFolders = fixedFolders.map { File(it.path) }
         favoriteFolders.emit(mFavoriteFolders.map { it.name })
     }

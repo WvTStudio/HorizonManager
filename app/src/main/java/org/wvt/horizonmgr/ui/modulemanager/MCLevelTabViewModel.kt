@@ -26,7 +26,7 @@ class MCLevelTabViewModel(dependencies: DependenciesContainer) : ViewModel() {
 
     fun load() {
         viewModelScope.launch(Dispatchers.Default) {
-            launch {
+            launch(Dispatchers.IO) {
                 val result = try {
                     levelManager.getLevels()
                 } catch (e: Exception) {
@@ -48,7 +48,7 @@ class MCLevelTabViewModel(dependencies: DependenciesContainer) : ViewModel() {
                 cachedLevels = mapped
                 levels.emit(mapped.keys.toList())
             }
-            launch {
+            launch(Dispatchers.IO) {
                 val uuid = localCache.getSelectedPackageUUID() ?: return@launch
                 currentPackage = manager.getInstalledPackages().find { it.getInstallationInfo().internalId == uuid }
             }

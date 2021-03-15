@@ -3,14 +3,11 @@ package org.wvt.horizonmgr.ui.onlinemods
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancelAndJoin
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.consumeAsFlow
-import kotlinx.coroutines.launch
 import org.wvt.horizonmgr.DependenciesContainer
 import org.wvt.horizonmgr.service.mod.ZipMod
 import org.wvt.horizonmgr.ui.components.ProgressDialogState
@@ -101,7 +98,7 @@ class OnlineModsViewModel(
     }
 
     fun installChineseMod(id: Int) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             try {
                 val pkg = localCache.getSelectedPackageUUID()?.let { uuid ->
                     manager.getInstalledPackages().find { it.getInstallationInfo().internalId == uuid }
@@ -133,7 +130,7 @@ class OnlineModsViewModel(
     }
 
     fun installMirrorMod(id: Int) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             try {
                 val pkg = localCache.getSelectedPackageUUID()?.let { uuid ->
                     manager.getInstalledPackages().find { it.getInstallationInfo().internalId == uuid }
@@ -164,7 +161,7 @@ class OnlineModsViewModel(
     }
 
     fun load() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             state.emit(State.Loading)
             try {
                 if (selectedRepository.value == Repository.OfficialMirror) {
@@ -197,8 +194,8 @@ class OnlineModsViewModel(
         }
     }
 
-    private suspend fun loadMirrorMods(sortMode: MirrorSortMode, filterText: String?) {
-        val mods = cdnModRepository.getAllMods()
+    private suspend fun loadMirrorMods(sortMode: MirrorSortMode, filterText: String?) = withContext(Dispatchers.Default) {
+        val mods = withContext(Dispatchers.IO) { cdnModRepository.getAllMods() }
         cachedMirrorMods = mods
         var processed = mods.sorted(sortMode)
         if (filterText != null) {
@@ -226,8 +223,8 @@ class OnlineModsViewModel(
         cdnMods.emit(mapped)
     }
 
-    private suspend fun loadChineseMods(sortMode: ChineseSortMode, filterText: String?) {
-        val mods = chineseModRepository.getAllMods()
+    private suspend fun loadChineseMods(sortMode: ChineseSortMode, filterText: String?) =withContext(Dispatchers.Default) {
+        val mods = withContext(Dispatchers.IO) { chineseModRepository.getAllMods() }
         cachedChineseMods = mods
         var processed = mods.sorted(sortMode)
         if (filterText != null) {

@@ -3,9 +3,11 @@ package org.wvt.horizonmgr.ui.downloaded
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.wvt.horizonmgr.DependenciesContainer
 import org.wvt.horizonmgr.utils.ModDownloader
 import org.wvt.horizonmgr.service.hzpack.InstalledPackage
@@ -35,14 +37,16 @@ class DMViewModel(dependencies: DependenciesContainer) : ViewModel() {
     fun setSelectedPackage(uuid: String?) {
         viewModelScope.launch {
             selectedUUID = uuid
-            selectedPackage = manager.getInstalledPackages().find { it.getInstallationInfo().internalId == uuid }
+            selectedPackage = withContext(Dispatchers.IO) {
+                manager.getInstalledPackages().find { it.getInstallationInfo().internalId == uuid }
+            }
         }
     }
 
     private var map: Map<DownloadedMod, ModDownloader.DownloadedMod> = emptyMap()
 
     fun refresh() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             val mMap = LinkedHashMap<DownloadedMod, ModDownloader.DownloadedMod>()
             downloader.getDownloadedMods().forEach {
                 val modInfo = it.zipMod.getModInfo()
@@ -60,7 +64,7 @@ class DMViewModel(dependencies: DependenciesContainer) : ViewModel() {
     }
 
     fun install(dm: DownloadedMod) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             try {
                 _progressState.value = ProgressDialogState.Loading("正在安装")
                 val mod = map[dm] ?: return@launch
@@ -74,7 +78,7 @@ class DMViewModel(dependencies: DependenciesContainer) : ViewModel() {
     }
 
     fun delete(dm: DownloadedMod) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             map[dm]?.let { mod ->
                 File(mod.path).delete()
                 refresh()

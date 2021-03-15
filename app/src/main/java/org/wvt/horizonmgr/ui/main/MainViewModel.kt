@@ -43,7 +43,7 @@ class MainViewModel(
     val hzNotInstalled = MutableStateFlow(false)
 
     init {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             userInfo.value = localCache.getCachedUserInfo()
             selectedPackage.value = localCache.getSelectedPackageUUID()
             initialized = true
@@ -51,7 +51,7 @@ class MainViewModel(
     }
 
     fun checkUpdate() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             Log.d(
                 TAG,
                 "Build Type: ${BuildConfig.BUILD_TYPE}, Version Code: ${BuildConfig.VERSION_CODE}"
@@ -110,14 +110,14 @@ class MainViewModel(
     }
 
     fun setSelectedPackage(uuid: String?) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             localCache.setSelectedPackageUUID(uuid)
             selectedPackage.value = uuid
         }
     }
 
     fun setUserInfo(userInfo: LoginResult) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             if (userInfo is LoginResult.Succeed) {
                 localCache.cacheUserInfo(
                     userInfo.uid,
@@ -131,7 +131,7 @@ class MainViewModel(
     }
 
     fun logOut() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             localCache.clearCachedUserInfo()
             userInfo.value = null
         }
@@ -148,7 +148,7 @@ class MainViewModel(
     }
 
     fun ignoreVersion(versionCode: Int) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             localCache.setIgnoreVersion(versionCode)
         }
     }
