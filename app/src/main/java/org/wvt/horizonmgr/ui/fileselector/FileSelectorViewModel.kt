@@ -163,6 +163,7 @@ class FileSelectorViewModel(dependencies: DependenciesContainer) : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             val file = mListFiles[index]
             localCache.addFixedFolder(file.name, file.absolutePath)
+            loadFavoriteFolders()
         }
     }
 
@@ -170,6 +171,7 @@ class FileSelectorViewModel(dependencies: DependenciesContainer) : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             val file = mListFiles[index]
             localCache.removeFixedFolder(file.absolutePath)
+            loadFavoriteFolders()
         }
     }
 
@@ -177,6 +179,8 @@ class FileSelectorViewModel(dependencies: DependenciesContainer) : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             val file = mFavoriteFolders[index]
             localCache.removeFixedFolder(file.absolutePath)
+            mFavoriteFolders = mFavoriteFolders.toMutableList().also { it.remove(file) }
+            loadFavoriteFolders()
         }
     }
 

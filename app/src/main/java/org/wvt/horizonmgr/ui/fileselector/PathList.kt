@@ -1,6 +1,7 @@
 package org.wvt.horizonmgr.ui.fileselector
 
 import androidx.compose.animation.Crossfade
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -43,12 +44,14 @@ internal fun PathList(
             color = MaterialTheme.colors.primary,
             style = MaterialTheme.typography.subtitle1
         )
-        pinedPath.fastForEachIndexed { index, folder ->
-            FolderItem(name = folder.name,
-                onClick = { onPinnedFolderSelect(index) },
-                isStared = true,
-                onStarChange = { onPinnedFolderStar(index, false) }
-            )
+        Column(Modifier.animateContentSize()) {
+            pinedPath.fastForEachIndexed { index, folder ->
+                FolderItem(name = folder.name,
+                    onClick = { onPinnedFolderSelect(index) },
+                    isStared = true,
+                    onStarChange = { onPinnedFolderStar(index, false) }
+                )
+            }
         }
         Divider(Modifier.padding(top = 8.dp, bottom = 8.dp))
     }
