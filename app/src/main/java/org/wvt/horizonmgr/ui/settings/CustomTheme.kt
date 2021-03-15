@@ -24,6 +24,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import org.wvt.horizonmgr.ui.theme.*
 
 private enum class CheckedColorType {
@@ -84,7 +85,9 @@ fun CustomTheme(requestClose: () -> Unit) {
 
     Box(Modifier.fillMaxSize()) {
         Column(Modifier.fillMaxSize()) {
-            TopAppBar(navigationIcon = {
+            TopAppBar(
+                modifier = Modifier.zIndex(4f),
+                navigationIcon = {
                 IconButton(onClick = requestClose) {
                     Icon(imageVector = Icons.Filled.ArrowBack, "返回")
                 }
