@@ -4,7 +4,6 @@ import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.indication
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -22,7 +21,6 @@ fun DropDownSelector(
     selectedIndex: Int,
     onSelected: (index: Int) -> Unit
 ) {
-
     val sourceInteractionState = remember { MutableInteractionSource() }
     var dropDown by remember { mutableStateOf(false) }
 
@@ -37,15 +35,13 @@ fun DropDownSelector(
         Crossfade(items[selectedIndex]) {
             Text(it, style = MaterialTheme.typography.body1)
         }
-        Box {
-            IconButton(
-                modifier = Modifier.indication(
-                    sourceInteractionState,
-                    rememberRipple(bounded = false, radius = 24.dp)
-                ),
-                onClick = { dropDown = true }
-            ) { Icon(Icons.Filled.ArrowDropDown, "展开") }
-        }
+        IconButton(
+            modifier = Modifier.indication(
+                sourceInteractionState,
+                rememberRipple(bounded = false, radius = 24.dp)
+            ),
+            onClick = { dropDown = true }
+        ) { Icon(Icons.Filled.ArrowDropDown, "展开") }
         DropdownMenu(
             expanded = dropDown,
             onDismissRequest = { dropDown = false }

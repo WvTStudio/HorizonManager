@@ -1,7 +1,9 @@
 package org.wvt.horizonmgr.ui.onlinemods
 
 import androidx.compose.animation.Crossfade
+import androidx.compose.animation.animateColor
 import androidx.compose.animation.core.*
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -13,13 +15,14 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.layoutId
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -47,6 +50,9 @@ private val iconFade = tween<Float>(durationMillis = 120, easing = FastOutSlowIn
 private val searchBoxEnter = tween<Dp>(275, 0, FastOutSlowInEasing) // Shrink to enter
 private val searchBoxExit = tween<Dp>(225, 40, FastOutSlowInEasing) // Expand to exit
 
+private val searchBoxEnterColor = tween<Color>(275, 40, FastOutSlowInEasing) // Expand to exit
+private val searchBoxExitColor = tween<Color>(225, 40, FastOutSlowInEasing) // Expand to exit
+
 private val contentAppear = tween<Float>(275, 80, LinearOutSlowInEasing)
 private val contentDisappear = tween<Float>(225, 0, FastOutLinearInEasing)
 
@@ -67,22 +73,33 @@ internal fun TuneAppBar(
     onSortModeSelect: (index: Int) -> Unit
 ) {
     var expand by remember { mutableStateOf(false) }
-
     var filterValue by remember(filterText) { mutableStateOf(TextFieldValue(filterText)) }
+    val updateTransition = updateTransition(expand)
 
-    val actionOpacity by animateFloatAsState(if (expand) 0.72f else 1f)
-
-    val offset by animateDpAsState(
-        if (expand) 16.dp else 0.dp,
-        animationSpec = if (expand) searchBoxEnter else searchBoxExit
+    val actionOpacity by updateTransition.animateFloat(
+        targetValueByState = { if (it) 0.72f else 1f }
     )
-
-    val contentOpacity by animateFloatAsState(
-        if (expand) 1f else 0f,
-        if (expand) contentAppear else contentDisappear
+    val searchBoxPadding by updateTransition.animateDp(
+        transitionSpec = { if (targetState) searchBoxEnter else searchBoxExit },
+        targetValueByState = { if (it) 16.dp else 0.dp }
     )
-
-    val searchTextfieldFocus = remember { FocusRequester() }
+    val searchBoxCorner by updateTransition.animateDp(
+        transitionSpec = { if (targetState) searchBoxEnter else searchBoxExit },
+        targetValueByState = { if (it) 4.dp else 0.dp }
+    )
+    val searchBoxElevation by updateTransition.animateDp(
+        transitionSpec = { if (targetState) searchBoxEnter else searchBoxExit },
+        targetValueByState = { if (it) 4.dp else 0.dp }
+    )
+    val searchBoxBackgroundColor by updateTransition.animateColor(
+        transitionSpec = { if (targetState) searchBoxEnterColor else searchBoxExitColor },
+        targetValueByState = { if (it) MaterialTheme.colors.surface else Color.Transparent }
+    )
+    val contentOpacity by updateTransition.animateFloat(
+        transitionSpec = { if (targetState) contentAppear else contentDisappear },
+        targetValueByState = { if (it) 1f else 0f }
+    )
+    val searchTextFieldFocus = remember { FocusRequester() }
 
     Surface(
         modifier = Modifier
@@ -98,19 +115,44 @@ internal fun TuneAppBar(
                 modifier = Modifier
                     .layoutId("searchbox_bg")
                     .fillMaxWidth()
-                    .padding(top = offset, start = offset, end = offset)
+                    .padding(
+                        top = searchBoxPadding,
+                        start = searchBoxPadding,
+                        end = searchBoxPadding
+                    )
                     .height(56.dp)
-                    .alpha(contentOpacity),
-                shape = RoundedCornerShape(4.dp),
-                elevation = 4.dp,
-                content = {}
+                    .graphicsLayer(
+                        alpha = contentOpacity,
+                        shadowElevation = with(LocalDensity.current) { searchBoxElevation.toPx() },
+                        shape = RoundedCornerShape(searchBoxCorner)
+                    ),
+                shape = RoundedCornerShape(searchBoxCorner),
+                color = LocalElevationOverlay.current?.apply(
+                    color = MaterialTheme.colors.surface,
+                    elevation = LocalAbsoluteElevation.current + 4.dp
+                ) ?: MaterialTheme.colors.surface, // 手动应用 4dp 海拔的 surface 颜色效果
+                content = {
+                    Box(
+                        Modifier
+                            .fillMaxSize()
+                            .apply {
+                                if (expand) clickable {
+                                    searchTextFieldFocus.requestFocus()
+                                }
+                            }
+                    )
+                },
             )
 
             // AppBar & SearchBox
             Box(
                 Modifier
                     .layoutId("appbar")
-                    .padding(top = offset)
+                    .padding(
+                        top = searchBoxPadding,
+                        start = searchBoxPadding,
+                        end = searchBoxPadding
+                    )
                     .height(56.dp)
                     .fillMaxWidth()
                     .zIndex(4.dp.value)
@@ -119,12 +161,13 @@ internal fun TuneAppBar(
                 IconButton(
                     modifier = Modifier
                         .align(Alignment.CenterStart)
-                        .padding(start = 4.dp + offset)
+                        .padding(start = 4.dp)
                         .graphicsLayer(alpha = actionOpacity),
                     onClick = {
                         if (expand) expand = false
                         else onNavClicked()
-                    }) {
+                    }
+                ) {
                     Crossfade(targetState = expand, animationSpec = iconFade) {
                         if (it) Icon(
                             imageVector = Icons.Filled.ArrowBack,
@@ -138,7 +181,10 @@ internal fun TuneAppBar(
                     Box(
                         modifier = Modifier
                             .align(Alignment.CenterStart)
-                            .padding(start = 72.dp + offset, end = 24.dp + offset)
+                            .padding(
+                                start = 72.dp,
+                                end = 24.dp
+                            )
                             .fillMaxSize(),
                         contentAlignment = Alignment.CenterStart
                     ) {
@@ -157,7 +203,7 @@ internal fun TuneAppBar(
                             BasicTextField(
                                 modifier = Modifier
                                     .align(Alignment.CenterStart)
-                                    .focusRequester(searchTextfieldFocus),
+                                    .focusRequester(searchTextFieldFocus),
                                 value = filterValue,
                                 onValueChange = {
                                     if (!it.text.contains('\n')) {
@@ -170,7 +216,7 @@ internal fun TuneAppBar(
                                 ),
                                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
                                 keyboardActions = KeyboardActions(onSearch = {
-                                    searchTextfieldFocus.freeFocus()
+                                    searchTextFieldFocus.freeFocus()
                                     onFilterValueConfirm(filterValue.text)
                                 })
                             )
@@ -187,11 +233,11 @@ internal fun TuneAppBar(
                     // Tune Button
                     IconButton(modifier = Modifier
                         .align(Alignment.CenterEnd)
-                        .padding(end = 4.dp + offset)
+                        .padding(end = 4.dp)
                         .graphicsLayer(alpha = actionOpacity),
                         onClick = {
                             if (expand) { // Search
-                                searchTextfieldFocus.freeFocus()
+                                searchTextFieldFocus.freeFocus()
                                 onFilterValueConfirm(filterValue.text)
                             } else { // Expand
                                 expand = true
@@ -213,46 +259,19 @@ internal fun TuneAppBar(
             // Content
             Box(
                 Modifier
+                    .fillMaxWidth()
                     .wrapContentHeight()
                     .graphicsLayer(alpha = contentOpacity)
                     .layoutId("content")
             ) {
-                CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-                    Column(
-                        Modifier.padding(top = 8.dp, start = 32.dp, end = 16.dp, bottom = 16.dp)
-                    ) {
-                        // Tune Option 1: Source
-                        Row(
-                            modifier = Modifier.padding(top = 8.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(imageVector = Icons.Filled.Language, contentDescription = "源仓库")
-                            DropDownSelector(
-                                modifier = Modifier
-                                    .padding(start = 16.dp)
-                                    .fillMaxWidth(),
-                                items = repositories,
-                                selectedIndex = selectedRepository,
-                                onSelected = { onRepositorySelect(it) }
-                            )
-                        }
-                        // Tune Option2: Sort Mode
-                        Row(
-                            modifier = Modifier
-                                .padding(top = 8.dp)
-                                .fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(imageVector = Icons.Filled.Sort, contentDescription = "排序方式")
-                            DropDownSelector(
-                                modifier = Modifier.padding(start = 16.dp),
-                                items = sortModes,
-                                selectedIndex = selectedSortMode,
-                                onSelected = { onSortModeSelect(it) }
-                            )
-                        }
-                    }
-                }
+                TuneContent(
+                    repositories,
+                    selectedRepository,
+                    onRepositorySelect,
+                    sortModes,
+                    selectedSortMode,
+                    onSortModeSelect
+                )
             }
         }
     }
@@ -263,39 +282,85 @@ private fun AppBarLayout(
     expand: Boolean,
     content: @Composable () -> Unit
 ) {
-    val progress =
-        animateFloatAsState(if (expand) 1f else 0f, if (expand) tuneExpand else tuneShrink).value
+    val progress by updateTransition(expand).animateFloat(transitionSpec = {
+        if (targetState) tuneExpand else tuneShrink
+    }, targetValueByState = {
+        if (it) 1f else 0f
+    })
     Layout(content) { m: List<Measurable>, c: Constraints ->
         check(m.size == 3)
 
-        if (progress == 0f) { // Not expand
-            val appbar = m.first { it.layoutId == "appbar" }.measure(c)
-            val appbarHeight = appbar.height
-            layout(
-                appbar.width,
-                appbarHeight
+        // Expanding | Expanded
+        val appbar = m.first { it.layoutId == "appbar" }.measure(c)
+        val appbarHeight = appbar.height
+
+        val mContent = m.first { it.layoutId == "content" }.measure(c)
+        val mContentHeight = mContent.height
+
+        val searchBoxBG = m.first { it.layoutId == "searchbox_bg" }.measure(c)
+
+        // 在 appbarHeight 和 appbarHeight + mContentHeight 之间变换
+        val height = lerp(appbarHeight, appbarHeight + mContentHeight, progress)
+
+        layout(
+            maxOf(appbar.width, mContent.width),
+            height
+        ) {
+            searchBoxBG.placeRelative(0, 0) // SearchBox Background
+            appbar.placeRelative(0, 0) // TopAppBar
+            mContent.placeRelative(0, appbarHeight) // Content
+        }
+    }
+}
+
+@Composable
+private fun TuneContent(
+    repositories: List<String>,
+    selectedRepository: Int,
+    onRepositorySelect: (index: Int) -> Unit,
+    sortModes: List<String>,
+    selectedSortMode: Int,
+    onSortModeSelect: (index: Int) -> Unit
+) {
+    CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+        Column(
+            Modifier
+                .padding(top = 8.dp, start = 32.dp, end = 16.dp, bottom = 16.dp)
+                .fillMaxWidth()
+                .wrapContentHeight()
+        ) {
+            // Tune Option 1: Source
+            Row(
+                modifier = Modifier
+                    .padding(top = 8.dp)
+                    .fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                appbar.placeRelative(0, 0) // TopAppBar
+                Icon(Icons.Filled.Language, contentDescription = "源仓库")
+                DropDownSelector(
+                    modifier = Modifier.padding(horizontal = 16.dp).weight(1f).wrapContentHeight(),
+                    items = repositories,
+                    selectedIndex = selectedRepository,
+                    onSelected = { onRepositorySelect(it) }
+                )
             }
-        } else { // Expanding | Expanded
-            val appbar = m.first { it.layoutId == "appbar" }.measure(c)
-            val appbarHeight = appbar.height
-
-            val mContent = m.first { it.layoutId == "content" }.measure(c)
-            val mContentHeight = mContent.height
-
-            val searchBoxBG = m.first { it.layoutId == "searchbox_bg" }.measure(c)
-
-            // 在 appbarHeight 和 appbarHeight + mContentHeight 之间变换
-            val height = lerp(appbarHeight, appbarHeight + mContentHeight, progress)
-
-            layout(
-                maxOf(appbar.width, mContent.width),
-                height
+            // Tune Option2: Sort Mode
+            Row(
+                modifier = Modifier
+                    .padding(top = 8.dp)
+                    .fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                searchBoxBG.placeRelative(0, 0) // SearchBox Background
-                appbar.placeRelative(0, 0) // TopAppBar
-                mContent.placeRelative(0, appbarHeight) // Content
+                Icon(imageVector = Icons.Filled.Sort, contentDescription = "排序方式")
+                DropDownSelector(
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp)
+                        .weight(1f)
+                        .wrapContentHeight(),
+                    items = sortModes,
+                    selectedIndex = selectedSortMode,
+                    onSelected = { onSortModeSelect(it) }
+                )
             }
         }
     }

@@ -3,15 +3,15 @@
   <component name="deploymentTargetDropDown">
     <targetSelectedWithDropDown>
       <Target>
-        <type value="RUNNING_DEVICE_TARGET" />
+        <type value="QUICK_BOOT_TARGET" />
         <deviceKey>
           <Key>
-            <type value="SERIAL_NUMBER" />
-            <value value="Konyaco-mi8:5555" />
+            <type value="VIRTUAL_DEVICE_PATH" />
+            <value value="C:\Users\atwzj233\.android\avd\Pixel_5_API_30.avd" />
           </Key>
         </deviceKey>
       </Target>
     </targetSelectedWithDropDown>
-    <timeTargetWasSelectedWithDropDown value="2021-03-13T04:36:57.029620800Z" />
+    <timeTargetWasSelectedWithDropDown value="2021-03-14T08:03:55.680567400Z" />
   </component>
 </project>
