@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.wvt.horizonmgr.DependenciesContainer
+import org.wvt.horizonmgr.service.FileTypeGuesser
 import org.wvt.horizonmgr.service.hzpack.InstalledPackage
 import org.wvt.horizonmgr.service.mod.InstalledMod
 import org.wvt.horizonmgr.service.mod.ZipMod
@@ -92,6 +93,7 @@ class ModTabViewModel(dependencies: DependenciesContainer) : ViewModel() {
                         Log.e(TAG, "Mod 解析错误", e)
                     }
                 }
+                selectedPackage = pkg
                 _mods.emit(result)
                 newEnabledMods.emit(enabled)
                 map = mMap
@@ -167,7 +169,7 @@ class ModTabViewModel(dependencies: DependenciesContainer) : ViewModel() {
                 }
                 _progressState.value = ProgressDialogState.Finished("安装完成")
             } else {
-                _progressState.emit(ProgressDialogState.Failed("您还没有安装分包", "您还没有安装分包"))
+                _progressState.emit(ProgressDialogState.Failed("您还没有选择分包", "您还没有安装分包"))
             }
         }
     }

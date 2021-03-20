@@ -203,10 +203,18 @@ class PackageManagerViewModel(
         // TODO: 2021/2/20 实现选择文件安装
         viewModelScope.launch {
             _progressState.emit(ProgressDialogState.Loading("正在安装"))
+            val zipPackage = withContext(Dispatchers.IO) {
+                ZipPackage(File(filePath))
+            }
+            if (!zipPackage.isZipPackage()) {
+                _progressState.emit(ProgressDialogState.Failed("解析失败", "您选择的文件可能不是一个正确的分包"))
+                return@launch
+            }
             try {
                 withContext(Dispatchers.IO) { mgr.installPackage(ZipPackage(File(filePath)), null) }
             } catch (e: Exception) {
-                _progressState.emit(ProgressDialogState.Failed("安装失败", "安装失败，请检查文件格式是否正确"))
+                _progressState.emit(ProgressDialogState.Failed("安装失败", "安装过程中出现错误"))
+                return@launch
             }
             _progressState.emit(ProgressDialogState.Finished("安装完成"))
             loadPackages()

@@ -6,10 +6,12 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import org.wvt.horizonmgr.ui.components.ErrorPage
 import org.wvt.horizonmgr.ui.components.ModIcon
@@ -76,7 +78,7 @@ fun ResItem(
     description: String,
     onClick: () -> Unit
 ) {
-    val iconImage = icon?.let { loadLocalImage(path = icon) }
+    val iconImage = icon?.let { loadLocalImage(path = it) }
 
     Card(modifier) {
         Box(Modifier.clickable(onClick = onClick)) {
@@ -94,7 +96,8 @@ fun ResItem(
                 ModIcon(
                     modifier = Modifier
                         .padding(16.dp)
-                        .size(72.dp),
+                        .size(72.dp)
+                        .clip(RoundedCornerShape(4.dp)),
                     image = iconImage?.value
                 )
             }

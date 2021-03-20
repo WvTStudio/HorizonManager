@@ -86,11 +86,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun startSelectFileActivityForPackage() {
-        selectFileForModule.launch(this)
+        selectFileForPackage.launch(this)
     }
 
     private fun startSelectFileActivityForMod() {
-        selectFileForPackage.launch(this)
+        selectFileForModule.launch(this)
     }
 
     private fun startOnlineInstallActivity() {

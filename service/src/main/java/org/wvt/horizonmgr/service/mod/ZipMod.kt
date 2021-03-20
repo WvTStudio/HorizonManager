@@ -1,6 +1,7 @@
 package org.wvt.horizonmgr.service.mod
 
 import java.io.File
+import java.util.zip.ZipException
 import java.util.zip.ZipFile
 
 /**
@@ -9,13 +10,32 @@ import java.util.zip.ZipFile
  *
  */
 class ZipMod internal constructor(
-    internal val file: File
+    internal val file: File,
+    private val zipFile: ZipFile = ZipFile(file)
 ) {
-    private val zipFile = ZipFile(file)
+    class NotZipModFileException() : Exception("Not a zip mod file.")
+
 
     companion object {
+
+        @Throws(NotZipModFileException::class)
         fun fromFile(file: File): ZipMod {
-            return ZipMod(file)
+            val zipFile = try {
+                ZipFile(file)
+            } catch (e: ZipException) {
+                throw NotZipModFileException()
+            }
+            if (isZipMod(zipFile)) {
+                return ZipMod(file)
+            } else {
+                throw NotZipModFileException()
+            }
+        }
+
+        private fun isZipMod(file: ZipFile): Boolean {
+            return file.entries().asSequence().find {
+                it.name.endsWith("mod.info")
+            } != null
         }
     }
 
