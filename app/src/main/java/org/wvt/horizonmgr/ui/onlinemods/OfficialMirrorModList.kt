@@ -17,7 +17,7 @@ fun OfficialMirrorModList(
 ) {
     LazyColumn(
         modifier = modifier,
-        contentPadding = PaddingValues(top = 16.dp, bottom = 64.dp)
+        contentPadding = PaddingValues(top = 8.dp, bottom = 64.dp)
     ) {
         itemsIndexed(mods) { index: Int, item: OfficialMirrorModModel ->
             OfficialMirrorModItem(
