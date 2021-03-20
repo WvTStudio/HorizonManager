@@ -18,7 +18,7 @@ data class InstallationInfo(
     /**
      * 用户自定义的名称
      */
-    val customName: String?,
+    val customName: String? = null,
     /**
      * 分包安装时创建的 UUID，用于区别设备内安装的分包
      */

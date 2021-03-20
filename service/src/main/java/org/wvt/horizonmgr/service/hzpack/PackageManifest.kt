@@ -21,7 +21,7 @@ data class PackageManifest(
      */
     val pack: String,
     /**
-     * 分包的版本命
+     * 分包的版本名
      */
     val packVersion: String,
     /**

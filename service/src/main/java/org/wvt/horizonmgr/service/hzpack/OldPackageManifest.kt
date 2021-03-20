@@ -20,9 +20,9 @@ data class OldPackageManifest(
      */
     val pack: String,
     /**
-     * 分包的版本命
+     * 分包的版本名
      */
-    val packVersion: String,
+    val packVersion: String? = null,
     /**
      * 分包的版本号
      */
@@ -51,7 +51,7 @@ data class OldPackageManifest(
         }
 
         fun OldPackageManifest.toPackageManifest(): PackageManifest {
-            return PackageManifest(game, gameVersion, pack, packVersion, packVersionCode, developer, mapOf("gb" to description))
+            return PackageManifest(game, gameVersion, pack, packVersion ?: packVersionCode.toString(), packVersionCode, developer, mapOf("gb" to description))
         }
     }
 }
