@@ -4,6 +4,7 @@ import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Extension
@@ -14,8 +15,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import org.wvt.horizonmgr.ui.components.ModIcon
 import org.wvt.horizonmgr.ui.components.ProgressDialog
 import org.wvt.horizonmgr.ui.main.LocalSelectedPackageUUID
 import org.wvt.horizonmgr.ui.theme.AppBarBackgroundColor
@@ -68,7 +71,17 @@ fun DownloadedMods(
                             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
                             name = item.name,
                             description = item.description,
-                            icon = {},
+                            icon = {
+                                Box(Modifier.padding(16.dp)) {
+                                    // Mod Icon
+                                    ModIcon(
+                                        modifier = Modifier
+                                            .size(80.dp)
+                                            .clip(RoundedCornerShape(4.dp)),
+                                        image = item.icon
+                                    )
+                                }
+                            },
                             onInstallClicked = { vm.install(item) },
                             onDeleteClicked = { vm.delete(item) }
                         )
@@ -94,14 +107,20 @@ private fun ModItem(
 ) {
     Card(modifier = modifier, elevation = 2.dp) {
         Column {
-            Column(Modifier.padding(start = 16.dp, top = 16.dp, end = 16.dp)) {
-                // Name
-                Text(text = name, style = MaterialTheme.typography.h6)
-                // Description
-                Text(
-                    modifier = Modifier.padding(top = 16.dp),
-                    text = description
-                )
+            Row {
+                Column(
+                    Modifier
+                        .padding(start = 16.dp, top = 16.dp, end = 16.dp)
+                        .weight(1f)) {
+                    // Name
+                    Text(text = name, style = MaterialTheme.typography.h6)
+                    // Description
+                    Text(
+                        modifier = Modifier.padding(top = 16.dp),
+                        text = description
+                    )
+                }
+                icon()
             }
             Box(
                 modifier = Modifier

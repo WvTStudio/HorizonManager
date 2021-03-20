@@ -1,6 +1,7 @@
 package org.wvt.horizonmgr.service.mod
 
 import java.io.File
+import java.io.InputStream
 import java.util.zip.ZipException
 import java.util.zip.ZipFile
 
@@ -50,5 +51,13 @@ class ZipMod internal constructor(
         val modInfoStr = input.bufferedReader().use { it.readText() }
 
         return ModInfo.fromJson(modInfoStr)
+    }
+
+    fun getModIconStream(): InputStream? {
+        val entry = zipFile.entries().asSequence().find {
+            it.name.endsWith("mod_icon.png")
+        } ?: return null
+
+        return zipFile.getInputStream(entry)
     }
 }

@@ -1,6 +1,8 @@
 package org.wvt.horizonmgr.ui.downloaded
 
+import android.graphics.BitmapFactory
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
@@ -9,9 +11,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.wvt.horizonmgr.DependenciesContainer
-import org.wvt.horizonmgr.utils.ModDownloader
 import org.wvt.horizonmgr.service.hzpack.InstalledPackage
 import org.wvt.horizonmgr.ui.components.ProgressDialogState
+import org.wvt.horizonmgr.utils.ModDownloader
 import java.io.File
 
 class DMViewModel(dependencies: DependenciesContainer) : ViewModel() {
@@ -50,11 +52,14 @@ class DMViewModel(dependencies: DependenciesContainer) : ViewModel() {
             val mMap = LinkedHashMap<DownloadedMod, ModDownloader.DownloadedMod>()
             downloader.getDownloadedMods().forEach {
                 val modInfo = it.zipMod.getModInfo()
+                val icon = try {
+                    BitmapFactory.decodeStream(it.zipMod.getModIconStream()).asImageBitmap()
+                } catch (e: Exception) { null }
                 val downloaded = DownloadedMod(
                     it.path,
                     modInfo.name,
                     modInfo.description,
-                    null
+                    icon
                 )
                 mMap[downloaded] = it
             }
