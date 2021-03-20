@@ -1,5 +1,6 @@
 package org.wvt.horizonmgr.ui.downloaded
 
+import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -46,31 +47,32 @@ fun DownloadedMods(
                 })
             }, backgroundColor = AppBarBackgroundColor
         )
-
-        if (mods.isEmpty()) {
-            Box(
-                Modifier
-                    .fillMaxSize()
-                    .padding(16.dp), Alignment.Center
-            ) {
-                Text(
-                    "本地资源列表为空，您可以从在线资源中下载到本地",
-                    color = MaterialTheme.colors.onSurface.copy(ContentAlpha.medium)
-                )
-            }
-        } else {
-            LazyColumn(
-                contentPadding = PaddingValues(top = 8.dp, bottom = 64.dp)
-            ) {
-                itemsIndexed(mods) { _, item ->
-                    ModItem(
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                        name = item.name,
-                        description = item.description,
-                        icon = {},
-                        onInstallClicked = { vm.install(item) },
-                        onDeleteClicked = { vm.delete(item) }
+        Crossfade(mods) { mods ->
+            if (mods.isEmpty()) {
+                Box(
+                    Modifier
+                        .fillMaxSize()
+                        .padding(16.dp), Alignment.Center
+                ) {
+                    Text(
+                        "未找到本地资源，请从在线资源中下载",
+                        color = MaterialTheme.colors.onSurface.copy(ContentAlpha.medium)
                     )
+                }
+            } else {
+                LazyColumn(
+                    contentPadding = PaddingValues(top = 8.dp, bottom = 64.dp)
+                ) {
+                    itemsIndexed(mods) { _, item ->
+                        ModItem(
+                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                            name = item.name,
+                            description = item.description,
+                            icon = {},
+                            onInstallClicked = { vm.install(item) },
+                            onDeleteClicked = { vm.delete(item) }
+                        )
+                    }
                 }
             }
         }
