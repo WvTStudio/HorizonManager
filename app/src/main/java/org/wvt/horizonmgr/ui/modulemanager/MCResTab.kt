@@ -93,13 +93,14 @@ fun ResItem(
                         Text(text = description, style = MaterialTheme.typography.body1)
                     }
                 }
-                ModIcon(
-                    modifier = Modifier
-                        .padding(16.dp)
-                        .size(72.dp)
-                        .clip(RoundedCornerShape(4.dp)),
-                    image = iconImage?.value
-                )
+                Box(Modifier.padding(16.dp)) {
+                    ModIcon(
+                        modifier = Modifier
+                            .size(80.dp)
+                            .clip(RoundedCornerShape(4.dp)),
+                        image = iconImage?.value
+                    )
+                }
             }
         }
     }

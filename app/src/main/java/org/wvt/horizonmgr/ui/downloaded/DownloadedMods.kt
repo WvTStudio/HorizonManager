@@ -105,7 +105,7 @@ private fun ModItem(
     onDeleteClicked: () -> Unit,
     onInstallClicked: () -> Unit,
 ) {
-    Card(modifier = modifier, elevation = 2.dp) {
+    Card(modifier = modifier) {
         Column {
             Row {
                 Column(
