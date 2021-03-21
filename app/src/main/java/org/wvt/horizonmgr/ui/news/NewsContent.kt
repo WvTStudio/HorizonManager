@@ -45,23 +45,31 @@ fun NewsContent(
                     CircularProgressIndicator(Modifier.align(Alignment.Center))
                 }
                 NewsContentViewModel.Result.NetworkError -> {
-                    ErrorPage(message = { Text("网络错误，请稍后再试") },
-                        onRetryClick = { vm.refresh() })
+                    ErrorPage(
+                        modifier = Modifier.fillMaxSize(),
+                        message = { Text("网络错误，请稍后再试") },
+                        onRetryClick = { vm.refresh() }
+                    )
                 }
                 NewsContentViewModel.Result.NewsNotFound -> {
-                    ErrorPage(message = { Text("该资讯可能已被删除") },
-                        onRetryClick = { vm.refresh() })
+                    ErrorPage(
+                        modifier = Modifier.fillMaxSize(),
+                        message = { Text("该资讯可能已被删除") },
+                        onRetryClick = { vm.refresh() }
+                    )
                 }
                 NewsContentViewModel.Result.OtherError -> {
-                    ErrorPage(message = { Text("未知错误，请稍后再试") },
-                        onRetryClick = { vm.refresh() })
+                    ErrorPage(
+                        modifier = Modifier.fillMaxSize(),
+                        message = { Text("未知错误，请稍后再试") },
+                        onRetryClick = { vm.refresh() }
+                    )
                 }
                 is NewsContentViewModel.Result.Succeed -> {
                     val content = it.value
                     LazyColumn(modifier = Modifier.fillMaxSize()) {
                         item {
                             Column(Modifier.fillParentMaxWidth()) {
-
                                 if (content.coverUrl != null) {
                                     NetworkImage(
                                         modifier = Modifier
