@@ -4,7 +4,7 @@ package org.wvt.horizonmgr
 import androidx.test.platform.app.InstrumentationRegistry
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
-import org.wvt.horizonmgr.service.HorizonManager
+import org.wvt.horizonmgr.service.hzpack.HorizonManager
 
 
 class HorizonManagerTest {
