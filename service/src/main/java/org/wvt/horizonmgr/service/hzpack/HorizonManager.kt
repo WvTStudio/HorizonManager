@@ -1,10 +1,8 @@
-package org.wvt.horizonmgr.service
+package org.wvt.horizonmgr.service.hzpack
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.wvt.horizonmgr.service.hzpack.InstallationInfo
-import org.wvt.horizonmgr.service.hzpack.InstalledPackage
-import org.wvt.horizonmgr.service.hzpack.ZipPackage
+import org.wvt.horizonmgr.service.CoroutineZip
 import org.wvt.horizonmgr.service.utils.translateToValidFile
 import java.io.File
 import java.util.*
