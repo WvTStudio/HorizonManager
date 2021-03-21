@@ -5,6 +5,7 @@ import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import org.wvt.horizonmgr.service.CoroutineZip
 import org.wvt.horizonmgr.service.level.MCLevel
+import org.wvt.horizonmgr.service.level.MCLevelManager
 import org.wvt.horizonmgr.service.mod.InstalledMod
 import org.wvt.horizonmgr.service.mod.ZipMod
 import org.wvt.horizonmgr.service.utils.translateToValidFile
@@ -108,6 +109,10 @@ class InstalledPackage(val packageDirectory: File) {
         return@withContext newInfo
     }
 
+    fun getLevelManager(): MCLevelManager {
+        return MCLevelManager(packageDirectory.resolve("worlds"))
+    }
+/*
     fun getLevels(): List<MCLevel> {
         val result = mutableListOf<MCLevel>()
         val worlds = packageDirectory.resolve("worlds").listFiles() ?: return emptyList()
@@ -120,5 +125,5 @@ class InstalledPackage(val packageDirectory: File) {
             result.add(level)
         }
         return result
-    }
+    }*/
 }

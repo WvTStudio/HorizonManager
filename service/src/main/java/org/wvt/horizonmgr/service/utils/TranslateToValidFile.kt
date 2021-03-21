@@ -12,3 +12,7 @@ fun File.translateToValidFile(): File {
     }
     return translatedFile
 }
+
+fun translateToValidFileName(name: String): String {
+    return name.replace(' ', '_').replace('/', '_')
+}

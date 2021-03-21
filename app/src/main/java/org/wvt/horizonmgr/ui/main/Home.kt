@@ -67,6 +67,10 @@ fun Home(
     requestOnlineInstall: () -> Unit,
     onAddModClicked: () -> Unit,
     onAddPackageClicked: () -> Unit,
+    onAddICLevelClick: () -> Unit,
+    onAddMCLevelClick: () -> Unit,
+    onAddICTextureClick: () -> Unit,
+    onAddMCTextureClick: () -> Unit,
     community: () -> Unit,
     openGame: () -> Unit,
     joinGroup: () -> Unit,
@@ -136,12 +140,16 @@ fun Home(
                     )
                     HomeViewModel.Screen.LOCAL_MANAGE -> ModuleManager(
                         onNavClicked = { scope.launch { drawerState.open() } },
-                        onAddModClicked = onAddModClicked,
                         managerViewModel = moduleManagerVM,
                         icLevelViewModel = icLevelTabVM,
                         moduleViewModel = modTabVM,
                         mcLevelViewModel = mcLevelVM,
-                        mcResViewModel = mcResVM
+                        mcResViewModel = mcResVM,
+                        onAddModClicked = onAddModClicked,
+                        onAddICLevelClick = onAddICLevelClick,
+                        onAddICTextureClick = onAddICTextureClick,
+                        onAddMCLevelClick = onAddMCLevelClick,
+                        onAddMCTextureClick = onAddMCTextureClick
                     )
                     HomeViewModel.Screen.PACKAGE_MANAGE -> PackageManager(
                         viewModel = packageManagerVM,

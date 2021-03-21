@@ -1,19 +1,30 @@
 package org.wvt.horizonmgr.service.level
 
-import android.os.Environment
+import org.wvt.horizonmgr.service.CoroutineZip
+import org.wvt.horizonmgr.service.ProgressDeferred
+import org.wvt.horizonmgr.service.utils.translateToValidFile
+import java.io.File
 
-class MCLevelManager {
-    private val worldsDir = Environment.getExternalStorageDirectory()
-        .resolve("games")
-        .resolve("com.mojang")
-        .resolve("minecraftWorlds")
+class MCLevelManager(private val worldsDir: File) {
 
-    class WorldsDirectoryNotExists(): Exception()
+    class WorldsDirectoryNotExists() : Exception()
 
-    fun getLevels(): List<MCLevel> {
+    data class GetResult(
+        val levels: List<MCLevel>,
+        val errors: List<ErrorEntry>
+    )
+
+    data class ErrorEntry(
+        val file: File,
+        val error: Throwable
+    )
+
+    fun getLevels(): GetResult {
         if (!worldsDir.exists()) throw WorldsDirectoryNotExists()
-        val dirs = worldsDir.listFiles() ?: return emptyList()
+        val dirs = worldsDir.listFiles() ?: return GetResult(emptyList(), emptyList())
+
         val result = mutableListOf<MCLevel>()
+        val errors = mutableListOf<ErrorEntry>()
 
         for (file in dirs) {
             if (!file.isDirectory) continue
@@ -21,13 +32,18 @@ class MCLevelManager {
             val level = try {
                 MCLevel.parseByDirectory(file)
             } catch (e: Exception) {
-                e.printStackTrace()
+                errors.add(ErrorEntry(file, e))
                 continue
             }
 
             result.add(level)
         }
 
-        return result
+        return GetResult(result, errors)
+    }
+
+    fun installLevel(zipMCLevel: ZipMCLevel): ProgressDeferred<Float, Unit> {
+        val outDir = worldsDir.resolve(zipMCLevel.getLevelName()).translateToValidFile()
+        return CoroutineZip.unzip(zipMCLevel.file, outDir, false)
     }
 }

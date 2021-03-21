@@ -1,6 +1,8 @@
 package org.wvt.horizonmgr.service.respack
 
-import org.wvt.horizonmgr.service.utils.calcSize
+import org.wvt.horizonmgr.service.CoroutineZip
+import org.wvt.horizonmgr.service.ProgressDeferred
+import org.wvt.horizonmgr.service.utils.translateToValidFile
 import java.io.File
 
 class ResourcePackManager(val directory: File) {
@@ -17,31 +19,10 @@ class ResourcePackManager(val directory: File) {
         }
         return result
     }
-}
 
-class ResourcePackage internal constructor(val directory: File) {
-    private val manifestFile = directory.resolve("manifest.json")
-
-    companion object {
-        fun parseByDirectory(dir: File): ResourcePackage {
-            return ResourcePackage(dir)
-        }
-    }
-
-    /**
-     * 当解析失败时抛出错误
-     */
-    fun getManifest(): ResourcePackManifest {
-        val manifestStr = manifestFile.readText()
-        return ResourcePackManifest.fromJson(manifestStr)
-    }
-
-    fun getIcon(): File? {
-        return directory.resolve("pack_icon.png").takeIf { it.exists() }
-    }
-
-    suspend fun calcSize(): Long {
-        return directory.calcSize().fileCount
+    fun install(resourcePack: ZipResourcePackage): ProgressDeferred<Float, Unit> {
+        val directoryName = resourcePack.getManifest().header.name
+        val outDir = directory.resolve(directoryName).translateToValidFile()
+        return CoroutineZip.unzip(resourcePack.file, outDir = outDir, autoUnbox = true)
     }
 }
-

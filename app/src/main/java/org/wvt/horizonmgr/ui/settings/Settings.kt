@@ -112,7 +112,7 @@ fun Settings(
             text = { Text("自定义主题") }
         )
 
-        Text(
+/*        Text(
             modifier = Modifier.padding(top = 24.dp, bottom = 8.dp, start = 72.dp),
             text = "其他",
             style = MaterialTheme.typography.subtitle2,
@@ -129,6 +129,6 @@ fun Settings(
             modifier = Modifier.clickable(onClick = {}),
             icon = { Icon(Icons.Filled.PushPin, null) },
             text = { Text("固定文件夹") }
-        )
+        )*/
     }
 }

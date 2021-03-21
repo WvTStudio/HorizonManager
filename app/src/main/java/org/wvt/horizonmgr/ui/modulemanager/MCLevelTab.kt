@@ -6,21 +6,25 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material.FloatingActionButton
+import androidx.compose.material.Icon
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.launch
 import org.wvt.horizonmgr.ui.components.*
 
 @Composable
 internal fun MCLevelTab(
-    viewModel: MCLevelTabViewModel
+    viewModel: MCLevelTabViewModel,
+    onAddClick: () -> Unit
 ) {
     val items by viewModel.levels.collectAsState()
-    val scope = rememberCoroutineScope()
-    var progressDialogState by remember { mutableStateOf<ProgressDialogState?>(null) }
-    val inputDialogState = remember { InputDialogHostState() }
+    val progressState by viewModel.progressState.collectAsState()
+    val inputDialogState = viewModel.inputDialogState
 
     DisposableEffect(Unit) {
         viewModel.load()
@@ -38,78 +42,25 @@ internal fun MCLevelTab(
                     modifier = Modifier.padding(16.dp),
                     levelName = item.name,
                     screenshot = item.screenshot,
-                    onRenameClicked = {
-                        scope.launch {
-                            val result: InputDialogHostState.DialogResult =
-                                inputDialogState.showDialog(item.name, "请输入新名称", "新名称")
-                            if (result is InputDialogHostState.DialogResult.Confirm) {
-                                progressDialogState = ProgressDialogState.Loading("正在重命名")
-                                try {
-                                    viewModel.renameLevel(item, result.input)
-                                } catch (e: Exception) {
-                                    e.printStackTrace()
-                                    progressDialogState =
-                                        ProgressDialogState.Failed(
-                                            "重命名失败",
-                                            e.localizedMessage ?: "未知错误"
-                                        )
-                                    return@launch
-                                }
-                                progressDialogState = ProgressDialogState.Finished("重命名成功")
-                                viewModel.load()
-                            }
-                        }
-                    },
-                    onDeleteClicked = {
-                        scope.launch {
-                            progressDialogState = ProgressDialogState.Loading("正在删除")
-                            try {
-                                viewModel.deleteLevel(item)
-                            } catch (e: Exception) {
-                                progressDialogState =
-                                    ProgressDialogState.Failed("删除失败", e.localizedMessage ?: "未知错误")
-                                return@launch
-                            }
-                            progressDialogState = ProgressDialogState.Finished("删除完成")
-                            viewModel.load()
-                        }
-                    },
-                    onMoveClick = {
-                        scope.launch {
-                            progressDialogState = ProgressDialogState.Loading("正在移动存档动到 Horizon")
-                            try {
-                                viewModel.moveToHZ(item)
-                            } catch (e: Exception) {
-                                progressDialogState =
-                                    ProgressDialogState.Failed("移动失败", e.localizedMessage ?: "未知错误")
-                                return@launch
-                            }
-                            progressDialogState = ProgressDialogState.Finished("移动完成")
-                            viewModel.load()
-                        }
-                    },
-                    onCopyClick = {
-                        scope.launch {
-                            progressDialogState = ProgressDialogState.Loading("正在复制存档动到 Horizon")
-                            try {
-                                viewModel.copyToHZ(item)
-                            } catch (e: Exception) {
-                                progressDialogState =
-                                    ProgressDialogState.Failed("复制失败", e.localizedMessage ?: "未知错误")
-                                return@launch
-                            }
-                            progressDialogState = ProgressDialogState.Finished("复制完成")
-                        }
-                    }
+                    onRenameClicked = { viewModel.rename(item) },
+                    onDeleteClicked = { viewModel.delete(item) },
+                    onMoveClick = { viewModel.move(item) },
+                    onCopyClick = { viewModel.copy(item) }
                 )
             }
         }
-
+        FloatingActionButton(
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(16.dp), onClick = onAddClick
+        ) {
+            Icon(imageVector = Icons.Default.Add, contentDescription = "Add")
+        }
     }
 
     InputDialogHost(state = inputDialogState)
 
-    progressDialogState?.let {
-        ProgressDialog(onCloseRequest = { progressDialogState = null }, state = it)
+    progressState?.let {
+        ProgressDialog(onCloseRequest = { viewModel.dismissProgressDialog() }, state = it)
     }
 }

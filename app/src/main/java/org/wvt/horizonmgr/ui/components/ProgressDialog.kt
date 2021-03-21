@@ -16,7 +16,7 @@ import androidx.compose.ui.window.Dialog
 sealed class ProgressDialogState(val message: String) {
     class Loading(message: String) : ProgressDialogState(message)
     class ProgressLoading(message: String, val progress: Float) : ProgressDialogState(message)
-    class Failed(val title: String, message: String) : ProgressDialogState(message)
+    class Failed(val title: String, message: String, val detail: String? = null) : ProgressDialogState(message)
     class Finished(message: String) : ProgressDialogState(message)
 }
 

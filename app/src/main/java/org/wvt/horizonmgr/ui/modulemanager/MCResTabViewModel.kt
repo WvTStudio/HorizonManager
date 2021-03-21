@@ -8,6 +8,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import org.wvt.horizonmgr.DependenciesContainer
 import org.wvt.horizonmgr.service.respack.ResourcePackManifest
+import org.wvt.horizonmgr.service.respack.ZipResourcePackage
+import org.wvt.horizonmgr.ui.components.ProgressDialogState
 import java.io.File
 
 private const val TAG = "MCResTabVM"
@@ -18,6 +20,8 @@ class MCResTabViewModel(dependencies: DependenciesContainer) : ViewModel() {
     val resPacks = MutableStateFlow<List<ResPack>>(emptyList())
 
     val state = MutableStateFlow<State>(State.LOADING)
+
+    val progressState = MutableStateFlow<ProgressDialogState?>(null)
 
     enum class State {
         FINISHED, LOADING, FAILED
@@ -49,6 +53,37 @@ class MCResTabViewModel(dependencies: DependenciesContainer) : ViewModel() {
             }
             resPacks.emit(result)
             state.emit(State.FINISHED)
+        }
+    }
+
+    fun selectedFileToInstall(path: String) {
+        viewModelScope.launch {
+            try {
+                progressState.emit(ProgressDialogState.Loading("正在解析"))
+                val file = File(path)
+                val respack = try {
+                    ZipResourcePackage.parse(file)
+                } catch (e: ZipResourcePackage.NotZipResPackException) {
+                    progressState.emit(ProgressDialogState.Failed("解析失败", "您选择的文件可能不是一个正确的资源包"))
+                    return@launch
+                }
+                progressState.emit(ProgressDialogState.Loading("正在安装"))
+                val task = resManager.install(respack)
+                // TODO: 2021/3/21 安装进度
+                try {
+                    task.await()
+                } catch (e: Exception) {
+                    progressState.emit(ProgressDialogState.Failed("安装失败", "安装时出现错误", e.message))
+                }
+            } catch (e: Exception) {
+                progressState.emit(ProgressDialogState.Failed("安装失败", "出现未知错误", e.message))
+            }
+        }
+    }
+
+    fun dismissProgressDialog() {
+        viewModelScope.launch {
+            progressState.emit(null)
         }
     }
 }

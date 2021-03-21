@@ -66,6 +66,28 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private val selectLevelForMC = registerForActivityResult(FileSelectorResultContract()) {
+        if (it is FileSelectorResult.Succeed) {
+            mcLevelVM.selectedFileToInstall(it.filePath)
+        }
+    }
+    private val selectLevelForIC = registerForActivityResult(FileSelectorResultContract()) {
+        if (it is FileSelectorResult.Succeed) {
+            icLevelTabVM.selectedFileToInstall(it.filePath)
+        }
+    }
+
+    private val selectTextureForIC = registerForActivityResult(FileSelectorResultContract()) {
+        if (it is FileSelectorResult.Succeed) {
+            // TODO: 2021/3/21
+        }
+    }
+    private val selectTextureForMC = registerForActivityResult(FileSelectorResultContract()) {
+        if (it is FileSelectorResult.Succeed) {
+            mcResVM.selectedFileToInstall(it.filePath)
+        }
+    }
+
     private val onlineInstall =
         registerForActivityResult(InstallPackageResultContract()) { packageManagerVM.loadPackages() }
 
@@ -219,6 +241,10 @@ class MainActivity : AppCompatActivity() {
                 requestOpenGame = ::openGame,
                 selectFileForMod = ::startSelectFileActivityForMod,
                 selectFileForPackage = ::startSelectFileActivityForPackage,
+                selectLevelForIC = { selectLevelForIC.launch(this) },
+                selectLevelForMC = { selectLevelForMC.launch(this) },
+                selectTextureForIC = { selectTextureForIC.launch(this) },
+                selectTextureForMC = { selectTextureForMC.launch(this) },
                 onInstallHZClick = { openCoolapkURL() },
                 onInstallMCClick = { openMCGooglePlay() },
                 navigateToNewsDetail = { newsDetail.launch(it) }

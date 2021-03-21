@@ -27,7 +27,11 @@ fun ModuleManager(
     mcLevelViewModel: MCLevelTabViewModel,
     mcResViewModel: MCResTabViewModel,
     onNavClicked: () -> Unit,
-    onAddModClicked: () -> Unit
+    onAddModClicked: () -> Unit,
+    onAddICLevelClick: () -> Unit,
+    onAddMCLevelClick: () -> Unit,
+    onAddICTextureClick: () -> Unit,
+    onAddMCTextureClick: () -> Unit
 ) {
     val selectedTab by managerViewModel.selectedTab.collectAsState()
     val pkgId = LocalSelectedPackageUUID.current
@@ -42,7 +46,7 @@ fun ModuleManager(
 
     DisposableEffect(Unit) {
         mcLevelViewModel.load()
-        onDispose {  }
+        onDispose { }
     }
 
     Column {
@@ -56,10 +60,10 @@ fun ModuleManager(
             Crossfade(selectedTab) {
                 when (it) {
                     ModuleManagerViewModel.Tabs.MOD -> ModTab(moduleViewModel, onAddModClicked)
-                    ModuleManagerViewModel.Tabs.IC_MAP -> ICLevelTab(icLevelViewModel)
-                    ModuleManagerViewModel.Tabs.MC_MAP -> MCLevelTab(mcLevelViewModel)
+                    ModuleManagerViewModel.Tabs.IC_MAP -> ICLevelTab(icLevelViewModel, onAddICLevelClick)
+                    ModuleManagerViewModel.Tabs.MC_MAP -> MCLevelTab(mcLevelViewModel, onAddMCLevelClick)
                     ModuleManagerViewModel.Tabs.IC_TEXTURE -> ICResTab()
-                    ModuleManagerViewModel.Tabs.MC_TEXTURE -> MCResTab(mcResViewModel)
+                    ModuleManagerViewModel.Tabs.MC_TEXTURE -> MCResTab(mcResViewModel, onAddMCTextureClick)
                 }
             }
         }

@@ -8,7 +8,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.FloatingActionButton
+import androidx.compose.material.Icon
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,14 +22,13 @@ import org.wvt.horizonmgr.ui.components.*
 
 @Composable
 internal fun ICLevelTab(
-    viewModel: ICLevelTabViewModel
+    viewModel: ICLevelTabViewModel,
+    onAddButtonClicked: () -> Unit
 ) {
     val levels by viewModel.levels.collectAsState()
     val state by viewModel.state.collectAsState()
-
-    val scope = rememberCoroutineScope()
-    var progressDialogState by remember { mutableStateOf<ProgressDialogState?>(null) }
-    val inputDialogState = remember { InputDialogHostState() }
+    val progressState by viewModel.progressState.collectAsState()
+    val inputDialogState = viewModel.inputDialogState
 
     DisposableEffect(Unit) {
         viewModel.load()
@@ -44,7 +47,7 @@ internal fun ICLevelTab(
                     Text("你还没有选择分包")
                 }
             }
-            ICLevelTabViewModel.State.OK -> {
+            ICLevelTabViewModel.State.OK -> Box(Modifier.fillMaxSize()) {
                 if (levels.isEmpty()) {
                     EmptyPage(Modifier.fillMaxSize()) {
                         Text("当前还没有地图")
@@ -58,76 +61,20 @@ internal fun ICLevelTab(
                             modifier = Modifier.padding(16.dp),
                             levelName = item.name,
                             screenshot = item.screenshot,
-                            onRenameClicked = {
-                                scope.launch {
-                                    val result: InputDialogHostState.DialogResult =
-                                        inputDialogState.showDialog(
-                                            "New-${item.name}",
-                                            "请输入新名称",
-                                            "新名称"
-                                        )
-                                    if (result is InputDialogHostState.DialogResult.Confirm) {
-                                        progressDialogState = ProgressDialogState.Loading("正在重命名")
-                                        try {
-                                            viewModel.renameLevel(item, result.input)
-                                        } catch (e: Exception) {
-                                            e.printStackTrace()
-                                            progressDialogState =
-                                                ProgressDialogState.Failed(
-                                                    "重命名失败",
-                                                    e.localizedMessage ?: ""
-                                                )
-                                            return@launch
-                                        }
-                                        progressDialogState = ProgressDialogState.Finished("重命名成功")
-                                        viewModel.load()
-                                    }
-                                }
-                            },
-                            onDeleteClicked = {
-                                scope.launch {
-                                    progressDialogState = ProgressDialogState.Loading("正在删除")
-                                    try {
-                                        viewModel.deleteLevel(item)
-                                    } catch (e: Exception) {
-                                        progressDialogState =
-                                            ProgressDialogState.Failed(
-                                                "删除失败",
-                                                e.localizedMessage ?: ""
-                                            )
-                                        return@launch
-                                    }
-                                    progressDialogState = ProgressDialogState.Finished("删除完成")
-                                    viewModel.load()
-                                }
-                            },
-                            onCopyClick = {
-                                scope.launch {
-                                    progressDialogState = ProgressDialogState.Loading("正在复制存档到 MC")
-                                    try {
-                                        viewModel.copyToMC(item)
-                                    } catch (e: Exception) {
-                                        progressDialogState = ProgressDialogState.Failed("复制失败", e.message ?: "未知错误")
-                                        return@launch
-                                    }
-                                    progressDialogState = ProgressDialogState.Finished("复制成功")
-                                }
-                            },
-                            onMoveClick = {
-                                scope.launch {
-                                    progressDialogState = ProgressDialogState.Loading("正在复制存档到 MC")
-                                    try {
-                                        viewModel.moveToMC(item)
-                                    } catch (e: Exception) {
-                                        progressDialogState = ProgressDialogState.Failed("复制失败", e.message ?: "未知错误")
-                                        return@launch
-                                    }
-                                    progressDialogState = ProgressDialogState.Finished("复制成功")
-                                    viewModel.load()
-                                }
-                            }
+                            onRenameClicked = { viewModel.renameLevel(item) },
+                            onDeleteClicked = { viewModel.deleteLevel(item) },
+                            onCopyClick = { viewModel.copy(item) },
+                            onMoveClick = { viewModel.move(item) }
                         )
                     }
+                }
+                FloatingActionButton(
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .align(Alignment.BottomEnd),
+                    onClick = onAddButtonClicked
+                ) {
+                    Icon(Icons.Default.Add, contentDescription = "Add")
                 }
             }
             is ICLevelTabViewModel.State.Error -> ErrorPage(
@@ -141,7 +88,7 @@ internal fun ICLevelTab(
 
     InputDialogHost(state = inputDialogState)
 
-    progressDialogState?.let {
-        ProgressDialog(onCloseRequest = { progressDialogState = null }, state = it)
+    progressState?.let {
+        ProgressDialog(onCloseRequest = { viewModel.dismissProgressDialog() }, state = it)
     }
 }

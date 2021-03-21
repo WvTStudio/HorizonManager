@@ -108,14 +108,12 @@ internal fun ModTab(
                         item { Spacer(Modifier.height(64.dp)) }
                     }
                 }
-                ExtendedFloatingActionButton(
+                FloatingActionButton(
                     modifier = Modifier
                         .padding(16.dp)
                         .align(Alignment.BottomEnd),
-                    icon = { Icon(imageVector = Icons.Filled.Add, contentDescription = null) },
-                    text = { Text("安装") },
                     onClick = onAddModClicked
-                )
+                ) { Icon(imageVector = Icons.Filled.Add, contentDescription = "安装") }
             }
             is ModTabViewModel.State.Error -> ErrorPage(
                 message = { Text("解析模组列表失败") },

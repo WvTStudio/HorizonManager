@@ -44,7 +44,11 @@ fun App(
     navigateToNewsDetail: (newsId: Int) -> Unit,
     requestOpenGame: () -> Unit,
     selectFileForMod: () -> Unit,
-    selectFileForPackage: () -> Unit
+    selectFileForPackage: () -> Unit,
+    selectLevelForIC: () -> Unit,
+    selectLevelForMC: () -> Unit,
+    selectTextureForIC: () -> Unit,
+    selectTextureForMC: () -> Unit
 ) {
     val userInfo by mainVM.userInfo.collectAsState()
     val selectedPackage by mainVM.selectedPackage.collectAsState()
@@ -106,7 +110,11 @@ fun App(
                 onAddModClicked = selectFileForMod,
                 onAddPackageClicked = selectFileForPackage,
                 navigateToPackageInfo = navigateToPackageInfo,
-                navigateToNewsDetail = navigateToNewsDetail
+                navigateToNewsDetail = navigateToNewsDetail,
+                onAddMCTextureClick = selectTextureForMC,
+                onAddMCLevelClick = selectLevelForMC,
+                onAddICTextureClick = selectTextureForIC,
+                onAddICLevelClick = selectLevelForIC
             )
         }
 

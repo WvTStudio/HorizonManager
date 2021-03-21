@@ -47,7 +47,9 @@ private class DependenciesVMFactory(
 class DependenciesContainer internal constructor(private val context: Context) {
     val localCache by lazy { LocalCache(context) }
     val manager by lazy {
-        HorizonManager(Environment.getExternalStorageDirectory().resolve("games").resolve("horizon"))
+        HorizonManager(
+            Environment.getExternalStorageDirectory().resolve("games").resolve("horizon")
+        )
     }
     val packRepository by lazy { OfficialPackageCDNRepository() }
     val chineseModRepository by lazy { ChineseModRepository() }
@@ -57,7 +59,14 @@ class DependenciesContainer internal constructor(private val context: Context) {
     val news by lazy { MgrNewsModule() }
     val packageDownloader by lazy { OfficialCDNPackageDownloader(context) }
     val modDownloader by lazy { ModDownloader(context) }
-    val mcLevelManager by lazy { MCLevelManager() }
+    val mcLevelManager by lazy {
+        MCLevelManager(
+            Environment.getExternalStorageDirectory()
+                .resolve("games")
+                .resolve("com.mojang")
+                .resolve("minecraftWorlds")
+        )
+    }
     val levelTransporter by lazy {
         LevelTransporter(
             Environment.getExternalStorageDirectory()
