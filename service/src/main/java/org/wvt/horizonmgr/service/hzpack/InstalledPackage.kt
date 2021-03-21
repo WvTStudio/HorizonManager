@@ -112,18 +112,4 @@ class InstalledPackage(val packageDirectory: File) {
     fun getLevelManager(): MCLevelManager {
         return MCLevelManager(packageDirectory.resolve("worlds"))
     }
-/*
-    fun getLevels(): List<MCLevel> {
-        val result = mutableListOf<MCLevel>()
-        val worlds = packageDirectory.resolve("worlds").listFiles() ?: return emptyList()
-        for (file in worlds) {
-            val level = try {
-                MCLevel.parseByDirectory(file)
-            } catch (e: Exception) {
-                continue
-            }
-            result.add(level)
-        }
-        return result
-    }*/
 }
