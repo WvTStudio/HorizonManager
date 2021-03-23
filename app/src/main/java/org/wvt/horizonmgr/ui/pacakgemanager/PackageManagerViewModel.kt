@@ -41,7 +41,7 @@ class PackageManagerViewModel(
         object OK : State()
     }
 
-    val errors = MutableStateFlow<List<Exception>>(emptyList())
+    val errors = MutableStateFlow<List<String>>(emptyList())
 
     fun loadPackages() {
         viewModelScope.launch(Dispatchers.IO) {
@@ -55,7 +55,7 @@ class PackageManagerViewModel(
                 return@launch
             }
             Log.d(TAG, "获取到 ${packs.size} 个分包")
-            val exceptions = mutableListOf<Exception>()
+            val exceptions = mutableListOf<String>()
             val result = packs.mapNotNull {
                 val installInfo: InstallationInfo
                 val manifest: PackageManifest
@@ -63,7 +63,8 @@ class PackageManagerViewModel(
                     installInfo = it.getInstallationInfo()
                     manifest = it.getManifest()
                 } catch (e: Exception) {
-                    exceptions.add(e)
+                    exceptions.add("${it.packageDirectory}: ${e.message ?: "未知错误"}")
+                    Log.d(TAG, "分包解析失败", e)
                     return@mapNotNull null
                 }
                 PackageManagerItem(

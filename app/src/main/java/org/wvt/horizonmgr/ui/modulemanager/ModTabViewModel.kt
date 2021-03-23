@@ -9,7 +9,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.wvt.horizonmgr.DependenciesContainer
-import org.wvt.horizonmgr.service.FileTypeGuesser
 import org.wvt.horizonmgr.service.hzpack.InstalledPackage
 import org.wvt.horizonmgr.service.mod.InstalledMod
 import org.wvt.horizonmgr.service.mod.ZipMod
@@ -42,7 +41,7 @@ class ModTabViewModel(dependencies: DependenciesContainer) : ViewModel() {
     val newEnabledMods = MutableStateFlow<Set<ModEntry>>(emptySet())
 
     // TODO: 2021/3/12 考虑细分错误类型
-    val errors = MutableStateFlow<List<Exception>>(emptyList())
+    val errors = MutableStateFlow<List<String>>(emptyList())
 
     sealed class State {
         object Loading : State()
@@ -72,7 +71,7 @@ class ModTabViewModel(dependencies: DependenciesContainer) : ViewModel() {
                 val result = mutableListOf<ModEntry>()
                 val mMap = mutableMapOf<ModEntry, InstalledMod>()
 
-                val exceptions = mutableListOf<Exception>()
+                val exceptions = mutableListOf<String>()
 
                 mods.forEach { mod ->
                     try {
@@ -89,7 +88,7 @@ class ModTabViewModel(dependencies: DependenciesContainer) : ViewModel() {
                             enabled.add(entry)
                         }
                     } catch (e: Exception) {
-                        exceptions.add(e)
+                        exceptions.add("${mod.modDir.path}: ${e.message ?: "未知错误"}")
                         Log.e(TAG, "Mod 解析错误", e)
                     }
                 }

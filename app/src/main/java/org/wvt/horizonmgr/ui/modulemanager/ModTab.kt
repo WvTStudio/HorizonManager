@@ -40,9 +40,12 @@ internal fun ModTab(
     if (displayErrorDialog) {
         AlertDialog(
             onDismissRequest = { displayErrorDialog = false },
+            title = { Text("错误详情") },
             text = {
-                Text(text = errors.fold("") { acc, e ->
-                    acc + "\n" + e.localizedMessage
+                Text(text = remember(errors) {
+                    errors.foldIndexed("") { index, acc, e ->
+                        "$acc$index: \n$e\n\n"
+                    }
                 })
             },
             confirmButton = {

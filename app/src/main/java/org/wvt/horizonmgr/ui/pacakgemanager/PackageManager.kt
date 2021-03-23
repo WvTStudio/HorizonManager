@@ -95,16 +95,20 @@ fun PackageManager(
     }
 
     if (displayErrorDialog) {
-        AlertDialog(onDismissRequest = { displayErrorDialog = false }, text = {
-            // TODO: 2021/3/12 显示更详细的信息
-            Text(errors.fold("") { acc, e ->
-                acc + "\n" + e.message
+        AlertDialog(onDismissRequest = { displayErrorDialog = false },
+            title = { Text("错误详情") },
+            text = {
+                Text(text = remember(errors) {
+                    errors.foldIndexed("") { index, acc, e ->
+                        "$acc$index: \n$e\n\n"
+                    }
+                })
+            },
+            confirmButton = {
+                TextButton(onClick = { displayErrorDialog = false }) {
+                    Text(text = "确定")
+                }
             })
-        }, confirmButton = {
-            TextButton(onClick = { displayErrorDialog = false }) {
-                Text(text = "确定")
-            }
-        })
     }
 
     Box {
