@@ -15,6 +15,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.unit.dp
 import org.wvt.horizonmgr.ui.components.ErrorPage
 import org.wvt.horizonmgr.ui.components.ImageWithoutQualityFilter
@@ -68,7 +69,8 @@ fun PackageInfo(
                                         .padding(16.dp)
                                         .fillMaxWidth()
                                         .aspectRatio(16f / 9f),
-                                    shape = RoundedCornerShape(4.dp)
+                                    shape = RoundedCornerShape(4.dp),
+                                    color = MaterialTheme.colors.onBackground.copy(alpha = ContentAlpha.disabled).compositeOver(MaterialTheme.colors.background)
                                 ) {
                                     val image = info.packageGraphic.collectAsState()
                                     Crossfade(targetState = image.value) {
