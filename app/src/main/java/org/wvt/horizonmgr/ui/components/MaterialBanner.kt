@@ -31,43 +31,44 @@ fun MaterialBanner(
     dismissButton: @Composable () -> Unit,
     confirmButton: @Composable () -> Unit
 ) {
-    AnimatedVisibility(
-        visible = visible, initiallyVisible = false,
-        enter = expandVertically(Alignment.Bottom),
-        exit = shrinkVertically(Alignment.Bottom)
-    ) {
-        Surface(modifier = modifier, color = backgroundColor, contentColor = contentColor) {
-            Column(Modifier.fillMaxWidth()) {
-                Row(
-                    Modifier
-                        .fillMaxWidth()
-                        .paddingFromBaseline(top = 36.dp)
-                ) {
-                    if (icon != null) {
-                        Box(
-                            modifier = Modifier
-                                .padding(top = 16.dp, start = 16.dp)
-                                .size(40.dp),
-                            content = icon
-                        )
-                    }
-                    CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.body2) {
-                        Box(modifier = Modifier
+    Box(modifier) {
+        AnimatedVisibility(
+            visible = visible, initiallyVisible = false,
+            enter = expandVertically(Alignment.Bottom),
+            exit = shrinkVertically(Alignment.Bottom)
+        ) {
+            Card(Modifier.padding(16.dp), backgroundColor = backgroundColor, contentColor = contentColor) {
+                Column(Modifier.fillMaxWidth()) {
+                    Row(
+                        Modifier
                             .fillMaxWidth()
-                            .padding(start = 16.dp, end = 16.dp), content = text)
+                            .paddingFromBaseline(top = 36.dp)
+                    ) {
+                        if (icon != null) {
+                            Box(
+                                modifier = Modifier
+                                    .padding(top = 16.dp, start = 16.dp)
+                                    .size(40.dp),
+                                content = icon
+                            )
+                        }
+                        CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.body2) {
+                            Box(modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(start = 16.dp, end = 16.dp), content = text)
+                        }
+                    }
+                    Row(
+                        modifier = Modifier
+                            .padding(top = 16.dp, start = 16.dp, end = 8.dp, bottom = 8.dp)
+                            .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.End
+                    ) {
+                        confirmButton()
+                        Spacer(Modifier.width(8.dp))
+                        dismissButton()
                     }
                 }
-                Row(
-                    modifier = Modifier
-                        .padding(top = 16.dp, start = 16.dp, end = 8.dp, bottom = 8.dp)
-                        .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.End
-                ) {
-                    confirmButton()
-                    Spacer(Modifier.width(8.dp))
-                    dismissButton()
-                }
-                Divider()
             }
         }
     }
