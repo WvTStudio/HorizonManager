@@ -1,11 +1,10 @@
 package org.wvt.horizonmgr.ui.pacakgemanager
 
 import androidx.compose.animation.Crossfade
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.animation.core.*
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -15,8 +14,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.unit.dp
 import org.wvt.horizonmgr.ui.components.ErrorPage
+import org.wvt.horizonmgr.ui.components.ImageWithoutQualityFilter
 import org.wvt.horizonmgr.ui.theme.AppBarBackgroundColor
 
 @Composable
@@ -51,8 +52,33 @@ fun PackageInfo(
                 }
                 PackageDetailViewModel.State.SUCCEED -> {
                     val info = info
+                    val scale by rememberInfiniteTransition().animateFloat(
+                        initialValue = 1f,
+                        targetValue = 1.5f,
+                        animationSpec = InfiniteRepeatableSpec(
+                            tween(12000, 1000),
+                            RepeatMode.Reverse
+                        )
+                    )
                     if (info != null) {
                         LazyColumn {
+                            item {
+                                Surface(
+                                    modifier = Modifier
+                                        .padding(16.dp)
+                                        .fillMaxWidth()
+                                        .aspectRatio(16f / 9f),
+                                    shape = RoundedCornerShape(4.dp)
+                                ) {
+                                    val image = info.packageGraphic.collectAsState()
+                                    Crossfade(targetState = image.value) {
+                                        if (it != null) ImageWithoutQualityFilter(
+                                            modifier = Modifier.fillMaxSize().scale(scale),
+                                            imageBitmap = it,
+                                        )
+                                    }
+                                }
+                            }
                             item {
                                 ManifestSection(info = info)
                                 FileSection(path = info.installDir, packSize = remember(pkgSize) {
@@ -83,49 +109,77 @@ private fun ManifestSection(
         modifier = Modifier.padding(top = 16.dp, bottom = 8.dp, start = 72.dp)
     )
     ListItem(icon = {
-        Icon(Icons.Filled.Extension, modifier = Modifier.padding(top = 4.dp), contentDescription = null)
+        Icon(
+            Icons.Filled.Extension,
+            modifier = Modifier.padding(top = 4.dp),
+            contentDescription = null
+        )
     }, text = {
         Text("分包名称")
     }, secondaryText = {
         Text(info.packageName)
     })
     ListItem(icon = {
-        Icon(Icons.Filled.Person, modifier = Modifier.padding(top = 4.dp), contentDescription = null)
+        Icon(
+            Icons.Filled.Person,
+            modifier = Modifier.padding(top = 4.dp),
+            contentDescription = null
+        )
     }, text = {
         Text("开发者")
     }, secondaryText = {
         Text(info.developer)
     })
     ListItem(icon = {
-        Icon(Icons.Filled.Description, modifier = Modifier.padding(top = 4.dp), contentDescription = null)
+        Icon(
+            Icons.Filled.Description,
+            modifier = Modifier.padding(top = 4.dp),
+            contentDescription = null
+        )
     }, text = {
         Text("版本信息")
     }, secondaryText = {
         Text(info.version)
     })
     ListItem(icon = {
-        Icon(Icons.Filled.Description, modifier = Modifier.padding(top = 4.dp), contentDescription = null)
+        Icon(
+            Icons.Filled.Description,
+            modifier = Modifier.padding(top = 4.dp),
+            contentDescription = null
+        )
     }, text = {
         Text("版本号")
     }, secondaryText = {
         Text(info.versionCode)
     })
     ListItem(icon = {
-        Icon(Icons.Filled.Description, modifier = Modifier.padding(top = 4.dp), contentDescription = null)
+        Icon(
+            Icons.Filled.Description,
+            modifier = Modifier.padding(top = 4.dp),
+            contentDescription = null
+        )
     }, text = {
         Text("UUID")
     }, secondaryText = {
         Text(info.installUUID)
     })
     ListItem(icon = {
-        Icon(Icons.Filled.Description, modifier = Modifier.padding(top = 4.dp), contentDescription = null)
+        Icon(
+            Icons.Filled.Description,
+            modifier = Modifier.padding(top = 4.dp),
+            contentDescription = null
+        )
     }, text = {
         Text("分包 UUID")
     }, secondaryText = {
         Text(info.packageUUID)
     })
     ListItem(icon = {
-        Icon(Icons.Filled.Gamepad, modifier = Modifier.padding(top = 4.dp), contentDescription = null)
+        Icon(
+            Icons.Filled.Gamepad,
+            modifier = Modifier.padding(top = 4.dp),
+            contentDescription = null
+        )
     }, text = {
         Text("游戏版本")
     }, secondaryText = {
@@ -153,14 +207,22 @@ private fun FileSection(
         modifier = Modifier.padding(top = 16.dp, bottom = 8.dp, start = 72.dp)
     )
     ListItem(icon = {
-        Icon(Icons.Filled.Folder, modifier = Modifier.padding(top = 4.dp), contentDescription = null)
+        Icon(
+            Icons.Filled.Folder,
+            modifier = Modifier.padding(top = 4.dp),
+            contentDescription = null
+        )
     }, text = {
         Text("分包路径")
     }, secondaryText = {
         Text(path)
     })
     ListItem(icon = {
-        Icon(Icons.Filled.Storage, modifier = Modifier.padding(top = 4.dp), contentDescription = null)
+        Icon(
+            Icons.Filled.Storage,
+            modifier = Modifier.padding(top = 4.dp),
+            contentDescription = null
+        )
     }, text = {
         Text("分包大小")
     }, secondaryText = {

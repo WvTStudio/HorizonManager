@@ -4,7 +4,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import org.wvt.horizonmgr.service.CoroutineZip
-import org.wvt.horizonmgr.service.level.MCLevel
 import org.wvt.horizonmgr.service.level.MCLevelManager
 import org.wvt.horizonmgr.service.mod.InstalledMod
 import org.wvt.horizonmgr.service.mod.ZipMod
@@ -49,7 +48,11 @@ class InstalledPackage(val packageDirectory: File) {
     /**
      * 获取图像压缩包
      */
-    fun getCachedGraphics(): File = graphicsFile
+    fun getCachedGraphics(): PackageGraphics? = try {
+        PackageGraphics.parse(graphicsFile)
+    } catch (e: Exception) {
+        null
+    }
 
     /**
      * 安装 Mod 到该 Package
