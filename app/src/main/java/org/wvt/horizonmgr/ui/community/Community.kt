@@ -4,8 +4,7 @@ import android.graphics.Bitmap
 import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import androidx.activity.ComponentActivity
-import androidx.activity.OnBackPressedCallback
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.*
@@ -118,53 +117,52 @@ private fun WebViewCompose(
     newDownloadTask: (url: String, userAgent: String, contentDisposition: String, mimeType: String, contentLength: Long) -> Unit,
     onClose: () -> Unit
 ) {
+    val context = LocalContext.current
     val backgroundColor = MaterialTheme.colors.background
-    val backpack = (LocalContext.current as ComponentActivity).onBackPressedDispatcher
 
+    val view = remember {
+        WebView(context).apply {
+            settings.apply {
+                javaScriptEnabled = true
+                setSupportZoom(false)
+                javaScriptCanOpenWindowsAutomatically = true
+                domStorageEnabled = true
+            }
+            webChromeClient = object : WebChromeClient() {
+                override fun onProgressChanged(view: WebView?, newProgress: Int) {
+                    onProgressChanged(newProgress / 100f)
+                }
+            }
+            webViewClient = object : WebViewClient() {
+                override fun onPageStarted(
+                    view: WebView?,
+                    url: String?,
+                    favicon: Bitmap?
+                ) {
+                    onStateChanged(true)
+                }
+
+                override fun onPageFinished(view: WebView?, url: String?) {
+                    onStateChanged(false)
+                }
+            }
+            setDownloadListener { url, userAgent, contentDisposition, mimetype, contentLength ->
+                newDownloadTask(url, mimetype, userAgent, contentDisposition, contentLength)
+            }
+            loadUrl("https://forum.adodoz.cn")
+        }
+    }
+
+    BackHandler {
+        if (view.canGoBack()) {
+            view.goBack()
+        } else {
+            onClose()
+        }
+    }
     AndroidView(
         modifier = modifier,
-        factory = {
-            WebView(it).apply {
-                settings.apply {
-                    javaScriptEnabled = true
-                    setSupportZoom(false)
-                    javaScriptCanOpenWindowsAutomatically = true
-                    domStorageEnabled = true
-                }
-                webChromeClient = object : WebChromeClient() {
-                    override fun onProgressChanged(view: WebView?, newProgress: Int) {
-                        onProgressChanged(newProgress / 100f)
-                    }
-                }
-                webViewClient = object : WebViewClient() {
-                    override fun onPageStarted(
-                        view: WebView?,
-                        url: String?,
-                        favicon: Bitmap?
-                    ) {
-                        onStateChanged(true)
-                    }
-
-                    override fun onPageFinished(view: WebView?, url: String?) {
-                        onStateChanged(false)
-                    }
-                }
-                setDownloadListener { url, userAgent, contentDisposition, mimetype, contentLength ->
-                    newDownloadTask(url, mimetype, userAgent, contentDisposition, contentLength)
-                }
-                loadUrl("https://forum.adodoz.cn")
-            }.also { view ->
-                backpack.addCallback(object : OnBackPressedCallback(true) {
-                    override fun handleOnBackPressed() {
-                        if (view.canGoBack()) {
-                            view.goBack()
-                        } else {
-                            onClose()
-                        }
-                    }
-                })
-            }
-        },
+        factory = { view },
         update = {
             it.setBackgroundColor(backgroundColor.toArgb())
         }
