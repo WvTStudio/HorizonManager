@@ -4,7 +4,11 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.conflate
+import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.launch
 import org.wvt.horizonmgr.DependenciesContainer
 import org.wvt.horizonmgr.service.respack.ResourcePackManifest
@@ -69,12 +73,21 @@ class MCResTabViewModel(dependencies: DependenciesContainer) : ViewModel() {
                 }
                 progressState.emit(ProgressDialogState.Loading("正在安装"))
                 val task = resManager.install(respack)
-                // TODO: 2021/3/21 安装进度
+                val progressJob = launch {
+                    task.progressChannel().consumeAsFlow().conflate().collect {
+                        progressState.emit(ProgressDialogState.ProgressLoading("正在安装", it))
+                        delay(500)
+                    }
+                }
                 try {
                     task.await()
                 } catch (e: Exception) {
                     progressState.emit(ProgressDialogState.Failed("安装失败", "安装时出现错误", e.message))
+                } finally {
+                    progressJob.cancel()
                 }
+                load()
+                progressState.emit(ProgressDialogState.Finished("安装完成"))
             } catch (e: Exception) {
                 progressState.emit(ProgressDialogState.Failed("安装失败", "出现未知错误", e.message))
             }

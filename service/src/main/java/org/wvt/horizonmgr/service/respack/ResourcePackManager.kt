@@ -23,6 +23,6 @@ class ResourcePackManager(val directory: File) {
     fun install(resourcePack: ZipResourcePackage): ProgressDeferred<Float, Unit> {
         val directoryName = resourcePack.getManifest().header.name
         val outDir = directory.resolve(directoryName).translateToValidFile()
-        return CoroutineZip.unzip(resourcePack.file, outDir = outDir, autoUnbox = true)
+        return CoroutineZip.unzip(resourcePack.file, outDir = outDir, autoUnbox = false)
     }
 }
