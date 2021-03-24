@@ -15,10 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import org.wvt.horizonmgr.ui.components.ErrorPage
-import org.wvt.horizonmgr.ui.components.ModIcon
-import org.wvt.horizonmgr.ui.components.ProgressDialog
-import org.wvt.horizonmgr.ui.components.loadLocalImage
+import org.wvt.horizonmgr.ui.components.*
 
 @Composable
 fun MCResTab(
@@ -37,19 +34,23 @@ fun MCResTab(
         Crossfade(targetState = state) {
             Box(Modifier.fillMaxSize()) {
                 when (it) {
-                    MCResTabViewModel.State.FINISHED -> ResList(
-                        modifier = Modifier.fillMaxSize(),
-                        data = packs
-                    ) { _, item ->
-                        ResItem(
-                            modifier = Modifier
-                                .padding(horizontal = 16.dp, vertical = 8.dp)
-                                .fillParentMaxWidth(),
-                            icon = item.iconPath,
-                            name = item.manifest.header.name,
-                            description = item.manifest.header.description,
-                            onClick = {}
-                        )
+                    MCResTabViewModel.State.FINISHED -> {
+                        if (packs.isEmpty()) EmptyPage(Modifier.fillMaxSize()) {
+                            Text("没有找到资源包")
+                        } else ResList(
+                            modifier = Modifier.fillMaxSize(),
+                            data = packs
+                        ) { _, item ->
+                            ResItem(
+                                modifier = Modifier
+                                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                                    .fillParentMaxWidth(),
+                                icon = item.iconPath,
+                                name = item.manifest.header.name,
+                                description = item.manifest.header.description,
+                                onClick = {}
+                            )
+                        }
                     }
                     MCResTabViewModel.State.LOADING -> CircularProgressIndicator(
                         Modifier.align(Alignment.Center)
@@ -76,7 +77,7 @@ fun MCResTab(
 }
 
 @Composable
-fun <T> ResList(
+private fun <T> ResList(
     modifier: Modifier,
     data: List<T>,
     item: @Composable LazyItemScope.(index: Int, item: T) -> Unit
@@ -89,7 +90,7 @@ fun <T> ResList(
 }
 
 @Composable
-fun ResItem(
+private fun ResItem(
     modifier: Modifier,
     icon: String?,
     name: String,
