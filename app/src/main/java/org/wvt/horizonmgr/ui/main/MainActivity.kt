@@ -41,6 +41,7 @@ class MainActivity : AppCompatActivity() {
     private val newsVM: NewsViewModel by viewModels { factory }
     private val modTabVM: ModTabViewModel by viewModels { factory }
     private val icLevelTabVM: ICLevelTabViewModel by viewModels { factory }
+    private val icResTabVM: ICResTabViewModel by viewModels { factory }
     private val moduleManagerVM: ModuleManagerViewModel by viewModels { factory }
     private val packageManagerVM: PackageManagerViewModel by viewModels { factory }
     private val mcLevelVM: MCLevelTabViewModel by viewModels { factory }
@@ -79,7 +80,7 @@ class MainActivity : AppCompatActivity() {
 
     private val selectTextureForIC = registerForActivityResult(FileSelectorResultContract()) {
         if (it is FileSelectorResult.Succeed) {
-            // TODO: 2021/3/21
+            icResTabVM.selectedFileToInstall(it.filePath)
         }
     }
     private val selectTextureForMC = registerForActivityResult(FileSelectorResultContract()) {
@@ -224,6 +225,7 @@ class MainActivity : AppCompatActivity() {
                 newsVM = newsVM,
                 modTabVM = modTabVM,
                 icLevelTabVM = icLevelTabVM,
+                icResTabVM = icResTabVM,
                 moduleManagerVM = moduleManagerVM,
                 packageManagerVM = packageManagerVM,
                 mcLevelVM = mcLevelVM,

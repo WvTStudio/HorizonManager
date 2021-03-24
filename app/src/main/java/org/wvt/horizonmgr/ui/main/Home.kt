@@ -53,6 +53,7 @@ fun Home(
     newsVM: NewsViewModel,
     modTabVM: ModTabViewModel,
     icLevelTabVM: ICLevelTabViewModel,
+    icResTabVM: ICResTabViewModel,
     moduleManagerVM: ModuleManagerViewModel,
     packageManagerVM: PackageManagerViewModel,
     mcLevelVM: MCLevelTabViewModel,
@@ -141,8 +142,9 @@ fun Home(
                     HomeViewModel.Screen.LOCAL_MANAGE -> ModuleManager(
                         onNavClicked = { scope.launch { drawerState.open() } },
                         managerViewModel = moduleManagerVM,
-                        icLevelViewModel = icLevelTabVM,
                         moduleViewModel = modTabVM,
+                        icLevelViewModel = icLevelTabVM,
+                        icResViewModel = icResTabVM,
                         mcLevelViewModel = mcLevelVM,
                         mcResViewModel = mcResVM,
                         onAddModClicked = onAddModClicked,

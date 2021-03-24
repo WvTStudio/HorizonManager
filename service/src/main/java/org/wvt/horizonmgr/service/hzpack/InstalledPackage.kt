@@ -7,6 +7,7 @@ import org.wvt.horizonmgr.service.CoroutineZip
 import org.wvt.horizonmgr.service.level.MCLevelManager
 import org.wvt.horizonmgr.service.mod.InstalledMod
 import org.wvt.horizonmgr.service.mod.ZipMod
+import org.wvt.horizonmgr.service.respack.ResourcePackManager
 import org.wvt.horizonmgr.service.utils.translateToValidFile
 import java.io.File
 import java.util.*
@@ -112,7 +113,24 @@ class InstalledPackage(val packageDirectory: File) {
         return@withContext newInfo
     }
 
+    private val mLevelManager by lazy {
+        MCLevelManager(packageDirectory.resolve("worlds"))
+    }
+
     fun getLevelManager(): MCLevelManager {
-        return MCLevelManager(packageDirectory.resolve("worlds"))
+        return mLevelManager
+    }
+
+    private val mResManager by lazy {
+        val directory = packageDirectory.resolve("innercore").resolve("resource_packs")
+        if (!directory.exists()) {
+            directory.mkdirs()
+            directory.mkdir()
+        }
+        ResourcePackManager(directory)
+    }
+
+    fun getResManager(): ResourcePackManager {
+        return mResManager
     }
 }
