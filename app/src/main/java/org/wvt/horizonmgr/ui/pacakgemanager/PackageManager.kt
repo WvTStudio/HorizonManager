@@ -256,11 +256,11 @@ private fun <T> PackageManagerUI(
     }
 }
 
-private val fab1Enter = tween<Float>(100, 0, FastOutSlowInEasing)
-private val fab2Enter = tween<Float>(100, 40, FastOutSlowInEasing)
+private val fab1Enter = tween<Float>(100, 0, LinearOutSlowInEasing)
+private val fab2Enter = tween<Float>(100, 50, LinearOutSlowInEasing)
 
-private val fab1Exit = tween<Float>(100, 40, FastOutSlowInEasing)
-private val fab2Exit = tween<Float>(100, 0, FastOutSlowInEasing)
+private val fab1Exit = tween<Float>(80, 40, FastOutLinearInEasing)
+private val fab2Exit = tween<Float>(80, 0, FastOutLinearInEasing)
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
@@ -315,17 +315,19 @@ private fun FABs(
 private fun FABEntry(
     modifier: Modifier = Modifier,
     expand: Boolean,
-    enterAnim: AnimationSpec<Float>,
-    exitAnim: AnimationSpec<Float>,
+    enterAnim: FiniteAnimationSpec<Float>,
+    exitAnim: FiniteAnimationSpec<Float>,
     text: @Composable BoxScope.() -> Unit,
     icon: @Composable () -> Unit,
     onClick: () -> Unit
 ) {
-    val transition =
-        animateFloatAsState(
-            if (expand) 1f else 0f,
-            animationSpec = if (expand) enterAnim else exitAnim
-        ).value
+    val transition by updateTransition(expand, label = "progress").animateFloat(
+        transitionSpec = {
+            if (targetState) enterAnim else exitAnim
+        }, targetValueByState = {
+            if (it) 1f else 0f
+        }
+    )
 
     if (transition > 0f) {
         Row(modifier = modifier.wrapContentSize(), verticalAlignment = Alignment.CenterVertically) {
@@ -333,7 +335,8 @@ private fun FABEntry(
                 Modifier.graphicsLayer(
                     alpha = transition,
                     scaleY = transition,
-                    scaleX = transition
+                    scaleX = transition,
+                    clip = false
                 )
             ) {
                 Card(
@@ -356,7 +359,8 @@ private fun FABEntry(
                 Modifier.graphicsLayer(
                     alpha = transition,
                     scaleY = transition,
-                    scaleX = transition
+                    scaleX = transition,
+                    clip = false
                 )
             ) {
                 FloatingActionButton(
