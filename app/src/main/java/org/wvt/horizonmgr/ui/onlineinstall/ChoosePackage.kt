@@ -1,18 +1,17 @@
 package org.wvt.horizonmgr.ui.onlineinstall
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.Icon
+import androidx.compose.material.ListItem
+import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Extension
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import org.wvt.horizonmgr.ui.theme.AppBarBackgroundColor
 
 data class ChoosePackageItem(
     val uuid: String,
@@ -24,46 +23,29 @@ data class ChoosePackageItem(
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ChoosePackage(
+    modifier: Modifier,
     items: List<ChoosePackageItem>,
-    onCancel: () -> Unit,
     onChoose: (index: Int) -> Unit
 ) {
-    Column(Modifier.fillMaxSize()) {
-        TopAppBar(
-            navigationIcon = {
-                IconButton(onClick = onCancel) {
+    LazyColumn(modifier) {
+        itemsIndexed(items) { index, item ->
+            ListItem(
+                modifier = Modifier.clickable(onClick = { onChoose(index) }),
+                icon = {
                     Icon(
-                        Icons.Filled.ArrowBack,
-                        contentDescription = "返回"
+                        imageVector = Icons.Filled.Extension,
+                        contentDescription = "安装"
+                    )
+                },
+                text = { Text(if (item.recommended) "${item.name}（推荐）" else item.name) },
+                secondaryText = { Text(item.version) },
+                trailing = {
+                    Icon(
+                        imageVector = Icons.Filled.ArrowForward,
+                        contentDescription = "选择"
                     )
                 }
-            },
-            title = { Text("在线安装分包") }, backgroundColor = AppBarBackgroundColor
-        )
-        if (items.isEmpty()) {
-            Box(Modifier.fillMaxSize()) {
-                CircularProgressIndicator(Modifier.align(Alignment.Center))
-            }
-        } else {
-            items.forEachIndexed { index, it ->
-                ListItem(
-                    modifier = Modifier.clickable(onClick = { onChoose(index) }),
-                    icon = {
-                        Icon(
-                            imageVector = Icons.Filled.Extension,
-                            contentDescription = "安装"
-                        )
-                    },
-                    text = { Text(if (it.recommended) "${it.name}（推荐）" else it.name) },
-                    secondaryText = { Text(it.version) },
-                    trailing = {
-                        Icon(
-                            imageVector = Icons.Filled.ArrowForward,
-                            contentDescription = "选择"
-                        )
-                    }
-                )
-            }
+            )
         }
     }
 }

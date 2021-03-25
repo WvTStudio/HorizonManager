@@ -3,19 +3,25 @@ package org.wvt.horizonmgr.ui.onlineinstall
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import androidx.activity.OnBackPressedCallback
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContract
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.animation.Crossfade
+import androidx.compose.animation.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import org.wvt.horizonmgr.defaultViewModelFactory
+import org.wvt.horizonmgr.ui.components.ErrorPage
 import org.wvt.horizonmgr.ui.theme.AndroidHorizonManagerTheme
+import org.wvt.horizonmgr.ui.theme.AppBarBackgroundColor
 import org.wvt.horizonmgr.ui.theme.SideEffectStatusBar
 
 class InstallPackageResultContract : ActivityResultContract<Context, Boolean>() {
@@ -40,6 +46,11 @@ class InstallPackageActivity : AppCompatActivity() {
 
     private val viewModel by viewModels<InstallPackageViewModel> { defaultViewModelFactory }
 
+    enum class Screen {
+        CHOOSE_PACKAGE, EDIT_NAME, INSTALL
+    }
+
+    @OptIn(ExperimentalAnimationApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -47,52 +58,143 @@ class InstallPackageActivity : AppCompatActivity() {
                 SideEffectStatusBar()
 
                 val packages by viewModel.packages.collectAsState()
+                val state by viewModel.state.collectAsState()
 
-                var screen: Int by remember { mutableStateOf(0) }
+                var prevScreen by remember { mutableStateOf(Screen.CHOOSE_PACKAGE) }
+                var screen by remember { mutableStateOf(Screen.CHOOSE_PACKAGE) }
                 var chosenIndex by remember { mutableStateOf<Int>(-1) }
 
                 DisposableEffect(Unit) {
-                    onBackPressedDispatcher.addCallback(object : OnBackPressedCallback(true) {
-                        override fun handleOnBackPressed() {
-                            when (screen) {
-                                0 -> finish()
-                                1 -> screen = 0
-                            }
-                        }
-                    })
                     viewModel.getPackages()
                     onDispose { }
                 }
 
+                BackHandler {
+                    when (screen) {
+                        Screen.CHOOSE_PACKAGE -> finish()
+                        Screen.EDIT_NAME -> {
+                            prevScreen = screen
+                            screen = Screen.CHOOSE_PACKAGE
+                        }
+                        Screen.INSTALL -> {
+                        }
+                    }
+                }
+
                 Surface(Modifier.fillMaxSize(), color = MaterialTheme.colors.background) {
-                    Crossfade(targetState = screen) { it ->
-                        when (it) {
-                            0 -> ChoosePackage(
-                                onChoose = {
-                                    chosenIndex = it
-                                    viewModel.selectPackage(packages[it].uuid)
-                                    screen = 1
-                                },
-                                onCancel = { finish() },
-                                items = packages
-                            )
-                            1 -> EditName(
-                                packages[chosenIndex].name,
-                                packages[chosenIndex].version,
-                                onConfirm = {
-                                    viewModel.setCustomName(it)
-                                    viewModel.startInstall()
-                                    screen = 2
-                                },
-                                onCancel = { screen = 0 }
-                            )
-                            2 -> InstallProgress(
-                                totalProgress = viewModel.totalProgress.collectAsState().value,
-                                downloadState = viewModel.downloadState.collectAsState().value,
-                                installState = viewModel.installState.collectAsState().value,
-                                onCancelClick = { viewModel.cancelInstall() },
-                                onCompleteClick = { finishWithSucceed() }
-                            )
+                    Column {
+                        TopAppBar(
+                            navigationIcon = {
+                                if (screen == Screen.CHOOSE_PACKAGE || screen == Screen.EDIT_NAME) {
+                                    IconButton(onClick = {
+                                        when (screen) {
+                                            Screen.CHOOSE_PACKAGE -> finish()
+                                            Screen.EDIT_NAME -> {
+                                                prevScreen = screen
+                                                screen = Screen.CHOOSE_PACKAGE
+                                            }
+                                            else -> {
+                                            }
+                                        }
+                                    }) {
+                                        Icon(
+                                            Icons.Filled.ArrowBack,
+                                            contentDescription = "返回"
+                                        )
+                                    }
+                                }
+                            },
+                            title = {
+                                Crossfade(targetState = screen) { screen ->
+                                    when (screen) {
+                                        Screen.CHOOSE_PACKAGE -> Text("在线安装分包")
+                                        Screen.EDIT_NAME -> Text("输入分包的名字")
+                                        Screen.INSTALL -> Text(if (viewModel.totalProgress.collectAsState().value >= 1f) "安装完成" else "正在安装")
+                                    }
+                                }
+
+                            },
+                            backgroundColor = AppBarBackgroundColor
+                        )
+                        Box {
+                            androidx.compose.animation.AnimatedVisibility(
+                                visible = screen == Screen.CHOOSE_PACKAGE,
+                                enter = fadeIn() + slideInHorizontally(),
+                                exit = fadeOut() + slideOutHorizontally()
+                            ) {
+                                Crossfade(state) { state ->
+                                    when (state) {
+                                        InstallPackageViewModel.State.Loading -> Box(
+                                            Modifier.fillMaxSize(),
+                                            Alignment.Center
+                                        ) {
+                                            CircularProgressIndicator()
+                                        }
+                                        InstallPackageViewModel.State.Succeed -> ChoosePackage(
+                                            modifier = Modifier.fillMaxSize(),
+                                            items = packages,
+                                            onChoose = {
+                                                chosenIndex = it
+                                                viewModel.selectPackage(packages[it].uuid)
+                                                prevScreen = screen
+                                                screen = Screen.EDIT_NAME
+                                            }
+                                        )
+                                        is InstallPackageViewModel.State.Error -> ErrorPage(
+                                            modifier = Modifier.fillMaxSize(),
+                                            message = { Text(state.message) },
+                                            onRetryClick = { viewModel.getPackages() }
+                                        )
+                                    }
+                                }
+                            }
+
+                            androidx.compose.animation.AnimatedVisibility(
+                                visible = screen == Screen.EDIT_NAME,
+                                enter = fadeIn() + slideInHorizontally({
+                                    when (prevScreen) {
+                                        Screen.CHOOSE_PACKAGE -> it / 2 // Slide in from right
+                                        Screen.INSTALL -> -it / 2 // Slide in from left
+                                        else -> it
+                                    }
+                                }),
+                                exit = fadeOut() + slideOutHorizontally({
+                                    when (screen) {
+                                        Screen.CHOOSE_PACKAGE -> it / 2 // Slide out to right
+                                        Screen.INSTALL -> -it / 2 // Slide out to left
+                                        else -> it
+                                    }
+                                })
+                            ) {
+                                EditName(
+                                    packages[chosenIndex].name,
+                                    packages[chosenIndex].version,
+                                    onConfirm = {
+                                        viewModel.setCustomName(it)
+                                        viewModel.startInstall()
+                                        prevScreen = screen
+                                        screen = Screen.INSTALL
+                                    }
+                                )
+                            }
+
+                            androidx.compose.animation.AnimatedVisibility(
+                                visible = screen == Screen.INSTALL,
+                                enter = fadeIn() + slideInHorizontally({
+                                    it / 2  // Slide in from right
+                                }),
+                                exit = fadeOut() + slideOutHorizontally({
+                                    it / 2 // Slide out to right
+                                })
+                            ) {
+                                InstallProgress(
+                                    totalProgress = viewModel.totalProgress.collectAsState().value,
+                                    downloadState = viewModel.downloadState.collectAsState().value,
+                                    installState = viewModel.installState.collectAsState().value,
+                                    onCancelClick = { viewModel.cancelInstall() },
+                                    onCompleteClick = { finishWithSucceed() }
+                                )
+                            }
                         }
                     }
                 }

@@ -16,7 +16,6 @@ import androidx.compose.runtime.State
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import org.wvt.horizonmgr.ui.theme.AppBarBackgroundColor
 
 sealed class StepState {
     @Stable
@@ -43,13 +42,6 @@ fun InstallProgress(
 ) {
     Box(Modifier.fillMaxSize()) {
         Column(Modifier.fillMaxSize()) {
-            TopAppBar(title = {
-                Crossfade(if (totalProgress >= 1f) "安装完成" else "正在安装") {
-                    Text(it)
-                }
-            }, navigationIcon = {
-                // 安装目前不可被取消
-            }, backgroundColor = AppBarBackgroundColor)
             Row(
                 Modifier
                     .height(2.dp)
