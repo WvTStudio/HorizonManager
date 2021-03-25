@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import org.wvt.horizonmgr.ui.components.ErrorPage
 import org.wvt.horizonmgr.ui.components.ImageWithoutQualityFilter
 import org.wvt.horizonmgr.ui.theme.AppBarBackgroundColor
@@ -31,13 +32,16 @@ fun PackageInfo(
     val state = vm.state.collectAsState().value
 
     Column(Modifier.fillMaxSize()) {
-        TopAppBar(title = {
-            Text("分包详情")
-        }, navigationIcon = {
-            IconButton(onClick = onCloseClick) {
-                Icon(Icons.Filled.ArrowBack, "返回")
-            }
-        }, backgroundColor = AppBarBackgroundColor)
+        TopAppBar(
+            modifier = Modifier.zIndex(4f),
+            title = {
+                Text("分包详情")
+            }, navigationIcon = {
+                IconButton(onClick = onCloseClick) {
+                    Icon(Icons.Filled.ArrowBack, "返回")
+                }
+            }, backgroundColor = AppBarBackgroundColor
+        )
         Crossfade(
             modifier = Modifier.weight(1f),
             targetState = state
@@ -70,12 +74,16 @@ fun PackageInfo(
                                         .fillMaxWidth()
                                         .aspectRatio(16f / 9f),
                                     shape = RoundedCornerShape(4.dp),
-                                    color = MaterialTheme.colors.onBackground.copy(alpha = ContentAlpha.disabled).compositeOver(MaterialTheme.colors.background)
+                                    color = MaterialTheme.colors.onBackground.copy(alpha = ContentAlpha.disabled)
+                                        .compositeOver(MaterialTheme.colors.background),
+                                    elevation = 1.dp
                                 ) {
                                     val image = info.packageGraphic.collectAsState()
                                     Crossfade(targetState = image.value) {
                                         if (it != null) ImageWithoutQualityFilter(
-                                            modifier = Modifier.fillMaxSize().scale(scale),
+                                            modifier = Modifier
+                                                .fillMaxSize()
+                                                .scale(scale),
                                             imageBitmap = it,
                                         )
                                     }
