@@ -100,6 +100,7 @@ class OnlineModsViewModel(
     fun installChineseMod(id: Int) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
+                installState.emit(ProgressDialogState.Loading("正在下载"))
                 val pkg = localCache.getSelectedPackageUUID()?.let { uuid ->
                     manager.getInstalledPackages().find { it.getInstallationInfo().internalId == uuid }
                 }
@@ -107,7 +108,6 @@ class OnlineModsViewModel(
                     installState.emit(ProgressDialogState.Failed("安装失败", "您还未选择分包"))
                     return@launch
                 }
-                installState.emit(ProgressDialogState.Loading("正在下载"))
                 val selectedMod =
                     cachedChineseMods.find { it.id == id }
                         ?: return@launch // TODO: 2021/2/28 考虑显示错误信息
@@ -132,6 +132,7 @@ class OnlineModsViewModel(
     fun installMirrorMod(id: Int) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
+                installState.emit(ProgressDialogState.Loading("正在下载"))
                 val pkg = localCache.getSelectedPackageUUID()?.let { uuid ->
                     manager.getInstalledPackages().find { it.getInstallationInfo().internalId == uuid }
                 }
