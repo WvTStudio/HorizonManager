@@ -7,8 +7,6 @@ import java.io.File
 
 class MCLevelManager(private val worldsDir: File) {
 
-    class WorldsDirectoryNotExists() : Exception()
-
     data class GetResult(
         val levels: List<MCLevel>,
         val errors: List<ErrorEntry>
@@ -19,8 +17,12 @@ class MCLevelManager(private val worldsDir: File) {
         val error: Throwable
     )
 
+    /**
+     * 获取 [worldsDir] 的存档
+     * @return 获取的结果，[levels] 将确保为正确的存档，[errors] 存有解析时发生的所有错误，可能是 IO 错误，也可能是存档格式不正确
+     */
     fun getLevels(): GetResult {
-        if (!worldsDir.exists()) throw WorldsDirectoryNotExists()
+        if (!worldsDir.exists()) return GetResult(emptyList(), emptyList())
         val dirs = worldsDir.listFiles() ?: return GetResult(emptyList(), emptyList())
 
         val result = mutableListOf<MCLevel>()

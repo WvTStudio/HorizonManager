@@ -10,6 +10,7 @@ object PackageManifestWrapper {
     /**
      * 只会抛出新 PackageManifest 导致的异常
      */
+    @Throws(SerializationException::class)
     fun fromJson(jsonStr: String): PackageManifest {
         return try {
             PackageManifest.fromJson(jsonStr)

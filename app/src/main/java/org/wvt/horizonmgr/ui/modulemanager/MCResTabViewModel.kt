@@ -22,13 +22,15 @@ class MCResTabViewModel(dependencies: DependenciesContainer) : ViewModel() {
     private val resManager = dependencies.mcResourcePackManager
 
     val resPacks = MutableStateFlow<List<ResPack>>(emptyList())
-
-    val state = MutableStateFlow<State>(State.LOADING)
+    val errors = MutableStateFlow<List<String>>(emptyList())
+    val state = MutableStateFlow<State>(State.Loading)
 
     val progressState = MutableStateFlow<ProgressDialogState?>(null)
 
-    enum class State {
-        FINISHED, LOADING, FAILED
+    sealed class State {
+        object Loading : State()
+        object Done : State()
+        class Error(val message: String) : State()
     }
 
     data class ResPack(
@@ -38,25 +40,31 @@ class MCResTabViewModel(dependencies: DependenciesContainer) : ViewModel() {
 
     fun load() {
         viewModelScope.launch(Dispatchers.IO) {
-            state.emit(State.LOADING)
-            val errors = mutableListOf<Pair<File, Exception>>()
-            val result = mutableListOf<ResPack>()
-
-            try {
-                resManager.getPackages().forEach {
-                    try {
-                        result.add(ResPack(it.getIcon()?.absolutePath, it.getManifest()))
-                    } catch (e: Exception) {
-                        errors.add(it.directory to e)
-                    }
-                }
+            state.emit(State.Loading)
+            val result = try {
+                resManager.getPackages()
             } catch (e: Exception) {
                 Log.e(TAG, "获取资源包失败", e)
-                state.emit(State.FAILED)
+                state.emit(State.Error("获取资源包失败"))
                 return@launch
             }
-            resPacks.emit(result)
-            state.emit(State.FINISHED)
+            val mappedErrors = result.errors.map {
+                "${it.file.absolutePath}: ${it.error.message ?: "未知错误"}"
+            }
+            val packs = result.resPacks.map {
+                try {
+                    ResPack(it.getIcon()?.absolutePath, it.getManifest())
+                } catch (e: Exception) {
+                    // 这一步只有可能出现在解析过程中文件被更改
+                    Log.e(TAG, "获取资源包信息失败", e)
+                    state.emit(State.Error("获取资源包信息失败"))
+                    return@launch
+                }
+            }
+
+            resPacks.emit(packs)
+            errors.emit(mappedErrors)
+            state.emit(State.Done)
         }
     }
 

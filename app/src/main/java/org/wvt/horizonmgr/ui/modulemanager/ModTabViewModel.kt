@@ -57,7 +57,7 @@ class ModTabViewModel(dependencies: DependenciesContainer) : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             _state.emit(State.Loading)
             val pkg = localCache.getSelectedPackageUUID()?.let { uuid ->
-                manager.getInstalledPackages().find { it.getInstallationInfo().internalId == uuid }
+                manager.getInstalledPackage(uuid)
             }
             if (pkg != null) {
                 val mods = try {

@@ -25,6 +25,8 @@ class ICResTabViewModel(dependencies: DependenciesContainer) : ViewModel() {
 
     val state = MutableStateFlow<State>(State.Loading)
     val resPacks = MutableStateFlow<List<ResPack>>(emptyList())
+    val errors = MutableStateFlow<List<String>>(emptyList())
+
     val progressState = MutableStateFlow<ProgressDialogState?>(null)
 
     private var resPackManager: ResourcePackManager? = null
@@ -48,33 +50,39 @@ class ICResTabViewModel(dependencies: DependenciesContainer) : ViewModel() {
                 state.emit(State.Error("您还未选择分包"))
                 return@launch
             }
-            val selectedPack = packMgr.getInstalledPackages()
-                .find { it.getInstallationInfo().internalId == selectedUUID }
+
+            val selectedPack = packMgr.getInstalledPackage(selectedUUID)
             if (selectedPack == null) {
                 state.emit(State.Error("您选择的分包可能已被移动或删除"))
                 return@launch
             }
 
             val resManager = selectedPack.getResManager()
-            resPackManager = resManager
-
-            val errors = mutableListOf<Pair<File, Exception>>()
-            val result = mutableListOf<ResPack>()
-            try {
-                resManager.getPackages().forEach {
-                    try {
-                        result.add(ResPack(it.getIcon()?.absolutePath, it.getManifest()))
-                    } catch (e: Exception) {
-                        errors.add(it.directory to e)
-                    }
-                }
+            val result = try {
+                resManager.getPackages()
             } catch (e: Exception) {
                 Log.e(TAG, "获取资源包失败", e)
                 state.emit(State.Error("获取资源包失败"))
                 return@launch
             }
+            val mappedErrors = result.errors.map {
+                "${it.file.absolutePath}: ${it.error.message ?: "未知错误"}"
+            }
+            val packs = result.resPacks.map {
+                try {
+                    ResPack(it.getIcon()?.absolutePath, it.getManifest())
+                } catch (e: Exception) {
+                    // 这一步只有可能出现在解析过程中文件被更改
+                    Log.e(TAG, "获取资源包信息失败", e)
+                    state.emit(State.Error("获取资源包信息失败"))
+                    return@launch
+                }
+            }
 
-            resPacks.emit(result)
+            resPackManager = resManager
+            errors.emit(mappedErrors)
+            resPacks.emit(packs)
+
             state.emit(State.Done)
         }
     }

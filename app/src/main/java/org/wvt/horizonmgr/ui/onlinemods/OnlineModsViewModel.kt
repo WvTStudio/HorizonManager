@@ -102,7 +102,7 @@ class OnlineModsViewModel(
             try {
                 installState.emit(ProgressDialogState.Loading("正在下载"))
                 val pkg = localCache.getSelectedPackageUUID()?.let { uuid ->
-                    manager.getInstalledPackages().find { it.getInstallationInfo().internalId == uuid }
+                    manager.getInstalledPackage(uuid)
                 }
                 if (pkg == null) {
                     installState.emit(ProgressDialogState.Failed("安装失败", "您还未选择分包"))
@@ -134,7 +134,7 @@ class OnlineModsViewModel(
             try {
                 installState.emit(ProgressDialogState.Loading("正在下载"))
                 val pkg = localCache.getSelectedPackageUUID()?.let { uuid ->
-                    manager.getInstalledPackages().find { it.getInstallationInfo().internalId == uuid }
+                    manager.getInstalledPackage(uuid)
                 }
                 if (pkg == null) {
                     installState.emit(ProgressDialogState.Failed("安装失败", "您还未选择分包"))
@@ -195,61 +195,63 @@ class OnlineModsViewModel(
         }
     }
 
-    private suspend fun loadMirrorMods(sortMode: MirrorSortMode, filterText: String?) = withContext(Dispatchers.Default) {
-        val mods = withContext(Dispatchers.IO) { cdnModRepository.getAllMods() }
-        cachedMirrorMods = mods
-        var processed = mods.sorted(sortMode)
-        if (filterText != null) {
-            processed = processed.filter {
-                it.title.toLowerCase(Locale.ROOT)
-                    .contains(filterText.toLowerCase(Locale.ROOT)) ||
-                        it.description.toLowerCase(Locale.ROOT)
-                            .contains(filterText.toLowerCase(Locale.ROOT))
+    private suspend fun loadMirrorMods(sortMode: MirrorSortMode, filterText: String?) =
+        withContext(Dispatchers.Default) {
+            val mods = withContext(Dispatchers.IO) { cdnModRepository.getAllMods() }
+            cachedMirrorMods = mods
+            var processed = mods.sorted(sortMode)
+            if (filterText != null) {
+                processed = processed.filter {
+                    it.title.toLowerCase(Locale.ROOT)
+                        .contains(filterText.toLowerCase(Locale.ROOT)) ||
+                            it.description.toLowerCase(Locale.ROOT)
+                                .contains(filterText.toLowerCase(Locale.ROOT))
+                }
             }
+            val mapped = processed.map {
+                OfficialMirrorModModel(
+                    id = it.id,
+                    name = it.title,
+                    description = it.description,
+                    iconUrl = it.iconUrl,
+                    versionName = it.versionName,
+                    horizonOptimized = it.horizonOptimized,
+                    lastUpdateTime = it.lastUpdate,
+                    multiplayer = it.multiplayer,
+                    likes = it.likes,
+                    dislikes = it.dislikes
+                )
+            }
+            cdnMods.emit(mapped)
         }
-        val mapped = processed.map {
-            OfficialMirrorModModel(
-                id = it.id,
-                name = it.title,
-                description = it.description,
-                iconUrl = it.iconUrl,
-                versionName = it.versionName,
-                horizonOptimized = it.horizonOptimized,
-                lastUpdateTime = it.lastUpdate,
-                multiplayer = it.multiplayer,
-                likes = it.likes,
-                dislikes = it.dislikes
-            )
-        }
-        cdnMods.emit(mapped)
-    }
 
-    private suspend fun loadChineseMods(sortMode: ChineseSortMode, filterText: String?) =withContext(Dispatchers.Default) {
-        val mods = withContext(Dispatchers.IO) { chineseModRepository.getAllMods() }
-        cachedChineseMods = mods
-        var processed = mods.sorted(sortMode)
-        if (filterText != null) {
-            processed = processed.filter {
-                it.name.toLowerCase(Locale.ROOT)
-                    .contains(filterText.toLowerCase(Locale.ROOT)) ||
-                        it.description.toLowerCase(Locale.ROOT)
-                            .contains(filterText.toLowerCase(Locale.ROOT))
+    private suspend fun loadChineseMods(sortMode: ChineseSortMode, filterText: String?) =
+        withContext(Dispatchers.Default) {
+            val mods = withContext(Dispatchers.IO) { chineseModRepository.getAllMods() }
+            cachedChineseMods = mods
+            var processed = mods.sorted(sortMode)
+            if (filterText != null) {
+                processed = processed.filter {
+                    it.name.toLowerCase(Locale.ROOT)
+                        .contains(filterText.toLowerCase(Locale.ROOT)) ||
+                            it.description.toLowerCase(Locale.ROOT)
+                                .contains(filterText.toLowerCase(Locale.ROOT))
+                }
             }
+            val mapped = processed.map {
+                ChineseModModel(
+                    id = it.id,
+                    name = it.name,
+                    description = it.description,
+                    iconUrl = it.icon,
+                    previewPictureURLs = it.pictures,
+                    version = it.versionName,
+                    time = it.time,
+                    downloads = it.downloads
+                )
+            }
+            chineseMods.emit(mapped)
         }
-        val mapped = processed.map {
-            ChineseModModel(
-                id = it.id,
-                name = it.name,
-                description = it.description,
-                iconUrl = it.icon,
-                previewPictureURLs = it.pictures,
-                version = it.versionName,
-                time = it.time,
-                downloads = it.downloads
-            )
-        }
-        chineseMods.emit(mapped)
-    }
 
     private fun List<OfficialMirrorMod>.sorted(mode: MirrorSortMode): List<OfficialMirrorMod> {
         return when (mode) {

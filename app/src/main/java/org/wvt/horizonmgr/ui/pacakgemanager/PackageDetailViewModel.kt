@@ -71,8 +71,7 @@ class PackageDetailViewModel(
             packageUUID?.let { pkgId ->
                 state.emit(State.LOADING)
                 pkgSize.emit(PackageSize.Loading)
-                val pkg = manager.getInstalledPackages()
-                    .find { it.getInstallationInfo().internalId == pkgId }
+                val pkg = manager.getInstalledPackage(pkgId)
                 if (pkg == null) {
                     // TODO: 2021/2/22 添加错误信息
                     return@launch

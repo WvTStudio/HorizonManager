@@ -34,36 +34,8 @@ internal fun ModTab(
     val enabledMods by vm.newEnabledMods.collectAsState()
     val errors by vm.errors.collectAsState()
 
-    var displayErrorBanner by rememberSaveable(errors) { mutableStateOf(errors.isNotEmpty()) }
-    var displayErrorDialog by remember { mutableStateOf(false) }
-
-    if (displayErrorDialog) {
-        AlertDialog(
-            onDismissRequest = { displayErrorDialog = false },
-            title = { Text("错误详情") },
-            text = {
-                Text(text = remember(errors) {
-                    errors.foldIndexed("") { index, acc, e ->
-                        "$acc$index: \n$e\n\n"
-                    }
-                })
-            },
-            confirmButton = {
-                TextButton(onClick = { displayErrorDialog = false }) { Text("确定") }
-            }
-        )
-    }
-
     val banner = @Composable {
-        MaterialBanner(
-            modifier = Modifier.fillMaxWidth(),
-            visible = displayErrorBanner,
-            text = { Text("解析模组时发生 ${errors.size} 个错误") },
-            dismissButton = { TextButton(onClick = { displayErrorBanner = false }) { Text("关闭") } },
-            confirmButton = {
-                TextButton(onClick = { displayErrorDialog = true }) { Text("详情") }
-            }
-        )
+        ErrorBanner(modifier = Modifier.fillMaxWidth(), errors = errors, text = "解析模组时发生 ${errors.size} 个错误")
     }
 
     Crossfade(state) { state ->

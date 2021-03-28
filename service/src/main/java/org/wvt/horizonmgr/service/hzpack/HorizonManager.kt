@@ -2,6 +2,7 @@ package org.wvt.horizonmgr.service.hzpack
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.SerializationException
 import org.wvt.horizonmgr.service.CoroutineZip
 import org.wvt.horizonmgr.service.utils.translateToValidFile
 import java.io.File
@@ -12,6 +13,7 @@ class HorizonManager constructor(val horizonDir: File) {
 
     /**
      * 从本机中获取已安装的 Package
+     * 该方法仅把文件夹包装成 [InstalledPackage]，不加以验证，不会抛出 IO 以外的异常
      */
     suspend fun getInstalledPackages(): List<InstalledPackage> = withContext(Dispatchers.IO) {
         val subDirs = packDir.listFiles() ?: emptyArray()
@@ -28,6 +30,22 @@ class HorizonManager constructor(val horizonDir: File) {
 
         return@withContext packages
     }
+
+    /**
+     * 从本机中获取指定的分包
+     * 由于要使用 [InstalledPackage::getInstallationInfo()] 方法，该方法会对分包进行格式验证
+     * 如果格式不正确则返回 null，只会抛出 IO 导致的异常
+     */
+    suspend fun getInstalledPackage(installUUID: String): InstalledPackage? =
+        withContext(Dispatchers.IO) {
+            getInstalledPackages().find {
+                try {
+                    return@find it.getInstallationInfo().internalId == installUUID
+                } catch (e: SerializationException) {
+                    return@find false
+                }
+            }
+        }
 
     /**
      * 将 ZipPackage 安装到本机

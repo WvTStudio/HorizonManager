@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.wvt.horizonmgr.DependenciesContainer
@@ -25,20 +26,35 @@ class MCLevelTabViewModel(dependencies: DependenciesContainer) : ViewModel() {
     private val localCache = dependencies.localCache
     private var currentPackage: InstalledPackage? = null
     val inputDialogState = InputDialogHostState()
+
     val levels = MutableStateFlow<List<LevelInfo>>(emptyList())
+    val errors = MutableStateFlow<List<String>>(emptyList())
+
     private var cachedLevels = emptyMap<LevelInfo, MCLevel>()
+
+    val state = MutableStateFlow<State>(State.Loading)
+
+    sealed class State {
+        object Loading : State()
+        object Done : State()
+        class Error(val message: String) : State()
+    }
 
     val progressState = MutableStateFlow<ProgressDialogState?>(null)
 
     fun load() {
         viewModelScope.launch(Dispatchers.Default) {
-            launch(Dispatchers.IO) {
+            state.emit(State.Loading)
+            launch(Dispatchers.IO) level@{
                 val result = try {
                     levelManager.getLevels()
                 } catch (e: Exception) {
-                    // TODO 显示错误信息
                     Log.e(TAG, "获取存档失败", e)
-                    return@launch
+                    state.emit(State.Error("获取存档失败"))
+                    return@level
+                }
+                val mappedErrors = result.errors.map {
+                    "${it.file.absolutePath}: ${it.error.message ?: "未知错误"}"
                 }
                 val mapped = mutableMapOf<LevelInfo, MCLevel>().apply {
                     try {
@@ -47,18 +63,20 @@ class MCLevelTabViewModel(dependencies: DependenciesContainer) : ViewModel() {
                         }
                     } catch (e: Exception) {
                         Log.e(TAG, "获取存档信息失败", e)
-                        // TODO: 2021/3/3 显示错误信息
-                        return@launch
+                        state.emit(State.Error("获取存档信息失败"))
+                        return@level
                     }
                 }.toMap()
                 cachedLevels = mapped
                 levels.emit(mapped.keys.toList())
+                errors.emit(mappedErrors)
             }
-            launch(Dispatchers.IO) {
-                val uuid = localCache.getSelectedPackageUUID() ?: return@launch
-                currentPackage = manager.getInstalledPackages()
-                    .find { it.getInstallationInfo().internalId == uuid }
+            launch(Dispatchers.IO) pack@{
+                val uuid = localCache.getSelectedPackageUUID() ?: return@pack
+                currentPackage = manager.getInstalledPackage(uuid) ?: return@pack
             }
+            joinAll()
+            state.emit(State.Done)
         }
     }
 

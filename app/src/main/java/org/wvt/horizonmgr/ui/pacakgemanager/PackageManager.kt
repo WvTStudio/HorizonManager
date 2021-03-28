@@ -77,38 +77,12 @@ fun PackageManager(
         ProgressDialog(onCloseRequest = viewModel::dismiss, state = it)
     }
 
-    var displayBanner by remember(errors) { mutableStateOf(errors.isNotEmpty()) }
-    var displayErrorDialog by remember { mutableStateOf(false) }
-
     val banner = @Composable {
-        MaterialBanner(modifier = Modifier.fillMaxWidth(), visible = displayBanner, text = {
-            Text(text = "解析分包时发生 ${errors.size} 个错误")
-        }, dismissButton = {
-            TextButton(onClick = { displayBanner = false }) {
-                Text(text = "关闭")
-            }
-        }, confirmButton = {
-            TextButton(onClick = { displayErrorDialog = true }) {
-                Text(text = "详情")
-            }
-        })
-    }
-
-    if (displayErrorDialog) {
-        AlertDialog(onDismissRequest = { displayErrorDialog = false },
-            title = { Text("错误详情") },
-            text = {
-                Text(text = remember(errors) {
-                    errors.foldIndexed("") { index, acc, e ->
-                        "$acc$index: \n$e\n\n"
-                    }
-                })
-            },
-            confirmButton = {
-                TextButton(onClick = { displayErrorDialog = false }) {
-                    Text(text = "确定")
-                }
-            })
+        ErrorBanner(
+            modifier = Modifier.fillMaxWidth(),
+            errors = errors,
+            text = "解析分包时发生 ${errors.size} 个错误"
+        )
     }
 
     Box {

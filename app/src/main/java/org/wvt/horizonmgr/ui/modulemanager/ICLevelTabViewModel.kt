@@ -26,12 +26,14 @@ class ICLevelTabViewModel(dependencies: DependenciesContainer) : ViewModel() {
         object Loading : State()
         object PackageNotSelected : State()
         object OK : State()
-        class Error(val e: Throwable?) : State()
+        class Error(val message: String) : State()
     }
 
     val state = MutableStateFlow<State>(State.Loading)
 
     val levels = MutableStateFlow<List<LevelInfo>>(emptyList())
+    val errors = MutableStateFlow<List<String>>(emptyList())
+
     private var cachedLevels = emptyMap<LevelInfo, MCLevel>()
 
     private var pack: InstalledPackage? = null
@@ -45,10 +47,9 @@ class ICLevelTabViewModel(dependencies: DependenciesContainer) : ViewModel() {
             if (uuid == null) {
                 state.emit(State.PackageNotSelected)
             } else {
-                withContext(Dispatchers.IO) {
-                    pack = manager.getInstalledPackages().find {
-                        it.getInstallationInfo().internalId == uuid
-                    }
+                pack = manager.getInstalledPackage(uuid)
+                if (pack == null) {
+                    state.emit(State.Error("您选择的分包可能已被移动或删除"))
                 }
             }
         }
@@ -63,9 +64,12 @@ class ICLevelTabViewModel(dependencies: DependenciesContainer) : ViewModel() {
                 } catch (e: Exception) {
                     // TODO 显示错误信息
                     Log.e(TAG, "获取 IC 存档失败", e)
+                    state.emit(State.Error("获取存档失败"))
                     return@launch
                 }
-
+                val mappedErrors = result.errors.map {
+                    "${it.file.absolutePath}: ${it.error.message ?: "未知错误"}"
+                }
                 val mapped = mutableMapOf<LevelInfo, MCLevel>().apply {
                     try {
                         result.levels.forEach {
@@ -74,11 +78,12 @@ class ICLevelTabViewModel(dependencies: DependenciesContainer) : ViewModel() {
                     } catch (e: Exception) {
                         Log.e(TAG, "获取存档信息失败", e)
                         // TODO: 2021/3/3 显示错误信息
-                        state.emit(State.Error(e))
+                        state.emit(State.Error("获取存档信息失败"))
                         return@launch
                     }
                 }.toMap()
                 cachedLevels = mapped
+                errors.emit(mappedErrors)
                 levels.emit(mapped.keys.toList())
                 state.emit(State.OK)
             }

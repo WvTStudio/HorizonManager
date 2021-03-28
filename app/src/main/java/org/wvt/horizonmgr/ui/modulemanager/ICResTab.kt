@@ -4,7 +4,6 @@ import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -22,25 +21,38 @@ fun ICResTab(
     viewModel: ICResTabViewModel,
     onAddButtonClick: () -> Unit
 ) {
-    val packs by viewModel.resPacks.collectAsState()
     val state by viewModel.state.collectAsState()
+    val packs by viewModel.resPacks.collectAsState()
+    val errors by viewModel.errors.collectAsState()
+
     val progressState by viewModel.progressState.collectAsState()
 
     DisposableEffect(Unit) {
         viewModel.load()
         onDispose { }
     }
+
+    val banner = @Composable {
+        ErrorBanner(
+            modifier = Modifier.fillMaxWidth(),
+            errors = errors,
+            text = "解析资源包时发生 ${errors.size} 个错误"
+        )
+    }
+
     Box(Modifier.fillMaxSize()) {
-        Crossfade(targetState = state) {
-            Box(Modifier.fillMaxSize()) {
-                when (it) {
-                    ICResTabViewModel.State.Done -> {
-                        if (packs.isEmpty()) EmptyPage(Modifier.fillMaxSize()) {
+        Crossfade(targetState = state) { state ->
+            when (state) {
+                ICResTabViewModel.State.Done -> {
+                    if (packs.isEmpty()) Box(Modifier.fillMaxWidth()) {
+                        EmptyPage(Modifier.fillMaxSize()) {
                             Text("没有找到资源包")
-                        } else ResList(
-                            modifier = Modifier.fillMaxSize(),
-                            data = packs
-                        ) { _, item ->
+                        }
+                        banner()
+                    } else LazyColumn(modifier = Modifier.fillMaxSize()) {
+                        item { banner() }
+                        item { Spacer(Modifier.height(8.dp))}
+                        itemsIndexed(packs) { index, item ->
                             ResItem(
                                 modifier = Modifier
                                     .padding(horizontal = 16.dp, vertical = 8.dp)
@@ -51,16 +63,17 @@ fun ICResTab(
                                 onClick = {}
                             )
                         }
+                        item { Spacer(Modifier.height(24.dp))}
                     }
-                    ICResTabViewModel.State.Loading -> CircularProgressIndicator(
-                        Modifier.align(Alignment.Center)
-                    )
-                    is ICResTabViewModel.State.Error -> ErrorPage(
-                        modifier = Modifier.fillMaxSize(),
-                        message = { Text(text = it.message) },
-                        onRetryClick = { viewModel.load() }
-                    )
                 }
+                ICResTabViewModel.State.Loading -> Box(Modifier.fillMaxSize(), Alignment.Center) {
+                    CircularProgressIndicator(Modifier.align(Alignment.Center))
+                }
+                is ICResTabViewModel.State.Error -> ErrorPage(
+                    modifier = Modifier.fillMaxSize(),
+                    message = { Text(text = state.message) },
+                    onRetryClick = { viewModel.load() }
+                )
             }
         }
         FloatingActionButton(
@@ -72,19 +85,6 @@ fun ICResTab(
 
         progressState?.let {
             ProgressDialog(onCloseRequest = { viewModel.dismissProgressDialog() }, state = it)
-        }
-    }
-}
-
-@Composable
-private fun <T> ResList(
-    modifier: Modifier,
-    data: List<T>,
-    item: @Composable LazyItemScope.(index: Int, item: T) -> Unit
-) {
-    LazyColumn(modifier = modifier, contentPadding = PaddingValues(top = 8.dp, bottom = 24.dp)) {
-        itemsIndexed(data) { index, item ->
-            item(index, item)
         }
     }
 }

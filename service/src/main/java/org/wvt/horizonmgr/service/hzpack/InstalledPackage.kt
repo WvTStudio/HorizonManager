@@ -2,6 +2,7 @@ package org.wvt.horizonmgr.service.hzpack
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.SerializationException
 import org.json.JSONObject
 import org.wvt.horizonmgr.service.CoroutineZip
 import org.wvt.horizonmgr.service.level.MCLevelManager
@@ -26,11 +27,13 @@ class InstalledPackage(val packageDirectory: File) {
     private val graphicsFile = packageDirectory.resolve(".cached_graphics")
     private val modDir = packageDirectory.resolve("innercore").resolve("mods")
 
+    @Throws(MissingManifestFile::class, SerializationException::class)
     fun getManifest(): PackageManifest {
         if (!manifestFile.exists() || !manifestFile.isFile) throw MissingManifestFile()
         return PackageManifestWrapper.fromJson(manifestFile.readText())
     }
 
+    @Throws(MissingInstallationInfoFile::class, SerializationException::class)
     fun getInstallationInfo(): InstallationInfo {
         if (!installationInfoFile.exists() || !installationInfoFile.isFile) throw MissingInstallationInfoFile()
         return InstallationInfo.fromJson(installationInfoFile.readText())

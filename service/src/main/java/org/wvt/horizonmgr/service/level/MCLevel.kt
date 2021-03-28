@@ -3,9 +3,34 @@ package org.wvt.horizonmgr.service.level
 import java.io.File
 
 class MCLevel internal constructor(val directory: File) {
+    class NotMCLevelException(
+        val directory: File,
+        val missingFiles: List<String>
+    ) : Exception(
+        "${directory.absolutePath} is not a level directory. Missing ${missingFiles.size} files: ${
+            missingFiles.joinToString(
+                prefix = "[",
+                postfix = "]"
+            )
+        }"
+    )
+
     companion object {
-        internal fun parseByDirectory(directory: File): MCLevel {
+        @Throws(NotMCLevelException::class)
+        fun parseByDirectory(directory: File): MCLevel {
+            if (!isMCLevel(directory)) throw NotMCLevelException(directory, essentialFiles.toList())
             return MCLevel(directory)
+        }
+
+        private val essentialFiles = setOf("levelname.txt", "level.dat", "db")
+
+        fun isMCLevel(directory: File): Boolean {
+            if (!directory.isDirectory) return false
+            val listFiles = directory.listFiles() ?: return false
+            essentialFiles.forEach {
+                if (listFiles.find { file -> file.name == it } == null) return false
+            }
+            return true
         }
     }
 

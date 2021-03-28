@@ -87,10 +87,9 @@ class PackageManagerViewModel(
                 selectedPackageUUID = null
                 selectedPackage = null
             } else {
-                try {
-                    mgr.getInstalledPackages().find { it.getInstallationInfo().internalId == uuid }
-                } catch (e: Exception) {
-                    state.emit(State.Error("获取分包失败", e.message))
+                if (mgr.getInstalledPackage(uuid) == null) {
+                    // FIXME: 2021/3/28 使用 Snackbar 来显示该错误
+                    state.emit(State.Error("选择分包失败", "未找到该分包"))
                     return@launch
                 }
                 selectedPackageUUID = uuid
