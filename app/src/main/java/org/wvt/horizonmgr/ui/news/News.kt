@@ -237,14 +237,14 @@ private fun NewsPreview() {
             news = remember {
                 listOf(
                     NewsViewModel.News.Article(
-                        0,
+                        "",
                         "Test article",
                         "Test brief",
                         "http://aaa.aaa",
                         "2020-2020"
                     ),
                     NewsViewModel.News.Article(
-                        0,
+                        "",
                         "Test article",
                         "Test brief",
                         null,

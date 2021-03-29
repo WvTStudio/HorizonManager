@@ -17,11 +17,10 @@ class NewsViewModel(
         const val TAG = "NewsViewModel"
     }
 
-    private val newsModule = dependencies.news
-
+    private val articleModule = dependencies.article
     sealed class News {
         data class Article(
-            val id: Int,
+            val id: String,
             val title: String,
             val brief: String,
             val coverUrl: String?,
@@ -46,14 +45,8 @@ class NewsViewModel(
 
         viewModelScope.launch(Dispatchers.IO) {
             val result = try {
-                newsModule.getNewsSuggestions().map {
-                    News.Article(
-                        it.newsId,
-                        it.title,
-                        it.brief,
-                        it.cover.takeIf { it.isNotBlank() },
-                        formatter.format(Date(it.updateTime.epochSeconds))
-                    )
+                articleModule.getRecommendedArticle().map {
+                    News.Article(it.id, it.title, it.brief, it.coverImage, formatter.format(it.updateTimeInstant.epochSeconds))
                 }
             } catch (e: Exception) {
                 state.emit(State.Error(e))

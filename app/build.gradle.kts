@@ -14,7 +14,7 @@ android {
         applicationId = "org.wvt.horizonmgr"
         minSdkVersion(21)
         targetSdkVersion(30)
-        versionCode = 18
+        versionCode = 19
         versionName = "2.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -120,6 +120,13 @@ dependencies {
     implementation("com.github.bumptech.glide:glide:4.12.0")
     annotationProcessor("com.github.bumptech.glide:compiler:4.12.0")
 
+    val markwonVersion = "4.6.2"
+    implementation("io.noties.markwon:core:$markwonVersion")
+    implementation("io.noties.markwon:ext-latex:$markwonVersion")
+    implementation("io.noties.markwon:ext-tables:$markwonVersion")
+    implementation("io.noties.markwon:image-coil:$markwonVersion")
+    implementation("io.noties.markwon:syntax-highlight:$markwonVersion")
+
 //    implementation("androidx.navigation:navigation-compose:1.0.0-alpha03")
 
     testImplementation("junit:junit:4.13.2")
@@ -129,4 +136,8 @@ dependencies {
     implementation("androidx.compose.ui:ui-tooling:$composeVersion")
     implementation("androidx.compose.ui:ui-test:$composeVersion")
     debugImplementation(kotlin("reflect"))
+}
+
+configurations.all {
+    exclude("org.jetbrains", "annotations-java5") // For io.noties.markwon
 }

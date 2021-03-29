@@ -42,7 +42,7 @@ fun App(
     navigateToSettings: () -> Unit,
     navigateToOnlineInstall: () -> Unit,
     navigateToPackageInfo: (uuid: String) -> Unit,
-    navigateToNewsDetail: (newsId: Int) -> Unit,
+    navigateToNewsDetail: (newsId: String) -> Unit,
     requestOpenGame: () -> Unit,
     selectFileForMod: () -> Unit,
     selectFileForPackage: () -> Unit,

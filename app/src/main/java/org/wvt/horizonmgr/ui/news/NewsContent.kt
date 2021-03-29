@@ -1,5 +1,7 @@
 package org.wvt.horizonmgr.ui.news
 
+import android.view.ViewGroup
+import android.widget.TextView
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -8,15 +10,31 @@ import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.zIndex
+import coil.ImageLoader
+import coil.request.Disposable
+import coil.request.ImageRequest
+import coil.transform.CircleCropTransformation
+import io.noties.markwon.Markwon
+import io.noties.markwon.ext.latex.JLatexMathPlugin
+import io.noties.markwon.ext.tables.TablePlugin
+import io.noties.markwon.image.AsyncDrawable
+import io.noties.markwon.image.coil.CoilImagesPlugin
+import io.noties.markwon.inlineparser.MarkwonInlineParserPlugin
+import io.noties.markwon.syntax.Prism4jSyntaxHighlight
+import io.noties.markwon.syntax.Prism4jTheme
+import io.noties.markwon.syntax.SyntaxHighlightPlugin
+import io.noties.prism4j.GrammarLocator
+import io.noties.prism4j.Prism4j
 import org.wvt.horizonmgr.ui.components.ErrorPage
 import org.wvt.horizonmgr.ui.components.NetworkImage
 import org.wvt.horizonmgr.ui.theme.AppBarBackgroundColor
@@ -70,14 +88,14 @@ fun NewsContent(
                     LazyColumn(modifier = Modifier.fillMaxSize()) {
                         item {
                             Column(Modifier.fillParentMaxWidth()) {
-                                if (content.coverUrl != null) {
+                                if (content.coverImage != null) {
                                     NetworkImage(
                                         modifier = Modifier
                                             .padding(start = 16.dp, top = 16.dp, end = 16.dp)
                                             .fillParentMaxWidth()
                                             .aspectRatio(16f / 9f)
                                             .clip(RoundedCornerShape(4.dp)),
-                                        url = content.coverUrl,
+                                        url = content.coverImage,
                                         contentDescription = "封面",
                                         contentScale = ContentScale.Crop
                                     )
@@ -117,7 +135,7 @@ fun NewsContent(
                                 )
 
                                 // Content
-                                SelectionContainer {
+                                /*SelectionContainer {
                                     Text(
                                         modifier = Modifier
                                             .padding(horizontal = 16.dp, vertical = 24.dp)
@@ -126,7 +144,12 @@ fun NewsContent(
                                         style = MaterialTheme.typography.body1,
                                         color = MaterialTheme.colors.onSurface.copy(0.74f)
                                     )
-                                }
+                                }*/
+                                MarkdownContent(
+                                    modifier = Modifier
+                                        .padding(horizontal = 16.dp, vertical = 24.dp),
+                                    md = content.content
+                                )
                             }
                         }
                     }
@@ -151,4 +174,62 @@ private fun Label(
             content = {}
         )
     }
+}
+
+@Composable
+private fun MarkdownContent(modifier: Modifier, md: String) {
+    val context = LocalContext.current
+    val textColor = MaterialTheme.typography.body1.color.toArgb()
+    val view = remember {
+        TextView(context).apply {
+            layoutParams = ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT
+            )
+            textSize = 16f
+            setTextIsSelectable(true)
+        }
+    }
+
+    val markwon = remember {
+        val imageLoader = ImageLoader.Builder(context)
+            .apply {
+                availableMemoryPercentage(0.5)
+                bitmapPoolPercentage(0.5)
+                crossfade(true)
+            }
+            .build()
+
+        val coilPlugin = CoilImagesPlugin.create(
+            object : CoilImagesPlugin.CoilStore {
+                override fun load(drawable: AsyncDrawable): ImageRequest {
+                    return ImageRequest.Builder(context)
+                        .defaults(imageLoader.defaults)
+                        .data(drawable.destination)
+                        .crossfade(true)
+                        .build()
+                }
+
+                override fun cancel(disposable: Disposable) {
+                    disposable.dispose()
+                }
+            },
+            imageLoader
+        )
+        Markwon.builder(context).apply {
+            usePlugin(MarkwonInlineParserPlugin.create())
+            usePlugin(coilPlugin)
+            usePlugin(TablePlugin.create(context))
+            usePlugin(JLatexMathPlugin.create(view.textSize) { builder ->
+                builder.inlinesEnabled(true)
+            })
+        }.build()
+    }
+
+    DisposableEffect(md) {
+        markwon.setMarkdown(view, md)
+        onDispose { }
+    }
+
+    AndroidView(modifier = modifier, factory = { view })
 }

@@ -13,8 +13,8 @@ import org.wvt.horizonmgr.HorizonManagerApplication
 import org.wvt.horizonmgr.ui.theme.AndroidHorizonManagerTheme
 import org.wvt.horizonmgr.ui.theme.SideEffectStatusBar
 
-class NewsContentActivityContract : ActivityResultContract<Int, Unit>() {
-    override fun createIntent(context: Context, input: Int): Intent {
+class NewsContentActivityContract : ActivityResultContract<String, Unit>() {
+    override fun createIntent(context: Context, input: String): Intent {
         return Intent(context, NewsContentActivity::class.java).apply {
             putExtra("id", input)
         }
@@ -32,11 +32,8 @@ class NewsContentActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val id = intent.getIntExtra("id", -1)
-        if (id == -1) error("Id not specified")
-
+        val id = intent.getStringExtra("id") ?: error("Id not specified")
         vm.load(id)
-
         setContent {
             AndroidHorizonManagerTheme {
                 SideEffectStatusBar()

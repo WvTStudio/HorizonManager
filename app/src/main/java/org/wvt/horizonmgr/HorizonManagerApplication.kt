@@ -16,6 +16,7 @@ import org.wvt.horizonmgr.webapi.iccn.ICCNModule
 import org.wvt.horizonmgr.webapi.mgrinfo.MgrInfoModule
 import org.wvt.horizonmgr.webapi.mod.ChineseModRepository
 import org.wvt.horizonmgr.webapi.mod.OfficialModMirrorRepository
+import org.wvt.horizonmgr.webapi.news.MgrArticleModule
 import org.wvt.horizonmgr.webapi.news.MgrNewsModule
 import org.wvt.horizonmgr.webapi.pack.OfficialPackageCDNRepository
 
@@ -57,6 +58,7 @@ class DependenciesContainer internal constructor(private val context: Context) {
     val mgrInfo by lazy { MgrInfoModule() }
     val iccn by lazy { ICCNModule() }
     val news by lazy { MgrNewsModule() }
+    val article by lazy { MgrArticleModule() }
     val packageDownloader by lazy { OfficialCDNPackageDownloader(context) }
     val modDownloader by lazy { ModDownloader(context) }
     val mcLevelManager by lazy {

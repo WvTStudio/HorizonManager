@@ -14,13 +14,13 @@ private const val TAG = "NewsContentViewModel"
 class NewsContentViewModel(
     dependencies: DependenciesContainer
 ) : ViewModel() {
-    private val news = dependencies.news
-    private var newsId: Int = -1
+    private val article = dependencies.article
+    private var articleId: String = ""
 
     data class NewsContent(
-        val coverUrl: String?,
         val title: String,
         val brief: String,
+        val coverImage: String?,
         val content: String
     )
 
@@ -34,8 +34,8 @@ class NewsContentViewModel(
 
     val content = MutableStateFlow<Result>(Result.Loading)
 
-    fun load(newsId: Int) {
-        this.newsId = newsId
+    fun load(articleId: String) {
+        this.articleId = articleId
         refresh()
     }
 
@@ -43,7 +43,7 @@ class NewsContentViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             content.emit(Result.Loading)
             val result = try {
-                news.getNews(newsId)
+                article.getArticle(articleId)
             } catch (e: NetworkException) {
                 content.emit(Result.NetworkError)
                 Log.e(TAG, "获取新闻内容时出现网络错误", e)
@@ -59,7 +59,7 @@ class NewsContentViewModel(
             }
             content.emit(Result.Succeed(
                 NewsContent(
-                    coverUrl = result.coverUrl.takeIf { it.isNotBlank() },
+                    coverImage = result.coverImage,
                     title = result.title,
                     brief = result.brief,
                     content = result.content

@@ -78,7 +78,7 @@ fun Home(
     donate: () -> Unit,
     settings: () -> Unit,
     navigateToPackageInfo: (uuid: String) -> Unit,
-    navigateToNewsDetail: (newsId: Int) -> Unit
+    navigateToNewsDetail: (newsId: String) -> Unit
 ) {
     val scope = rememberCoroutineScope()
     val drawerState = rememberDrawerState(DrawerValue.Closed)
