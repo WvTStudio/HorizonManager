@@ -25,7 +25,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 file("proguard-rules.pro")
             )
-            versionNameSuffix = "-rc"
+            versionNameSuffix = "-rc2"
 //            isShrinkResources = true
 //            isMinifyEnabled = true
         }
