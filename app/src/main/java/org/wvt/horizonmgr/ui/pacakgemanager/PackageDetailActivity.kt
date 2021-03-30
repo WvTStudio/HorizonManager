@@ -9,7 +9,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.material.Surface
 import org.wvt.horizonmgr.HorizonManagerApplication
 import org.wvt.horizonmgr.ui.theme.AndroidHorizonManagerTheme
-import org.wvt.horizonmgr.ui.theme.SideEffectStatusBar
 
 class PackageDetailActivity : AppCompatActivity() {
     companion object {
@@ -34,7 +33,6 @@ class PackageDetailActivity : AppCompatActivity() {
 
         setContent {
             AndroidHorizonManagerTheme {
-                SideEffectStatusBar()
                 Surface {
                     PackageInfo(viewModel, onCloseClick = ::finish)
                 }

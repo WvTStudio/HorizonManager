@@ -11,7 +11,6 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import org.wvt.horizonmgr.HorizonManagerApplication
 import org.wvt.horizonmgr.ui.theme.AndroidHorizonManagerTheme
-import org.wvt.horizonmgr.ui.theme.SideEffectStatusBar
 
 class NewsContentActivityContract : ActivityResultContract<String, Unit>() {
     override fun createIntent(context: Context, input: String): Intent {
@@ -36,7 +35,6 @@ class NewsContentActivity : AppCompatActivity() {
         vm.load(id)
         setContent {
             AndroidHorizonManagerTheme {
-                SideEffectStatusBar()
                 Surface(color = MaterialTheme.colors.background) {
                     NewsContent(vm, ::finish)
                 }

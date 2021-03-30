@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -16,7 +15,6 @@ import org.wvt.horizonmgr.ui.onlinemods.OnlineModsViewModel
 import org.wvt.horizonmgr.ui.pacakgemanager.PackageManagerViewModel
 import org.wvt.horizonmgr.ui.theme.AndroidHorizonManagerTheme
 import org.wvt.horizonmgr.ui.theme.PreviewTheme
-import org.wvt.horizonmgr.ui.theme.SideEffectStatusBar
 
 @Composable
 fun App(
@@ -76,7 +74,6 @@ fun App(
     }
 
     AndroidHorizonManagerTheme {
-        SideEffectStatusBar()
         Surface(color = MaterialTheme.colors.background) {
             if (mainVM.initialized) Home(
                 homeVM = homeVM,

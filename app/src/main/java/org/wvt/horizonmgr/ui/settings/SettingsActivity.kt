@@ -7,7 +7,6 @@ import androidx.compose.material.Surface
 import org.wvt.horizonmgr.BuildConfig
 import org.wvt.horizonmgr.ui.startActivity
 import org.wvt.horizonmgr.ui.theme.AndroidHorizonManagerTheme
-import org.wvt.horizonmgr.ui.theme.SideEffectStatusBar
 
 class SettingsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -15,7 +14,7 @@ class SettingsActivity : AppCompatActivity() {
         val version = "Version " + BuildConfig.VERSION_NAME
 
         setContent {
-            AndroidHorizonManagerTheme {
+            AndroidHorizonManagerTheme(fullScreen = true) {
                 Surface {
                     Settings(
                         versionName = version,

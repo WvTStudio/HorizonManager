@@ -23,10 +23,11 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEach
 import org.wvt.horizonmgr.R
+import org.wvt.horizonmgr.ui.theme.LocalThemeConfig
 import kotlin.random.Random
 
-private val alipayColor = Color(0xFF1678FF)
-private val wechatColor = Color(0xFF19AD19)
+val alipayColor = Color(0xFF1678FF)
+val wechatColor = Color(0xFF19AD19)
 
 private data class DonateItem(
     val name: String,
@@ -42,8 +43,7 @@ fun Donate(
     onWechatPayClicked: () -> Unit
 ) {
     var displayDialog by remember { mutableStateOf(false) }
-    val light = !isSystemInDarkTheme()
-
+    val light = !LocalThemeConfig.current.isDark
     Box(Modifier.fillMaxSize()) {
         Column(Modifier.fillMaxSize()) {
             // Alipay

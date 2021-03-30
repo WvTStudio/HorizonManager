@@ -19,6 +19,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.wvt.horizonmgr.R
 import org.wvt.horizonmgr.defaultViewModelFactory
+import org.wvt.horizonmgr.ui.theme.AndroidDonateTheme
 import org.wvt.horizonmgr.ui.theme.AndroidHorizonManagerTheme
 
 class DonateActivity : AppCompatActivity() {
@@ -45,7 +46,7 @@ class DonateActivity : AppCompatActivity() {
                 }
             }
 
-            AndroidHorizonManagerTheme {
+            AndroidDonateTheme {
                 Box(Modifier.fillMaxSize()) {
                     Surface(
                         color = MaterialTheme.colors.background

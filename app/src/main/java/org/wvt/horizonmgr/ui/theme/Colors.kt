@@ -3,6 +3,7 @@ package org.wvt.horizonmgr.ui.theme
 import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 
 val DarkColorPalette = darkColors(
     primary = Color(MaterialColors.purple[200]!!),
@@ -27,12 +28,12 @@ object MaterialColors {
         val color: Long
     )
 
+    fun isLightColor(color: Color): Boolean {
+        return color.luminance() > 0.5
+    }
+
     fun contentColorFor(color: Color): Color {
-        return if (color.blue + color.green + color.red < 2) {
-            Color.White
-        } else {
-            Color.Black
-        }
+        return if (isLightColor(color)) Color.Black else Color.White
     }
 
     fun parseColor(color: Color): Pair<String, Int>? {

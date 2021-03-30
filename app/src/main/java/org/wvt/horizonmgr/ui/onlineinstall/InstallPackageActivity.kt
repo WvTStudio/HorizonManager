@@ -22,7 +22,6 @@ import org.wvt.horizonmgr.defaultViewModelFactory
 import org.wvt.horizonmgr.ui.components.ErrorPage
 import org.wvt.horizonmgr.ui.theme.AndroidHorizonManagerTheme
 import org.wvt.horizonmgr.ui.theme.AppBarBackgroundColor
-import org.wvt.horizonmgr.ui.theme.SideEffectStatusBar
 
 class InstallPackageResultContract : ActivityResultContract<Context, Boolean>() {
     override fun createIntent(context: Context, input: Context?): Intent {
@@ -55,7 +54,6 @@ class InstallPackageActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             AndroidHorizonManagerTheme {
-                SideEffectStatusBar()
 
                 val packages by viewModel.packages.collectAsState()
                 val state by viewModel.state.collectAsState()

@@ -8,7 +8,6 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.ui.Modifier
 import org.wvt.horizonmgr.ui.theme.AndroidHorizonManagerTheme
-import org.wvt.horizonmgr.ui.theme.SideEffectStatusBar
 
 class OnlineModDetailActivity : AppCompatActivity() {
     companion object {
@@ -23,7 +22,6 @@ class OnlineModDetailActivity : AppCompatActivity() {
         // TODO: 2020/10/30
         setContent {
             AndroidHorizonManagerTheme {
-                SideEffectStatusBar()
                 Surface(Modifier.fillMaxSize(), color = MaterialTheme.colors.background) {
                     OnlineModDetail()
                 }

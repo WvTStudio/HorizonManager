@@ -48,7 +48,7 @@ fun Settings(
                         modifier = Modifier.padding(start = 4.dp, top = 4.dp),
                         contentDescription = "LOGO",
                         painter = painterResource(
-                            id = if (isSystemInDarkTheme()) R.drawable.ic_logo_banner_dark
+                            id = if (themeConfig.isDark) R.drawable.ic_logo_banner_dark
                             else R.drawable.ic_logo_banner
                         )
                     )

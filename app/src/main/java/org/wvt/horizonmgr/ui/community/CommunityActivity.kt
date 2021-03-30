@@ -9,7 +9,6 @@ import androidx.compose.material.Surface
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import org.wvt.horizonmgr.ui.theme.AndroidHorizonManagerTheme
-import org.wvt.horizonmgr.ui.theme.SideEffectStatusBar
 
 class CommunityActivity : AppCompatActivity() {
     private val viewModel by viewModels<CommunityViewModel> {
@@ -26,7 +25,6 @@ class CommunityActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             AndroidHorizonManagerTheme {
-                SideEffectStatusBar()
                 Surface(color = MaterialTheme.colors.background) {
                     Community(vm = viewModel, onClose = ::close)
                 }

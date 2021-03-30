@@ -22,7 +22,6 @@ import org.wvt.horizonmgr.HorizonManagerApplication
 import org.wvt.horizonmgr.ui.components.ErrorPage
 import org.wvt.horizonmgr.ui.theme.AndroidHorizonManagerTheme
 import org.wvt.horizonmgr.ui.theme.AppBarBackgroundColor
-import org.wvt.horizonmgr.ui.theme.SideEffectStatusBar
 
 class JoinGroupActivity : AppCompatActivity() {
     private val vm by viewModels<JoinGroupViewModel> {
@@ -51,7 +50,6 @@ class JoinGroupActivity : AppCompatActivity() {
             }
 
             AndroidHorizonManagerTheme {
-                SideEffectStatusBar()
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
