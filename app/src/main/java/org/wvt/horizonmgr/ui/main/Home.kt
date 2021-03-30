@@ -40,7 +40,7 @@ import org.wvt.horizonmgr.ui.onlinemods.OnlineMods
 import org.wvt.horizonmgr.ui.onlinemods.OnlineModsViewModel
 import org.wvt.horizonmgr.ui.pacakgemanager.PackageManager
 import org.wvt.horizonmgr.ui.pacakgemanager.PackageManagerViewModel
-import org.wvt.horizonmgr.ui.theme.AppBarBackgroundColor
+import org.wvt.horizonmgr.ui.theme.LocalThemeConfig
 import org.wvt.horizonmgr.ui.theme.PreviewTheme
 
 @Deprecated("Deprecated")
@@ -203,11 +203,14 @@ private fun Drawer(
     ModalDrawer(
         drawerState = state,
         drawerContent = {
+            val theme = LocalThemeConfig.current
             Column(modifier = Modifier.fillMaxSize()) {
                 LazyColumn(modifier = Modifier.weight(1f)) {
                     item {
                         header()
-                        Divider(Modifier.fillParentMaxWidth())
+                        if (theme.isDark || !theme.appbarAccent) {
+                            Divider(Modifier.fillParentMaxWidth())
+                        }
                         Column(Modifier.padding(vertical = 8.dp)) { tabs() }
                         Divider(Modifier.fillParentMaxWidth())
                         Column(Modifier.padding(vertical = 8.dp)) { items() }
@@ -234,6 +237,7 @@ private fun DrawerHeader(
     requestLogin: () -> Unit,
     requestLogout: () -> Unit
 ) {
+    val theme = LocalThemeConfig.current
     var showDialog by remember { mutableStateOf(false) }
     if (showDialog) {
         AlertDialog(
@@ -258,7 +262,7 @@ private fun DrawerHeader(
     }
     Surface(
         modifier = Modifier.fillMaxWidth(),
-        color = AppBarBackgroundColor
+        color = theme.appbarColor
     ) {
         val contentColor = LocalContentColor.current
         val gear = painterResource(id = R.drawable.ic_gear_full)

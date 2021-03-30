@@ -42,6 +42,8 @@ data class ThemeConfig(
     val appbarAccent: Boolean
 ) {
     val isDark = if (followSystemDarkMode) isSystemInDark else isCustomInDark
+    val color = if (isDark) darkColor else lightColor
+    val appbarColor by mutableStateOf(if (appbarAccent && !isDark) color.primary else color.surface)
 }
 
 @Composable
