@@ -47,23 +47,26 @@ class PackageManagerViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             state.emit(State.Loading)
             val dateFormatter = SimpleDateFormat.getDateInstance()
-            val packs = try {
+            val getResult = try {
                 mgr.getInstalledPackages()
             } catch (e: Exception) {
                 Log.e(TAG, "获取分包失败", e)
                 state.emit(State.Error("获取分包失败", e.message))
                 return@launch
             }
-            Log.d(TAG, "获取到 ${packs.size} 个分包")
-            val exceptions = mutableListOf<String>()
-            val result = packs.mapNotNull {
+            Log.d(TAG, "获取到 ${getResult.packages.size} 个分包")
+            val mappedExceptions = getResult.errors.map {
+                "${it.file}: ${it.error.message ?: "未知错误"}"
+            }.toMutableList()
+            val result = getResult.packages.mapNotNull {
                 val installInfo: InstallationInfo
                 val manifest: PackageManifest
+
                 try {
                     installInfo = it.getInstallationInfo()
                     manifest = it.getManifest()
                 } catch (e: Exception) {
-                    exceptions.add("${it.packageDirectory}: ${e.message ?: "未知错误"}")
+                    mappedExceptions.add("${it.packageDirectory}: ${e.message ?: "未知错误"}")
                     Log.d(TAG, "分包解析失败", e)
                     return@mapNotNull null
                 }
@@ -74,9 +77,9 @@ class PackageManagerViewModel(
                     description = manifest.recommendDescription()
                 )
             }
-            cachedPackages = packs
+            cachedPackages = getResult.packages
             _packages.emit(result)
-            errors.emit(exceptions)
+            errors.emit(mappedExceptions)
             state.emit(State.OK)
         }
     }

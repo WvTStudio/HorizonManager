@@ -2,7 +2,6 @@ package org.wvt.horizonmgr.service.hzpack
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import kotlinx.serialization.SerializationException
 import org.wvt.horizonmgr.service.CoroutineZip
 import org.wvt.horizonmgr.service.utils.translateToValidFile
 import java.io.File
@@ -11,37 +10,49 @@ import java.util.*
 class HorizonManager constructor(val horizonDir: File) {
     private val packDir = horizonDir.resolve("packs")
 
+    data class GetResult(
+        val packages: List<InstalledPackage>,
+        val errors: List<ErrorEntry>
+    )
+
+    data class ErrorEntry(
+        val file: File,
+        val error: Throwable
+    )
+
     /**
      * 从本机中获取已安装的 Package
-     * 该方法仅把文件夹包装成 [InstalledPackage]，不加以验证，不会抛出 IO 以外的异常
+     * 该方法把从 [horizonDir] 的所有子文件通过 [InstalledPackage.parseByDirectory] 方法转换成 [InstalledPackage]
+     * 转换时遇到的所有错误都会放在 errors
      */
-    suspend fun getInstalledPackages(): List<InstalledPackage> = withContext(Dispatchers.IO) {
+    suspend fun getInstalledPackages(): GetResult = withContext(Dispatchers.IO) {
         val subDirs = packDir.listFiles() ?: emptyArray()
         val packages = mutableListOf<InstalledPackage>()
+        val exceptions = mutableListOf<ErrorEntry>()
 
         for (dir in subDirs) {
             val pkg = try {
-                InstalledPackage(dir)
-            } catch (e: IllegalStateException) {
+                InstalledPackage.parseByDirectory(dir)
+            } catch (e: Exception) {
+                exceptions.add(ErrorEntry(dir, e))
                 continue
             }
             packages.add(pkg)
         }
-
-        return@withContext packages
+        return@withContext GetResult(packages, exceptions)
     }
 
     /**
      * 从本机中获取指定的分包
      * 由于要使用 [InstalledPackage::getInstallationInfo()] 方法，该方法会对分包进行格式验证
-     * 如果格式不正确则返回 null，只会抛出 IO 导致的异常
+     * 如果格式不正确则返回 null
      */
     suspend fun getInstalledPackage(installUUID: String): InstalledPackage? =
         withContext(Dispatchers.IO) {
-            getInstalledPackages().find {
+            getInstalledPackages().packages.find {
                 try {
                     return@find it.getInstallationInfo().internalId == installUUID
-                } catch (e: SerializationException) {
+                } catch (e: Exception) {
                     return@find false
                 }
             }
@@ -84,6 +95,6 @@ class HorizonManager constructor(val horizonDir: File) {
             it.write(jsonStr)
         }
         outDir.resolve(".installation_complete").createNewFile()
-        return@withContext InstalledPackage(outDir)
+        return@withContext InstalledPackage.parseByDirectory(outDir)
     }
 }

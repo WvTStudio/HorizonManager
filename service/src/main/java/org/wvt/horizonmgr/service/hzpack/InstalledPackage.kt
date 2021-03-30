@@ -16,7 +16,44 @@ import java.util.*
 /**
  * 该类代表一个已经安装的分包
  */
-class InstalledPackage(val packageDirectory: File) {
+class InstalledPackage private constructor(val packageDirectory: File) {
+    companion object {
+        class NotInstalledPackageException(val file: File) :
+            Exception("${file.absolutePath} is not a installed package directory.")
+
+        /**
+         * 初步验证文件夹中是否存在文件，如果存在则返回
+         */
+        @Throws(NotInstalledPackageException::class)
+        fun parseByDirectory(packageDirectory: File): InstalledPackage {
+            if (isInstalledPackage(packageDirectory)) {
+                return InstalledPackage(packageDirectory)
+            } else {
+                throw NotInstalledPackageException(packageDirectory)
+            }
+        }
+
+        val essentialFiles = setOf("manifest.json", ".installation_info")
+        val optionalFiles = setOf("assets", "innercore", "java", "native", "so", "worlds")
+
+        fun isInstalledPackage(packageDirectory: File): Boolean {
+            if (!packageDirectory.isDirectory) return false
+            val listFiles = packageDirectory.listFiles() ?: return false
+            essentialFiles.forEach {
+                if (listFiles.find { file -> file.name == it } == null) {
+                    return false
+                }
+            }
+            var count = 0
+            optionalFiles.forEach {
+                if (listFiles.find { file -> file.name == it } != null) {
+                    count++
+                }
+            }
+            return count >= 1
+        }
+    }
+
     class PackageDoesNotExistsException() : Exception("Package does not exists.")
     class MissingManifestFile() : Exception("Could not find the manifest file.")
     class MissingInstallationInfoFile() : Exception("Could not find .installation_info file")
