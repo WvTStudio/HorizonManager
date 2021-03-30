@@ -1,23 +1,28 @@
 package org.wvt.horizonmgr.ui.theme
 
+import android.app.Activity
 import android.content.Context
 import android.content.res.Configuration
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.Colors
+import androidx.compose.material.Surface
 import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import androidx.core.content.edit
+import androidx.core.view.WindowCompat
+import com.google.accompanist.insets.LocalWindowInsets
 import com.google.accompanist.insets.ProvideWindowInsets
 import com.google.accompanist.systemuicontroller.rememberAndroidSystemUiController
 import org.wvt.horizonmgr.ui.donate.alipayColor
 import org.wvt.horizonmgr.ui.donate.wechatColor
-
 
 private val config = mutableStateOf<ThemeConfig>(DefaultThemeConfig)
 
@@ -26,22 +31,32 @@ fun AndroidHorizonManagerTheme(
     fullScreen: Boolean = false,
     content: @Composable () -> Unit
 ) {
-    val context = LocalContext.current.applicationContext
+    val context = LocalContext.current
     val themeController = remember(context) { AndroidThemeController(context) }
 
     val controller = rememberAndroidSystemUiController()
 
+    DisposableEffect(Unit) {
+        WindowCompat.setDecorFitsSystemWindows((context as Activity).window, false)
+        onDispose {}
+    }
     DisposableEffect(isSystemInDarkTheme()) {
         themeController.update()
         onDispose { }
     }
 
+    var statusBarColor by remember {
+        mutableStateOf(Color.Transparent)
+    }
+
+    var navigationBarColor by remember {
+        mutableStateOf(Color.Transparent)
+    }
+
     DisposableEffect(config.value) {
         val config = config.value
         val color = if (config.isDark) config.darkColor else config.lightColor
-
-
-        val statusBarColor = if (fullScreen) {
+        statusBarColor = if (fullScreen) {
             color.background
         } else {
             if (config.isDark) {
@@ -52,10 +67,12 @@ fun AndroidHorizonManagerTheme(
             }
         }
 
-        controller.setStatusBarColor(statusBarColor)
-
-        val navigationBarColor = color.background
-        controller.setNavigationBarColor(navigationBarColor)
+        controller.setStatusBarColor(Color.Transparent, MaterialColors.isLightColor(statusBarColor))
+        navigationBarColor = color.background
+        controller.setNavigationBarColor(
+            Color.Transparent,
+            MaterialColors.isLightColor(navigationBarColor)
+        )
         onDispose { }
     }
 
@@ -63,8 +80,36 @@ fun AndroidHorizonManagerTheme(
         HorizonManagerTheme(
             controller = themeController,
             config = config.value,
-            content = content
-        )
+        ) {
+            val insets = LocalWindowInsets.current
+            val statusBarHeight: Dp
+            val navigationBarHeight: Dp
+            with(LocalDensity.current) {
+                statusBarHeight = insets.statusBars.top.toDp()
+                navigationBarHeight = insets.navigationBars.bottom.toDp()
+            }
+            Column(Modifier.fillMaxSize()) {
+                Surface(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(statusBarHeight),
+                    color = statusBarColor, content = {},
+                    elevation = if (fullScreen) 0.dp else 4.dp
+                )
+                Box(
+                    Modifier
+                        .fillMaxWidth()
+                        .weight(1f)) {
+                    content()
+                }
+                Surface(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(navigationBarHeight),
+                    color = navigationBarColor, content = {}
+                )
+            }
+        }
     }
 }
 
