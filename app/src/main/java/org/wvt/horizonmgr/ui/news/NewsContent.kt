@@ -1,5 +1,6 @@
 package org.wvt.horizonmgr.ui.news
 
+import android.util.Log
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.compose.animation.Crossfade
@@ -36,6 +37,7 @@ import io.noties.markwon.syntax.SyntaxHighlightPlugin
 import io.noties.prism4j.GrammarLocator
 import io.noties.prism4j.Prism4j
 import org.wvt.horizonmgr.ui.components.ErrorPage
+import org.wvt.horizonmgr.ui.components.MarkdownContent
 import org.wvt.horizonmgr.ui.components.NetworkImage
 import org.wvt.horizonmgr.ui.theme.AppBarBackgroundColor
 
@@ -176,60 +178,3 @@ private fun Label(
     }
 }
 
-@Composable
-private fun MarkdownContent(modifier: Modifier, md: String) {
-    val context = LocalContext.current
-    val textColor = MaterialTheme.typography.body1.color.toArgb()
-    val view = remember {
-        TextView(context).apply {
-            layoutParams = ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT
-            )
-            textSize = 16f
-            setTextIsSelectable(true)
-        }
-    }
-
-    val markwon = remember {
-        val imageLoader = ImageLoader.Builder(context)
-            .apply {
-                availableMemoryPercentage(0.5)
-                bitmapPoolPercentage(0.5)
-                crossfade(true)
-            }
-            .build()
-
-        val coilPlugin = CoilImagesPlugin.create(
-            object : CoilImagesPlugin.CoilStore {
-                override fun load(drawable: AsyncDrawable): ImageRequest {
-                    return ImageRequest.Builder(context)
-                        .defaults(imageLoader.defaults)
-                        .data(drawable.destination)
-                        .crossfade(true)
-                        .build()
-                }
-
-                override fun cancel(disposable: Disposable) {
-                    disposable.dispose()
-                }
-            },
-            imageLoader
-        )
-        Markwon.builder(context).apply {
-            usePlugin(MarkwonInlineParserPlugin.create())
-            usePlugin(coilPlugin)
-            usePlugin(TablePlugin.create(context))
-            usePlugin(JLatexMathPlugin.create(view.textSize) { builder ->
-                builder.inlinesEnabled(true)
-            })
-        }.build()
-    }
-
-    DisposableEffect(md) {
-        markwon.setMarkdown(view, md)
-        onDispose { }
-    }
-
-    AndroidView(modifier = modifier, factory = { view })
-}
