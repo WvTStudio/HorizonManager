@@ -20,11 +20,10 @@ import kotlinx.coroutines.withContext
 import org.wvt.horizonmgr.R
 import org.wvt.horizonmgr.defaultViewModelFactory
 import org.wvt.horizonmgr.ui.theme.AndroidDonateTheme
-import org.wvt.horizonmgr.ui.theme.AndroidHorizonManagerTheme
 
 class DonateActivity : AppCompatActivity() {
     companion object {
-        const val aliPayCode = "fkx18184vir1w8crfl6vsa9"
+        const val aliPayCode = "fkx12551fuzelw9z0pvfb1f"
     }
 
     private val vm by viewModels<DonateViewModel> { defaultViewModelFactory }
@@ -100,10 +99,10 @@ class DonateActivity : AppCompatActivity() {
     private suspend fun saveQrCode() = withContext(Dispatchers.IO) {
         val qrPath = Environment.getExternalStorageDirectory().resolve("DCIM")
             .resolve("Screenshots").also { it.mkdirs() }
-            .resolve("hz_wechat_donate_qr_c.png")
+            .resolve("hz_wechat_donate_qr_code.png")
 
         if (!qrPath.exists()) {
-            resources.openRawResource(R.raw.wechatpay_qr).use { imgInput ->
+            resources.openRawResource(R.raw.wechatpay_qr_code).use { imgInput ->
                 qrPath.outputStream().use { fileOutput ->
                     imgInput.copyTo(fileOutput)
                 }
