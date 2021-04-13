@@ -47,7 +47,7 @@ dependencies {
     implementation("androidx.core:core-ktx:1.3.2")
     implementation("androidx.appcompat:appcompat:1.2.0")
 
-    val ktorVersion = "1.5.2"
+    val ktorVersion = "1.5.3"
     implementation("io.ktor:ktor-client-cio:$ktorVersion")
     implementation("io.ktor:ktor-client-serialization:$ktorVersion")
 
@@ -57,7 +57,7 @@ dependencies {
 
     testImplementation("junit:junit:4.13.2")
     testImplementation("androidx.test:core:1.3.0")
-    testImplementation("org.mockito:mockito-core:3.8.0")
+    testImplementation("org.mockito:mockito-core:3.9.0")
     testImplementation("org.json:json:20210307")
     testImplementation(kotlin("reflect"))
     androidTestImplementation("androidx.test.ext:junit:1.1.2")

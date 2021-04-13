@@ -55,7 +55,7 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.0.0-beta03"
+        kotlinCompilerExtensionVersion = "1.0.0-beta04"
     }
     lint {
         disable("InvalidFragmentVersionForActivityResult")
@@ -86,22 +86,22 @@ dependencies {
     implementation(project(":service"))
 
     implementation("androidx.core:core-ktx:1.3.2")
-    implementation("androidx.activity:activity-ktx:1.3.0-alpha05")
-    implementation("androidx.activity:activity-compose:1.3.0-alpha05")
+    implementation("androidx.activity:activity-ktx:1.3.0-alpha06")
+    implementation("androidx.activity:activity-compose:1.3.0-alpha06")
 
     implementation("androidx.appcompat:appcompat:1.3.0-rc01")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.1")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:1.0.0-alpha03")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:1.0.0-alpha04")
     implementation("com.google.android.material:material:1.3.0")
 
 
-    val accompanistVersion = "0.7.0"
+    val accompanistVersion = "0.7.1"
     implementation("com.google.accompanist:accompanist-coil:$accompanistVersion")
     implementation("com.google.accompanist:accompanist-insets:$accompanistVersion")
     implementation("com.google.accompanist:accompanist-pager:$accompanistVersion")
     implementation("com.google.accompanist:accompanist-systemuicontroller:$accompanistVersion")
 
-    val composeVersion = "1.0.0-beta03"
+    val composeVersion = "1.0.0-beta04"
     implementation("androidx.compose.compiler:compiler:$composeVersion")
     implementation("androidx.compose.runtime:runtime:$composeVersion")
     implementation("androidx.compose.foundation:foundation:$composeVersion")
