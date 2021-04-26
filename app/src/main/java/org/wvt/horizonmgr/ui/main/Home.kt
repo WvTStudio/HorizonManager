@@ -66,7 +66,6 @@ fun Home(
     requestLogin: () -> Unit,
     requestLogout: () -> Unit,
     selectedPackageUUID: String?,
-    selectedPackageChange: (uuid: String?) -> Unit,
     requestOnlineInstall: () -> Unit,
     onAddModClicked: () -> Unit,
     onAddPackageClicked: () -> Unit,
@@ -157,7 +156,6 @@ fun Home(
                     )
                     HomeViewModel.Screen.PACKAGE_MANAGE -> PackageManager(
                         viewModel = packageManagerVM,
-                        onPackageSelect = selectedPackageChange,
                         onNavClick = { scope.launch { drawerState.open() } },
                         onOnlineInstallClick = requestOnlineInstall,
                         onLocalInstallClick = onAddPackageClicked,

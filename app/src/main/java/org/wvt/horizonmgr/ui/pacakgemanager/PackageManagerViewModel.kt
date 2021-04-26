@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -23,87 +24,103 @@ class PackageManagerViewModel(
     dependencies: DependenciesContainer
 ) : ViewModel() {
     private val mgr = dependencies.manager
+    private val localCache = dependencies.localCache
     private val _packages = MutableStateFlow(emptyList<PackageManagerItem>())
-    val packages: StateFlow<List<PackageManagerItem>> = _packages.asStateFlow()
-
     private val _progressState = MutableStateFlow<ProgressDialogState?>(null)
-    val progressState: StateFlow<ProgressDialogState?> = _progressState.asStateFlow()
-
+    private val dateFormatter = SimpleDateFormat.getDateInstance()
     private var cachedPackages: List<InstalledPackage> = emptyList()
-    private var selectedPackage: InstalledPackage? = null
-    private var selectedPackageUUID: String? = null
 
-    var state = MutableStateFlow<State>(State.Loading)
+    val state = MutableStateFlow<State>(State.Initializing)
+    val errors = MutableStateFlow<List<String>>(emptyList())
+    val isRefreshing = MutableStateFlow(false)
+    val progressState: StateFlow<ProgressDialogState?> = _progressState.asStateFlow()
+    val packages: StateFlow<List<PackageManagerItem>> = _packages.asStateFlow()
+    val selectedPackage = MutableStateFlow<String?>(null)
 
     sealed class State {
-        object Loading : State()
+        object Initializing : State()
         class Error(val message: String, val detail: String?) : State()
         object OK : State()
     }
 
-    val errors = MutableStateFlow<List<String>>(emptyList())
-
     fun loadPackages() {
         viewModelScope.launch(Dispatchers.IO) {
-            state.emit(State.Loading)
-            val dateFormatter = SimpleDateFormat.getDateInstance()
-            val getResult = try {
-                mgr.getInstalledPackages()
-            } catch (e: Exception) {
-                Log.e(TAG, "获取分包失败", e)
-                state.emit(State.Error("获取分包失败", e.message))
-                return@launch
+            if (state.value == State.Initializing) {
+                loadData()
+                loadSelectedPackage()
+            } else {
+                isRefreshing.emit(true)
+                loadData()
+                loadSelectedPackage()
+                isRefreshing.emit(false)
             }
-            Log.d(TAG, "获取到 ${getResult.packages.size} 个分包")
-            val mappedExceptions = getResult.errors.map {
-                "${it.file}: ${it.error.message ?: "未知错误"}"
-            }.toMutableList()
-            val result = getResult.packages.mapNotNull {
-                val installInfo: InstallationInfo
-                val manifest: PackageManifest
-
-                try {
-                    installInfo = it.getInstallationInfo()
-                    manifest = it.getManifest()
-                } catch (e: Exception) {
-                    mappedExceptions.add("${it.packageDirectory}: ${e.message ?: "未知错误"}")
-                    Log.d(TAG, "分包解析失败", e)
-                    return@mapNotNull null
-                }
-                PackageManagerItem(
-                    uuid = installInfo.internalId,
-                    name = installInfo.customName ?: manifest.pack,
-                    timeStr = dateFormatter.format(Date(installInfo.timeStamp)),
-                    description = manifest.recommendDescription()
-                )
-            }
-            cachedPackages = getResult.packages
-            _packages.emit(result)
-            errors.emit(mappedExceptions)
-            state.emit(State.OK)
         }
     }
 
-    fun setSelectedPackage(uuid: String?) {
-        viewModelScope.launch(Dispatchers.IO) {
-            if (uuid == null) {
-                selectedPackageUUID = null
-                selectedPackage = null
-            } else {
-                if (mgr.getInstalledPackage(uuid) == null) {
-                    // FIXME: 2021/3/28 使用 Snackbar 来显示该错误
-                    state.emit(State.Error("选择分包失败", "未找到该分包"))
-                    return@launch
-                }
-                selectedPackageUUID = uuid
+    private suspend fun loadData() {
+        val getResult = try {
+            mgr.getInstalledPackages()
+        } catch (e: Exception) {
+            Log.e(TAG, "获取分包失败", e)
+            state.emit(State.Error("获取分包失败", e.message))
+            return
+        }
+        Log.d(TAG, "获取到 ${getResult.packages.size} 个分包")
+        val mappedExceptions = getResult.errors.map {
+            "${it.file}: ${it.error.message ?: "未知错误"}"
+        }.toMutableList()
+        val result = getResult.packages.mapNotNull {
+            val installInfo: InstallationInfo
+            val manifest: PackageManifest
+
+            try {
+                installInfo = it.getInstallationInfo()
+                manifest = it.getManifest()
+            } catch (e: Exception) {
+                mappedExceptions.add("${it.packageDirectory}: ${e.message ?: "未知错误"}")
+                Log.d(TAG, "分包解析失败", e)
+                return@mapNotNull null
             }
+            PackageManagerItem(
+                uuid = installInfo.internalId,
+                name = installInfo.customName ?: manifest.pack,
+                timeStr = dateFormatter.format(Date(installInfo.timeStamp)),
+                description = manifest.recommendDescription()
+            )
+        }
+        cachedPackages = getResult.packages
+        delay(200)
+        _packages.emit(result)
+        errors.emit(mappedExceptions)
+
+
+        state.emit(State.OK)
+    }
+
+    private suspend fun loadSelectedPackage() {
+        val uuid = localCache.getSelectedPackageUUID()
+        val selectedPackage = uuid?.let { uuid ->
+            cachedPackages.find {
+                it.getInstallationInfo().internalId == uuid
+            }
+        }
+        if (selectedPackage != null) {
+            this.selectedPackage.emit(uuid)
+        } else {
+            this.selectedPackage.emit(null)
+        }
+    }
+
+    fun selectPackage(uuid: String?) {
+        viewModelScope.launch {
+            localCache.setSelectedPackageUUID(uuid)
+            selectedPackage.emit(uuid)
         }
     }
 
     fun deletePackage(
         uuid: String,
-        confirmDeleteDialogHostState: ConfirmDeleteDialogHostState,
-        onSucceed: () -> Unit
+        confirmDeleteDialogHostState: ConfirmDeleteDialogHostState
     ) {
         viewModelScope.launch(Dispatchers.IO) {
             if (confirmDeleteDialogHostState.showDialog() ==
@@ -120,7 +137,8 @@ class PackageManagerViewModel(
                     return@launch
                 }
                 _progressState.emit(ProgressDialogState.Finished("删除成功"))
-                onSucceed()
+                localCache.setSelectedPackageUUID(null)
+                selectedPackage.emit(null)
                 loadPackages()
             }
         }

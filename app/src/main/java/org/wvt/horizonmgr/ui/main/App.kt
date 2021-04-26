@@ -101,7 +101,6 @@ fun App(
                 requestLogin = navigateToLogin,
                 requestLogout = mainVM::logOut,
                 selectedPackageUUID = selectedPackage,
-                selectedPackageChange = mainVM::setSelectedPackage,
                 openGame = requestOpenGame,
                 community = navigateToCommunity,
                 joinGroup = navigateToJoinGroup,

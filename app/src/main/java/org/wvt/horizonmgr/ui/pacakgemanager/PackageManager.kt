@@ -1,16 +1,14 @@
 package org.wvt.horizonmgr.ui.pacakgemanager
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.*
 import androidx.compose.animation.core.*
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -24,6 +22,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.SwipeRefreshIndicator
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.sync.Mutex
@@ -45,44 +46,27 @@ data class PackageManagerItem(
 @Composable
 fun PackageManager(
     viewModel: PackageManagerViewModel,
-    onPackageSelect: (uuid: String?) -> Unit,
     navigateToPackageInfo: (uuid: String) -> Unit,
     onOnlineInstallClick: () -> Unit,
     onLocalInstallClick: () -> Unit,
     onNavClick: () -> Unit
 ) {
-    val selectedPackageUUID = LocalSelectedPackageUUID.current
-
-    DisposableEffect(Unit) {
-        viewModel.loadPackages()
-        onDispose { }
-    }
-
-    DisposableEffect(selectedPackageUUID) {
-        viewModel.setSelectedPackage(selectedPackageUUID)
-        onDispose {}
-    }
+    LaunchedEffect(Unit) { viewModel.loadPackages() }
 
     val packages by viewModel.packages.collectAsState()
-    val progresstate by viewModel.progressState.collectAsState()
-
+    val selectedPackage by viewModel.selectedPackage.collectAsState()
+    val progressState by viewModel.progressState.collectAsState()
+    val isRefreshing by viewModel.isRefreshing.collectAsState()
     val errors by viewModel.errors.collectAsState()
+    val state by viewModel.state.collectAsState()
 
     val snackbarHostState = remember { SnackbarHostState() }
     val confirmDeleteDialogHostState = remember { ConfirmDeleteDialogHostState() }
     val inputDialogHostState = remember { InputDialogHostState() }
     var fabExpand by rememberSaveable { mutableStateOf(false) }
 
-    progresstate?.let {
+    progressState?.let {
         ProgressDialog(onCloseRequest = viewModel::dismiss, state = it)
-    }
-
-    val banner = @Composable {
-        ErrorBanner(
-            modifier = Modifier.fillMaxWidth(),
-            errors = errors,
-            text = "解析分包时发生 ${errors.size} 个错误"
-        )
     }
 
     Box {
@@ -116,41 +100,51 @@ fun PackageManager(
                 }
             )
 
-            if (packages.isNullOrEmpty()) {
-                // Tips when there was no package installed.
-                EmptyPage(Modifier.fillMaxSize()) { Text("你还没有安装分包") }
-                banner()
-            } else LazyColumn(modifier = Modifier.fillMaxSize()) {
-                item { banner() }
-                item { Spacer(Modifier.height(8.dp)) }
-                itemsIndexed(packages) { index, item ->
-                    PackageItem(
-                        modifier = Modifier.padding(16.dp, 8.dp),
-                        title = item.name,
-                        description = item.description,
-                        installTime = item.timeStr,
-                        selected = item.uuid == selectedPackageUUID,
-                        onClick = { onPackageSelect(item.uuid) },
-                        onInfoClick = { navigateToPackageInfo(item.uuid) },
-                        onDeleteClick = {
-                            viewModel.deletePackage(item.uuid,
-                                confirmDeleteDialogHostState,
-                                { onPackageSelect(null) }
-                            )
-                        },
-                        onRenameClick = {
-                            viewModel.renamePackage(
-                                item.uuid,
-                                inputDialogHostState
-                            )
-                        },
-                        onCloneClick = { viewModel.clonePackage(item.uuid, inputDialogHostState) }
-                    )
+            Crossfade(state) {
+                when (it) {
+                    PackageManagerViewModel.State.Initializing -> Box(
+                        modifier = Modifier.fillMaxSize(),
+                        Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
+                    is PackageManagerViewModel.State.Error -> ErrorPage(
+                        message = { Text(it.message) },
+                        onRetryClick = { viewModel.loadPackages() })
+                    PackageManagerViewModel.State.OK -> PackageList(
+                        packages = packages,
+                        isRefreshing = isRefreshing,
+                        onRefresh = { viewModel.loadPackages() },
+                        errors = errors
+                    ) { index, item ->
+                        PackageItem(
+                            modifier = Modifier.padding(16.dp, 8.dp),
+                            title = item.name,
+                            description = item.description,
+                            installTime = item.timeStr,
+                            selected = item.uuid == selectedPackage,
+                            onClick = { viewModel.selectPackage(item.uuid) },
+                            onInfoClick = { navigateToPackageInfo(item.uuid) },
+                            onDeleteClick = {
+                                viewModel.deletePackage(item.uuid, confirmDeleteDialogHostState)
+                            },
+                            onRenameClick = {
+                                viewModel.renamePackage(
+                                    item.uuid,
+                                    inputDialogHostState
+                                )
+                            },
+                            onCloneClick = {
+                                viewModel.clonePackage(
+                                    item.uuid,
+                                    inputDialogHostState
+                                )
+                            }
+                        )
+                    }
                 }
-                item { Spacer(Modifier.height(64.dp)) }
             }
         }
-
         SnackbarHost(hostState = snackbarHostState)
 
         // Displays when user is deleting a package
@@ -174,6 +168,48 @@ fun PackageManager(
             }
         )
     }
+}
+
+@Composable
+private fun PackageList(
+    packages: List<PackageManagerItem>,
+    isRefreshing: Boolean,
+    errors: List<String>,
+    onRefresh: () -> Unit,
+    item: @Composable LazyItemScope.(index: Int, item: PackageManagerItem) -> Unit
+) {
+    val banner = @Composable {
+        ErrorBanner(
+            modifier = Modifier.fillMaxWidth(),
+            errors = errors,
+            text = "解析分包时发生 ${errors.size} 个错误"
+        )
+    }
+    SwipeRefresh(state = rememberSwipeRefreshState(isRefreshing),
+        onRefresh = onRefresh,
+        indicator = { state, distance ->
+            SwipeRefreshIndicator(
+                state = state,
+                refreshTriggerDistance = distance,
+                contentColor = MaterialTheme.colors.primary
+            )
+        }) {
+        if (packages.isNullOrEmpty()) {
+            // Tips when there was no package installed.
+            Box {
+                EmptyPage(Modifier.fillMaxSize()) { Text("你还没有安装分包") }
+                banner()
+            }
+        } else LazyColumn(modifier = Modifier.fillMaxSize()) {
+            item { banner() }
+            item { Spacer(Modifier.height(8.dp)) }
+            itemsIndexed(packages) { index, item ->
+                item(index, item)
+            }
+            item { Spacer(Modifier.height(64.dp)) }
+        }
+    }
+
 }
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -300,7 +336,7 @@ private fun FABEntry(
             if (targetState) enterAnim else exitAnim
         }, targetValueByState = {
             if (it) 1f else 0f
-        }
+        }, label = "progress"
     )
 
     if (transition > 0f) {
