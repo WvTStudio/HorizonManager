@@ -34,6 +34,7 @@ class OnlineModsViewModel(
 
     val state = MutableStateFlow<State>(State.Loading)
     val installState = MutableStateFlow<ProgressDialogState?>(null)
+    val isRefreshing = MutableStateFlow(false)
 
     private var installJob: Job? = null
 
@@ -72,7 +73,7 @@ class OnlineModsViewModel(
     fun setFilterText(text: String) {
         viewModelScope.launch {
             filterText.emit(text)
-            load()
+            refresh()
         }
     }
 
@@ -86,14 +87,14 @@ class OnlineModsViewModel(
     fun setSelectedCNSortMode(sortMode: ChineseSortMode) {
         viewModelScope.launch {
             selectedCNSortMode.emit(sortMode)
-            load()
+            refresh()
         }
     }
 
     fun setSelectedMirrorSortMode(sortMode: MirrorSortMode) {
         viewModelScope.launch {
             selectedMirrorSortMode.emit(sortMode)
-            load()
+            refresh()
         }
     }
 
@@ -161,6 +162,15 @@ class OnlineModsViewModel(
         }
     }
 
+    private var initialized = false
+
+    fun init() {
+        if (!initialized) {
+            initialized = true
+            load()
+        }
+    }
+
     fun load() {
         viewModelScope.launch(Dispatchers.IO) {
             state.emit(State.Loading)
@@ -178,6 +188,28 @@ class OnlineModsViewModel(
                 Log.e(TAG, "获取 Mod 列表失败", e)
                 return@launch
             }
+            state.emit(State.Succeed)
+        }
+    }
+
+    fun refresh() {
+        viewModelScope.launch(Dispatchers.IO) {
+            isRefreshing.emit(true)
+            try {
+                if (selectedRepository.value == Repository.OfficialMirror) {
+                    loadMirrorMods(selectedMirrorSortMode.value, filterText.value)
+                } else {
+                    loadChineseMods(selectedCNSortMode.value, filterText.value)
+                }
+            } catch (e: NetworkException) {
+                state.emit(State.Error("网络错误，请稍后重试"))
+                return@launch
+            } catch (e: Exception) {
+                state.emit(State.Error("未知错误，请稍后重试"))
+                Log.e(TAG, "获取 Mod 列表失败", e)
+                return@launch
+            }
+            isRefreshing.emit(false)
             state.emit(State.Succeed)
         }
     }

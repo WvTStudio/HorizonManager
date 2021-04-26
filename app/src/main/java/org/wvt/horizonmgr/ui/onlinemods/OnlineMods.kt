@@ -8,12 +8,13 @@ import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.SwipeRefreshIndicator
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import org.wvt.horizonmgr.ui.components.EmptyPage
 import org.wvt.horizonmgr.ui.components.ErrorPage
 import org.wvt.horizonmgr.ui.components.ProgressDialog
@@ -69,12 +70,10 @@ fun OnlineMods(
     val chineseMods by viewModel.chineseMods.collectAsState()
     val filterText by viewModel.filterText.collectAsState()
     val installState by viewModel.installState.collectAsState()
+    val isRefreshing by viewModel.isRefreshing.collectAsState()
 
-    DisposableEffect(isLogon) {
-        if (isLogon) {
-            viewModel.load()
-        }
-        onDispose { }
+    LaunchedEffect(isLogon) {
+        if (isLogon) { viewModel.init() }
     }
 
     installState?.let { ProgressDialog(onCloseRequest = { viewModel.installFinish() }, state = it) }
@@ -125,41 +124,53 @@ fun OnlineMods(
                             message = {
                                 Text(state.message)
                             }, onRetryClick = {
-                                viewModel.load()
+                                viewModel.refresh()
                             }
                         )
                     }
-                    OnlineModsViewModel.State.Succeed -> when (selectedRepository) {
-                        OnlineModsViewModel.Repository.OfficialMirror -> {
-                            if (mirrorMods.isEmpty()) {
-                                EmptyPage(Modifier.fillMaxSize()) {
-                                    Text("什么模组都没有")
-                                }
-                            } else {
-                                OfficialMirrorModList(
-                                    modifier = Modifier.fillMaxSize(),
-                                    mods = mirrorMods,
-                                    onItemClick = { /*TODO*/ },
-                                    onInstallClick = {
-                                        viewModel.installMirrorMod(mirrorMods[it].id)
-                                    }
-                                )
-                            }
+                    OnlineModsViewModel.State.Succeed -> SwipeRefresh(
+                        state = rememberSwipeRefreshState(isRefreshing),
+                        onRefresh = { viewModel.refresh() },
+                        indicator = { state, distance ->
+                            SwipeRefreshIndicator(
+                                state = state,
+                                refreshTriggerDistance = distance,
+                                contentColor = MaterialTheme.colors.primary
+                            )
                         }
-                        OnlineModsViewModel.Repository.Chinese -> {
-                            if (chineseMods.isEmpty()) {
-                                EmptyPage(Modifier.fillMaxSize()) {
-                                    Text("什么模组都没有")
-                                }
-                            } else {
-                                ChineseModList(
-                                    modifier = Modifier.fillMaxSize(),
-                                    mods = chineseMods,
-                                    onItemClick = { /*TODO*/ },
-                                    onInstallClick = {
-                                        viewModel.installChineseMod(chineseMods[it].id)
+                    ) {
+                        when (selectedRepository) {
+                            OnlineModsViewModel.Repository.OfficialMirror -> {
+                                if (mirrorMods.isEmpty()) {
+                                    EmptyPage(Modifier.fillMaxSize()) {
+                                        Text("什么模组都没有")
                                     }
-                                )
+                                } else {
+                                    OfficialMirrorModList(
+                                        modifier = Modifier.fillMaxSize(),
+                                        mods = mirrorMods,
+                                        onItemClick = { /*TODO*/ },
+                                        onInstallClick = {
+                                            viewModel.installMirrorMod(mirrorMods[it].id)
+                                        }
+                                    )
+                                }
+                            }
+                            OnlineModsViewModel.Repository.Chinese -> {
+                                if (chineseMods.isEmpty()) {
+                                    EmptyPage(Modifier.fillMaxSize()) {
+                                        Text("什么模组都没有")
+                                    }
+                                } else {
+                                    ChineseModList(
+                                        modifier = Modifier.fillMaxSize(),
+                                        mods = chineseMods,
+                                        onItemClick = { /*TODO*/ },
+                                        onInstallClick = {
+                                            viewModel.installChineseMod(chineseMods[it].id)
+                                        }
+                                    )
+                                }
                             }
                         }
                     }
