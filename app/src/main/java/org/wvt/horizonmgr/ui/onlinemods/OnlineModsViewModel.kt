@@ -44,8 +44,6 @@ class OnlineModsViewModel(
         data class Error(val message: String) : State()
     }
 
-    // TODO: 2021/2/27 两个仓库应该有不同的排序方式
-
     enum class MirrorSortMode {
         DEFAULT,
         TIME_ASC, TIME_DSC,
