@@ -42,7 +42,6 @@ data class PackageManagerItem(
     val description: String
 )
 
-@OptIn(ExperimentalAnimationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun PackageManager(
     viewModel: PackageManagerViewModel,
@@ -212,67 +211,12 @@ private fun PackageList(
 
 }
 
-@OptIn(ExperimentalMaterialApi::class)
-@Composable
-private fun <T> PackageManagerUI(
-    onNavClick: () -> Unit,
-    packages: List<T>,
-    fabContent: @Composable () -> Unit,
-    emptyPage: @Composable () -> Unit,
-    item: @Composable (index: Int, item: T) -> Unit,
-    displayConfirmDialog: Boolean,
-    onConfirmDialogConfirm: () -> Unit,
-    onConfirmDialogCancel: () -> Unit,
-) {
-    val snackbarHostState = remember { SnackbarHostState() }
-    val confirmDeleteDialogHostState = remember { ConfirmDeleteDialogHostState() }
-    val inputDialogHostState = remember { InputDialogHostState() }
-
-    Box {
-        Column {
-            // Top App Bar
-            TopAppBar(
-                modifier = Modifier.zIndex(4.dp.value),
-                title = {
-                    Text("分包管理")
-                }, navigationIcon = {
-                    IconButton(onClick = onNavClick) { Icon(Icons.Filled.Menu, "菜单") }
-                }, backgroundColor = MaterialTheme.colors.surface
-            )
-
-            if (packages.isEmpty()) {
-                Box(Modifier.fillMaxSize()) {
-                    emptyPage()
-                }
-            } else {
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(top = 8.dp, bottom = 64.dp)
-                ) {
-                    itemsIndexed(packages) { index, item ->
-                        item(index, item)
-                    }
-                }
-            }
-        }
-
-        SnackbarHost(hostState = snackbarHostState)
-        ConfirmDeleteDialogHost(state = confirmDeleteDialogHostState)
-        InputDialogHost(state = inputDialogHostState)
-
-        Box(Modifier.align(Alignment.BottomEnd)) {
-            fabContent()
-        }
-    }
-}
-
 private val fab1Enter = tween<Float>(100, 0, LinearOutSlowInEasing)
 private val fab2Enter = tween<Float>(100, 50, LinearOutSlowInEasing)
 
 private val fab1Exit = tween<Float>(80, 40, FastOutLinearInEasing)
 private val fab2Exit = tween<Float>(80, 0, FastOutLinearInEasing)
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 private fun FABs(
     modifier: Modifier = Modifier,
@@ -554,43 +498,5 @@ fun ConfirmDeleteDialogHost(state: ConfirmDeleteDialogHostState) {
         }, confirmButton = {
             TextButton(onClick = { data.confirm() }) { Text("删除") }
         })
-    }
-}
-
-@Preview
-@Composable
-private fun Pareview() {
-    var fabExpand by remember { mutableStateOf(false) }
-    PreviewTheme {
-        PackageManagerUI(
-            onNavClick = { /*TODO*/ },
-            packages = (0..10).toList(),
-            fabContent = {
-                FABs(
-                    modifier = Modifier.fillMaxSize(),
-                    expand = fabExpand,
-                    onExpandStateChange = { fabExpand = it },
-                    onLocalInstallClick = { /*TODO*/ },
-                    onOnlineInstallClick = { /*TODO*/ }
-                )
-            },
-            emptyPage = {},
-            item = { index, item ->
-                PackageItem(
-                    modifier = Modifier.padding(16.dp, 8.dp),
-                    title = "Example Item",
-                    description = "Example description",
-                    installTime = "unknown",
-                    selected = false,
-                    onClick = { /*TODO*/ },
-                    onInfoClick = { /*TODO*/ },
-                    onDeleteClick = { /*TODO*/ },
-                    onRenameClick = { /*TODO*/ },
-                    onCloneClick = { /*TODO*/ })
-            },
-            displayConfirmDialog = false,
-            onConfirmDialogConfirm = { /*TODO*/ },
-            onConfirmDialogCancel = { /*TODO*/ }
-        )
     }
 }
