@@ -22,6 +22,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.SwipeRefreshIndicator
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import org.wvt.horizonmgr.ui.components.ErrorPage
 import org.wvt.horizonmgr.ui.components.NetworkImage
 import org.wvt.horizonmgr.ui.theme.AppBarBackgroundColor
@@ -37,7 +40,7 @@ fun News(
     val state by viewModel.state.collectAsState()
 
     DisposableEffect(viewModel) {
-        viewModel.refresh()
+        viewModel.load()
         onDispose { }
     }
 
@@ -46,7 +49,8 @@ fun News(
         state = state,
         news = news,
         onNewsClick = { onNewsClick(it) },
-        onRefreshClick = { viewModel.refresh() }
+        onRefresh = { viewModel.refresh() },
+        isRefreshing = viewModel.isRefreshing.collectAsState().value
     )
 }
 
@@ -56,7 +60,8 @@ private fun NewsUI(
     state: NewsViewModel.State,
     news: List<NewsViewModel.News>,
     onNewsClick: (NewsViewModel.News) -> Unit,
-    onRefreshClick: () -> Unit
+    isRefreshing: Boolean,
+    onRefresh: () -> Unit
 ) {
     Column(Modifier.fillMaxSize()) {
         TopAppBar(
@@ -76,13 +81,20 @@ private fun NewsUI(
                 is NewsViewModel.State.Loading -> Box(Modifier.fillMaxSize()) {
                     CircularProgressIndicator(Modifier.align(Alignment.Center))
                 }
-                is NewsViewModel.State.Succeed -> NewsList(news, onNewsClick)
+                is NewsViewModel.State.Succeed -> {
+                    NewsList(
+                        news,
+                        onNewsClick,
+                        isRefreshing,
+                        onRefresh
+                    )
+                }
                 is NewsViewModel.State.Error -> Box(Modifier.fillMaxSize()) {
                     ErrorPage(
                         modifier = Modifier.align(Alignment.Center),
                         message = {
                             Text("加载出错")
-                        }, onRetryClick = onRefreshClick
+                        }, onRetryClick = onRefresh
                     )
                 }
             }
@@ -91,40 +103,56 @@ private fun NewsUI(
 }
 
 @Composable
-private fun NewsList(news: List<NewsViewModel.News>, onNewsClick: (NewsViewModel.News) -> Unit) {
-    LazyColumn(
-        modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(top = 8.dp, bottom = 8.dp)
+private fun NewsList(
+    news: List<NewsViewModel.News>,
+    onNewsClick: (NewsViewModel.News) -> Unit,
+    isRefreshing: Boolean,
+    onRefreshClick: () -> Unit
+) {
+    SwipeRefresh(
+        state = rememberSwipeRefreshState(isRefreshing),
+        onRefresh = onRefreshClick,
+        indicator = { state, trigger ->
+            SwipeRefreshIndicator(
+                state = state,
+                refreshTriggerDistance = trigger,
+                contentColor = MaterialTheme.colors.primary
+            )
+        }
     ) {
-        items(news) { item ->
-            when {
-                item is NewsViewModel.News.Article && item.coverUrl != null -> NewsItem(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp, horizontal = 16.dp),
-                    title = item.title,
-                    brief = item.brief,
-                    onClick = { onNewsClick(item) },
-                    coverImage = {
-                        NetworkImage(
-                            url = item.coverUrl,
-                            contentScale = ContentScale.Crop,
-                            contentDescription = "封面"
-                        )
-                    }
-                )
-                item is NewsViewModel.News.Article && item.coverUrl == null -> NewsItemNoCover(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp, horizontal = 16.dp),
-                    title = item.title,
-                    brief = item.brief,
-                    onClick = { onNewsClick(item) }
-                )
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(top = 8.dp, bottom = 8.dp)
+        ) {
+            items(news) { item ->
+                when {
+                    item is NewsViewModel.News.Article && item.coverUrl != null -> NewsItem(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp, horizontal = 16.dp),
+                        title = item.title,
+                        brief = item.brief,
+                        onClick = { onNewsClick(item) },
+                        coverImage = {
+                            NetworkImage(
+                                url = item.coverUrl,
+                                contentScale = ContentScale.Crop,
+                                contentDescription = "封面"
+                            )
+                        }
+                    )
+                    item is NewsViewModel.News.Article && item.coverUrl == null -> NewsItemNoCover(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp, horizontal = 16.dp),
+                        title = item.title,
+                        brief = item.brief,
+                        onClick = { onNewsClick(item) }
+                    )
+                }
             }
         }
     }
-
 }
 
 @Composable
@@ -257,7 +285,8 @@ private fun NewsPreview() {
                 )
             },
             onNewsClick = {},
-            onRefreshClick = {}
+            onRefresh = {},
+            isRefreshing = false
         )
     }
 }

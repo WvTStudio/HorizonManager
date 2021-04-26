@@ -25,46 +25,59 @@ class NewsContentViewModel(
     )
 
     sealed class Result {
-        object Loading: Result()
-        class Succeed(val value: NewsContent): Result()
-        object NetworkError: Result()
-        object NewsNotFound: Result()
-        object OtherError: Result()
+        object Loading : Result()
+        class Succeed(val value: NewsContent) : Result()
+        object NetworkError : Result()
+        object NewsNotFound : Result()
+        object OtherError : Result()
     }
 
+    val isRefreshing = MutableStateFlow(false)
     val content = MutableStateFlow<Result>(Result.Loading)
 
     fun load(articleId: String) {
-        this.articleId = articleId
-        refresh()
+        if (articleId != this.articleId) {
+            this.articleId = articleId
+            viewModelScope.launch(Dispatchers.IO) {
+                content.emit(Result.Loading)
+                loadData()
+            }
+        }
     }
 
     fun refresh() {
         viewModelScope.launch(Dispatchers.IO) {
-            content.emit(Result.Loading)
-            val result = try {
-                article.getArticle(articleId)
-            } catch (e: NetworkException) {
-                content.emit(Result.NetworkError)
-                Log.e(TAG, "获取新闻内容时出现网络错误", e)
-                return@launch
-            } catch (e: Exception) {
-                content.emit(Result.OtherError)
-                Log.e(TAG, "获取新闻内容时出现未知错误", e)
-                return@launch
-            }
-            if (result == null) {
-                content.emit(Result.NewsNotFound)
-                return@launch
-            }
-            content.emit(Result.Succeed(
+            isRefreshing.value = true
+            loadData()
+            isRefreshing.value = false
+        }
+    }
+
+    private suspend fun loadData() {
+        val result = try {
+            article.getArticle(articleId)
+        } catch (e: NetworkException) {
+            content.emit(Result.NetworkError)
+            Log.e(TAG, "获取新闻内容时出现网络错误", e)
+            return
+        } catch (e: Exception) {
+            content.emit(Result.OtherError)
+            Log.e(TAG, "获取新闻内容时出现未知错误", e)
+            return
+        }
+        if (result == null) {
+            content.emit(Result.NewsNotFound)
+            return
+        }
+        content.emit(
+            Result.Succeed(
                 NewsContent(
                     coverImage = result.coverImage,
                     title = result.title,
                     brief = result.brief,
                     content = result.content
                 )
-            ))
-        }
+            )
+        )
     }
 }
