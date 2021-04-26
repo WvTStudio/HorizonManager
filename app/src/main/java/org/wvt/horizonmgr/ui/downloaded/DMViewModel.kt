@@ -16,8 +16,16 @@ import org.wvt.horizonmgr.utils.ModDownloader
 import java.io.File
 
 class DMViewModel(dependencies: DependenciesContainer) : ViewModel() {
+    private val localCache = dependencies.localCache
     private val downloader = dependencies.modDownloader
     private val manager = dependencies.manager
+    private val _mods = MutableStateFlow(emptyList<DownloadedMod>())
+    private val _progressState = MutableStateFlow<ProgressDialogState?>(null)
+    private var map: Map<DownloadedMod, ModDownloader.DownloadedMod> = emptyMap()
+
+    val mods: StateFlow<List<DownloadedMod>> = _mods
+    val progressState: StateFlow<ProgressDialogState?> = _progressState
+    val isRefreshing = MutableStateFlow(false)
 
     data class DownloadedMod(
         internal val uuid: String,
@@ -26,24 +34,19 @@ class DMViewModel(dependencies: DependenciesContainer) : ViewModel() {
         val icon: ImageBitmap?
     )
 
-    private val _mods = MutableStateFlow(emptyList<DownloadedMod>())
-    val mods: StateFlow<List<DownloadedMod>> = _mods
-
-    private var selectedUUID: String? = null
-    private var selectedPackage: InstalledPackage? = null
-    private val _progressState = MutableStateFlow<ProgressDialogState?>(null)
-
-    val progressState: StateFlow<ProgressDialogState?> = _progressState
-
-    fun setSelectedPackage(uuid: String?) {
-        viewModelScope.launch {
-            selectedUUID = uuid
-            if (uuid == null) return@launch
-            selectedPackage = manager.getInstalledPackage(uuid)
-        }
+    private suspend fun getSelectedPackage(): InstalledPackage? {
+        val uuid = localCache.getSelectedPackageUUID() ?: return null
+        return manager.getInstalledPackage(uuid)
     }
 
-    private var map: Map<DownloadedMod, ModDownloader.DownloadedMod> = emptyMap()
+    private var initialized = false
+
+    fun init() {
+        if (!initialized) {
+            initialized = true
+            refresh()
+        }
+    }
 
     fun refresh() {
         viewModelScope.launch(Dispatchers.IO) {
@@ -73,7 +76,7 @@ class DMViewModel(dependencies: DependenciesContainer) : ViewModel() {
             try {
                 _progressState.value = ProgressDialogState.Loading("正在安装")
                 val mod = map[dm] ?: return@launch
-                val pack = selectedPackage ?: return@launch
+                val pack = getSelectedPackage() ?: return@launch
                 pack.installMod(mod.zipMod)
                 _progressState.value = ProgressDialogState.Finished("安装成功")
             } catch (e: Exception) {

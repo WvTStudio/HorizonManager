@@ -3,6 +3,7 @@ package org.wvt.horizonmgr.ui.downloaded
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -10,7 +11,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Extension
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -18,9 +19,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.SwipeRefreshIndicator
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import org.wvt.horizonmgr.ui.components.ModIcon
 import org.wvt.horizonmgr.ui.components.ProgressDialog
-import org.wvt.horizonmgr.ui.main.LocalSelectedPackageUUID
 import org.wvt.horizonmgr.ui.theme.AppBarBackgroundColor
 
 @Composable
@@ -30,15 +33,9 @@ fun DownloadedMods(
 ) {
     val mods by vm.mods.collectAsState()
     val progressState by vm.progressState.collectAsState()
-    val selected = LocalSelectedPackageUUID.current
+    val isRefreshing by vm.isRefreshing.collectAsState()
 
-    DisposableEffect(selected) {
-        vm.setSelectedPackage(selected)
-        vm.refresh()
-        onDispose {
-            // TODO: 2021/2/6 添加 cancel 逻辑
-        }
-    }
+    LaunchedEffect(vm) { vm.init() }
 
     Column(Modifier.fillMaxSize()) {
         TopAppBar(
@@ -50,42 +47,42 @@ fun DownloadedMods(
                 })
             }, backgroundColor = AppBarBackgroundColor
         )
-        Crossfade(mods) { mods ->
-            if (mods.isEmpty()) {
-                Box(
-                    Modifier
-                        .fillMaxSize()
-                        .padding(16.dp), Alignment.Center
-                ) {
-                    Text(
-                        "未找到本地资源，请从在线资源中下载",
-                        color = MaterialTheme.colors.onSurface.copy(ContentAlpha.medium)
+        Box(
+            Modifier
+                .weight(1f)
+                .fillMaxWidth()
+        ) {
+            SwipeRefresh(
+                modifier = Modifier.fillMaxSize(),
+                state = rememberSwipeRefreshState(isRefreshing),
+                onRefresh = { vm.refresh() },
+                indicator = { state, distance ->
+                    SwipeRefreshIndicator(
+                        state = state,
+                        refreshTriggerDistance = distance,
+                        contentColor = MaterialTheme.colors.primary
                     )
                 }
-            } else {
-                LazyColumn(
-                    contentPadding = PaddingValues(top = 8.dp, bottom = 64.dp)
-                ) {
-                    itemsIndexed(mods) { _, item ->
-                        ModItem(
-                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                            name = item.name,
-                            description = item.description,
-                            icon = {
-                                Box(Modifier.padding(16.dp)) {
-                                    // Mod Icon
-                                    ModIcon(
-                                        modifier = Modifier
-                                            .size(80.dp)
-                                            .clip(RoundedCornerShape(4.dp)),
-                                        image = item.icon
-                                    )
-                                }
-                            },
-                            onInstallClicked = { vm.install(item) },
-                            onDeleteClicked = { vm.delete(item) }
-                        )
-                    }
+            ) {
+                ModList(mods = mods) { _, item ->
+                    ModItem(
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                        name = item.name,
+                        description = item.description,
+                        icon = {
+                            Box(Modifier.padding(16.dp)) {
+                                // Mod Icon
+                                ModIcon(
+                                    modifier = Modifier
+                                        .size(80.dp)
+                                        .clip(RoundedCornerShape(4.dp)),
+                                    image = item.icon
+                                )
+                            }
+                        },
+                        onInstallClicked = { vm.install(item) },
+                        onDeleteClicked = { vm.delete(item) }
+                    )
                 }
             }
         }
@@ -93,6 +90,37 @@ fun DownloadedMods(
 
     progressState?.let {
         ProgressDialog(onCloseRequest = vm::dismiss, state = it)
+    }
+}
+
+@Composable
+private fun ModList(
+    mods: List<DMViewModel.DownloadedMod>,
+    item: @Composable LazyItemScope.(index: Int, item: DMViewModel.DownloadedMod) -> Unit
+) {
+    Crossfade(mods) { mods ->
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(top = 8.dp, bottom = 64.dp)
+        ) {
+            if (mods.isEmpty()) {
+                item {
+                    Box(
+                        Modifier
+                            .fillParentMaxSize()
+                            .padding(16.dp), Alignment.Center
+                    ) {
+                        Text(
+                            "未找到本地资源，请从在线资源中下载",
+                            color = MaterialTheme.colors.onSurface.copy(ContentAlpha.medium)
+                        )
+                    }
+                }
+            }
+            itemsIndexed(mods) { index, item ->
+                item(index, item)
+            }
+        }
     }
 }
 
@@ -111,7 +139,8 @@ private fun ModItem(
                 Column(
                     Modifier
                         .padding(start = 16.dp, top = 16.dp, end = 16.dp)
-                        .weight(1f)) {
+                        .weight(1f)
+                ) {
                     // Name
                     Text(text = name, style = MaterialTheme.typography.h6)
                     // Description
