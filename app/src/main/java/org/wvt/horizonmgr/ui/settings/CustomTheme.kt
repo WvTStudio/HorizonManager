@@ -6,6 +6,7 @@ import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -287,7 +288,10 @@ private fun SelectColorItem(
 ) {
     val shrinkTween = remember { tween<Float>(250, 0, LinearOutSlowInEasing) }
     val expandTween = remember { tween<Float>(250, 40, LinearOutSlowInEasing) }
-    var pressed by remember { mutableStateOf(false) }
+
+
+    val interactionSource = remember { MutableInteractionSource() }
+    val pressed by interactionSource.collectIsPressedAsState()
     val scale by updateTransition(targetState = pressed, label = "transition").animateFloat(
         transitionSpec = { if (targetState) shrinkTween else expandTween },
         targetValueByState = {
@@ -303,26 +307,12 @@ private fun SelectColorItem(
         CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
             Text(text = text)
         }
+
         Surface(
             modifier = Modifier
                 .size(128.dp, 96.dp)
                 .padding(top = 8.dp)
-                .clickable { }
-                .pointerInput(Unit) {
-                    detectTapGestures(onPress = {
-                        pressed = true
-                        Log.d("SelectColorItem", "SelectColorItem: pressed")
-                        val succeed = tryAwaitRelease()
-                        if (succeed) {
-                            onSelect()
-                            Log.d("SelectColorItem", "SelectColorItem: clicked")
-                        } else {
-                            Log.d("SelectColorItem", "SelectColorItem: canceled")
-                        }
-                        Log.d("SelectColorItem", "SelectColorItem: released")
-                        pressed = false
-                    })
-                }
+                .clickable(interactionSource, null, onClick = onSelect)
                 .graphicsLayer(scaleX = scale, scaleY = scale),
             color = animateColorAsState(color).value,
             elevation = animateDpAsState(if (selected) 8.dp else 0.dp).value,
