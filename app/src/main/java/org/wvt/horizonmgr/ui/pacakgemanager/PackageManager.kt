@@ -193,22 +193,22 @@ private fun PackageList(
                 contentColor = MaterialTheme.colors.primary
             )
         }) {
-        if (packages.isNullOrEmpty()) {
-            // Tips when there was no package installed.
-            Box {
-                EmptyPage(Modifier.fillMaxSize()) { Text("你还没有安装分包") }
-                banner()
+        LazyColumn(modifier = Modifier.fillMaxSize()) {
+            if (packages.isNullOrEmpty()) item {
+                Box(Modifier.fillParentMaxSize()) {
+                    EmptyPage(Modifier.fillMaxSize()) { Text("你还没有安装分包") }
+                    banner()
+                }
+            } else {
+                item { banner() }
+                item { Spacer(Modifier.height(8.dp)) }
+                itemsIndexed(packages) { index, item ->
+                    item(index, item)
+                }
+                item { Spacer(Modifier.height(64.dp)) }
             }
-        } else LazyColumn(modifier = Modifier.fillMaxSize()) {
-            item { banner() }
-            item { Spacer(Modifier.height(8.dp)) }
-            itemsIndexed(packages) { index, item ->
-                item(index, item)
-            }
-            item { Spacer(Modifier.height(64.dp)) }
         }
     }
-
 }
 
 private val fab1Enter = tween<Float>(100, 0, LinearOutSlowInEasing)
