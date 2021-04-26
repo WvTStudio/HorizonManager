@@ -3,8 +3,9 @@ package org.wvt.horizonmgr.ui.pacakgemanager
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -66,39 +67,35 @@ fun PackageInfo(
                         )
                     )
                     if (info != null) {
-                        LazyColumn {
-                            item {
-                                Surface(
-                                    modifier = Modifier
-                                        .padding(16.dp)
-                                        .fillMaxWidth()
-                                        .aspectRatio(16f / 9f),
-                                    shape = RoundedCornerShape(4.dp),
-                                    color = MaterialTheme.colors.onBackground.copy(alpha = ContentAlpha.disabled)
-                                        .compositeOver(MaterialTheme.colors.background),
-                                    elevation = 1.dp
-                                ) {
-                                    val image = info.packageGraphic.collectAsState()
-                                    Crossfade(targetState = image.value) {
-                                        if (it != null) ImageWithoutQualityFilter(
-                                            modifier = Modifier
-                                                .fillMaxSize()
-                                                .scale(scale),
-                                            imageBitmap = it,
-                                        )
-                                    }
+                        Column(Modifier.verticalScroll(rememberScrollState())) {
+                            Surface(
+                                modifier = Modifier
+                                    .padding(16.dp)
+                                    .fillMaxWidth()
+                                    .aspectRatio(16f / 9f),
+                                shape = RoundedCornerShape(4.dp),
+                                color = MaterialTheme.colors.onBackground.copy(alpha = ContentAlpha.disabled)
+                                    .compositeOver(MaterialTheme.colors.background),
+                                elevation = 1.dp
+                            ) {
+                                val image = info.packageGraphic.collectAsState()
+                                Crossfade(targetState = image.value) {
+                                    if (it != null) ImageWithoutQualityFilter(
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .scale(scale),
+                                        imageBitmap = it,
+                                    )
                                 }
                             }
-                            item {
-                                ManifestSection(info = info)
-                                FileSection(path = info.installDir, packSize = remember(pkgSize) {
-                                    when (val pkgSize = pkgSize) {
-                                        is PackageDetailViewModel.PackageSize.Succeed -> pkgSize.sizeStr + "  共 ${pkgSize.count} 个文件"
-                                        is PackageDetailViewModel.PackageSize.Failed -> "计算出错"
-                                        is PackageDetailViewModel.PackageSize.Loading -> "正在计算"
-                                    }
-                                })
-                            }
+                            ManifestSection(info = info)
+                            FileSection(path = info.installDir, packSize = remember(pkgSize) {
+                                when (val pkgSize = pkgSize) {
+                                    is PackageDetailViewModel.PackageSize.Succeed -> pkgSize.sizeStr + "  共 ${pkgSize.count} 个文件"
+                                    is PackageDetailViewModel.PackageSize.Failed -> "计算出错"
+                                    is PackageDetailViewModel.PackageSize.Loading -> "正在计算"
+                                }
+                            })
                         }
                     }
                 }

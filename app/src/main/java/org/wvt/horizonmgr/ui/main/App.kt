@@ -1,8 +1,10 @@
 package org.wvt.horizonmgr.ui.main
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -203,17 +205,19 @@ private fun NewVersionDialog(
     AlertDialog(
         title = { Text("发现新版本") },
         text = {
-            LazyColumn(Modifier.fillMaxHeight(0.6f)) {
-                item {
-                    Text(
-                        """
+            Column(
+                Modifier
+                    .fillMaxHeight(0.6f)
+                    .verticalScroll(rememberScrollState())
+            ) {
+                Text(
+                    """
                         |版本名：${versionName}
                         |版本号：${versionCode}
                         |更新日志：
                         |${changelog}
                         """.trimMargin()
-                    )
-                }
+                )
             }
         },
         onDismissRequest = onConfirm,

@@ -1,14 +1,12 @@
 package org.wvt.horizonmgr.ui.settings
 
+import android.util.Log
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.indication
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -88,12 +86,13 @@ fun CustomTheme(requestClose: () -> Unit) {
             TopAppBar(
                 modifier = Modifier.zIndex(4f),
                 navigationIcon = {
-                IconButton(onClick = requestClose) {
-                    Icon(imageVector = Icons.Filled.ArrowBack, "返回")
-                }
-            }, title = {
-                Text("自定义主题")
-            }, backgroundColor = AppBarBackgroundColor)
+                    IconButton(onClick = requestClose) {
+                        Icon(imageVector = Icons.Filled.ArrowBack, "返回")
+                    }
+                }, title = {
+                    Text("自定义主题")
+                }, backgroundColor = AppBarBackgroundColor
+            )
 
             MaterialColorPalette(
                 modifier = Modifier.height(256.dp),
@@ -127,115 +126,113 @@ fun CustomTheme(requestClose: () -> Unit) {
                 }
             )
             Divider(Modifier.fillMaxWidth())
-            LazyColumn(Modifier.weight(1f)) {
-                item {
-                    // TODO: 2021/2/8 再套一层 Column 是因为 alpha11 的 LazyColumn 在内部组件移出屏外会出现问题，在问题解决后应当删除此 Column
-                    Column(Modifier.fillParentMaxWidth()) {
-                        Text(
-                            modifier = Modifier.padding(top = 16.dp, start = 24.dp),
-                            text = "亮色主题",
-                            color = MaterialTheme.colors.primary
-                        )
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(top = 16.dp),
-                            horizontalArrangement = Arrangement.SpaceEvenly
-                        ) {
-                            SelectColorItem(text = "主题色",
-                                color = getColor(lightColor.primary),
-                                selected = checkedColorType == CheckedColorType.LIGHT_PRIMARY,
-                                onSelect = { checkedColorType = CheckedColorType.LIGHT_PRIMARY })
-                            SelectColorItem(text = "主题色 - 变体",
-                                color = getColor(lightColor.primaryVariant),
-                                selected = checkedColorType == CheckedColorType.LIGHT_PRIMARY_VARIANT,
-                                onSelect = {
-                                    checkedColorType = CheckedColorType.LIGHT_PRIMARY_VARIANT
-                                }
-                            )
+            Column(
+                Modifier
+                    .weight(1f)
+                    .verticalScroll(rememberScrollState())) {
+                Text(
+                    modifier = Modifier.padding(top = 16.dp, start = 24.dp),
+                    text = "亮色主题",
+                    color = MaterialTheme.colors.primary
+                )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 16.dp),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    SelectColorItem(text = "主题色",
+                        color = getColor(lightColor.primary),
+                        selected = checkedColorType == CheckedColorType.LIGHT_PRIMARY,
+                        onSelect = { checkedColorType = CheckedColorType.LIGHT_PRIMARY })
+                    SelectColorItem(text = "主题色 - 变体",
+                        color = getColor(lightColor.primaryVariant),
+                        selected = checkedColorType == CheckedColorType.LIGHT_PRIMARY_VARIANT,
+                        onSelect = {
+                            checkedColorType = CheckedColorType.LIGHT_PRIMARY_VARIANT
                         }
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(top = 16.dp),
-                            horizontalArrangement = Arrangement.SpaceEvenly
-                        ) {
-                            SelectColorItem(text = "补充色",
-                                color = getColor(lightColor.secondary),
-                                selected = checkedColorType == CheckedColorType.LIGHT_SECONDARY,
-                                onSelect = { checkedColorType = CheckedColorType.LIGHT_SECONDARY })
-                            SelectColorItem(text = "补充色 - 变体",
-                                color = getColor(lightColor.secondaryVariant),
-                                selected = checkedColorType == CheckedColorType.LIGHT_SECONDARY_VARIANT,
-                                onSelect = {
-                                    checkedColorType = CheckedColorType.LIGHT_SECONDARY_VARIANT
-                                }
-                            )
-                        }
-                        val interactionSource = remember { MutableInteractionSource() }
-                        Row(
-                            Modifier
-                                .clickable(
-                                    indication = null,
-                                    interactionSource = interactionSource,
-                                    onClick = { accentColor = !accentColor })
-                                .fillMaxWidth()
-                                .padding(top = 16.dp, start = 42.dp, end = 42.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Checkbox(
-                                modifier = Modifier.indication(
-                                    interactionSource,
-                                    rememberRipple(bounded = false, radius = 24.dp)
-                                ),
-                                checked = accentColor,
-                                onCheckedChange = { accentColor = it }
-                            )
-                            Spacer(Modifier.width(8.dp))
-                            Text("强调色状态栏")
-                        }
-                        Divider(
-                            Modifier
-                                .padding(vertical = 16.dp)
-                                .fillMaxWidth()
-                        )
-                        Text(
-                            modifier = Modifier.padding(start = 24.dp),
-                            text = "暗色主题",
-                            color = MaterialTheme.colors.primary
-                        )
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(top = 16.dp),
-                            horizontalArrangement = Arrangement.SpaceEvenly
-                        ) {
-                            SelectColorItem(text = "主题色",
-                                color = getColor(darkColor.primary),
-                                selected = checkedColorType == CheckedColorType.DARK_PRIMARY,
-                                onSelect = { checkedColorType = CheckedColorType.DARK_PRIMARY })
-                            SelectColorItem(text = "主题色 - 变体",
-                                color = getColor(darkColor.primaryVariant),
-                                selected = checkedColorType == CheckedColorType.DARK_PRIMARY_VARIANT,
-                                onSelect = {
-                                    checkedColorType = CheckedColorType.DARK_PRIMARY_VARIANT
-                                }
-                            )
-                        }
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(top = 16.dp),
-                            horizontalArrangement = Arrangement.SpaceEvenly
-                        ) {
-                            SelectColorItem(text = "补充色",
-                                color = getColor(darkColor.secondary),
-                                selected = checkedColorType == CheckedColorType.DARK_SECONDARY,
-                                onSelect = { checkedColorType = CheckedColorType.DARK_SECONDARY })
-                        }
-                        Spacer(modifier = Modifier.height(64.dp))
-                    }
+                    )
                 }
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 16.dp),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    SelectColorItem(text = "补充色",
+                        color = getColor(lightColor.secondary),
+                        selected = checkedColorType == CheckedColorType.LIGHT_SECONDARY,
+                        onSelect = { checkedColorType = CheckedColorType.LIGHT_SECONDARY })
+                    SelectColorItem(text = "补充色 - 变体",
+                        color = getColor(lightColor.secondaryVariant),
+                        selected = checkedColorType == CheckedColorType.LIGHT_SECONDARY_VARIANT,
+                        onSelect = {
+                            checkedColorType = CheckedColorType.LIGHT_SECONDARY_VARIANT
+                        }
+                    )
+                }
+                val interactionSource = remember { MutableInteractionSource() }
+                Row(
+                    Modifier
+                        .clickable(
+                            indication = null,
+                            interactionSource = interactionSource,
+                            onClick = { accentColor = !accentColor })
+                        .fillMaxWidth()
+                        .padding(top = 16.dp, start = 42.dp, end = 42.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Checkbox(
+                        modifier = Modifier.indication(
+                            interactionSource,
+                            rememberRipple(bounded = false, radius = 24.dp)
+                        ),
+                        checked = accentColor,
+                        onCheckedChange = { accentColor = it }
+                    )
+                    Spacer(Modifier.width(8.dp))
+                    Text("强调色状态栏")
+                }
+                Divider(
+                    Modifier
+                        .padding(vertical = 16.dp)
+                        .fillMaxWidth()
+                )
+                Text(
+                    modifier = Modifier.padding(start = 24.dp),
+                    text = "暗色主题",
+                    color = MaterialTheme.colors.primary
+                )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 16.dp),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    SelectColorItem(text = "主题色",
+                        color = getColor(darkColor.primary),
+                        selected = checkedColorType == CheckedColorType.DARK_PRIMARY,
+                        onSelect = { checkedColorType = CheckedColorType.DARK_PRIMARY })
+                    SelectColorItem(text = "主题色 - 变体",
+                        color = getColor(darkColor.primaryVariant),
+                        selected = checkedColorType == CheckedColorType.DARK_PRIMARY_VARIANT,
+                        onSelect = {
+                            checkedColorType = CheckedColorType.DARK_PRIMARY_VARIANT
+                        }
+                    )
+                }
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 16.dp),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    SelectColorItem(text = "补充色",
+                        color = getColor(darkColor.secondary),
+                        selected = checkedColorType == CheckedColorType.DARK_SECONDARY,
+                        onSelect = { checkedColorType = CheckedColorType.DARK_SECONDARY })
+                }
+                Spacer(modifier = Modifier.height(64.dp))
             }
         }
 
@@ -291,15 +288,17 @@ private fun SelectColorItem(
     val shrinkTween = remember { tween<Float>(250, 0, LinearOutSlowInEasing) }
     val expandTween = remember { tween<Float>(250, 40, LinearOutSlowInEasing) }
     var pressed by remember { mutableStateOf(false) }
-    val scale = animateFloatAsState(
-        targetValue = if (selected) {
-            if (pressed) 1f
-            else 1.1f
-        } else {
-            if (pressed) 0.9f
-            else 1f
-        }, animationSpec = if (pressed) shrinkTween else expandTween
-    ).value
+    val scale by updateTransition(targetState = pressed, label = "transition").animateFloat(
+        transitionSpec = { if (targetState) shrinkTween else expandTween },
+        targetValueByState = {
+            if (selected) {
+                if (it) 1f else 1.1f
+            } else {
+                if (it) 0.9f else 1f
+            }
+        }, label = "scale"
+    )
+
     Column(modifier) {
         CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
             Text(text = text)
@@ -308,13 +307,19 @@ private fun SelectColorItem(
             modifier = Modifier
                 .size(128.dp, 96.dp)
                 .padding(top = 8.dp)
+                .clickable { }
                 .pointerInput(Unit) {
                     detectTapGestures(onPress = {
                         pressed = true
+                        Log.d("SelectColorItem", "SelectColorItem: pressed")
                         val succeed = tryAwaitRelease()
                         if (succeed) {
                             onSelect()
+                            Log.d("SelectColorItem", "SelectColorItem: clicked")
+                        } else {
+                            Log.d("SelectColorItem", "SelectColorItem: canceled")
                         }
+                        Log.d("SelectColorItem", "SelectColorItem: released")
                         pressed = false
                     })
                 }
@@ -339,57 +344,58 @@ private fun MaterialColorPalette(
             "A100", "A200", "A400", "A700"
         )
     }
-    LazyColumn(modifier = modifier) {
-        item {
-            LazyRow {
-                item {
-                    Column {
-                        Spacer(
-                            Modifier
+    Column(
+        modifier
+            .verticalScroll(rememberScrollState())
+            .horizontalScroll(rememberScrollState())
+    ) {
+        Row {
+
+            Column {
+                Spacer(
+                    Modifier
+                        .padding(1.dp)
+                        .height(42.dp)
+                )
+                CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+                    for (i in colors) {
+                        Box(
+                            modifier = Modifier
                                 .padding(1.dp)
                                 .height(42.dp)
-                        )
-                        CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-                            for (i in colors) {
-                                Box(
-                                    modifier = Modifier
-                                        .padding(1.dp)
-                                        .height(42.dp)
-                                        .width(72.dp),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Text(
-                                        text = i.key,
-                                        textAlign = TextAlign.Center
-                                    )
-                                }
-                            }
+                                .width(72.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = i.key,
+                                textAlign = TextAlign.Center
+                            )
                         }
                     }
-                    Column {
-                        Row {
-                            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-                                tags.forEach {
-                                    Box(
-                                        modifier = Modifier
-                                            .padding(1.dp)
-                                            .size(42.dp),
-                                        contentAlignment = Alignment.Center
-                                    ) { Text(text = it) }
-                                }
-                            }
+                }
+            }
+            Column {
+                Row {
+                    CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+                        tags.forEach {
+                            Box(
+                                modifier = Modifier
+                                    .padding(1.dp)
+                                    .size(42.dp),
+                                contentAlignment = Alignment.Center
+                            ) { Text(text = it) }
                         }
-                        for ((series, map) in colors) {
-                            Row {
-                                for ((bright, color) in map) {
-                                    ColorItem(
-                                        modifier = Modifier.padding(1.dp),
-                                        color = Color(color),
-                                        selected = selected.first == series && selected.second == bright,
-                                        onSelect = { onSelect(series, bright) }
-                                    )
-                                }
-                            }
+                    }
+                }
+                for ((series, map) in colors) {
+                    Row {
+                        for ((bright, color) in map) {
+                            ColorItem(
+                                modifier = Modifier.padding(1.dp),
+                                color = Color(color),
+                                selected = selected.first == series && selected.second == bright,
+                                onSelect = { onSelect(series, bright) }
+                            )
                         }
                     }
                 }
@@ -441,4 +447,3 @@ private fun ColorItemPreview() {
         }
     }
 }
-

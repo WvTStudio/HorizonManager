@@ -48,33 +48,6 @@ object MaterialColors {
         return null
     }
 
-    @Deprecated("Not implemented yet")
-    operator fun get(series: String, bright: String): Long {
-        val series = when (series) {
-            "red" -> red
-            "pink" -> pink
-            "purple" -> purple
-            "deepPurple" -> deepPurple
-            "indigo" -> indigo
-            "blue" -> blue
-            "lightBlue" -> lightBlue
-            "cyan" -> cyan
-            "teal" -> teal
-            "green" -> green
-            "lightGreen" -> lightGreen
-            "lime" -> lime
-            "yellow" -> yellow
-            "amber" -> amber
-            "orange" -> orange
-            "deepOrange" -> deepOrange
-            "brown" -> brown
-            "gray" -> gray
-            "blueGray" -> blueGray
-            else -> error("Series not found")
-        }
-        TODO()
-    }
-
     val red = mapOf(
         50 to 0xFFFFEBEE,
         100 to 0xFFFFCDD2,

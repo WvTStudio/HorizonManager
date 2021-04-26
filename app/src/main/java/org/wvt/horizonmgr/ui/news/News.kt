@@ -76,40 +76,7 @@ private fun NewsUI(
                 is NewsViewModel.State.Loading -> Box(Modifier.fillMaxSize()) {
                     CircularProgressIndicator(Modifier.align(Alignment.Center))
                 }
-                is NewsViewModel.State.Succeed -> {
-                    LazyColumn(
-                        modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(top = 8.dp, bottom = 8.dp)
-                    ) {
-                        items(news) { item ->
-                            when {
-                                item is NewsViewModel.News.Article && item.coverUrl != null -> NewsItem(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(vertical = 8.dp, horizontal = 16.dp),
-                                    title = item.title,
-                                    brief = item.brief,
-                                    onClick = { onNewsClick(item) },
-                                    coverImage = {
-                                        NetworkImage(
-                                            url = item.coverUrl,
-                                            contentScale = ContentScale.Crop,
-                                            contentDescription = "封面"
-                                        )
-                                    }
-                                )
-                                item is NewsViewModel.News.Article && item.coverUrl == null -> NewsItemNoCover(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(vertical = 8.dp, horizontal = 16.dp),
-                                    title = item.title,
-                                    brief = item.brief,
-                                    onClick = { onNewsClick(item) }
-                                )
-                            }
-                        }
-                    }
-                }
+                is NewsViewModel.State.Succeed -> NewsList(news, onNewsClick)
                 is NewsViewModel.State.Error -> Box(Modifier.fillMaxSize()) {
                     ErrorPage(
                         modifier = Modifier.align(Alignment.Center),
@@ -121,6 +88,43 @@ private fun NewsUI(
             }
         }
     }
+}
+
+@Composable
+private fun NewsList(news: List<NewsViewModel.News>, onNewsClick: (NewsViewModel.News) -> Unit) {
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        contentPadding = PaddingValues(top = 8.dp, bottom = 8.dp)
+    ) {
+        items(news) { item ->
+            when {
+                item is NewsViewModel.News.Article && item.coverUrl != null -> NewsItem(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp, horizontal = 16.dp),
+                    title = item.title,
+                    brief = item.brief,
+                    onClick = { onNewsClick(item) },
+                    coverImage = {
+                        NetworkImage(
+                            url = item.coverUrl,
+                            contentScale = ContentScale.Crop,
+                            contentDescription = "封面"
+                        )
+                    }
+                )
+                item is NewsViewModel.News.Article && item.coverUrl == null -> NewsItemNoCover(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp, horizontal = 16.dp),
+                    title = item.title,
+                    brief = item.brief,
+                    onClick = { onNewsClick(item) }
+                )
+            }
+        }
+    }
+
 }
 
 @Composable

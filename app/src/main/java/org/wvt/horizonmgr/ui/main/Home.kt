@@ -7,9 +7,11 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.gestures.forEachGesture
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -205,16 +207,18 @@ private fun Drawer(
         drawerContent = {
             val theme = LocalThemeConfig.current
             Column(modifier = Modifier.fillMaxSize()) {
-                LazyColumn(modifier = Modifier.weight(1f)) {
-                    item {
-                        header()
-                        if (theme.isDark || !theme.appbarAccent) {
-                            Divider(Modifier.fillParentMaxWidth())
-                        }
-                        Column(Modifier.padding(vertical = 8.dp)) { tabs() }
-                        Divider(Modifier.fillParentMaxWidth())
-                        Column(Modifier.padding(vertical = 8.dp)) { items() }
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .verticalScroll(rememberScrollState())
+                ) {
+                    header()
+                    if (theme.isDark || !theme.appbarAccent) {
+                        Divider(Modifier.fillMaxWidth())
                     }
+                    Column(Modifier.padding(vertical = 8.dp)) { tabs() }
+                    Divider(Modifier.fillMaxWidth())
+                    Column(Modifier.padding(vertical = 8.dp)) { items() }
                 }
                 Divider()
                 // Settings
@@ -272,27 +276,34 @@ private fun DrawerHeader(
         Box {
             BoxWithConstraints(Modifier.matchParentSize()) {
                 val size = with(LocalDensity.current) { constraints.maxHeight.toDp() }
-                Image(
-                    modifier = Modifier
+                val animationScope = rememberCoroutineScope()
+                Box(
+                    Modifier
                         .size(size, size)
                         .align(Alignment.CenterEnd)
                         .offset(x = size * 0.35f, y = -size * 0.35f)
                         .rotate(gearRotation.value)
                         .pointerInput(Unit) {
-                            detectTapGestures(onPress = {
-                                awaitRelease()
-                                try {
-                                    gearRotation.animateTo(720f, tween(1000))
-                                } finally {
-                                    gearRotation.snapTo(0f)
+                            forEachGesture {
+                                detectTapGestures {
+                                    animationScope.launch {
+                                        if (!gearRotation.isRunning) {
+                                            gearRotation.animateTo(720f, tween(1000))
+                                            gearRotation.snapTo(0f)
+                                        }
+                                    }
                                 }
-                            })
-                        },
-                    painter = gear,
-                    alpha = 0.12f,
-                    colorFilter = ColorFilter.tint(contentColor),
-                    contentDescription = null
-                )
+                            }
+                        }
+                ) {
+                    Image(
+                        modifier = Modifier.fillMaxSize(),
+                        painter = gear,
+                        alpha = 0.12f,
+                        colorFilter = ColorFilter.tint(contentColor),
+                        contentDescription = null
+                    )
+                }
             }
 
             Column(Modifier.padding(16.dp)) {
