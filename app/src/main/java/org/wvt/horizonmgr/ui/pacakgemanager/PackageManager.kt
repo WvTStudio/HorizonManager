@@ -19,7 +19,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.google.accompanist.swiperefresh.SwipeRefresh
@@ -30,9 +29,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import org.wvt.horizonmgr.ui.components.*
-import org.wvt.horizonmgr.ui.main.LocalSelectedPackageUUID
 import org.wvt.horizonmgr.ui.theme.AppBarBackgroundColor
-import org.wvt.horizonmgr.ui.theme.PreviewTheme
 import kotlin.coroutines.resume
 
 data class PackageManagerItem(

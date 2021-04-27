@@ -45,8 +45,6 @@ import org.wvt.horizonmgr.ui.pacakgemanager.PackageManagerViewModel
 import org.wvt.horizonmgr.ui.theme.LocalThemeConfig
 import org.wvt.horizonmgr.ui.theme.PreviewTheme
 
-@Deprecated("Deprecated")
-val LocalSelectedPackageUUID = staticCompositionLocalOf<String?> { null }
 val LocalDrawerState = staticCompositionLocalOf<DrawerState> { error("No local drawer provided") }
 
 @Composable
@@ -125,10 +123,7 @@ fun Home(
             )
         }
     ) {
-        CompositionLocalProvider(
-            LocalDrawerState provides drawerState,
-            LocalSelectedPackageUUID provides selectedPackageUUID
-        ) {
+        CompositionLocalProvider(LocalDrawerState provides drawerState) {
             Crossfade(targetState = homeVM.currentScreen) { cs ->
                 when (cs) {
                     HomeViewModel.Screen.HOME -> News(
