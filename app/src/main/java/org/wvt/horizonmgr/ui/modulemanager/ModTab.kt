@@ -45,7 +45,7 @@ internal fun ModTab(
         )
     }
 
-    LaunchedEffect(Unit) { vm.init() }
+    LaunchedEffect(Unit) { vm.refresh() }
 
     Crossfade(state) { state ->
         when (state) {

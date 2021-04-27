@@ -40,18 +40,12 @@ class ICLevelTabViewModel(dependencies: DependenciesContainer) : ViewModel() {
         class Error(val message: String) : State()
     }
 
-    fun init() {
-        if (!initialized) {
-            viewModelScope.launch(Dispatchers.IO) {
-                initialized = true
-                state.emit(State.Loading)
-                loadData()
-            }
-        }
-    }
-
     fun refresh() {
-        viewModelScope.launch(Dispatchers.IO) {
+        if (!initialized) viewModelScope.launch(Dispatchers.IO) {
+            initialized = true
+            state.emit(State.Loading)
+            loadData()
+        } else viewModelScope.launch(Dispatchers.IO) {
             isRefreshing.emit(true)
             loadData()
             isRefreshing.emit(false)

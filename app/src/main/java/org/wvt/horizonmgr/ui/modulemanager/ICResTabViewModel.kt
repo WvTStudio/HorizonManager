@@ -43,16 +43,12 @@ class ICResTabViewModel(dependencies: DependenciesContainer) : ViewModel() {
         val manifest: ResourcePackManifest
     )
 
-    fun init() {
+    fun refresh() {
         if (!initialized) viewModelScope.launch(Dispatchers.IO) {
             initialized = true
             state.emit(State.Loading)
             loadData()
-        }
-    }
-
-    fun refresh() {
-        viewModelScope.launch(Dispatchers.IO) {
+        } else viewModelScope.launch(Dispatchers.IO) {
             isRefreshing.emit(true)
             loadData()
             isRefreshing.emit(false)

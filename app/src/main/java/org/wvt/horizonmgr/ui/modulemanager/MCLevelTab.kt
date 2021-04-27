@@ -31,7 +31,7 @@ internal fun MCLevelTab(
     val isRefreshing by viewModel.isRefreshing.collectAsState()
     val inputDialogState = viewModel.inputDialogState
 
-    LaunchedEffect(Unit) { viewModel.init() }
+    LaunchedEffect(Unit) { viewModel.refresh() }
 
     val banner = @Composable {
         ErrorBanner(

@@ -39,7 +39,7 @@ internal fun ICLevelTab(
         )
     }
 
-    LaunchedEffect(Unit) { viewModel.init() }
+    LaunchedEffect(Unit) { viewModel.refresh() }
 
     Crossfade(state) {
         when (it) {

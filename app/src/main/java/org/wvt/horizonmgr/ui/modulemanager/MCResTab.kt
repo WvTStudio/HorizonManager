@@ -30,7 +30,7 @@ fun MCResTab(
     val progressState by viewModel.progressState.collectAsState()
     val isRefreshing by viewModel.isRefreshing.collectAsState()
 
-    LaunchedEffect(Unit) { viewModel.init() }
+    LaunchedEffect(Unit) { viewModel.refresh() }
 
     val banner = @Composable {
         ErrorBanner(
