@@ -2,12 +2,8 @@ package org.wvt.horizonmgr.ui.modulemanager
 
 import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.wvt.horizonmgr.DependenciesContainer
 
 class ModuleManagerViewModel(dependencies: DependenciesContainer) : ViewModel() {
