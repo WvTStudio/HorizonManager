@@ -77,7 +77,8 @@ fun PackageManager(
                     IconButton(onClick = onNavClick) { Icon(Icons.Filled.Menu, "菜单") }
                 }, backgroundColor = AppBarBackgroundColor,
                 actions = {
-                    Box {
+                    // TODO: 2021/4/27 Retain this for future features.
+                    /*Box {
                         // Menu Icon
                         IconButton(onClick = { showMenu = true }) {
                             Icon(Icons.Filled.MoreVert, "更多")
@@ -92,7 +93,7 @@ fun PackageManager(
                                 showMenu = false
                             }) { Text("刷新") }
                         }
-                    }
+                    }*/
                 }
             )
 
