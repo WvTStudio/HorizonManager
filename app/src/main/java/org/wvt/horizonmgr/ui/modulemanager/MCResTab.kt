@@ -14,6 +14,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.SwipeRefreshIndicator
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import org.wvt.horizonmgr.ui.components.*
 
 @Composable
@@ -25,11 +28,9 @@ fun MCResTab(
     val packs by viewModel.resPacks.collectAsState()
     val errors by viewModel.errors.collectAsState()
     val progressState by viewModel.progressState.collectAsState()
+    val isRefreshing by viewModel.isRefreshing.collectAsState()
 
-    DisposableEffect(Unit) {
-        viewModel.load()
-        onDispose { }
-    }
+    LaunchedEffect(Unit) { viewModel.init() }
 
     val banner = @Composable {
         ErrorBanner(
@@ -42,30 +43,50 @@ fun MCResTab(
     Box(Modifier.fillMaxSize()) {
         Crossfade(targetState = state) {
             when (it) {
-                MCResTabViewModel.State.Done -> {
-                    if (packs.isEmpty()) Box(Modifier.fillMaxSize()) {
-                        EmptyPage(Modifier.fillMaxSize()) {
-                            Text("没有找到资源包")
+                MCResTabViewModel.State.Done -> Box(Modifier.fillMaxSize()) {
+                    SwipeRefresh(
+                        state = rememberSwipeRefreshState(isRefreshing),
+                        onRefresh = viewModel::refresh,
+                        indicator = { state, distance ->
+                            SwipeRefreshIndicator(
+                                state = state,
+                                refreshTriggerDistance = distance,
+                                contentColor = MaterialTheme.colors.primary
+                            )
                         }
-                        banner()
-                    } else {
+                    ) {
                         LazyColumn(modifier = Modifier.fillMaxSize()) {
-                            item { banner() }
-                            item { Spacer(Modifier.height(8.dp)) }
-                            itemsIndexed(packs) { index, item ->
-                                ResItem(
-                                    modifier = Modifier
-                                        .padding(horizontal = 16.dp, vertical = 8.dp)
-                                        .fillParentMaxWidth(),
-                                    icon = item.iconPath,
-                                    name = item.manifest.header.name,
-                                    description = item.manifest.header.description,
-                                    onClick = {}
-                                )
+                            if (packs.isEmpty()) item {
+                                Box(Modifier.fillParentMaxSize()) {
+                                    EmptyPage(Modifier.fillMaxSize()) {
+                                        Text("没有找到资源包")
+                                    }
+                                    banner()
+                                }
+                            } else {
+                                item { banner() }
+                                item { Spacer(Modifier.height(8.dp)) }
+                                itemsIndexed(packs) { index, item ->
+                                    ResItem(
+                                        modifier = Modifier
+                                            .padding(horizontal = 16.dp, vertical = 8.dp)
+                                            .fillParentMaxWidth(),
+                                        icon = item.iconPath,
+                                        name = item.manifest.header.name,
+                                        description = item.manifest.header.description,
+                                        onClick = {}
+                                    )
+                                }
+                                item { Spacer(Modifier.height(24.dp)) }
                             }
-                            item { Spacer(Modifier.height(24.dp)) }
                         }
                     }
+                    FloatingActionButton(
+                        modifier = Modifier
+                            .padding(16.dp)
+                            .align(Alignment.BottomEnd),
+                        onClick = onAddButtonClick
+                    ) { Icon(Icons.Default.Add, "Add") }
                 }
                 MCResTabViewModel.State.Loading -> Box(Modifier.fillMaxSize()) {
                     CircularProgressIndicator(
@@ -75,17 +96,10 @@ fun MCResTab(
                 is MCResTabViewModel.State.Error -> ErrorPage(
                     modifier = Modifier.fillMaxSize(),
                     message = { Text(text = it.message) },
-                    onRetryClick = { viewModel.load() }
+                    onRetryClick = { viewModel.refresh() }
                 )
             }
         }
-        FloatingActionButton(
-            modifier = Modifier
-                .padding(16.dp)
-                .align(Alignment.BottomEnd),
-            onClick = onAddButtonClick
-        ) { Icon(Icons.Default.Add, "Add") }
-
         progressState?.let {
             ProgressDialog(onCloseRequest = { viewModel.dismissProgressDialog() }, state = it)
         }

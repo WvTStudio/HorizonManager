@@ -20,7 +20,18 @@ private const val TAG = "ICLevelTabVM"
 
 class ICLevelTabViewModel(dependencies: DependenciesContainer) : ViewModel() {
     private val manager = dependencies.manager
+    private val localCache = dependencies.localCache
     private val levelTransporter = dependencies.levelTransporter
+    private var cachedLevels = emptyMap<LevelInfo, MCLevel>()
+    private var pack: InstalledPackage? = null
+    private var initialized = false
+
+    val state = MutableStateFlow<State>(State.Loading)
+    val levels = MutableStateFlow<List<LevelInfo>>(emptyList())
+    val errors = MutableStateFlow<List<String>>(emptyList())
+    val progressState = MutableStateFlow<ProgressDialogState?>(null)
+    val inputDialogState = InputDialogHostState()
+    val isRefreshing = MutableStateFlow(false)
 
     sealed class State {
         object Loading : State()
@@ -29,65 +40,62 @@ class ICLevelTabViewModel(dependencies: DependenciesContainer) : ViewModel() {
         class Error(val message: String) : State()
     }
 
-    val state = MutableStateFlow<State>(State.Loading)
-
-    val levels = MutableStateFlow<List<LevelInfo>>(emptyList())
-    val errors = MutableStateFlow<List<String>>(emptyList())
-
-    private var cachedLevels = emptyMap<LevelInfo, MCLevel>()
-
-    private var pack: InstalledPackage? = null
-
-    val progressState = MutableStateFlow<ProgressDialogState?>(null)
-    val inputDialogState = InputDialogHostState()
-
-    fun setPackage(uuid: String?) {
-        Log.d(TAG, "New package: $uuid")
-        viewModelScope.launch {
-            if (uuid == null) {
-                state.emit(State.PackageNotSelected)
-            } else {
-                pack = manager.getInstalledPackage(uuid)
-                if (pack == null) {
-                    state.emit(State.Error("您选择的分包可能已被移动或删除"))
-                }
+    fun init() {
+        if (!initialized) {
+            viewModelScope.launch(Dispatchers.IO) {
+                initialized = true
+                state.emit(State.Loading)
+                loadData()
             }
         }
     }
 
-    fun load() {
+    fun refresh() {
         viewModelScope.launch(Dispatchers.IO) {
-            pack?.let { pack ->
-                state.emit(State.Loading)
-                val result = try {
-                    pack.getLevelManager().getLevels()
-                } catch (e: Exception) {
-                    // TODO 显示错误信息
-                    Log.e(TAG, "获取 IC 存档失败", e)
-                    state.emit(State.Error("获取存档失败"))
-                    return@launch
-                }
-                val mappedErrors = result.errors.map {
-                    "${it.file.absolutePath}: ${it.error.message ?: "未知错误"}"
-                }
-                val mapped = mutableMapOf<LevelInfo, MCLevel>().apply {
-                    try {
-                        result.levels.forEach {
-                            put(it.getInfo(), it)
-                        }
-                    } catch (e: Exception) {
-                        Log.e(TAG, "获取存档信息失败", e)
-                        // TODO: 2021/3/3 显示错误信息
-                        state.emit(State.Error("获取存档信息失败"))
-                        return@launch
-                    }
-                }.toMap()
-                cachedLevels = mapped
-                errors.emit(mappedErrors)
-                levels.emit(mapped.keys.toList())
-                state.emit(State.OK)
-            }
+            isRefreshing.emit(true)
+            loadData()
+            isRefreshing.emit(false)
         }
+    }
+
+    private suspend fun loadData() {
+        val selectedUUID = localCache.getSelectedPackageUUID()
+        if (selectedUUID == null) {
+            state.emit(State.PackageNotSelected)
+            return
+        }
+        val pack = manager.getInstalledPackage(selectedUUID)
+        if (pack == null) {
+            state.emit(State.Error("您选择的分包可能已被移动或删除"))
+            return
+        }
+        val result = try {
+            pack.getLevelManager().getLevels()
+        } catch (e: Exception) {
+            // TODO 显示错误信息
+            Log.e(TAG, "获取 IC 存档失败", e)
+            state.emit(State.Error("获取存档失败"))
+            return
+        }
+        val mappedErrors = result.errors.map {
+            "${it.file.absolutePath}: ${it.error.message ?: "未知错误"}"
+        }
+        val mapped = mutableMapOf<LevelInfo, MCLevel>().apply {
+            try {
+                result.levels.forEach {
+                    put(it.getInfo(), it)
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "获取存档信息失败", e)
+                // TODO: 2021/3/3 显示错误信息
+                state.emit(State.Error("获取存档信息失败"))
+                return
+            }
+        }.toMap()
+        cachedLevels = mapped
+        errors.emit(mappedErrors)
+        levels.emit(mapped.keys.toList())
+        state.emit(State.OK)
     }
 
     fun deleteLevel(item: LevelInfo) {
@@ -105,7 +113,7 @@ class ICLevelTabViewModel(dependencies: DependenciesContainer) : ViewModel() {
                 return@launch
             }
             progressState.emit(ProgressDialogState.Finished("删除完成"))
-            load()
+            refresh()
         }
     }
 
@@ -138,7 +146,7 @@ class ICLevelTabViewModel(dependencies: DependenciesContainer) : ViewModel() {
                     return@launch
                 }
                 progressState.emit(ProgressDialogState.Finished("重命名成功"))
-                load()
+                refresh()
             }
         }
     }
@@ -180,7 +188,7 @@ class ICLevelTabViewModel(dependencies: DependenciesContainer) : ViewModel() {
                 return@launch
             }
             progressState.emit(ProgressDialogState.Finished("移动成功"))
-            load()
+            refresh()
         }
     }
 
@@ -213,7 +221,10 @@ class ICLevelTabViewModel(dependencies: DependenciesContainer) : ViewModel() {
                     task.await()
                 } catch (e: Exception) {
                     progressState.emit(ProgressDialogState.Failed("安装失败", "安装时出现错误", e.message))
+                    return@launch
                 }
+                progressState.emit(ProgressDialogState.Finished("安装成功"))
+                refresh()
             } catch (e: Exception) {
                 progressState.emit(ProgressDialogState.Failed("安装失败", "出现未知错误", e.message))
             }

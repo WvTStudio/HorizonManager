@@ -23,9 +23,19 @@ class ModTabViewModel(dependencies: DependenciesContainer) : ViewModel() {
     private val localCache = dependencies.localCache
 
     private var selectedPackage: InstalledPackage? = null
-
     private val _progressState = MutableStateFlow<ProgressDialogState?>(null)
+    private val _state = MutableStateFlow<State>(State.Loading)
+    private val _mods = MutableStateFlow(emptyList<ModEntry>())
+    private var map: Map<ModEntry, InstalledMod> = emptyMap()
+
+    private var initialized = false
+
+    val errors = MutableStateFlow<List<String>>(emptyList())
     val progressState: StateFlow<ProgressDialogState?> = _progressState
+    val mods: StateFlow<List<ModEntry>> = _mods
+    val state: StateFlow<State> = _state
+    val newEnabledMods = MutableStateFlow<Set<ModEntry>>(emptySet())
+    val isRefreshing = MutableStateFlow(false)
 
     data class ModEntry(
         val id: String,
@@ -34,15 +44,6 @@ class ModTabViewModel(dependencies: DependenciesContainer) : ViewModel() {
         val iconPath: String?
     )
 
-    private val _mods = MutableStateFlow(emptyList<ModEntry>())
-    val mods: StateFlow<List<ModEntry>> = _mods
-
-    private var map: Map<ModEntry, InstalledMod> = emptyMap()
-    val newEnabledMods = MutableStateFlow<Set<ModEntry>>(emptySet())
-
-    // TODO: 2021/3/12 考虑细分错误类型
-    val errors = MutableStateFlow<List<String>>(emptyList())
-
     sealed class State {
         object Loading : State()
         object PackageNotSelected : State()
@@ -50,58 +51,70 @@ class ModTabViewModel(dependencies: DependenciesContainer) : ViewModel() {
         class Error(val message: String) : State()
     }
 
-    private val _state = MutableStateFlow<State>(State.Loading)
-    val state: StateFlow<State> = _state
 
-    fun load() {
-        viewModelScope.launch(Dispatchers.IO) {
+    fun init() {
+        if (!initialized) viewModelScope.launch(Dispatchers.IO) {
+            initialized = true
             _state.emit(State.Loading)
-            val pkg = localCache.getSelectedPackageUUID()?.let { uuid ->
-                manager.getInstalledPackage(uuid)
-            }
-            if (pkg != null) {
-                val mods = try {
-                    pkg.getMods()
-                } catch (e: Exception) {
-                    _state.emit(State.Error("获取模组列表出错"))
-                    return@launch
-                }
-
-                val enabled = mutableSetOf<ModEntry>()
-                val result = mutableListOf<ModEntry>()
-                val mMap = mutableMapOf<ModEntry, InstalledMod>()
-
-                val exceptions = mutableListOf<String>()
-
-                mods.forEach { mod ->
-                    try {
-                        val modInfo = mod.getModInfo()
-                        val entry = ModEntry(
-                            mod.modDir.absolutePath,
-                            modInfo.name,
-                            modInfo.description,
-                            mod.iconFile?.absolutePath
-                        )
-                        result.add(entry)
-                        mMap[entry] = mod
-                        if (mod.isEnabled()) {
-                            enabled.add(entry)
-                        }
-                    } catch (e: Exception) {
-                        exceptions.add("${mod.modDir.path}: ${e.message ?: "未知错误"}")
-                        Log.e(TAG, "Mod 解析错误", e)
-                    }
-                }
-                selectedPackage = pkg
-                _mods.emit(result)
-                newEnabledMods.emit(enabled)
-                map = mMap
-                _state.emit(State.OK)
-                errors.emit(exceptions)
-            } else {
-                _state.emit(State.PackageNotSelected)
-            }
+            loadData()
         }
+    }
+
+    fun refresh() {
+        viewModelScope.launch {
+            isRefreshing.emit(true)
+            loadData()
+            isRefreshing.emit(false)
+        }
+    }
+
+    private suspend fun loadData() {
+        val pkg = localCache.getSelectedPackageUUID()?.let { uuid ->
+            manager.getInstalledPackage(uuid)
+        }
+        if (pkg != null) {
+            val mods = try {
+                pkg.getMods()
+            } catch (e: Exception) {
+                _state.emit(State.Error("获取模组列表出错"))
+                return
+            }
+
+            val enabled = mutableSetOf<ModEntry>()
+            val result = mutableListOf<ModEntry>()
+            val mMap = mutableMapOf<ModEntry, InstalledMod>()
+
+            val exceptions = mutableListOf<String>()
+
+            mods.forEach { mod ->
+                try {
+                    val modInfo = mod.getModInfo()
+                    val entry = ModEntry(
+                        mod.modDir.absolutePath,
+                        modInfo.name,
+                        modInfo.description,
+                        mod.iconFile?.absolutePath
+                    )
+                    result.add(entry)
+                    mMap[entry] = mod
+                    if (mod.isEnabled()) {
+                        enabled.add(entry)
+                    }
+                } catch (e: Exception) {
+                    exceptions.add("${mod.modDir.path}: ${e.message ?: "未知错误"}")
+                    Log.e(TAG, "Mod 解析错误", e)
+                }
+            }
+            selectedPackage = pkg
+            _mods.emit(result)
+            newEnabledMods.emit(enabled)
+            map = mMap
+            _state.emit(State.OK)
+            errors.emit(exceptions)
+        } else {
+            _state.emit(State.PackageNotSelected)
+        }
+
     }
 
     fun enableMod(mod: ModEntry) {
@@ -137,7 +150,7 @@ class ModTabViewModel(dependencies: DependenciesContainer) : ViewModel() {
                 Log.e(TAG, "deleteMod: Error", e)
                 return@launch
             }
-            load()
+            refresh()
             _progressState.value = ProgressDialogState.Finished("删除成功")
         }
     }

@@ -35,20 +35,6 @@ fun ModuleManager(
     onAddMCTextureClick: () -> Unit
 ) {
     val selectedTab by managerViewModel.selectedTab.collectAsState()
-    val pkgId = LocalSelectedPackageUUID.current
-
-    DisposableEffect(pkgId) {
-        moduleViewModel.load()
-
-        icLevelViewModel.setPackage(pkgId)
-        icLevelViewModel.load()
-        onDispose {}
-    }
-
-    DisposableEffect(Unit) {
-        mcLevelViewModel.load()
-        onDispose { }
-    }
 
     Column {
         CustomAppBar(

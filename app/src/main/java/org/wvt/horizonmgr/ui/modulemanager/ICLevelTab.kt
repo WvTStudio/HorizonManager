@@ -7,11 +7,16 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.SwipeRefreshIndicator
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import org.wvt.horizonmgr.ui.components.*
 
 @Composable
@@ -24,6 +29,7 @@ internal fun ICLevelTab(
     val progressState by viewModel.progressState.collectAsState()
     val inputDialogState = viewModel.inputDialogState
     val errors by viewModel.errors.collectAsState()
+    val isRefreshing by viewModel.isRefreshing.collectAsState()
 
     val banner = @Composable {
         ErrorBanner(
@@ -33,10 +39,7 @@ internal fun ICLevelTab(
         )
     }
 
-    DisposableEffect(Unit) {
-        viewModel.load()
-        onDispose { }
-    }
+    LaunchedEffect(Unit) { viewModel.init() }
 
     Crossfade(state) {
         when (it) {
@@ -51,30 +54,45 @@ internal fun ICLevelTab(
                 }
             }
             ICLevelTabViewModel.State.OK -> Box(Modifier.fillMaxSize()) {
-                if (levels.isEmpty()) {
-                    Box(Modifier.fillMaxSize()) {
-                        EmptyPage(Modifier.fillMaxSize()) {
-                            Text("当前还没有地图")
-                        }
-                        banner()
-                    }
-                } else LazyColumn(
+                SwipeRefresh(
                     modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(bottom = 64.dp)
-                ) {
-                    item {
-                        banner()
-                    }
-                    itemsIndexed(items = levels) { _, item ->
-                        LevelItem(
-                            modifier = Modifier.padding(16.dp),
-                            levelName = item.name,
-                            screenshot = item.screenshot,
-                            onRenameClicked = { viewModel.renameLevel(item) },
-                            onDeleteClicked = { viewModel.deleteLevel(item) },
-                            onCopyClick = { viewModel.copy(item) },
-                            onMoveClick = { viewModel.move(item) }
+                    state = rememberSwipeRefreshState(isRefreshing),
+                    onRefresh = viewModel::refresh,
+                    indicator = { state, distance ->
+                        SwipeRefreshIndicator(
+                            state = state,
+                            refreshTriggerDistance = distance,
+                            contentColor = MaterialTheme.colors.primary
                         )
+                    }
+                ) {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(bottom = 64.dp)
+                    ) {
+                        if (levels.isEmpty()) item {
+                            Box(Modifier.fillParentMaxSize()) {
+                                EmptyPage(Modifier.fillMaxSize()) {
+                                    Text("当前还没有地图")
+                                }
+                                banner()
+                            }
+                        } else {
+                            item {
+                                banner()
+                            }
+                            itemsIndexed(items = levels) { _, item ->
+                                LevelItem(
+                                    modifier = Modifier.padding(16.dp),
+                                    levelName = item.name,
+                                    screenshot = item.screenshot,
+                                    onRenameClicked = { viewModel.renameLevel(item) },
+                                    onDeleteClicked = { viewModel.deleteLevel(item) },
+                                    onCopyClick = { viewModel.copy(item) },
+                                    onMoveClick = { viewModel.move(item) }
+                                )
+                            }
+                        }
                     }
                 }
                 FloatingActionButton(
@@ -89,7 +107,7 @@ internal fun ICLevelTab(
             is ICLevelTabViewModel.State.Error -> ErrorPage(
                 modifier = Modifier.fillMaxSize(),
                 message = { Text(it.message) },
-                onRetryClick = { viewModel.load() }
+                onRetryClick = { viewModel.refresh() }
             )
         }
     }

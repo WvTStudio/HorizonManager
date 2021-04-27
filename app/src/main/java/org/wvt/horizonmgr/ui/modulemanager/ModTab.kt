@@ -14,13 +14,15 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.SwipeRefreshIndicator
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import org.wvt.horizonmgr.ui.components.*
 
 @Composable
@@ -33,10 +35,17 @@ internal fun ModTab(
     val mods by vm.mods.collectAsState()
     val enabledMods by vm.newEnabledMods.collectAsState()
     val errors by vm.errors.collectAsState()
+    val isRefreshing by vm.isRefreshing.collectAsState()
 
     val banner = @Composable {
-        ErrorBanner(modifier = Modifier.fillMaxWidth(), errors = errors, text = "解析模组时发生 ${errors.size} 个错误")
+        ErrorBanner(
+            modifier = Modifier.fillMaxWidth(),
+            errors = errors,
+            text = "解析模组时发生 ${errors.size} 个错误"
+        )
     }
+
+    LaunchedEffect(Unit) { vm.init() }
 
     Crossfade(state) { state ->
         when (state) {
@@ -51,36 +60,51 @@ internal fun ModTab(
                 }
             }
             is ModTabViewModel.State.OK -> Box(Modifier.fillMaxSize()) {
-                if (mods.isEmpty()) {
-                    EmptyPage(Modifier.fillMaxSize()) {
-                        Text("当前分包内没有已安装的模组")
+                SwipeRefresh(
+                    modifier = Modifier.fillMaxSize(),
+                    state = rememberSwipeRefreshState(isRefreshing),
+                    onRefresh = vm::refresh,
+                    indicator = { state, distance ->
+                        SwipeRefreshIndicator(
+                            state = state,
+                            refreshTriggerDistance = distance,
+                            contentColor = MaterialTheme.colors.primary
+                        )
                     }
-                    banner()
-                } else {
-                    LazyColumn {
-                        item { banner() }
-                        item { Spacer(Modifier.height(8.dp)) }
-                        itemsIndexed(items = mods) { _, item ->
-                            ModItem(
-                                modifier = Modifier.padding(
-                                    horizontal = 16.dp,
-                                    vertical = 8.dp
-                                ),
-                                enable = enabledMods.contains(item),
-                                title = item.name,
-                                text = item.description,
-                                iconPath = item.iconPath,
-                                selected = false,
-                                onLongClick = {},
-                                onEnabledChange = {
-                                    if (it) vm.enableMod(item)
-                                    else vm.disableMod(item)
-                                },
-                                onClick = {/* TODO 显示 Mod 详情 */ },
-                                onDeleteClick = { vm.deleteMod(item) }
-                            )
+                ) {
+                    LazyColumn(modifier = Modifier.fillMaxSize()) {
+                        if (mods.isEmpty()) item {
+                            Box(Modifier.fillParentMaxSize()) {
+                                EmptyPage(Modifier.fillMaxSize()) {
+                                    Text("当前分包内没有已安装的模组")
+                                }
+                                banner()
+                            }
+                        } else {
+                            item { banner() }
+                            item { Spacer(Modifier.height(8.dp)) }
+                            itemsIndexed(items = mods) { _, item ->
+                                ModItem(
+                                    modifier = Modifier.padding(
+                                        horizontal = 16.dp,
+                                        vertical = 8.dp
+                                    ),
+                                    enable = enabledMods.contains(item),
+                                    title = item.name,
+                                    text = item.description,
+                                    iconPath = item.iconPath,
+                                    selected = false,
+                                    onLongClick = {},
+                                    onEnabledChange = {
+                                        if (it) vm.enableMod(item)
+                                        else vm.disableMod(item)
+                                    },
+                                    onClick = {/* TODO 显示 Mod 详情 */ },
+                                    onDeleteClick = { vm.deleteMod(item) }
+                                )
+                            }
+                            item { Spacer(Modifier.height(64.dp)) }
                         }
-                        item { Spacer(Modifier.height(64.dp)) }
                     }
                 }
                 FloatingActionButton(
@@ -92,7 +116,7 @@ internal fun ModTab(
             }
             is ModTabViewModel.State.Error -> ErrorPage(
                 message = { Text("解析模组列表失败") },
-                onRetryClick = { vm.load() }
+                onRetryClick = { vm.refresh() }
             )
         }
         ps?.let {

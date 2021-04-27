@@ -21,11 +21,13 @@ private const val TAG = "MCResTabVM"
 class MCResTabViewModel(dependencies: DependenciesContainer) : ViewModel() {
     private val resManager = dependencies.mcResourcePackManager
 
+    private var initialized = false
+
     val resPacks = MutableStateFlow<List<ResPack>>(emptyList())
     val errors = MutableStateFlow<List<String>>(emptyList())
     val state = MutableStateFlow<State>(State.Loading)
-
     val progressState = MutableStateFlow<ProgressDialogState?>(null)
+    val isRefreshing = MutableStateFlow(false)
 
     sealed class State {
         object Loading : State()
@@ -38,34 +40,47 @@ class MCResTabViewModel(dependencies: DependenciesContainer) : ViewModel() {
         val manifest: ResourcePackManifest
     )
 
-    fun load() {
-        viewModelScope.launch(Dispatchers.IO) {
+    fun init() {
+        if (!initialized) viewModelScope.launch(Dispatchers.IO) {
+            initialized = true
             state.emit(State.Loading)
-            val result = try {
-                resManager.getPackages()
-            } catch (e: Exception) {
-                Log.e(TAG, "获取资源包失败", e)
-                state.emit(State.Error("获取资源包失败"))
-                return@launch
-            }
-            val mappedErrors = result.errors.map {
-                "${it.file.absolutePath}: ${it.error.message ?: "未知错误"}"
-            }
-            val packs = result.resPacks.map {
-                try {
-                    ResPack(it.getIcon()?.absolutePath, it.getManifest())
-                } catch (e: Exception) {
-                    // 这一步只有可能出现在解析过程中文件被更改
-                    Log.e(TAG, "获取资源包信息失败", e)
-                    state.emit(State.Error("获取资源包信息失败"))
-                    return@launch
-                }
-            }
-
-            resPacks.emit(packs)
-            errors.emit(mappedErrors)
-            state.emit(State.Done)
+            loadData()
         }
+    }
+
+    fun refresh() {
+        viewModelScope.launch(Dispatchers.IO) {
+            isRefreshing.emit(true)
+            loadData()
+            isRefreshing.emit(false)
+        }
+    }
+
+    private suspend fun loadData() {
+        val result = try {
+            resManager.getPackages()
+        } catch (e: Exception) {
+            Log.e(TAG, "获取资源包失败", e)
+            state.emit(State.Error("获取资源包失败"))
+            return
+        }
+        val mappedErrors = result.errors.map {
+            "${it.file.absolutePath}: ${it.error.message ?: "未知错误"}"
+        }
+        val packs = result.resPacks.map {
+            try {
+                ResPack(it.getIcon()?.absolutePath, it.getManifest())
+            } catch (e: Exception) {
+                // 这一步只有可能出现在解析过程中文件被更改
+                Log.e(TAG, "获取资源包信息失败", e)
+                state.emit(State.Error("获取资源包信息失败"))
+                return
+            }
+        }
+
+        resPacks.emit(packs)
+        errors.emit(mappedErrors)
+        state.emit(State.Done)
     }
 
     fun selectedFileToInstall(path: String) {
@@ -94,7 +109,7 @@ class MCResTabViewModel(dependencies: DependenciesContainer) : ViewModel() {
                 } finally {
                     progressJob.cancel()
                 }
-                load()
+                refresh()
                 progressState.emit(ProgressDialogState.Finished("安装完成"))
             } catch (e: Exception) {
                 progressState.emit(ProgressDialogState.Failed("安装失败", "出现未知错误", e.message))
