@@ -146,4 +146,12 @@ class MgrInfoModule {
 
         return null
     }
+
+    fun getWechatQRCodeURL(): String {
+        return "https://adodoz.cn/hzmgr/v2/donate/donate_qr_wechat.png"
+    }
+
+    fun getAlipayQRCodeURL(): String {
+        return "https://adodoz.cn/hzmgr/v2/donate/donate_qr_alipay.png"
+    }
 }

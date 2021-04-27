@@ -1,6 +1,7 @@
 package org.wvt.horizonmgr.ui.donate
 
 import android.util.Log
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
@@ -28,6 +29,9 @@ class DonateViewModel(
 
     private val _donates = MutableStateFlow(emptySet<DonateItem>())
     val donates: StateFlow<Set<DonateItem>> = _donates.asStateFlow()
+
+    val alipayQrCodeURL = mgrInfo.getAlipayQRCodeURL()
+    val wechatQrCodeURL = mgrInfo.getWechatQRCodeURL()
 
     fun refresh() {
         viewModelScope.launch(Dispatchers.IO) {
