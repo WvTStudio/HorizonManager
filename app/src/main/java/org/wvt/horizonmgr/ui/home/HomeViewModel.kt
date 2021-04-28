@@ -1,4 +1,4 @@
-package org.wvt.horizonmgr.ui.news
+package org.wvt.horizonmgr.ui.home
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
@@ -9,7 +9,7 @@ import kotlinx.coroutines.launch
 import org.wvt.horizonmgr.DependenciesContainer
 import java.text.SimpleDateFormat
 
-class NewsViewModel(
+class HomeViewModel(
     dependencies: DependenciesContainer
 ) : ViewModel() {
     companion object {
@@ -18,14 +18,14 @@ class NewsViewModel(
 
     private val articleModule = dependencies.article
 
-    sealed class News {
+    sealed class ContentResource {
         data class Article(
             val id: String,
             val title: String,
             val brief: String,
             val coverUrl: String?,
             val updateTime: String
-        ) : News()
+        ) : ContentResource()
     }
 
     sealed class State {
@@ -36,7 +36,7 @@ class NewsViewModel(
 
     private var initiate = false
 
-    val news = MutableStateFlow(emptyList<News>())
+    val contentResources = MutableStateFlow(emptyList<ContentResource>())
 
     val state: MutableStateFlow<State> = MutableStateFlow(State.Loading)
     val isRefreshing = MutableStateFlow(false)
@@ -64,7 +64,7 @@ class NewsViewModel(
     private suspend fun loadData() {
         val result = try {
             articleModule.getRecommendedArticle().map {
-                News.Article(
+                ContentResource.Article(
                     it.id,
                     it.title,
                     it.brief,
@@ -74,10 +74,10 @@ class NewsViewModel(
             }
         } catch (e: Exception) {
             state.emit(State.Error(e))
-            Log.e(TAG, "Failed to refresh news", e)
+            Log.e(TAG, "Failed to refresh content resources", e)
             return
         }
-        news.emit(result)
+        contentResources.emit(result)
         state.emit(State.Succeed)
     }
 }

@@ -50,7 +50,7 @@
         <activity
             android:configChanges="uiMode" android:name=".ui.community.CommunityActivity" />
         <activity
-            android:configChanges="uiMode" android:name=".ui.news.NewsContentActivity" />
+            android:configChanges="uiMode" android:name=".ui.article.ArticleContentActivity" />
         <activity
             android:configChanges="uiMode" android:name=".ui.onlinemoddetail.OnlineModDetailActivity" />
         <activity

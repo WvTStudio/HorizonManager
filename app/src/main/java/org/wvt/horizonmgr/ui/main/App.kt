@@ -12,7 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import org.wvt.horizonmgr.ui.downloaded.DMViewModel
 import org.wvt.horizonmgr.ui.modulemanager.*
-import org.wvt.horizonmgr.ui.news.NewsViewModel
+import org.wvt.horizonmgr.ui.home.HomeViewModel
 import org.wvt.horizonmgr.ui.onlinemods.OnlineModsViewModel
 import org.wvt.horizonmgr.ui.pacakgemanager.PackageManagerViewModel
 import org.wvt.horizonmgr.ui.theme.AndroidHorizonManagerTheme
@@ -21,8 +21,8 @@ import org.wvt.horizonmgr.ui.theme.PreviewTheme
 @Composable
 fun App(
     mainVM: MainViewModel,
+    rootVM: RootViewModel,
     homeVM: HomeViewModel,
-    newsVM: NewsViewModel,
     modTabVM: ModTabViewModel,
     icLevelTabVM: ICLevelTabViewModel,
     icResTabVM: ICResTabViewModel,
@@ -78,8 +78,8 @@ fun App(
     AndroidHorizonManagerTheme {
         Surface(color = MaterialTheme.colors.background) {
             if (mainVM.initialized) Home(
+                rootVM = rootVM,
                 homeVM = homeVM,
-                newsVM = newsVM,
                 modTabVM = modTabVM,
                 icLevelTabVM = icLevelTabVM,
                 icResTabVM = icResTabVM,

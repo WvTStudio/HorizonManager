@@ -1,4 +1,4 @@
-package org.wvt.horizonmgr.ui.news
+package org.wvt.horizonmgr.ui.article
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
@@ -11,13 +11,13 @@ import org.wvt.horizonmgr.webapi.NetworkException
 
 private const val TAG = "NewsContentViewModel"
 
-class NewsContentViewModel(
+class ArticleContentViewModel(
     dependencies: DependenciesContainer
 ) : ViewModel() {
     private val article = dependencies.article
     private var articleId: String = ""
 
-    data class NewsContent(
+    data class ArticleContent(
         val title: String,
         val brief: String,
         val coverImage: String?,
@@ -26,9 +26,9 @@ class NewsContentViewModel(
 
     sealed class Result {
         object Loading : Result()
-        class Succeed(val value: NewsContent) : Result()
+        class Succeed(val value: ArticleContent) : Result()
         object NetworkError : Result()
-        object NewsNotFound : Result()
+        object ArticleNotFound : Result()
         object OtherError : Result()
     }
 
@@ -58,20 +58,20 @@ class NewsContentViewModel(
             article.getArticle(articleId)
         } catch (e: NetworkException) {
             content.emit(Result.NetworkError)
-            Log.e(TAG, "获取新闻内容时出现网络错误", e)
+            Log.e(TAG, "获取文章内容时出现网络错误", e)
             return
         } catch (e: Exception) {
             content.emit(Result.OtherError)
-            Log.e(TAG, "获取新闻内容时出现未知错误", e)
+            Log.e(TAG, "获取文章内容时出现未知错误", e)
             return
         }
         if (result == null) {
-            content.emit(Result.NewsNotFound)
+            content.emit(Result.ArticleNotFound)
             return
         }
         content.emit(
             Result.Succeed(
-                NewsContent(
+                ArticleContent(
                     coverImage = result.coverImage,
                     title = result.title,
                     brief = result.brief,

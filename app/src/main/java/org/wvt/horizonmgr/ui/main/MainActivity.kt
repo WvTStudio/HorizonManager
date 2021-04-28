@@ -22,8 +22,8 @@ import org.wvt.horizonmgr.ui.fileselector.FileSelectorResultContract
 import org.wvt.horizonmgr.ui.joingroup.JoinGroupActivity
 import org.wvt.horizonmgr.ui.login.LoginResultContract
 import org.wvt.horizonmgr.ui.modulemanager.*
-import org.wvt.horizonmgr.ui.news.NewsContentActivityContract
-import org.wvt.horizonmgr.ui.news.NewsViewModel
+import org.wvt.horizonmgr.ui.article.ArticleContentActivityContract
+import org.wvt.horizonmgr.ui.home.HomeViewModel
 import org.wvt.horizonmgr.ui.onlineinstall.InstallPackageResultContract
 import org.wvt.horizonmgr.ui.onlinemods.OnlineModsViewModel
 import org.wvt.horizonmgr.ui.pacakgemanager.PackageDetailActivity
@@ -37,8 +37,8 @@ class MainActivity : AppCompatActivity() {
     private val factory by lazy { defaultViewModelFactory }
 
     private val mainVM: MainViewModel by viewModels { factory }
+    private val rootVM: RootViewModel by viewModels { factory }
     private val homeVM: HomeViewModel by viewModels { factory }
-    private val newsVM: NewsViewModel by viewModels { factory }
     private val modTabVM: ModTabViewModel by viewModels { factory }
     private val icLevelTabVM: ICLevelTabViewModel by viewModels { factory }
     private val icResTabVM: ICResTabViewModel by viewModels { factory }
@@ -49,7 +49,7 @@ class MainActivity : AppCompatActivity() {
     private val onlineModsVM: OnlineModsViewModel by viewModels { factory }
     private val mcResVM: MCResTabViewModel by viewModels { factory }
 
-    private val newsDetail = registerForActivityResult(NewsContentActivityContract()) {}
+    private val newsDetail = registerForActivityResult(ArticleContentActivityContract()) {}
 
     private val login = registerForActivityResult(LoginResultContract()) {
         mainVM.setUserInfo(it)
@@ -221,8 +221,8 @@ class MainActivity : AppCompatActivity() {
         setContent {
             App(
                 mainVM = mainVM,
+                rootVM = rootVM,
                 homeVM = homeVM,
-                newsVM = newsVM,
                 modTabVM = modTabVM,
                 icLevelTabVM = icLevelTabVM,
                 icResTabVM = icResTabVM,

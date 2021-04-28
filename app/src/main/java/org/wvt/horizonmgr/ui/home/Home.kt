@@ -1,4 +1,4 @@
-package org.wvt.horizonmgr.ui.news
+package org.wvt.horizonmgr.ui.home
 
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.animateDpAsState
@@ -31,12 +31,12 @@ import org.wvt.horizonmgr.ui.theme.AppBarBackgroundColor
 import org.wvt.horizonmgr.ui.theme.PreviewTheme
 
 @Composable
-fun News(
-    viewModel: NewsViewModel,
+fun Home(
+    viewModel: HomeViewModel,
     onNavClick: () -> Unit,
-    onNewsClick: (NewsViewModel.News) -> Unit
+    onNewsClick: (HomeViewModel.ContentResource) -> Unit
 ) {
-    val news by viewModel.news.collectAsState()
+    val news by viewModel.contentResources.collectAsState()
     val state by viewModel.state.collectAsState()
 
     DisposableEffect(viewModel) {
@@ -47,7 +47,7 @@ fun News(
     NewsUI(
         onNavClick = onNavClick,
         state = state,
-        news = news,
+        home = news,
         onNewsClick = { onNewsClick(it) },
         onRefresh = { viewModel.refresh() },
         isRefreshing = viewModel.isRefreshing.collectAsState().value
@@ -57,9 +57,9 @@ fun News(
 @Composable
 private fun NewsUI(
     onNavClick: () -> Unit,
-    state: NewsViewModel.State,
-    news: List<NewsViewModel.News>,
-    onNewsClick: (NewsViewModel.News) -> Unit,
+    state: HomeViewModel.State,
+    home: List<HomeViewModel.ContentResource>,
+    onNewsClick: (HomeViewModel.ContentResource) -> Unit,
     isRefreshing: Boolean,
     onRefresh: () -> Unit
 ) {
@@ -68,7 +68,7 @@ private fun NewsUI(
             modifier = Modifier
                 .fillMaxWidth()
                 .zIndex(4.dp.value),
-            title = { Text("推荐资讯") },
+            title = { Text("首页") },
             navigationIcon = {
                 IconButton(onClick = onNavClick) {
                     Icon(imageVector = Icons.Filled.Menu, contentDescription = "菜单")
@@ -78,18 +78,18 @@ private fun NewsUI(
         )
         Crossfade(state) {
             when (it) {
-                is NewsViewModel.State.Loading -> Box(Modifier.fillMaxSize()) {
+                is HomeViewModel.State.Loading -> Box(Modifier.fillMaxSize()) {
                     CircularProgressIndicator(Modifier.align(Alignment.Center))
                 }
-                is NewsViewModel.State.Succeed -> {
+                is HomeViewModel.State.Succeed -> {
                     NewsList(
-                        news,
+                        home,
                         onNewsClick,
                         isRefreshing,
                         onRefresh
                     )
                 }
-                is NewsViewModel.State.Error -> Box(Modifier.fillMaxSize()) {
+                is HomeViewModel.State.Error -> Box(Modifier.fillMaxSize()) {
                     ErrorPage(
                         modifier = Modifier.align(Alignment.Center),
                         message = {
@@ -104,8 +104,8 @@ private fun NewsUI(
 
 @Composable
 private fun NewsList(
-    news: List<NewsViewModel.News>,
-    onNewsClick: (NewsViewModel.News) -> Unit,
+    home: List<HomeViewModel.ContentResource>,
+    onNewsClick: (HomeViewModel.ContentResource) -> Unit,
     isRefreshing: Boolean,
     onRefreshClick: () -> Unit
 ) {
@@ -124,9 +124,9 @@ private fun NewsList(
             modifier = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(top = 8.dp, bottom = 8.dp)
         ) {
-            items(news) { item ->
+            items(home) { item ->
                 when {
-                    item is NewsViewModel.News.Article && item.coverUrl != null -> NewsItem(
+                    item is HomeViewModel.ContentResource.Article && item.coverUrl != null -> NewsItem(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(vertical = 8.dp, horizontal = 16.dp),
@@ -141,7 +141,7 @@ private fun NewsList(
                             )
                         }
                     )
-                    item is NewsViewModel.News.Article && item.coverUrl == null -> NewsItemNoCover(
+                    item is HomeViewModel.ContentResource.Article && item.coverUrl == null -> NewsItemNoCover(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(vertical = 8.dp, horizontal = 16.dp),
@@ -265,17 +265,17 @@ private fun NewsPreview() {
     PreviewTheme {
         NewsUI(
             onNavClick = {},
-            state = NewsViewModel.State.Succeed,
-            news = remember {
+            state = HomeViewModel.State.Succeed,
+            home = remember {
                 listOf(
-                    NewsViewModel.News.Article(
+                    HomeViewModel.ContentResource.Article(
                         "",
                         "Test article",
                         "Test brief",
                         "http://aaa.aaa",
                         "2020-2020"
                     ),
-                    NewsViewModel.News.Article(
+                    HomeViewModel.ContentResource.Article(
                         "",
                         "Test article",
                         "Test brief",

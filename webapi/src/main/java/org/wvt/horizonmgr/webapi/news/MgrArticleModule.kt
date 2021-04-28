@@ -41,7 +41,7 @@ class MgrArticleModule {
         return try {
             client.get<List<RecommendedArticle>>("https://adodoz.cn/hzmgr/v2/recommended_articles.json")
         } catch (e: IOException) {
-            throw NetworkException("获取推荐资讯失败", e)
+            throw NetworkException("获取推荐文章失败", e)
         } catch (e: SerializationException) {
             throw JsonParseException("unknown", e)
         }

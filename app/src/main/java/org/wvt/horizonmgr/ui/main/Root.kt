@@ -36,8 +36,8 @@ import org.wvt.horizonmgr.ui.components.NetworkImage
 import org.wvt.horizonmgr.ui.downloaded.DMViewModel
 import org.wvt.horizonmgr.ui.downloaded.DownloadedMods
 import org.wvt.horizonmgr.ui.modulemanager.*
-import org.wvt.horizonmgr.ui.news.News
-import org.wvt.horizonmgr.ui.news.NewsViewModel
+import org.wvt.horizonmgr.ui.home.Home
+import org.wvt.horizonmgr.ui.home.HomeViewModel
 import org.wvt.horizonmgr.ui.onlinemods.OnlineMods
 import org.wvt.horizonmgr.ui.onlinemods.OnlineModsViewModel
 import org.wvt.horizonmgr.ui.pacakgemanager.PackageManager
@@ -49,8 +49,8 @@ val LocalDrawerState = staticCompositionLocalOf<DrawerState> { error("No local d
 
 @Composable
 fun Home(
+    rootVM: RootViewModel,
     homeVM: HomeViewModel,
-    newsVM: NewsViewModel,
     modTabVM: ModTabViewModel,
     icLevelTabVM: ICLevelTabViewModel,
     icResTabVM: ICResTabViewModel,
@@ -81,7 +81,7 @@ fun Home(
 ) {
     val scope = rememberCoroutineScope()
     val drawerState = rememberDrawerState(DrawerValue.Closed)
-    val screens by remember { mutableStateOf(HomeViewModel.Screen.values()) }
+    val screens by remember { mutableStateOf(RootViewModel.Screen.values()) }
 
     Drawer(
         state = drawerState,
@@ -93,8 +93,8 @@ fun Home(
             )
         },
         tabs = {
-            DrawerTabs(screens = screens, currentScreen = homeVM.currentScreen, onChange = {
-                homeVM.navigate(it)
+            DrawerTabs(screens = screens, currentScreen = rootVM.currentScreen, onChange = {
+                rootVM.navigate(it)
                 scope.launch { drawerState.close() }
             })
         },
@@ -124,18 +124,18 @@ fun Home(
         }
     ) {
         CompositionLocalProvider(LocalDrawerState provides drawerState) {
-            Crossfade(targetState = homeVM.currentScreen) { cs ->
+            Crossfade(targetState = rootVM.currentScreen) { cs ->
                 when (cs) {
-                    HomeViewModel.Screen.HOME -> News(
-                        viewModel = newsVM,
+                    RootViewModel.Screen.HOME -> Home(
+                        viewModel = homeVM,
                         onNavClick = { scope.launch { drawerState.open() } },
                         onNewsClick = {
-                            if (it is NewsViewModel.News.Article) {
+                            if (it is HomeViewModel.ContentResource.Article) {
                                 navigateToNewsDetail(it.id)
                             }
                         }
                     )
-                    HomeViewModel.Screen.LOCAL_MANAGE -> ModuleManager(
+                    RootViewModel.Screen.LOCAL_MANAGE -> ModuleManager(
                         onNavClicked = { scope.launch { drawerState.open() } },
                         managerViewModel = moduleManagerVM,
                         moduleViewModel = modTabVM,
@@ -149,19 +149,19 @@ fun Home(
                         onAddMCLevelClick = onAddMCLevelClick,
                         onAddMCTextureClick = onAddMCTextureClick
                     )
-                    HomeViewModel.Screen.PACKAGE_MANAGE -> PackageManager(
+                    RootViewModel.Screen.PACKAGE_MANAGE -> PackageManager(
                         viewModel = packageManagerVM,
                         onNavClick = { scope.launch { drawerState.open() } },
                         onOnlineInstallClick = requestOnlineInstall,
                         onLocalInstallClick = onAddPackageClicked,
                         navigateToPackageInfo = navigateToPackageInfo
                     )
-                    HomeViewModel.Screen.ONLINE_DOWNLOAD -> OnlineMods(
+                    RootViewModel.Screen.ONLINE_DOWNLOAD -> OnlineMods(
                         viewModel = onlineModsVM,
                         isLogon = userInfo != null,
                         onNavClick = { scope.launch { drawerState.open() } }
                     )
-                    HomeViewModel.Screen.DOWNLOADED_MOD -> DownloadedMods(
+                    RootViewModel.Screen.DOWNLOADED_MOD -> DownloadedMods(
                         vm = downloadedModVM,
                         onNavClicked = { scope.launch { drawerState.open() } }
                     )
@@ -173,9 +173,9 @@ fun Home(
 
 @Composable
 private fun DrawerTabs(
-    screens: Array<HomeViewModel.Screen>,
-    currentScreen: HomeViewModel.Screen,
-    onChange: (HomeViewModel.Screen) -> Unit,
+    screens: Array<RootViewModel.Screen>,
+    currentScreen: RootViewModel.Screen,
+    onChange: (RootViewModel.Screen) -> Unit,
 ) {
     screens.forEach {
         NavigationItem(
@@ -386,8 +386,8 @@ private fun DrawerPreview() {
             DrawerHeader(userInfo = null, requestLogin = {}, requestLogout = {})
         }, tabs = {
             DrawerTabs(
-                screens = HomeViewModel.Screen.values(),
-                currentScreen = HomeViewModel.Screen.HOME,
+                screens = RootViewModel.Screen.values(),
+                currentScreen = RootViewModel.Screen.HOME,
                 onChange = {}
             )
         }, items = {}, setting = {}) {}

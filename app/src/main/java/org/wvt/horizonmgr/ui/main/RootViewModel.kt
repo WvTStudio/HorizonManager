@@ -9,13 +9,13 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.ViewModel
 import org.wvt.horizonmgr.DependenciesContainer
 
-class HomeViewModel(private val dependencies: DependenciesContainer) : ViewModel() {
+class RootViewModel(private val dependencies: DependenciesContainer) : ViewModel() {
 
     enum class Screen(
         val label: String,
         val icon: ImageVector
     ) {
-        HOME("推荐资讯", Icons.Filled.Home),
+        HOME("首页", Icons.Filled.Home),
         PACKAGE_MANAGE("分包管理", Icons.Filled.Dashboard),
         LOCAL_MANAGE("模组管理", Icons.Filled.Extension),
         ONLINE_DOWNLOAD("在线资源", Icons.Filled.Store),

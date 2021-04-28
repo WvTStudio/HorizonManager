@@ -1,4 +1,4 @@
-package org.wvt.horizonmgr.ui.news
+package org.wvt.horizonmgr.ui.article
 
 import android.content.Context
 import android.content.Intent
@@ -12,9 +12,9 @@ import androidx.compose.material.Surface
 import org.wvt.horizonmgr.HorizonManagerApplication
 import org.wvt.horizonmgr.ui.theme.AndroidHorizonManagerTheme
 
-class NewsContentActivityContract : ActivityResultContract<String, Unit>() {
+class ArticleContentActivityContract : ActivityResultContract<String, Unit>() {
     override fun createIntent(context: Context, input: String): Intent {
-        return Intent(context, NewsContentActivity::class.java).apply {
+        return Intent(context, ArticleContentActivity::class.java).apply {
             putExtra("id", input)
         }
     }
@@ -24,8 +24,8 @@ class NewsContentActivityContract : ActivityResultContract<String, Unit>() {
     }
 }
 
-class NewsContentActivity : AppCompatActivity() {
-    private val vm by viewModels<NewsContentViewModel> {
+class ArticleContentActivity : AppCompatActivity() {
+    private val vm by viewModels<ArticleContentViewModel> {
         (application as HorizonManagerApplication).dependenciesVMFactory
     }
 
@@ -35,7 +35,7 @@ class NewsContentActivity : AppCompatActivity() {
         setContent {
             AndroidHorizonManagerTheme {
                 Surface(color = MaterialTheme.colors.background) {
-                    NewsContent(id, vm, ::finish)
+                    ArticleContent(id, vm, ::finish)
                 }
             }
         }

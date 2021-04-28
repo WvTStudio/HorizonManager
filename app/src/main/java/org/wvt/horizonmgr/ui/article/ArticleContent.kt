@@ -1,4 +1,4 @@
-package org.wvt.horizonmgr.ui.news
+package org.wvt.horizonmgr.ui.article
 
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.*
@@ -28,9 +28,9 @@ import org.wvt.horizonmgr.ui.components.NetworkImage
 import org.wvt.horizonmgr.ui.theme.AppBarBackgroundColor
 
 @Composable
-fun NewsContent(
+fun ArticleContent(
     id: String,
-    vm: NewsContentViewModel,
+    vm: ArticleContentViewModel,
     onNavClick: () -> Unit
 ) {
     val news by vm.content.collectAsState()
@@ -46,36 +46,36 @@ fun NewsContent(
                     Icon(Icons.Filled.ArrowBack, contentDescription = "返回")
                 }
             }, title = {
-                Text("资讯正文")
+                Text("文章正文")
             }, backgroundColor = AppBarBackgroundColor
         )
         Crossfade(news) {
             when (it) {
-                NewsContentViewModel.Result.Loading -> Box(Modifier.fillMaxSize()) {
+                ArticleContentViewModel.Result.Loading -> Box(Modifier.fillMaxSize()) {
                     CircularProgressIndicator(Modifier.align(Alignment.Center))
                 }
-                NewsContentViewModel.Result.NetworkError -> {
+                ArticleContentViewModel.Result.NetworkError -> {
                     ErrorPage(
                         modifier = Modifier.fillMaxSize(),
                         message = { Text("网络错误，请稍后再试") },
                         onRetryClick = { vm.refresh() }
                     )
                 }
-                NewsContentViewModel.Result.NewsNotFound -> {
+                ArticleContentViewModel.Result.ArticleNotFound -> {
                     ErrorPage(
                         modifier = Modifier.fillMaxSize(),
-                        message = { Text("该资讯可能已被删除") },
+                        message = { Text("该文章可能已被删除") },
                         onRetryClick = { vm.refresh() }
                     )
                 }
-                NewsContentViewModel.Result.OtherError -> {
+                ArticleContentViewModel.Result.OtherError -> {
                     ErrorPage(
                         modifier = Modifier.fillMaxSize(),
                         message = { Text("未知错误，请稍后再试") },
                         onRetryClick = { vm.refresh() }
                     )
                 }
-                is NewsContentViewModel.Result.Succeed -> {
+                is ArticleContentViewModel.Result.Succeed -> {
                     Content(it.value, refreshing, vm::refresh)
                 }
             }
@@ -86,7 +86,7 @@ fun NewsContent(
 
 @Composable
 private fun Content(
-    content: NewsContentViewModel.NewsContent,
+    content: ArticleContentViewModel.ArticleContent,
     isRefreshing: Boolean,
     onRefresh: () -> Unit
 ) {
