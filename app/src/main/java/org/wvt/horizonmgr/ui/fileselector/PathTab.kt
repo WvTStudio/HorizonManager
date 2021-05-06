@@ -63,7 +63,7 @@ internal fun PathTab(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = item,
+                    text = if(index == 0) "内部存储空间" else item,
                     color = animateColorAsState(
                         if (data.depth == index) contentColor
                         else contentColor.copy(alpha = 0.5f)
