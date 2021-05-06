@@ -2,10 +2,7 @@ package org.wvt.horizonmgr.ui.fileselector
 
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animateContentSize
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.Divider
@@ -61,7 +58,7 @@ internal fun PathList(
             // 如果子文件是空的，那么 LazyColumnForIndex 不会触发，需要手动检测
             Column(modifier) {
                 header()
-                Box(Modifier.fillMaxSize()) {
+                Box(Modifier.weight(1f).fillMaxWidth()) {
                     Text(
                         modifier = Modifier.align(Alignment.Center),
                         text = "空文件夹"

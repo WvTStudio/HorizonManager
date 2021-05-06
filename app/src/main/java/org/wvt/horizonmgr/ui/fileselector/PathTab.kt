@@ -3,10 +3,9 @@ package org.wvt.horizonmgr.ui.fileselector
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.animateScrollBy
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
@@ -20,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.util.fastForEachIndexed
 
 @Immutable
 data class PathTabData(
@@ -39,22 +39,19 @@ internal fun PathTab(
 
     LaunchedEffect(data.depth) {
         if (sizes.isNotEmpty()) {
-            var value = 0
-            for (i in 0..data.depth) {
-                value += sizes.getOrNull(i) ?: 0
-            }
-            value -= sizes.getOrNull(data.depth) ?: 0 / 2
-            scrollState.animateScrollBy(value.toFloat())
+            val target = sizes.take(data.depth).sum()
+            scrollState.animateScrollTo(target)
         }
     }
 
     val contentColor = LocalContentColor.current
 
-    LazyRow(
+    Row(
+        modifier = Modifier.horizontalScroll(scrollState),
         verticalAlignment = Alignment.CenterVertically,
-        contentPadding = PaddingValues(start = 72.dp, end = 32.dp)
     ) {
-        itemsIndexed(data.paths) { index, item ->
+        Spacer(modifier = Modifier.width(72.dp))
+        data.paths.fastForEachIndexed { index, item ->
             Box(
                 modifier = Modifier
                     .clickable(
@@ -62,7 +59,7 @@ internal fun PathTab(
                         indication = null
                     ) { onSelectDepth(index) } // TODO: 2021/2/26 希望 Tab 的点击能有涟漪
                     .padding(top = 16.dp, bottom = 16.dp)
-                    .onGloballyPositioned { sizes.add(index, it.size.width) },
+                .onGloballyPositioned { sizes.add(index, it.size.width) },
                 contentAlignment = Alignment.Center
             ) {
                 Text(
@@ -89,5 +86,6 @@ internal fun PathTab(
                 )
             }
         }
+        Spacer(modifier = Modifier.width(32.dp))
     }
 }
