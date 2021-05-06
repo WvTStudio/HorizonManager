@@ -20,7 +20,7 @@ import androidx.core.content.edit
 import androidx.core.view.WindowCompat
 import com.google.accompanist.insets.LocalWindowInsets
 import com.google.accompanist.insets.ProvideWindowInsets
-import com.google.accompanist.systemuicontroller.rememberAndroidSystemUiController
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import org.wvt.horizonmgr.ui.donate.alipayColor
 import org.wvt.horizonmgr.ui.donate.wechatColor
 
@@ -34,7 +34,7 @@ fun AndroidHorizonManagerTheme(
     val context = LocalContext.current
     val themeController = remember(context) { AndroidThemeController(context) }
 
-    val controller = rememberAndroidSystemUiController()
+    val controller = rememberSystemUiController()
 
     DisposableEffect(Unit) {
         WindowCompat.setDecorFitsSystemWindows((context as Activity).window, false)
@@ -124,7 +124,7 @@ fun AndroidDonateTheme(content: @Composable() () -> Unit) {
         onDispose { }
     }
 
-    val controller = rememberAndroidSystemUiController()
+    val controller = rememberSystemUiController()
     DisposableEffect(config.value) {
         val config = config.value
         val color = if (config.isDark) config.darkColor else config.lightColor

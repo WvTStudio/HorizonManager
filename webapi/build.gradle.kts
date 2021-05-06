@@ -5,33 +5,33 @@ plugins {
 }
 
 android {
-    compileSdkVersion(30)
+    compileSdk = 30
 
     defaultConfig {
-        minSdkVersion(21)
-        targetSdkVersion(30)
-        versionCode = 1
-        versionName = "1.0"
+        minSdk = 21
+        targetSdk = 30
+//        versionCode = 1
+//        versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
         create("beta") {
-            proguardFiles = mutableListOf(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                file("proguard-rules.pro")
-            )
+            proguardFiles.apply {
+                add(getDefaultProguardFile("proguard-android-optimize.txt"))
+                add(file("proguard-rules.pro"))
+            }
         }
         create("alpha") {
-            proguardFiles = mutableListOf(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                file("proguard-rules.pro")
-            )
+            proguardFiles.apply {
+                add(getDefaultProguardFile("proguard-android-optimize.txt"))
+                add(file("proguard-rules.pro"))
+            }
         }
         getByName("release") {
-            proguardFiles = mutableListOf(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                file("proguard-rules.pro")
-            )
+            proguardFiles.apply {
+                add(getDefaultProguardFile("proguard-android-optimize.txt"))
+                add(file("proguard-rules.pro"))
+            }
         }
     }
     compileOptions {

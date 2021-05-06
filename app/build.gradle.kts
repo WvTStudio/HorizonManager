@@ -7,13 +7,13 @@ plugins {
 }
 
 android {
-    compileSdkVersion(30)
+    compileSdk = 30
     buildToolsVersion = "30.0.3"
 
     defaultConfig {
         applicationId = "org.wvt.horizonmgr"
-        minSdkVersion(21)
-        targetSdkVersion(30)
+        minSdk = 21
+        targetSdk = 30
         versionCode = 23
         versionName = "2.1.1"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -21,10 +21,10 @@ android {
 
     buildTypes {
         getByName("release") {
-            proguardFiles = mutableListOf(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                file("proguard-rules.pro")
-            )
+            proguardFiles.apply {
+                add(getDefaultProguardFile("proguard-android-optimize.txt"))
+                add(file("proguard-rules.pro"))
+            }
 //            isShrinkResources = true
 //            isMinifyEnabled = true
         }
@@ -32,17 +32,17 @@ android {
             versionNameSuffix = "-debug"
         }
         create("beta") {
-            proguardFiles = mutableListOf(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                file("proguard-rules.pro")
-            )
+            proguardFiles.apply {
+                add(getDefaultProguardFile("proguard-android-optimize.txt"))
+                add(file("proguard-rules.pro"))
+            }
             versionNameSuffix = "-beta4"
         }
         create("alpha") {
-            proguardFiles = mutableListOf(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                file("proguard-rules.pro")
-            )
+            proguardFiles.apply {
+                add(getDefaultProguardFile("proguard-android-optimize.txt"))
+                add(file("proguard-rules.pro"))
+            }
             versionNameSuffix = "-alpha12"
         }
     }
@@ -55,7 +55,7 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.0.0-beta05"
+        kotlinCompilerExtensionVersion = "1.0.0-beta06"
     }
     lint {
         disable("InvalidFragmentVersionForActivityResult")
@@ -95,14 +95,14 @@ dependencies {
     implementation("com.google.android.material:material:1.3.0")
 
 
-    val accompanistVersion = "0.8.1"
+    val accompanistVersion = "0.9.0"
     implementation("com.google.accompanist:accompanist-coil:$accompanistVersion")
     implementation("com.google.accompanist:accompanist-insets:$accompanistVersion")
     implementation("com.google.accompanist:accompanist-pager:$accompanistVersion")
     implementation("com.google.accompanist:accompanist-systemuicontroller:$accompanistVersion")
     implementation("com.google.accompanist:accompanist-swiperefresh:$accompanistVersion")
 
-    val composeVersion = "1.0.0-beta05"
+    val composeVersion = "1.0.0-beta06"
     implementation("androidx.compose.compiler:compiler:$composeVersion")
     implementation("androidx.compose.runtime:runtime:$composeVersion")
     implementation("androidx.compose.foundation:foundation:$composeVersion")

@@ -237,7 +237,9 @@ private fun SwitchIcon(
         else inactiveColor
     ).value
 
-    val transition = updateTransition(targetState = if (isActive) IconState.ON else IconState.OFF)
+    val transition = updateTransition(targetState = if (isActive) IconState.ON else IconState.OFF,
+        label = "transition"
+    )
     val scale by transition.animateFloat(
         transitionSpec = {
             keyframes {
@@ -248,8 +250,8 @@ private fun SwitchIcon(
             }
         },
         targetValueByState = {
-            1f
-        }
+            if(it == IconState.ON) 1f else 1f
+        }, label = "scale"
     )
 
     Icon(
