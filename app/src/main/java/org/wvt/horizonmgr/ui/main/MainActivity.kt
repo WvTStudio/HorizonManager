@@ -13,17 +13,16 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import org.wvt.horizonmgr.R
-import org.wvt.horizonmgr.defaultViewModelFactory
+import org.wvt.horizonmgr.ui.article.ArticleContentActivityContract
 import org.wvt.horizonmgr.ui.community.CommunityActivity
 import org.wvt.horizonmgr.ui.donate.DonateActivity
 import org.wvt.horizonmgr.ui.downloaded.DMViewModel
 import org.wvt.horizonmgr.ui.fileselector.FileSelectorResult
 import org.wvt.horizonmgr.ui.fileselector.FileSelectorResultContract
+import org.wvt.horizonmgr.ui.home.HomeViewModel
 import org.wvt.horizonmgr.ui.joingroup.JoinGroupActivity
 import org.wvt.horizonmgr.ui.login.LoginResultContract
 import org.wvt.horizonmgr.ui.modulemanager.*
-import org.wvt.horizonmgr.ui.article.ArticleContentActivityContract
-import org.wvt.horizonmgr.ui.home.HomeViewModel
 import org.wvt.horizonmgr.ui.onlineinstall.InstallPackageResultContract
 import org.wvt.horizonmgr.ui.onlinemods.OnlineModsViewModel
 import org.wvt.horizonmgr.ui.pacakgemanager.PackageDetailActivity
@@ -34,20 +33,20 @@ import org.wvt.horizonmgr.ui.startActivity
 private const val TAG = "MainActivity"
 
 class MainActivity : AppCompatActivity() {
-    private val factory by lazy { defaultViewModelFactory }
+//    private val factory by lazy { HiltViewModelFactory(this, NavBackStackEntry.create(this)) }
 
-    private val mainVM: MainViewModel by viewModels { factory }
-    private val rootVM: RootViewModel by viewModels { factory }
-    private val homeVM: HomeViewModel by viewModels { factory }
-    private val modTabVM: ModTabViewModel by viewModels { factory }
-    private val icLevelTabVM: ICLevelTabViewModel by viewModels { factory }
-    private val icResTabVM: ICResTabViewModel by viewModels { factory }
-    private val moduleManagerVM: ModuleManagerViewModel by viewModels { factory }
-    private val packageManagerVM: PackageManagerViewModel by viewModels { factory }
-    private val mcLevelVM: MCLevelTabViewModel by viewModels { factory }
-    private val downloadedModVM: DMViewModel by viewModels { factory }
-    private val onlineModsVM: OnlineModsViewModel by viewModels { factory }
-    private val mcResVM: MCResTabViewModel by viewModels { factory }
+    private val mainVM: MainViewModel by viewModels()
+    private val rootVM: RootViewModel by viewModels()
+    private val homeVM: HomeViewModel by viewModels()
+    private val modTabVM: ModTabViewModel by viewModels()
+    private val icLevelTabVM: ICLevelTabViewModel by viewModels ()
+    private val icResTabVM: ICResTabViewModel by viewModels()
+    private val moduleManagerVM: ModuleManagerViewModel by viewModels()
+    private val packageManagerVM: PackageManagerViewModel by viewModels()
+    private val mcLevelVM: MCLevelTabViewModel by viewModels()
+    private val downloadedModVM: DMViewModel by viewModels()
+    private val onlineModsVM: OnlineModsViewModel by viewModels()
+    private val mcResVM: MCResTabViewModel by viewModels()
 
     private val newsDetail = registerForActivityResult(ArticleContentActivityContract()) {}
 
@@ -219,8 +218,8 @@ class MainActivity : AppCompatActivity() {
         setTheme(R.style.Theme_HorizonManagerCompose_NoActionBar) // cancel the slash theme
 
         setContent {
-            App(
-                mainVM = mainVM,
+            Main(
+/*                mainVM = mainVM,
                 rootVM = rootVM,
                 homeVM = homeVM,
                 modTabVM = modTabVM,
@@ -231,7 +230,7 @@ class MainActivity : AppCompatActivity() {
                 mcLevelVM = mcLevelVM,
                 mcResVM = mcResVM,
                 downloadedModVM = downloadedModVM,
-                onlineModsVM = onlineModsVM,
+                onlineModsVM = onlineModsVM,*/
                 onRequestPermission = ::requestPermission,
                 navigateToCommunity = ::startCommunityActivity,
                 navigateToDonate = ::startDonateActivity,

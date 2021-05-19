@@ -29,14 +29,11 @@ import org.wvt.horizonmgr.ui.theme.AppBarBackgroundColor
 
 @Composable
 fun ArticleContent(
-    id: String,
     vm: ArticleContentViewModel,
     onNavClick: () -> Unit
 ) {
     val news by vm.content.collectAsState()
     val refreshing by vm.isRefreshing.collectAsState()
-
-    LaunchedEffect(id) { vm.load(id) }
 
     Column {
         TopAppBar(

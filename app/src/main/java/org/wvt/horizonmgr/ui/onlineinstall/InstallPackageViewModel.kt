@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collect
@@ -14,10 +15,12 @@ import org.wvt.horizonmgr.service.hzpack.PackageManifestWrapper
 import org.wvt.horizonmgr.service.hzpack.ZipPackage
 import org.wvt.horizonmgr.webapi.NetworkException
 import org.wvt.horizonmgr.webapi.pack.OfficialCDNPackage
+import javax.inject.Inject
 
 private const val TAG = "InstallPackageVM"
 
-class InstallPackageViewModel(
+@HiltViewModel
+class InstallPackageViewModel @Inject constructor(
     dependencies: DependenciesContainer
 ) : ViewModel() {
     private val packRepository = dependencies.packRepository

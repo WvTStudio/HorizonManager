@@ -10,6 +10,4 @@ class DownloadListViewModel(
 ) : ViewModel() {
     private val _downloadItems = MutableStateFlow(emptyList<String>())
     val downloadItems: StateFlow<List<String>> = _downloadItems
-
-
 }

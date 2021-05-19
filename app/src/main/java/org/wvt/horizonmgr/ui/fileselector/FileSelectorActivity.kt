@@ -8,9 +8,10 @@ import androidx.activity.result.contract.ActivityResultContract
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.ui.Modifier
-import org.wvt.horizonmgr.defaultViewModelFactory
+import androidx.hilt.navigation.compose.hiltViewModel
 import org.wvt.horizonmgr.ui.theme.AndroidHorizonManagerTheme
 
 sealed class FileSelectorResult {
@@ -48,16 +49,16 @@ class FileSelectorActivity : AppCompatActivity() {
         const val FILE_PATH = "file_path"
     }
 
-    private val viewModel by viewModels<FileSelectorViewModel> { defaultViewModelFactory }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             AndroidHorizonManagerTheme {
-                Surface {
+                Surface(color = MaterialTheme.colors.background) {
                     FileSelector(
                         modifier = Modifier.fillMaxSize(),
-                        viewModel = viewModel, onSelect = ::onFileSelect, onClose = ::onCancel
+                        viewModel = hiltViewModel(),
+                        onSelect = ::onFileSelect,
+                        onClose = ::onCancel
                     )
                 }
             }

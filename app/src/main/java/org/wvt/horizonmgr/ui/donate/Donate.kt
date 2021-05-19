@@ -17,21 +17,19 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.util.fastForEach
 import org.wvt.horizonmgr.R
 import org.wvt.horizonmgr.ui.theme.LocalThemeConfig
+import org.wvt.horizonmgr.ui.theme.PreviewTheme
 import kotlin.random.Random
 
 val alipayColor = Color(0xFF1678FF)
 val wechatColor = Color(0xFF19AD19)
-
-private data class DonateItem(
-    val name: String,
-    val size: TextUnit
-)
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
@@ -105,9 +103,11 @@ fun Donate(
                 enter = fadeIn(),
                 exit = fadeOut()
             ) {
-                RandomPlaceLayout(modifier = Modifier
-                    .fillMaxSize()
-                    .padding(top = 16.dp)) {
+                RandomPlaceLayout(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(top = 16.dp)
+                ) {
                     donates.forEach {
                         Text(
                             fontSize = it.size,
@@ -122,7 +122,8 @@ fun Donate(
         Row(
             Modifier
                 .align(Alignment.BottomEnd)
-                .padding(16.dp)) {
+                .padding(16.dp)
+        ) {
             TextButton(onClick = { displayDialog = true }) {
                 Text(
                     text = "关于",
@@ -165,5 +166,18 @@ fun RandomPlaceLayout(modifier: Modifier, content: @Composable () -> Unit) {
                 it.place(x, y)
             }
         }
+    }
+}
+
+@Preview
+@Composable
+private fun DonatePreview() {
+    PreviewTheme {
+        Donate(
+            donates = setOf(DonateViewModel.DonateItem("User 1", 4.sp), DonateViewModel.DonateItem("User 2", 4.sp)),
+            onClose = { /*TODO*/ },
+            onAlipayClicked = { /*TODO*/ },
+            onWechatPayClicked = { /*TODO*/ }
+        )
     }
 }

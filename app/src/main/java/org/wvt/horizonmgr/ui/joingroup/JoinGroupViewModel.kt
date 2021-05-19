@@ -3,15 +3,18 @@ package org.wvt.horizonmgr.ui.joingroup
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.wvt.horizonmgr.DependenciesContainer
+import javax.inject.Inject
 
 private const val TAG = "JoinGroupVMLogger"
 
-class JoinGroupViewModel(
+@HiltViewModel
+class JoinGroupViewModel @Inject constructor(
     dependencies: DependenciesContainer
 ) : ViewModel() {
     private val mgrInfo = dependencies.mgrInfo

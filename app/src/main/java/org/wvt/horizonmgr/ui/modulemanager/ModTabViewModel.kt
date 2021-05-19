@@ -3,6 +3,7 @@ package org.wvt.horizonmgr.ui.modulemanager
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -15,10 +16,12 @@ import org.wvt.horizonmgr.service.mod.ZipMod
 import org.wvt.horizonmgr.ui.components.ProgressDialogState
 import java.io.File
 import java.util.*
+import javax.inject.Inject
 
 private const val TAG = "ModTabVM"
 
-class ModTabViewModel(dependencies: DependenciesContainer) : ViewModel() {
+@HiltViewModel
+class ModTabViewModel @Inject constructor(dependencies: DependenciesContainer) : ViewModel() {
     private val manager = dependencies.manager
     private val localCache = dependencies.localCache
 

@@ -22,6 +22,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.SwipeRefreshIndicator
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
@@ -29,6 +30,14 @@ import org.wvt.horizonmgr.ui.components.ErrorPage
 import org.wvt.horizonmgr.ui.components.NetworkImage
 import org.wvt.horizonmgr.ui.theme.AppBarBackgroundColor
 import org.wvt.horizonmgr.ui.theme.PreviewTheme
+
+@Composable
+fun HomeScreen(
+    onNavClick: () -> Unit,
+    onNewsClick: (HomeViewModel.ContentResource) -> Unit
+) {
+    Home(viewModel = hiltViewModel(), onNavClick = onNavClick, onNewsClick = onNewsClick)
+}
 
 @Composable
 fun Home(

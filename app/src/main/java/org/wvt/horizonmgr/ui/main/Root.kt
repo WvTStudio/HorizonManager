@@ -30,6 +30,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.launch
 import org.wvt.horizonmgr.R
 import org.wvt.horizonmgr.ui.components.NetworkImage
@@ -37,6 +38,7 @@ import org.wvt.horizonmgr.ui.downloaded.DMViewModel
 import org.wvt.horizonmgr.ui.downloaded.DownloadedMods
 import org.wvt.horizonmgr.ui.modulemanager.*
 import org.wvt.horizonmgr.ui.home.Home
+import org.wvt.horizonmgr.ui.home.HomeScreen
 import org.wvt.horizonmgr.ui.home.HomeViewModel
 import org.wvt.horizonmgr.ui.onlinemods.OnlineMods
 import org.wvt.horizonmgr.ui.onlinemods.OnlineModsViewModel
@@ -44,26 +46,22 @@ import org.wvt.horizonmgr.ui.pacakgemanager.PackageManager
 import org.wvt.horizonmgr.ui.pacakgemanager.PackageManagerViewModel
 import org.wvt.horizonmgr.ui.theme.LocalThemeConfig
 import org.wvt.horizonmgr.ui.theme.PreviewTheme
-
-val LocalDrawerState = staticCompositionLocalOf<DrawerState> { error("No local drawer provided") }
-
 @Composable
 fun Home(
-    rootVM: RootViewModel,
-    homeVM: HomeViewModel,
-    modTabVM: ModTabViewModel,
-    icLevelTabVM: ICLevelTabViewModel,
-    icResTabVM: ICResTabViewModel,
-    moduleManagerVM: ModuleManagerViewModel,
-    packageManagerVM: PackageManagerViewModel,
-    mcLevelVM: MCLevelTabViewModel,
-    mcResVM: MCResTabViewModel,
-    downloadedModVM: DMViewModel,
-    onlineModsVM: OnlineModsViewModel,
+//    rootVM: RootViewModel,
+//    homeVM: HomeViewModel,
+//    modTabVM: ModTabViewModel,
+//    icLevelTabVM: ICLevelTabViewModel,
+//    icResTabVM: ICResTabViewModel,
+//    moduleManagerVM: ModuleManagerViewModel,
+//    packageManagerVM: PackageManagerViewModel,
+//    mcLevelVM: MCLevelTabViewModel,
+//    mcResVM: MCResTabViewModel,
+//    downloadedModVM: DMViewModel,
+//    onlineModsVM: OnlineModsViewModel,
     userInfo: UserInformation?,
     requestLogin: () -> Unit,
     requestLogout: () -> Unit,
-    selectedPackageUUID: String?,
     requestOnlineInstall: () -> Unit,
     onAddModClicked: () -> Unit,
     onAddPackageClicked: () -> Unit,
@@ -79,6 +77,7 @@ fun Home(
     navigateToPackageInfo: (uuid: String) -> Unit,
     navigateToNewsDetail: (newsId: String) -> Unit
 ) {
+    val vm: RootViewModel = hiltViewModel()
     val scope = rememberCoroutineScope()
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val screens by remember { mutableStateOf(RootViewModel.Screen.values()) }
@@ -93,8 +92,8 @@ fun Home(
             )
         },
         tabs = {
-            DrawerTabs(screens = screens, currentScreen = rootVM.currentScreen, onChange = {
-                rootVM.navigate(it)
+            DrawerTabs(screens = screens, currentScreen = vm.currentScreen, onChange = {
+                vm.navigate(it)
                 scope.launch { drawerState.close() }
             })
         },
@@ -123,11 +122,9 @@ fun Home(
             )
         }
     ) {
-        CompositionLocalProvider(LocalDrawerState provides drawerState) {
-            Crossfade(targetState = rootVM.currentScreen) { cs ->
+            Crossfade(targetState = vm.currentScreen) { cs ->
                 when (cs) {
-                    RootViewModel.Screen.HOME -> Home(
-                        viewModel = homeVM,
+                    RootViewModel.Screen.HOME -> HomeScreen(
                         onNavClick = { scope.launch { drawerState.open() } },
                         onNewsClick = {
                             if (it is HomeViewModel.ContentResource.Article) {
@@ -135,14 +132,14 @@ fun Home(
                             }
                         }
                     )
-                    RootViewModel.Screen.LOCAL_MANAGE -> ModuleManager(
-                        onNavClicked = { scope.launch { drawerState.open() } },
+                    RootViewModel.Screen.LOCAL_MANAGE -> ModuleManagerScreen(
+                        onNavClicked = { scope.launch { drawerState.open() } },/*
                         managerViewModel = moduleManagerVM,
                         moduleViewModel = modTabVM,
                         icLevelViewModel = icLevelTabVM,
                         icResViewModel = icResTabVM,
                         mcLevelViewModel = mcLevelVM,
-                        mcResViewModel = mcResVM,
+                        mcResViewModel = mcResVM,*/
                         onAddModClicked = onAddModClicked,
                         onAddICLevelClick = onAddICLevelClick,
                         onAddICTextureClick = onAddICTextureClick,
@@ -150,24 +147,23 @@ fun Home(
                         onAddMCTextureClick = onAddMCTextureClick
                     )
                     RootViewModel.Screen.PACKAGE_MANAGE -> PackageManager(
-                        viewModel = packageManagerVM,
+                        viewModel = hiltViewModel(),
                         onNavClick = { scope.launch { drawerState.open() } },
                         onOnlineInstallClick = requestOnlineInstall,
                         onLocalInstallClick = onAddPackageClicked,
                         navigateToPackageInfo = navigateToPackageInfo
                     )
                     RootViewModel.Screen.ONLINE_DOWNLOAD -> OnlineMods(
-                        viewModel = onlineModsVM,
+                        viewModel = hiltViewModel(),
                         isLogon = userInfo != null,
                         onNavClick = { scope.launch { drawerState.open() } }
                     )
                     RootViewModel.Screen.DOWNLOADED_MOD -> DownloadedMods(
-                        vm = downloadedModVM,
+                        vm = hiltViewModel(),
                         onNavClicked = { scope.launch { drawerState.open() } }
                     )
                 }
             }
-        }
     }
 }
 

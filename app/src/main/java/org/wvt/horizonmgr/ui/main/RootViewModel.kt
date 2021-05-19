@@ -7,9 +7,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.ViewModel
+import dagger.hilt.android.lifecycle.HiltViewModel
 import org.wvt.horizonmgr.DependenciesContainer
+import javax.inject.Inject
 
-class RootViewModel(private val dependencies: DependenciesContainer) : ViewModel() {
+@HiltViewModel
+class RootViewModel @Inject constructor() : ViewModel() {
 
     enum class Screen(
         val label: String,

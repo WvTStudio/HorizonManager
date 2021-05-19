@@ -3,6 +3,7 @@ package org.wvt.horizonmgr.ui.onlinemods
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collect
@@ -15,10 +16,12 @@ import org.wvt.horizonmgr.webapi.NetworkException
 import org.wvt.horizonmgr.webapi.mod.ChineseMod
 import org.wvt.horizonmgr.webapi.mod.OfficialMirrorMod
 import java.util.*
+import javax.inject.Inject
 
 private const val TAG = "OnlineModsVM"
 
-class OnlineModsViewModel(
+@HiltViewModel
+class OnlineModsViewModel @Inject constructor(
     dependencies: DependenciesContainer
 ) : ViewModel() {
     private val chineseModRepository = dependencies.chineseModRepository

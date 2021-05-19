@@ -3,6 +3,7 @@ package org.wvt.horizonmgr.ui.pacakgemanager
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,10 +18,12 @@ import org.wvt.horizonmgr.ui.components.ProgressDialogState
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
+import javax.inject.Inject
 
 private const val TAG = "PackageManagerVM"
 
-class PackageManagerViewModel(
+@HiltViewModel
+class PackageManagerViewModel @Inject constructor(
     dependencies: DependenciesContainer
 ) : ViewModel() {
     private val mgr = dependencies.manager

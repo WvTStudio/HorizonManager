@@ -10,6 +10,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.hilt.navigation.compose.hiltViewModel
 import org.wvt.horizonmgr.ui.downloaded.DMViewModel
 import org.wvt.horizonmgr.ui.home.HomeViewModel
 import org.wvt.horizonmgr.ui.modulemanager.*
@@ -19,9 +20,9 @@ import org.wvt.horizonmgr.ui.theme.AndroidHorizonManagerTheme
 import org.wvt.horizonmgr.ui.theme.PreviewTheme
 
 @Composable
-fun App(
-    mainVM: MainViewModel,
-    rootVM: RootViewModel,
+fun Main(
+    mainVM: MainViewModel = hiltViewModel(),
+/*    rootVM: RootViewModel,
     homeVM: HomeViewModel,
     modTabVM: ModTabViewModel,
     icLevelTabVM: ICLevelTabViewModel,
@@ -31,7 +32,7 @@ fun App(
     mcLevelVM: MCLevelTabViewModel,
     mcResVM: MCResTabViewModel,
     downloadedModVM: DMViewModel,
-    onlineModsVM: OnlineModsViewModel,
+    onlineModsVM: OnlineModsViewModel,*/
     onInstallHZClick: () -> Unit,
     onInstallMCClick: () -> Unit,
     onRequestPermission: () -> Unit,
@@ -52,7 +53,6 @@ fun App(
     selectTextureForMC: () -> Unit
 ) {
     val userInfo by mainVM.userInfo.collectAsState()
-    val selectedPackage by mainVM.selectedPackage.collectAsState()
     val showPermissionDialog by mainVM.showPermissionDialog.collectAsState()
 
     val newVersion by mainVM.newVersion.collectAsState()
@@ -78,7 +78,7 @@ fun App(
     AndroidHorizonManagerTheme {
         Surface(color = MaterialTheme.colors.background) {
             if (mainVM.initialized) Home(
-                rootVM = rootVM,
+/*                rootVM = rootVM,
                 homeVM = homeVM,
                 modTabVM = modTabVM,
                 icLevelTabVM = icLevelTabVM,
@@ -88,7 +88,7 @@ fun App(
                 mcLevelVM = mcLevelVM,
                 downloadedModVM = downloadedModVM,
                 onlineModsVM = onlineModsVM,
-                mcResVM = mcResVM,
+                mcResVM = mcResVM,*/
                 userInfo = remember(userInfo) {
                     userInfo?.let {
                         UserInformation(
@@ -100,7 +100,6 @@ fun App(
                 },
                 requestLogin = navigateToLogin,
                 requestLogout = mainVM::logOut,
-                selectedPackageUUID = selectedPackage,
                 openGame = requestOpenGame,
                 community = navigateToCommunity,
                 joinGroup = navigateToJoinGroup,

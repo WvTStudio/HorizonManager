@@ -5,6 +5,8 @@ import android.content.Context
 import android.os.Environment
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import dagger.hilt.android.HiltAndroidApp
+import dagger.hilt.android.qualifiers.ApplicationContext
 import org.wvt.horizonmgr.service.hzpack.HorizonManager
 import org.wvt.horizonmgr.service.level.LevelTransporter
 import org.wvt.horizonmgr.service.level.MCLevelManager
@@ -19,22 +21,28 @@ import org.wvt.horizonmgr.webapi.mod.OfficialModMirrorRepository
 import org.wvt.horizonmgr.webapi.news.MgrArticleModule
 import org.wvt.horizonmgr.webapi.news.MgrNewsModule
 import org.wvt.horizonmgr.webapi.pack.OfficialPackageCDNRepository
+import javax.inject.Inject
+import javax.inject.Singleton
 
+@HiltAndroidApp
 class HorizonManagerApplication : Application() {
-    private lateinit var container: DependenciesContainer
+/*    @Inject lateinit var container: DependenciesContainer
     lateinit var dependenciesVMFactory: ViewModelProvider.Factory
-        private set
+        private set*/
 
     override fun onCreate() {
         super.onCreate()
-        container = DependenciesContainer(this)
-        dependenciesVMFactory = DependenciesVMFactory(container)
+//        container = DependenciesContainer(this)
+//        dependenciesVMFactory = DependenciesVMFactory(container)
     }
 }
 
+/*
 val Context.defaultViewModelFactory: ViewModelProvider.Factory
     get() = (applicationContext as HorizonManagerApplication).dependenciesVMFactory
+*/
 
+/*
 private class DependenciesVMFactory(
     private val dependenciesContainer: DependenciesContainer
 ) : ViewModelProvider.Factory {
@@ -44,8 +52,12 @@ private class DependenciesVMFactory(
             .newInstance(dependenciesContainer)
     }
 }
+*/
 
-class DependenciesContainer internal constructor(private val context: Context) {
+@Singleton
+class DependenciesContainer @Inject internal constructor(
+    @ApplicationContext private val context: Context
+) {
     val localCache by lazy { LocalCache(context) }
     val manager by lazy {
         HorizonManager(
@@ -57,7 +69,6 @@ class DependenciesContainer internal constructor(private val context: Context) {
     val mirrorModRepository by lazy { OfficialModMirrorRepository() }
     val mgrInfo by lazy { MgrInfoModule() }
     val iccn by lazy { ICCNModule() }
-    val news by lazy { MgrNewsModule() }
     val article by lazy { MgrArticleModule() }
     val packageDownloader by lazy { OfficialCDNPackageDownloader(context) }
     val modDownloader by lazy { ModDownloader(context) }

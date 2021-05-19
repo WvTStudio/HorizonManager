@@ -6,6 +6,7 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
@@ -15,10 +16,12 @@ import org.wvt.horizonmgr.service.utils.calcSize
 import org.wvt.horizonmgr.utils.longSizeToString
 import java.text.SimpleDateFormat
 import java.util.*
+import javax.inject.Inject
 
 private const val TAG = "PackageDetailVM"
 
-class PackageDetailViewModel(
+@HiltViewModel
+class PackageDetailViewModel @Inject constructor(
     dependenciesContainer: DependenciesContainer
 ) : ViewModel() {
     private val manager = dependenciesContainer.manager

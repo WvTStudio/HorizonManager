@@ -18,7 +18,6 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import org.wvt.horizonmgr.defaultViewModelFactory
 import org.wvt.horizonmgr.ui.components.ErrorPage
 import org.wvt.horizonmgr.ui.theme.AndroidHorizonManagerTheme
 import org.wvt.horizonmgr.ui.theme.AppBarBackgroundColor
@@ -43,7 +42,7 @@ class InstallPackageActivity : AppCompatActivity() {
         const val SUCCEED = 1
     }
 
-    private val viewModel by viewModels<InstallPackageViewModel> { defaultViewModelFactory }
+    private val viewModel by viewModels<InstallPackageViewModel>() /*{ defaultViewModelFactory }*/
 
     enum class Screen {
         CHOOSE_PACKAGE, EDIT_NAME, INSTALL

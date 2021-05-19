@@ -7,9 +7,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import org.wvt.horizonmgr.ui.theme.AppBarBackgroundColor
+import org.wvt.horizonmgr.ui.theme.PreviewTheme
 
 @Composable
 internal fun CustomAppBar(
@@ -44,3 +46,14 @@ internal fun CustomAppBar(
     }
 }
 
+@Preview
+@Composable
+private fun Preview(){
+    PreviewTheme {
+        Column {
+            CustomAppBar(onCancel = { /*TODO*/ }, data = PathTabData(
+                listOf("内部存储", "Android", "com"), 1
+            ), onSelectDepth = { /*TODO*/ })
+        }
+    }
+}

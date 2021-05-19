@@ -6,88 +6,26 @@ import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
 import androidx.compose.ui.Modifier
-import org.wvt.horizonmgr.HorizonManagerApplication
-import org.wvt.horizonmgr.ui.components.ErrorPage
 import org.wvt.horizonmgr.ui.theme.AndroidHorizonManagerTheme
-import org.wvt.horizonmgr.ui.theme.AppBarBackgroundColor
 
 class JoinGroupActivity : AppCompatActivity() {
-    private val vm by viewModels<JoinGroupViewModel> {
-        (application as HorizonManagerApplication).dependenciesVMFactory
-    }
+
+    private val vm: JoinGroupViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        vm.refresh()
 
         setContent {
-            val groups by vm.groups.collectAsState()
-            val isLoading by vm.isLoading.collectAsState()
-            val loadError by vm.loadError.collectAsState()
-            val startError by vm.startQQError.collectAsState()
-            val snackbar = remember { SnackbarHostState() }
-
-            LaunchedEffect(startError) {
-                if (startError) {
-                    try {
-                        snackbar.showSnackbar("启动 QQ 失败")
-                    } finally {
-                        vm.handledError()
-                    }
-                }
-            }
-
             AndroidHorizonManagerTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    Box(Modifier.fillMaxSize()) {
-                        Column(Modifier.fillMaxSize()) {
-                            TopAppBar(
-                                title = { Text("加入群组") },
-                                navigationIcon = {
-                                    IconButton(onClick = { finish() }) {
-                                        Icon(Icons.Filled.ArrowBack, contentDescription = "返回")
-                                    }
-                                },
-                                backgroundColor = AppBarBackgroundColor
-                            )
-                            when {
-                                isLoading && loadError == null -> {
-                                    Box(Modifier.fillMaxSize(), Alignment.Center) {
-                                        CircularProgressIndicator()
-                                    }
-                                }
-                                !isLoading && loadError == null -> GroupList(groups,
-                                    onGroupSelect = { openURL(it.url) }
-                                )
-                                !isLoading && loadError != null -> {
-                                    ErrorPage(
-                                        modifier = Modifier.fillMaxSize(),
-                                        message = { Text("加载失败") },
-                                        onRetryClick = { vm.refresh() }
-                                    )
-                                }
-                            }
-                        }
-                        SnackbarHost(
-                            modifier = Modifier.align(Alignment.BottomCenter),
-                            hostState = snackbar
-                        )
-                    }
+                    JoinGroupScreen(onClose = { finish() }, openURL = ::openURL, vm = vm)
                 }
             }
         }

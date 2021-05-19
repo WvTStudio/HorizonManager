@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.ui.Modifier
-import org.wvt.horizonmgr.defaultViewModelFactory
 import org.wvt.horizonmgr.ui.theme.AndroidHorizonManagerTheme
 
 private const val TAG = "LoginActivity"
@@ -68,7 +67,7 @@ class LoginActivity : AppCompatActivity() {
         const val EXTRA_AVATAR = "avatar"
     }
 
-    private val viewModel by viewModels<LoginViewModel> { defaultViewModelFactory }
+    private val viewModel by viewModels<LoginViewModel>() /*{ defaultViewModelFactory }*/
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

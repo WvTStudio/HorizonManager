@@ -18,8 +18,34 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEachIndexed
 import androidx.compose.ui.zIndex
+import androidx.hilt.navigation.compose.hiltViewModel
 import org.wvt.horizonmgr.ui.components.HorizonDivider
 import org.wvt.horizonmgr.ui.theme.AppBarBackgroundColor
+
+@Composable
+fun ModuleManagerScreen(
+    onNavClicked: () -> Unit,
+    onAddModClicked: () -> Unit,
+    onAddICLevelClick: () -> Unit,
+    onAddMCLevelClick: () -> Unit,
+    onAddICTextureClick: () -> Unit,
+    onAddMCTextureClick: () -> Unit
+) {
+    ModuleManager(
+        managerViewModel = hiltViewModel(),
+        moduleViewModel = hiltViewModel(),
+        icLevelViewModel = hiltViewModel(),
+        icResViewModel = hiltViewModel(),
+        mcLevelViewModel = hiltViewModel(),
+        mcResViewModel = hiltViewModel(),
+        onNavClicked = onNavClicked,
+        onAddModClicked = onAddModClicked,
+        onAddICLevelClick = onAddICLevelClick,
+        onAddMCLevelClick = onAddMCLevelClick,
+        onAddICTextureClick = onAddICTextureClick,
+        onAddMCTextureClick = onAddMCTextureClick
+    )
+}
 
 @Composable
 fun ModuleManager(
@@ -49,10 +75,22 @@ fun ModuleManager(
             Crossfade(selectedTab) {
                 when (it) {
                     ModuleManagerViewModel.Tabs.MOD -> ModTab(moduleViewModel, onAddModClicked)
-                    ModuleManagerViewModel.Tabs.IC_MAP -> ICLevelTab(icLevelViewModel, onAddICLevelClick)
-                    ModuleManagerViewModel.Tabs.MC_MAP -> MCLevelTab(mcLevelViewModel, onAddMCLevelClick)
-                    ModuleManagerViewModel.Tabs.IC_TEXTURE -> ICResTab(icResViewModel, onAddICTextureClick)
-                    ModuleManagerViewModel.Tabs.MC_TEXTURE -> MCResTab(mcResViewModel, onAddMCTextureClick)
+                    ModuleManagerViewModel.Tabs.IC_MAP -> ICLevelTab(
+                        icLevelViewModel,
+                        onAddICLevelClick
+                    )
+                    ModuleManagerViewModel.Tabs.MC_MAP -> MCLevelTab(
+                        mcLevelViewModel,
+                        onAddMCLevelClick
+                    )
+                    ModuleManagerViewModel.Tabs.IC_TEXTURE -> ICResTab(
+                        icResViewModel,
+                        onAddICTextureClick
+                    )
+                    ModuleManagerViewModel.Tabs.MC_TEXTURE -> MCResTab(
+                        mcResViewModel,
+                        onAddMCTextureClick
+                    )
                 }
             }
         }

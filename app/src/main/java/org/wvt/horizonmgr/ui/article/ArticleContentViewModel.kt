@@ -1,21 +1,26 @@
 package org.wvt.horizonmgr.ui.article
 
 import android.util.Log
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import org.wvt.horizonmgr.DependenciesContainer
 import org.wvt.horizonmgr.webapi.NetworkException
+import javax.inject.Inject
 
 private const val TAG = "NewsContentViewModel"
 
-class ArticleContentViewModel(
-    dependencies: DependenciesContainer
+@HiltViewModel
+class ArticleContentViewModel @Inject constructor(
+    dependencies: DependenciesContainer,
+    savedStateHandle: SavedStateHandle
 ) : ViewModel() {
     private val article = dependencies.article
-    private var articleId: String = ""
+    private var articleId: String = savedStateHandle.get<String>("id")!!
 
     data class ArticleContent(
         val title: String,

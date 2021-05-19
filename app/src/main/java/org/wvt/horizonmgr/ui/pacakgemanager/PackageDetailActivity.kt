@@ -20,9 +20,9 @@ class PackageDetailActivity : AppCompatActivity() {
         }
     }
 
-    private val viewModel by viewModels<PackageDetailViewModel> {
+    private val viewModel by viewModels<PackageDetailViewModel>() /*{
         (application as HorizonManagerApplication).dependenciesVMFactory
-    }
+    }*/
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

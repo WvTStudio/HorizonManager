@@ -1,11 +1,11 @@
 package org.wvt.horizonmgr.ui.donate
 
 import android.util.Log
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -13,11 +13,13 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import org.wvt.horizonmgr.DependenciesContainer
 import org.wvt.horizonmgr.webapi.NetworkException
+import javax.inject.Inject
 import kotlin.math.log
 
 private const val TAG = "DonateVMLogger"
 
-class DonateViewModel(
+@HiltViewModel
+class DonateViewModel @Inject constructor(
     dependencies: DependenciesContainer
 ) : ViewModel() {
     private val mgrInfo = dependencies.mgrInfo

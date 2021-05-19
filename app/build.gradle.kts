@@ -2,6 +2,9 @@ plugins {
     id("com.android.application")
     id("kotlin-android")
 
+    kotlin("kapt")
+    id("dagger.hilt.android.plugin")
+
     id("com.google.gms.google-services")
     id("com.google.firebase.crashlytics")
 }
@@ -14,8 +17,8 @@ android {
         applicationId = "org.wvt.horizonmgr"
         minSdk = 21
         targetSdk = 30
-        versionCode = 23
-        versionName = "2.1.1"
+        versionCode = 24
+        versionName = "2.1.2"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -55,11 +58,11 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.0.0-beta06"
+        kotlinCompilerExtensionVersion = "1.0.0-beta07"
     }
-    lint {
+    /*lint {
         disable("InvalidFragmentVersionForActivityResult")
-    }
+    }*/
     kotlinOptions {
         jvmTarget = "1.8"
         freeCompilerArgs = freeCompilerArgs + listOf(
@@ -85,15 +88,26 @@ dependencies {
     implementation(project(":webapi"))
     implementation(project(":service"))
 
-    implementation("androidx.core:core-ktx:1.3.2")
-    implementation("androidx.activity:activity-ktx:1.3.0-alpha07")
-    implementation("androidx.activity:activity-compose:1.3.0-alpha07")
+    implementation("androidx.core:core-ktx:1.5.0")
+    implementation("androidx.activity:activity-ktx:1.3.0-alpha08")
+    implementation("androidx.activity:activity-compose:1.3.0-alpha08")
 
-    implementation("androidx.appcompat:appcompat:1.3.0-rc01")
+    implementation("androidx.appcompat:appcompat:1.4.0-alpha01")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.1")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:1.0.0-alpha04")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:1.0.0-alpha05")
     implementation("com.google.android.material:material:1.3.0")
 
+    implementation("androidx.navigation:navigation-compose:2.4.0-alpha01")
+
+    val workVersion = "2.5.0"
+    implementation("androidx.work:work-runtime-ktx:$workVersion")
+
+
+    val hiltVersion = "2.35.1"
+    implementation("com.google.dagger:hilt-android:$hiltVersion")
+    kapt("com.google.dagger:hilt-android-compiler:$hiltVersion")
+    
+    implementation("androidx.hilt:hilt-navigation-compose:1.0.0-alpha02")
 
     val accompanistVersion = "0.9.0"
     implementation("com.google.accompanist:accompanist-coil:$accompanistVersion")
@@ -101,8 +115,9 @@ dependencies {
     implementation("com.google.accompanist:accompanist-pager:$accompanistVersion")
     implementation("com.google.accompanist:accompanist-systemuicontroller:$accompanistVersion")
     implementation("com.google.accompanist:accompanist-swiperefresh:$accompanistVersion")
+    implementation("com.google.accompanist:accompanist-flowlayout:$accompanistVersion")
 
-    val composeVersion = "1.0.0-beta06"
+    val composeVersion = "1.0.0-beta07"
     implementation("androidx.compose.compiler:compiler:$composeVersion")
     implementation("androidx.compose.runtime:runtime:$composeVersion")
     implementation("androidx.compose.foundation:foundation:$composeVersion")
@@ -124,7 +139,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.1.1")
 
     implementation("com.github.bumptech.glide:glide:4.12.0")
-    annotationProcessor("com.github.bumptech.glide:compiler:4.12.0")
+    kapt("com.github.bumptech.glide:compiler:4.12.0")
 
     val markwonVersion = "4.6.2"
     implementation("io.noties.markwon:core:$markwonVersion")
@@ -133,7 +148,6 @@ dependencies {
     implementation("io.noties.markwon:image-coil:$markwonVersion")
     implementation("io.noties.markwon:syntax-highlight:$markwonVersion")
 
-//    implementation("androidx.navigation:navigation-compose:1.0.0-alpha03")
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.2")
