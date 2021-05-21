@@ -12,6 +12,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
+import dagger.hilt.android.AndroidEntryPoint
 import org.wvt.horizonmgr.ui.theme.AndroidHorizonManagerTheme
 
 sealed class FileSelectorResult {
@@ -42,6 +43,7 @@ class FileSelectorResultContract : ActivityResultContract<Context, FileSelectorR
 }
 
 
+@AndroidEntryPoint
 class FileSelectorActivity : AppCompatActivity() {
     companion object {
         const val CANCEL = 0

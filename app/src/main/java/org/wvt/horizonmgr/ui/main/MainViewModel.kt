@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.wvt.horizonmgr.BuildConfig
@@ -13,10 +14,12 @@ import org.wvt.horizonmgr.DependenciesContainer
 import org.wvt.horizonmgr.ui.login.LoginResult
 import org.wvt.horizonmgr.utils.LocalCache
 import org.wvt.horizonmgr.webapi.NetworkException
+import javax.inject.Inject
 
 private const val TAG = "MainActivityVM"
 
-class MainViewModel(
+@HiltViewModel
+class MainViewModel @Inject constructor(
     dependencies: DependenciesContainer
 ) : ViewModel() {
     private val localCache = dependencies.localCache

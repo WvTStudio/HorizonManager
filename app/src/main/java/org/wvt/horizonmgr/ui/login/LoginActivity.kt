@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.ui.Modifier
+import dagger.hilt.android.AndroidEntryPoint
 import org.wvt.horizonmgr.ui.theme.AndroidHorizonManagerTheme
 
 private const val TAG = "LoginActivity"
@@ -56,6 +57,7 @@ class LoginResultContract : ActivityResultContract<Unit, LoginResult>() {
     }
 }
 
+@AndroidEntryPoint
 class LoginActivity : AppCompatActivity() {
     companion object {
         const val LOGIN_CANCELED = 0

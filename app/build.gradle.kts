@@ -109,7 +109,7 @@ dependencies {
     
     implementation("androidx.hilt:hilt-navigation-compose:1.0.0-alpha02")
 
-    val accompanistVersion = "0.9.0"
+    val accompanistVersion = "0.10.0"
     implementation("com.google.accompanist:accompanist-coil:$accompanistVersion")
     implementation("com.google.accompanist:accompanist-insets:$accompanistVersion")
     implementation("com.google.accompanist:accompanist-pager:$accompanistVersion")

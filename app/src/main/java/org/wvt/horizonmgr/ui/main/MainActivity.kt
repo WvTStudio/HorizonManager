@@ -12,6 +12,9 @@ import android.provider.Settings
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
+import dagger.hilt.android.AndroidEntryPoint
 import org.wvt.horizonmgr.R
 import org.wvt.horizonmgr.ui.article.ArticleContentActivityContract
 import org.wvt.horizonmgr.ui.community.CommunityActivity
@@ -29,9 +32,11 @@ import org.wvt.horizonmgr.ui.pacakgemanager.PackageDetailActivity
 import org.wvt.horizonmgr.ui.pacakgemanager.PackageManagerViewModel
 import org.wvt.horizonmgr.ui.settings.SettingsActivity
 import org.wvt.horizonmgr.ui.startActivity
+import org.wvt.horizonmgr.ui.theme.AndroidHorizonManagerTheme
 
 private const val TAG = "MainActivity"
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 //    private val factory by lazy { HiltViewModelFactory(this, NavBackStackEntry.create(this)) }
 
@@ -218,38 +223,30 @@ class MainActivity : AppCompatActivity() {
         setTheme(R.style.Theme_HorizonManagerCompose_NoActionBar) // cancel the slash theme
 
         setContent {
-            Main(
-/*                mainVM = mainVM,
-                rootVM = rootVM,
-                homeVM = homeVM,
-                modTabVM = modTabVM,
-                icLevelTabVM = icLevelTabVM,
-                icResTabVM = icResTabVM,
-                moduleManagerVM = moduleManagerVM,
-                packageManagerVM = packageManagerVM,
-                mcLevelVM = mcLevelVM,
-                mcResVM = mcResVM,
-                downloadedModVM = downloadedModVM,
-                onlineModsVM = onlineModsVM,*/
-                onRequestPermission = ::requestPermission,
-                navigateToCommunity = ::startCommunityActivity,
-                navigateToDonate = ::startDonateActivity,
-                navigateToJoinGroup = ::startJoinGroupActivity,
-                navigateToLogin = { login.launch(Unit) },
-                navigateToSettings = ::startSettingsActivity,
-                navigateToOnlineInstall = ::startOnlineInstallActivity,
-                navigateToPackageInfo = { PackageDetailActivity.start(this, it) },
-                requestOpenGame = ::openGame,
-                selectFileForMod = ::startSelectFileActivityForMod,
-                selectFileForPackage = ::startSelectFileActivityForPackage,
-                selectLevelForIC = { selectLevelForIC.launch(this) },
-                selectLevelForMC = { selectLevelForMC.launch(this) },
-                selectTextureForIC = { selectTextureForIC.launch(this) },
-                selectTextureForMC = { selectTextureForMC.launch(this) },
-                onInstallHZClick = { openCoolapkURL() },
-                onInstallMCClick = { openMCGooglePlay() },
-                navigateToNewsDetail = { newsDetail.launch(it) }
-            )
+            AndroidHorizonManagerTheme {
+                Surface(color = MaterialTheme.colors.background) {
+                    Main(
+                        onRequestPermission = ::requestPermission,
+                        navigateToCommunity = ::startCommunityActivity,
+                        navigateToDonate = ::startDonateActivity,
+                        navigateToJoinGroup = ::startJoinGroupActivity,
+                        navigateToLogin = { login.launch(Unit) },
+                        navigateToSettings = ::startSettingsActivity,
+                        navigateToOnlineInstall = ::startOnlineInstallActivity,
+                        navigateToPackageInfo = { PackageDetailActivity.start(this, it) },
+                        requestOpenGame = ::openGame,
+                        selectFileForMod = ::startSelectFileActivityForMod,
+                        selectFileForPackage = ::startSelectFileActivityForPackage,
+                        selectLevelForIC = { selectLevelForIC.launch(this) },
+                        selectLevelForMC = { selectLevelForMC.launch(this) },
+                        selectTextureForIC = { selectTextureForIC.launch(this) },
+                        selectTextureForMC = { selectTextureForMC.launch(this) },
+                        onInstallHZClick = { openCoolapkURL() },
+                        onInstallMCClick = { openMCGooglePlay() },
+                        navigateToNewsDetail = { newsDetail.launch(it) }
+                    )
+                }
+            }
         }
 
         this.checkPermission()

@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.internal.lifecycle.HiltViewModelFactory
 import org.wvt.horizonmgr.ui.theme.AndroidHorizonManagerTheme
 
 class ArticleContentActivityContract : ActivityResultContract<String, Unit>() {
@@ -26,9 +27,7 @@ class ArticleContentActivityContract : ActivityResultContract<String, Unit>() {
 
 @AndroidEntryPoint
 class ArticleContentActivity : AppCompatActivity() {
-    private val vm by viewModels<ArticleContentViewModel>() /*{
-        (application as HorizonManagerApplication).dependenciesVMFactory
-    }*/
+    private val vm by viewModels<ArticleContentViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

@@ -11,28 +11,12 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
-import org.wvt.horizonmgr.ui.downloaded.DMViewModel
-import org.wvt.horizonmgr.ui.home.HomeViewModel
-import org.wvt.horizonmgr.ui.modulemanager.*
-import org.wvt.horizonmgr.ui.onlinemods.OnlineModsViewModel
-import org.wvt.horizonmgr.ui.pacakgemanager.PackageManagerViewModel
-import org.wvt.horizonmgr.ui.theme.AndroidHorizonManagerTheme
 import org.wvt.horizonmgr.ui.theme.PreviewTheme
+import java.io.File
 
 @Composable
 fun Main(
     mainVM: MainViewModel = hiltViewModel(),
-/*    rootVM: RootViewModel,
-    homeVM: HomeViewModel,
-    modTabVM: ModTabViewModel,
-    icLevelTabVM: ICLevelTabViewModel,
-    icResTabVM: ICResTabViewModel,
-    moduleManagerVM: ModuleManagerViewModel,
-    packageManagerVM: PackageManagerViewModel,
-    mcLevelVM: MCLevelTabViewModel,
-    mcResVM: MCResTabViewModel,
-    downloadedModVM: DMViewModel,
-    onlineModsVM: OnlineModsViewModel,*/
     onInstallHZClick: () -> Unit,
     onInstallMCClick: () -> Unit,
     onRequestPermission: () -> Unit,
@@ -75,89 +59,76 @@ fun Main(
         }
     }
 
-    AndroidHorizonManagerTheme {
-        Surface(color = MaterialTheme.colors.background) {
-            if (mainVM.initialized) Home(
-/*                rootVM = rootVM,
-                homeVM = homeVM,
-                modTabVM = modTabVM,
-                icLevelTabVM = icLevelTabVM,
-                icResTabVM = icResTabVM,
-                moduleManagerVM = moduleManagerVM,
-                packageManagerVM = packageManagerVM,
-                mcLevelVM = mcLevelVM,
-                downloadedModVM = downloadedModVM,
-                onlineModsVM = onlineModsVM,
-                mcResVM = mcResVM,*/
-                userInfo = remember(userInfo) {
-                    userInfo?.let {
-                        UserInformation(
-                            it.name,
-                            it.account,
-                            it.avatarUrl
-                        )
-                    }
-                },
-                requestLogin = navigateToLogin,
-                requestLogout = mainVM::logOut,
-                openGame = requestOpenGame,
-                community = navigateToCommunity,
-                joinGroup = navigateToJoinGroup,
-                donate = navigateToDonate,
-                settings = navigateToSettings,
-                requestOnlineInstall = navigateToOnlineInstall,
-                onAddModClicked = selectFileForMod,
-                onAddPackageClicked = selectFileForPackage,
-                navigateToPackageInfo = navigateToPackageInfo,
-                navigateToNewsDetail = navigateToNewsDetail,
-                onAddMCTextureClick = selectTextureForMC,
-                onAddMCLevelClick = selectLevelForMC,
-                onAddICTextureClick = selectTextureForIC,
-                onAddICLevelClick = selectLevelForIC
-            )
-        }
+    Surface(color = MaterialTheme.colors.background) {
+        if (mainVM.initialized) Home(
+            userInfo = remember(userInfo) {
+                userInfo?.let {
+                    UserInformation(
+                        it.name,
+                        it.account,
+                        it.avatarUrl
+                    )
+                }
+            },
+            requestLogin = navigateToLogin,
+            requestLogout = mainVM::logOut,
+            openGame = requestOpenGame,
+            community = navigateToCommunity,
+            joinGroup = navigateToJoinGroup,
+            donate = navigateToDonate,
+            settings = navigateToSettings,
+            requestOnlineInstall = navigateToOnlineInstall,
+            onAddModClicked = selectFileForMod,
+            onAddPackageClicked = selectFileForPackage,
+            navigateToPackageInfo = navigateToPackageInfo,
+            navigateToNewsDetail = navigateToNewsDetail,
+            onAddMCTextureClick = selectTextureForMC,
+            onAddMCLevelClick = selectLevelForMC,
+            onAddICTextureClick = selectTextureForIC,
+            onAddICLevelClick = selectLevelForIC
+        )
+    }
 
-        if (showPermissionDialog) {
-            RequestPermissionDialog {
-                mainVM.dismiss()
-                onRequestPermission()
+    if (showPermissionDialog) {
+        RequestPermissionDialog {
+            mainVM.dismiss()
+            onRequestPermission()
+        }
+    }
+
+    val theNewVersion = newVersion
+
+    if (theNewVersion != null && displayNewVersionDialog) {
+        NewVersionDialog(
+            versionName = theNewVersion.versionName,
+            versionCode = theNewVersion.versionCode,
+            changelog = theNewVersion.changelog,
+            onConfirm = { displayNewVersionDialog = false },
+            onIgnore = {
+                mainVM.ignoreVersion(theNewVersion.versionCode)
+                displayNewVersionDialog = false
             }
-        }
+        )
+    }
 
-        val theNewVersion = newVersion
+    if (showHZNotInstall) {
+        InstallHorizonDialog(
+            onDismiss = { mainVM.dismissGameNotInstallDialog() },
+            onConfirm = {
+                onInstallHZClick()
+                mainVM.dismissHZNotInstallDialog()
+            }
+        )
+    }
 
-        if (theNewVersion != null && displayNewVersionDialog) {
-            NewVersionDialog(
-                versionName = theNewVersion.versionName,
-                versionCode = theNewVersion.versionCode,
-                changelog = theNewVersion.changelog,
-                onConfirm = { displayNewVersionDialog = false },
-                onIgnore = {
-                    mainVM.ignoreVersion(theNewVersion.versionCode)
-                    displayNewVersionDialog = false
-                }
-            )
-        }
-
-        if (showHZNotInstall) {
-            InstallHorizonDialog(
-                onDismiss = { mainVM.dismissGameNotInstallDialog() },
-                onConfirm = {
-                    onInstallHZClick()
-                    mainVM.dismissHZNotInstallDialog()
-                }
-            )
-        }
-
-        if (showGameNotInstall) {
-            InstallMCDialog(
-                onDismiss = { mainVM.dismissGameNotInstallDialog() },
-                onConfirm = {
-                    onInstallMCClick()
-                    mainVM.dismissGameNotInstallDialog()
-                }
-            )
-        }
+    if (showGameNotInstall) {
+        InstallMCDialog(
+            onDismiss = { mainVM.dismissGameNotInstallDialog() },
+            onConfirm = {
+                onInstallMCClick()
+                mainVM.dismissGameNotInstallDialog()
+            }
+        )
     }
 }
 
@@ -181,6 +152,7 @@ private fun NewVersionDialog(
     onConfirm: () -> Unit,
     onIgnore: () -> Unit
 ) {
+    File(".")
     AlertDialog(
         title = { Text("发现新版本") },
         text = {

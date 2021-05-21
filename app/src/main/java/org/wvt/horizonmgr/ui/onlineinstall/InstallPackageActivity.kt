@@ -18,6 +18,7 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import dagger.hilt.android.AndroidEntryPoint
 import org.wvt.horizonmgr.ui.components.ErrorPage
 import org.wvt.horizonmgr.ui.theme.AndroidHorizonManagerTheme
 import org.wvt.horizonmgr.ui.theme.AppBarBackgroundColor
@@ -36,6 +37,7 @@ class InstallPackageResultContract : ActivityResultContract<Context, Boolean>() 
     }
 }
 
+@AndroidEntryPoint
 class InstallPackageActivity : AppCompatActivity() {
     companion object {
         const val CANCEL = 0
