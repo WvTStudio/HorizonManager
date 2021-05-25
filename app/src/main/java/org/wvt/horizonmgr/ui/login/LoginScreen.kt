@@ -23,12 +23,12 @@ private const val TAG = "ComposeLogin"
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun Login(
-    vm: LoginViewModel,
+fun LoginScreen(
+    viewModel: LoginViewModel,
     onLoginSuccess: (account: String, avatar: String?, name: String, uid: String) -> Unit,
     onCancel: () -> Unit
 ) {
-    val fabState by vm.fabState.collectAsState()
+    val fabState by viewModel.fabState.collectAsState()
 
     val snackbarHostState = remember { SnackbarHostState() }
     var screen by remember { mutableStateOf(0) }
@@ -108,7 +108,7 @@ fun Login(
             exit = remember { fadeOut() + slideOutHorizontally({ -80 }) }
         ) {
             LoginPage(onLoginClicked = { account, password ->
-                vm.login(account, password, snackbarHostState, onLoginSuccess)
+                viewModel.login(account, password, snackbarHostState, onLoginSuccess)
             }, onRegisterRequested = {
                 screen = 1
             }, fabState = fabState)
@@ -124,7 +124,7 @@ fun Login(
             RegisterPage(
                 fabState = fabState,
                 onRegisterRequest = { u, e, p, c ->
-                    vm.register(u, e, p, c, snackbarHostState) { _, _, _ ->
+                    viewModel.register(u, e, p, c, snackbarHostState) { _, _, _ ->
                         screen = 0
                     }
                 },

@@ -27,7 +27,7 @@ class JoinGroupActivity : AppCompatActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    JoinGroupScreen(onClose = { finish() }, openURL = ::openURL, vm = vm)
+                    JoinGroupScreen(onClose = { finish() }, openURL = ::openURL, viewModel = vm)
                 }
             }
         }

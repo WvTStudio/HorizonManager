@@ -28,7 +28,7 @@ class CommunityActivity : AppCompatActivity() {
         setContent {
             AndroidHorizonManagerTheme {
                 Surface(color = MaterialTheme.colors.background) {
-                    Community(vm = viewModel, onClose = ::close)
+                    CommunityScreen(vm = viewModel, onClose = ::close)
                 }
             }
         }

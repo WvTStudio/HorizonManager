@@ -9,7 +9,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.wvt.horizonmgr.DependenciesContainer
+import org.wvt.horizonmgr.utils.LocalCache
 import java.io.File
 import java.util.*
 import javax.inject.Inject
@@ -17,8 +17,9 @@ import javax.inject.Inject
 private const val TAG = "FileSelectorVM"
 
 @HiltViewModel
-class FileSelectorViewModel @Inject constructor(dependencies: DependenciesContainer) : ViewModel() {
-    private val localCache = dependencies.localCache
+class FileSelectorViewModel @Inject constructor(
+    private val localCache: LocalCache
+) : ViewModel() {
 
     sealed class State {
         object Loading : State()

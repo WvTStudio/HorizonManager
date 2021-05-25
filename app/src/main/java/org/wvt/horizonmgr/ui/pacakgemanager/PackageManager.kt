@@ -21,6 +21,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.SwipeRefreshIndicator
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
@@ -29,6 +30,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import org.wvt.horizonmgr.ui.components.*
+import org.wvt.horizonmgr.ui.fileselector.SharedFileChooserViewModel
 import org.wvt.horizonmgr.ui.theme.AppBarBackgroundColor
 import kotlin.coroutines.resume
 
@@ -40,6 +42,35 @@ data class PackageManagerItem(
 )
 
 @Composable
+fun PackageManagerScreen(
+    navigateToPackageInfo: (uuid: String) -> Unit,
+    onOnlineInstallClick: () -> Unit,
+    onLocalInstallClick: () -> Unit,
+    onNavClick: () -> Unit
+) {
+    val sharedFileChooserVM = hiltViewModel<SharedFileChooserViewModel>()
+    val selectedFile by sharedFileChooserVM.selected.collectAsState()
+    val packageVM = hiltViewModel<PackageManagerViewModel>()
+
+    LaunchedEffect(selectedFile) {
+        selectedFile?.let {
+            if (it.requestCode == "add_package") {
+                packageVM.selectedFile(it.path)
+                sharedFileChooserVM.handledSelectedFile()
+            }
+        }
+    }
+
+    PackageManager(
+        viewModel = packageVM,
+        navigateToPackageInfo = navigateToPackageInfo,
+        onOnlineInstallClick = onOnlineInstallClick,
+        onLocalInstallClick = onLocalInstallClick,
+        onNavClick = onNavClick
+    )
+}
+
+@Composable
 fun PackageManager(
     viewModel: PackageManagerViewModel,
     navigateToPackageInfo: (uuid: String) -> Unit,
@@ -48,7 +79,6 @@ fun PackageManager(
     onNavClick: () -> Unit
 ) {
     LaunchedEffect(Unit) { viewModel.loadPackages() }
-
     val packages by viewModel.packages.collectAsState()
     val selectedPackage by viewModel.selectedPackage.collectAsState()
     val progressState by viewModel.progressState.collectAsState()
@@ -67,7 +97,7 @@ fun PackageManager(
 
     Box {
         Column {
-            var showMenu by remember { mutableStateOf(false) }
+//            var showMenu by remember { mutableStateOf(false) }
             // Top App Bar
             TopAppBar(
                 modifier = Modifier.zIndex(4.dp.value),

@@ -11,8 +11,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.wvt.horizonmgr.DependenciesContainer
 import org.wvt.horizonmgr.ui.components.FabState
+import org.wvt.horizonmgr.utils.LocalCache
 import org.wvt.horizonmgr.webapi.NetworkException
 import org.wvt.horizonmgr.webapi.iccn.ICCNModule
 import javax.inject.Inject
@@ -20,8 +20,10 @@ import javax.inject.Inject
 private const val TAG = "LoginViewModelLogger"
 
 @HiltViewModel
-class LoginViewModel @Inject constructor(dependencies: DependenciesContainer) : ViewModel() {
-    private val iccn = dependencies.iccn
+class LoginViewModel @Inject constructor(
+    private val localCache: LocalCache,
+    private val iccn: ICCNModule
+) : ViewModel() {
     val fabState = MutableStateFlow<FabState>(FabState.TODO)
 
     fun login(
@@ -53,6 +55,14 @@ class LoginViewModel @Inject constructor(dependencies: DependenciesContainer) : 
                 return@launch
             }
             fabState.emit(FabState.SUCCEED)
+            localCache.cacheUserInfo(
+                LocalCache.CachedUserInfo(
+                    userInfo.uid,
+                    userInfo.name,
+                    userInfo.account,
+                    userInfo.avatarUrl!!
+                )
+            )
             launch { snackbarHostState.showSnackbar("登录成功") } // 此处用 launch 的原因是为了 UX，只希望等待 800ms
             delay(800)
             onLoginSuccess(userInfo.account, userInfo.avatarUrl, userInfo.name, userInfo.uid)

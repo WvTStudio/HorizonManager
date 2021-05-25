@@ -11,20 +11,22 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.launch
-import org.wvt.horizonmgr.DependenciesContainer
+import org.wvt.horizonmgr.service.hzpack.HorizonManager
 import org.wvt.horizonmgr.service.respack.ResourcePackManager
 import org.wvt.horizonmgr.service.respack.ResourcePackManifest
 import org.wvt.horizonmgr.service.respack.ZipResourcePackage
 import org.wvt.horizonmgr.ui.components.ProgressDialogState
+import org.wvt.horizonmgr.utils.LocalCache
 import java.io.File
 import javax.inject.Inject
 
 private const val TAG = "ICResTabVM"
 
 @HiltViewModel
-class ICResTabViewModel @Inject constructor(dependencies: DependenciesContainer) : ViewModel() {
-    private val packMgr = dependencies.manager
-    private val localCache = dependencies.localCache
+class ICResTabViewModel @Inject constructor(
+    private val packMgr: HorizonManager,
+    private val localCache: LocalCache
+) : ViewModel() {
 
     val state = MutableStateFlow<State>(State.Loading)
     val resPacks = MutableStateFlow<List<ResPack>>(emptyList())

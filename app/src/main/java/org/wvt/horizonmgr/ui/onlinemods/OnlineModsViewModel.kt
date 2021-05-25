@@ -9,12 +9,16 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.consumeAsFlow
-import org.wvt.horizonmgr.DependenciesContainer
+import org.wvt.horizonmgr.service.hzpack.HorizonManager
 import org.wvt.horizonmgr.service.mod.ZipMod
 import org.wvt.horizonmgr.ui.components.ProgressDialogState
+import org.wvt.horizonmgr.utils.LocalCache
+import org.wvt.horizonmgr.utils.ModDownloader
 import org.wvt.horizonmgr.webapi.NetworkException
 import org.wvt.horizonmgr.webapi.mod.ChineseMod
+import org.wvt.horizonmgr.webapi.mod.ChineseModRepository
 import org.wvt.horizonmgr.webapi.mod.OfficialMirrorMod
+import org.wvt.horizonmgr.webapi.mod.OfficialModMirrorRepository
 import java.util.*
 import javax.inject.Inject
 
@@ -22,13 +26,12 @@ private const val TAG = "OnlineModsVM"
 
 @HiltViewModel
 class OnlineModsViewModel @Inject constructor(
-    dependencies: DependenciesContainer
+    private val chineseModRepository: ChineseModRepository,
+    private val cdnModRepository: OfficialModMirrorRepository,
+    private val modDownloader: ModDownloader,
+    private val localCache: LocalCache,
+    private val manager: HorizonManager
 ) : ViewModel() {
-    private val chineseModRepository = dependencies.chineseModRepository
-    private val cdnModRepository = dependencies.mirrorModRepository
-    private val modDownloader = dependencies.modDownloader
-    private val localCache = dependencies.localCache
-    private val manager = dependencies.manager
 
     private var cachedMirrorMods: List<OfficialMirrorMod> = emptyList()
     val cdnMods = MutableStateFlow<List<OfficialMirrorModModel>>(emptyList())

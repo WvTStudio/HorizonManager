@@ -9,10 +9,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
@@ -24,13 +21,15 @@ import org.wvt.horizonmgr.ui.components.ImageWithoutQualityFilter
 import org.wvt.horizonmgr.ui.theme.AppBarBackgroundColor
 
 @Composable
-fun PackageInfo(
-    vm: PackageDetailViewModel,
+fun PackageDetailScreen(
+    viewModel: PackageDetailViewModel,
     onCloseClick: () -> Unit
 ) {
-    val info by vm.info.collectAsState()
-    val pkgSize by vm.pkgSize.collectAsState()
-    val state = vm.state.collectAsState().value
+    val info by viewModel.info.collectAsState()
+    val pkgSize by viewModel.pkgSize.collectAsState()
+    val state = viewModel.state.collectAsState().value
+
+    LaunchedEffect(Unit) { viewModel.load() }
 
     Column(Modifier.fillMaxSize()) {
         TopAppBar(
@@ -54,7 +53,7 @@ fun PackageInfo(
                     }
                 }
                 PackageDetailViewModel.State.FAILED -> {
-                    ErrorPage(message = { Text("获取分包详情失败") }, onRetryClick = { vm.load() })
+                    ErrorPage(message = { Text("获取分包详情失败") }, onRetryClick = { viewModel.load() })
                 }
                 PackageDetailViewModel.State.SUCCEED -> {
                     val info = info

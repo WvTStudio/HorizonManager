@@ -8,19 +8,20 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
-import org.wvt.horizonmgr.DependenciesContainer
 import org.wvt.horizonmgr.webapi.NetworkException
+import org.wvt.horizonmgr.webapi.news.MgrArticleModule
 import javax.inject.Inject
 
-private const val TAG = "NewsContentViewModel"
+private const val TAG = "ArticleContentViewModel"
 
 @HiltViewModel
 class ArticleContentViewModel @Inject constructor(
-    dependencies: DependenciesContainer,
-    savedStateHandle: SavedStateHandle
+    savedStateHandle: SavedStateHandle,
+    private val articleModule: MgrArticleModule
 ) : ViewModel() {
-    private val article = dependencies.article
     private var articleId: String = savedStateHandle.get<String>("id")!!
+
+    init { refresh() }
 
     data class ArticleContent(
         val title: String,
@@ -60,7 +61,7 @@ class ArticleContentViewModel @Inject constructor(
 
     private suspend fun loadData() {
         val result = try {
-            article.getArticle(articleId)
+            articleModule.getArticle(articleId)
         } catch (e: NetworkException) {
             content.emit(Result.NetworkError)
             Log.e(TAG, "获取文章内容时出现网络错误", e)

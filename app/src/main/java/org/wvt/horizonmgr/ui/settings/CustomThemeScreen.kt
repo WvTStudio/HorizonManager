@@ -38,7 +38,7 @@ data class CustomColor(
 )
 
 @Composable
-fun CustomTheme(requestClose: () -> Unit) {
+fun CustomThemeScreen(requestClose: () -> Unit) {
     val colors = remember { MaterialColors.series }
     var checkedColorType by remember { mutableStateOf(CheckedColorType.LIGHT_PRIMARY) }
     val themeConfig = LocalThemeConfig.current

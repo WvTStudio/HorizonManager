@@ -34,144 +34,124 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.launch
 import org.wvt.horizonmgr.R
 import org.wvt.horizonmgr.ui.components.NetworkImage
-import org.wvt.horizonmgr.ui.downloaded.DMViewModel
 import org.wvt.horizonmgr.ui.downloaded.DownloadedMods
-import org.wvt.horizonmgr.ui.modulemanager.*
-import org.wvt.horizonmgr.ui.home.Home
 import org.wvt.horizonmgr.ui.home.HomeScreen
 import org.wvt.horizonmgr.ui.home.HomeViewModel
+import org.wvt.horizonmgr.ui.modulemanager.ModuleManagerScreen
 import org.wvt.horizonmgr.ui.onlinemods.OnlineMods
-import org.wvt.horizonmgr.ui.onlinemods.OnlineModsViewModel
-import org.wvt.horizonmgr.ui.pacakgemanager.PackageManager
-import org.wvt.horizonmgr.ui.pacakgemanager.PackageManagerViewModel
+import org.wvt.horizonmgr.ui.pacakgemanager.PackageManagerScreen
 import org.wvt.horizonmgr.ui.theme.LocalThemeConfig
 import org.wvt.horizonmgr.ui.theme.PreviewTheme
+
 @Composable
-fun Home(
-//    rootVM: RootViewModel,
-//    homeVM: HomeViewModel,
-//    modTabVM: ModTabViewModel,
-//    icLevelTabVM: ICLevelTabViewModel,
-//    icResTabVM: ICResTabViewModel,
-//    moduleManagerVM: ModuleManagerViewModel,
-//    packageManagerVM: PackageManagerViewModel,
-//    mcLevelVM: MCLevelTabViewModel,
-//    mcResVM: MCResTabViewModel,
-//    downloadedModVM: DMViewModel,
-//    onlineModsVM: OnlineModsViewModel,
-    userInfo: UserInformation?,
-    requestLogin: () -> Unit,
-    requestLogout: () -> Unit,
-    requestOnlineInstall: () -> Unit,
+fun MainScreen(
+    viewModel: MainViewModel = hiltViewModel(),
+    requestOpenGame: () -> Unit,
+    navigateToLogin: () -> Unit,
+    navigateToOnlineInstall: () -> Unit,
+    navigateToCommunity: () -> Unit,
+    navigateToJoinGroup: () -> Unit,
+    navigateToDonate: () -> Unit,
+    navigateToSettings: () -> Unit,
+    navigateToPackageDetail: (uuid: String) -> Unit,
+    navigateToArticleDetail: (articleId: String) -> Unit,
     onAddModClicked: () -> Unit,
     onAddPackageClicked: () -> Unit,
     onAddICLevelClick: () -> Unit,
     onAddMCLevelClick: () -> Unit,
     onAddICTextureClick: () -> Unit,
-    onAddMCTextureClick: () -> Unit,
-    community: () -> Unit,
-    openGame: () -> Unit,
-    joinGroup: () -> Unit,
-    donate: () -> Unit,
-    settings: () -> Unit,
-    navigateToPackageInfo: (uuid: String) -> Unit,
-    navigateToNewsDetail: (newsId: String) -> Unit
+    onAddMCTextureClick: () -> Unit
 ) {
-    val vm: RootViewModel = hiltViewModel()
     val scope = rememberCoroutineScope()
     val drawerState = rememberDrawerState(DrawerValue.Closed)
-    val screens by remember { mutableStateOf(RootViewModel.Screen.values()) }
+    val screens by remember { mutableStateOf(MainViewModel.Screen.values()) }
+    val userInfo by viewModel.userInfo.collectAsState()
+
+    LaunchedEffect(Unit) { viewModel.resume() }
 
     Drawer(
         state = drawerState,
         header = {
             DrawerHeader(
                 userInfo = userInfo,
-                requestLogin = requestLogin,
-                requestLogout = requestLogout
+                requestLogin = navigateToLogin,
+                requestLogout = { viewModel.logOut() }
             )
         },
         tabs = {
-            DrawerTabs(screens = screens, currentScreen = vm.currentScreen, onChange = {
-                vm.navigate(it)
+            DrawerTabs(screens = screens, currentScreen = viewModel.currentScreen, onChange = {
+                viewModel.navigate(it)
                 scope.launch { drawerState.close() }
             })
         },
         items = {
             NavigationItem(
-                checked = false, onCheckedChange = { community() },
+                checked = false, onCheckedChange = { navigateToCommunity() },
                 text = "中文社区", icon = Icons.Filled.Forum
             )
             NavigationItem(
-                checked = false, onCheckedChange = { openGame() },
+                checked = false, onCheckedChange = { requestOpenGame() },
                 text = "进入游戏", icon = Icons.Filled.Gamepad
             )
             NavigationItem(
-                checked = false, onCheckedChange = { joinGroup() },
+                checked = false, onCheckedChange = { navigateToJoinGroup() },
                 text = "加入群组", icon = Icons.Filled.Group
             )
             NavigationItem(
-                checked = false, onCheckedChange = { donate() },
+                checked = false, onCheckedChange = { navigateToDonate() },
                 text = "捐赠作者", icon = Icons.Filled.AttachMoney
             )
         },
         setting = {
             NavigationItem(
-                checked = false, onCheckedChange = { settings() },
+                checked = false, onCheckedChange = { navigateToSettings() },
                 text = "设置", icon = Icons.Filled.Settings
             )
         }
     ) {
-            Crossfade(targetState = vm.currentScreen) { cs ->
-                when (cs) {
-                    RootViewModel.Screen.HOME -> HomeScreen(
-                        onNavClick = { scope.launch { drawerState.open() } },
-                        onNewsClick = {
-                            if (it is HomeViewModel.ContentResource.Article) {
-                                navigateToNewsDetail(it.id)
-                            }
+        Crossfade(targetState = viewModel.currentScreen) { cs ->
+            when (cs) {
+                MainViewModel.Screen.HOME -> HomeScreen(
+                    onNavClick = { scope.launch { drawerState.open() } },
+                    onNewsClick = {
+                        if (it is HomeViewModel.ContentResource.Article) {
+                            navigateToArticleDetail(it.id)
                         }
-                    )
-                    RootViewModel.Screen.LOCAL_MANAGE -> ModuleManagerScreen(
-                        onNavClicked = { scope.launch { drawerState.open() } },/*
-                        managerViewModel = moduleManagerVM,
-                        moduleViewModel = modTabVM,
-                        icLevelViewModel = icLevelTabVM,
-                        icResViewModel = icResTabVM,
-                        mcLevelViewModel = mcLevelVM,
-                        mcResViewModel = mcResVM,*/
-                        onAddModClicked = onAddModClicked,
-                        onAddICLevelClick = onAddICLevelClick,
-                        onAddICTextureClick = onAddICTextureClick,
-                        onAddMCLevelClick = onAddMCLevelClick,
-                        onAddMCTextureClick = onAddMCTextureClick
-                    )
-                    RootViewModel.Screen.PACKAGE_MANAGE -> PackageManager(
-                        viewModel = hiltViewModel(),
-                        onNavClick = { scope.launch { drawerState.open() } },
-                        onOnlineInstallClick = requestOnlineInstall,
-                        onLocalInstallClick = onAddPackageClicked,
-                        navigateToPackageInfo = navigateToPackageInfo
-                    )
-                    RootViewModel.Screen.ONLINE_DOWNLOAD -> OnlineMods(
-                        viewModel = hiltViewModel(),
-                        isLogon = userInfo != null,
-                        onNavClick = { scope.launch { drawerState.open() } }
-                    )
-                    RootViewModel.Screen.DOWNLOADED_MOD -> DownloadedMods(
-                        vm = hiltViewModel(),
-                        onNavClicked = { scope.launch { drawerState.open() } }
-                    )
-                }
+                    }
+                )
+                MainViewModel.Screen.LOCAL_MANAGE -> ModuleManagerScreen(
+                    onNavClicked = { scope.launch { drawerState.open() } },
+                    onAddModClicked = onAddModClicked,
+                    onAddICLevelClick = onAddICLevelClick,
+                    onAddICTextureClick = onAddICTextureClick,
+                    onAddMCLevelClick = onAddMCLevelClick,
+                    onAddMCTextureClick = onAddMCTextureClick
+                )
+                MainViewModel.Screen.PACKAGE_MANAGE -> PackageManagerScreen(
+                    onNavClick = { scope.launch { drawerState.open() } },
+                    onOnlineInstallClick = navigateToOnlineInstall,
+                    onLocalInstallClick = onAddPackageClicked,
+                    navigateToPackageInfo = navigateToPackageDetail
+                )
+                MainViewModel.Screen.ONLINE_DOWNLOAD -> OnlineMods(
+                    viewModel = hiltViewModel(),
+                    isLogon = userInfo != null,
+                    onNavClick = { scope.launch { drawerState.open() } }
+                )
+                MainViewModel.Screen.DOWNLOADED_MOD -> DownloadedMods(
+                    vm = hiltViewModel(),
+                    onNavClicked = { scope.launch { drawerState.open() } }
+                )
             }
+        }
     }
 }
 
 @Composable
 private fun DrawerTabs(
-    screens: Array<RootViewModel.Screen>,
-    currentScreen: RootViewModel.Screen,
-    onChange: (RootViewModel.Screen) -> Unit,
+    screens: Array<MainViewModel.Screen>,
+    currentScreen: MainViewModel.Screen,
+    onChange: (MainViewModel.Screen) -> Unit,
 ) {
     screens.forEach {
         NavigationItem(
@@ -382,8 +362,8 @@ private fun DrawerPreview() {
             DrawerHeader(userInfo = null, requestLogin = {}, requestLogout = {})
         }, tabs = {
             DrawerTabs(
-                screens = RootViewModel.Screen.values(),
-                currentScreen = RootViewModel.Screen.HOME,
+                screens = MainViewModel.Screen.values(),
+                currentScreen = MainViewModel.Screen.HOME,
                 onChange = {}
             )
         }, items = {}, setting = {}) {}

@@ -3,10 +3,12 @@ package org.wvt.horizonmgr
 import android.app.Application
 import android.content.Context
 import android.os.Environment
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
 import dagger.hilt.android.HiltAndroidApp
 import dagger.hilt.android.qualifiers.ApplicationContext
+import dagger.hilt.components.SingletonComponent
 import org.wvt.horizonmgr.service.hzpack.HorizonManager
 import org.wvt.horizonmgr.service.level.LevelTransporter
 import org.wvt.horizonmgr.service.level.MCLevelManager
@@ -19,82 +21,93 @@ import org.wvt.horizonmgr.webapi.mgrinfo.MgrInfoModule
 import org.wvt.horizonmgr.webapi.mod.ChineseModRepository
 import org.wvt.horizonmgr.webapi.mod.OfficialModMirrorRepository
 import org.wvt.horizonmgr.webapi.news.MgrArticleModule
-import org.wvt.horizonmgr.webapi.news.MgrNewsModule
 import org.wvt.horizonmgr.webapi.pack.OfficialPackageCDNRepository
-import javax.inject.Inject
 import javax.inject.Singleton
 
 @HiltAndroidApp
 class HorizonManagerApplication : Application() {
-/*    @Inject lateinit var container: DependenciesContainer
-    lateinit var dependenciesVMFactory: ViewModelProvider.Factory
-        private set*/
-
     override fun onCreate() {
         super.onCreate()
-//        container = DependenciesContainer(this)
-//        dependenciesVMFactory = DependenciesVMFactory(container)
     }
 }
 
-/*
-val Context.defaultViewModelFactory: ViewModelProvider.Factory
-    get() = (applicationContext as HorizonManagerApplication).dependenciesVMFactory
-*/
+@Module
+@InstallIn(SingletonComponent::class)
+object DependenciesModule {
+    @Singleton
+    @Provides
+    fun provideLocalCache(
+        @ApplicationContext context: Context
+    ): LocalCache = LocalCache(context)
 
-/*
-private class DependenciesVMFactory(
-    private val dependenciesContainer: DependenciesContainer
-) : ViewModelProvider.Factory {
-
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-        return modelClass.getConstructor(DependenciesContainer::class.java)
-            .newInstance(dependenciesContainer)
-    }
-}
-*/
-
-@Singleton
-class DependenciesContainer @Inject internal constructor(
-    @ApplicationContext private val context: Context
-) {
-    val localCache by lazy { LocalCache(context) }
-    val manager by lazy {
-        HorizonManager(
+    @Singleton
+    @Provides
+    fun provideHorizonManager(): HorizonManager {
+        return HorizonManager(
             Environment.getExternalStorageDirectory().resolve("games").resolve("horizon")
         )
     }
-    val packRepository by lazy { OfficialPackageCDNRepository() }
-    val chineseModRepository by lazy { ChineseModRepository() }
-    val mirrorModRepository by lazy { OfficialModMirrorRepository() }
-    val mgrInfo by lazy { MgrInfoModule() }
-    val iccn by lazy { ICCNModule() }
-    val article by lazy { MgrArticleModule() }
-    val packageDownloader by lazy { OfficialCDNPackageDownloader(context) }
-    val modDownloader by lazy { ModDownloader(context) }
-    val mcLevelManager by lazy {
-        MCLevelManager(
-            Environment.getExternalStorageDirectory()
-                .resolve("games")
-                .resolve("com.mojang")
-                .resolve("minecraftWorlds")
-        )
-    }
-    val levelTransporter by lazy {
-        LevelTransporter(
-            Environment.getExternalStorageDirectory()
-                .resolve("games")
-                .resolve("com.mojang")
-                .resolve("minecraftWorlds").absolutePath
-        )
-    }
 
-    val mcResourcePackManager by lazy {
-        ResourcePackManager(
-            Environment.getExternalStorageDirectory()
-                .resolve("games")
-                .resolve("com.mojang")
-                .resolve("resource_packs")
-        )
-    }
+    @Singleton
+    @Provides
+    fun provideOfficialPackageCDNRepository() = OfficialPackageCDNRepository()
+
+    @Singleton
+    @Provides
+    fun provideChineseModRepository() = ChineseModRepository()
+
+    @Singleton
+    @Provides
+    fun provideOfficialModMirrorRepository() = OfficialModMirrorRepository()
+
+    @Singleton
+    @Provides
+    fun provideMgrInfoModule() = MgrInfoModule()
+
+    @Singleton
+    @Provides
+    fun provideICCNModule() = ICCNModule()
+
+    @Singleton
+    @Provides
+    fun provideMgrArticleModule() = MgrArticleModule()
+
+    @Singleton
+    @Provides
+    fun provideOfficialCDNPackageDownloader(
+        @ApplicationContext context: Context
+    ) = OfficialCDNPackageDownloader(context)
+
+    @Singleton
+    @Provides
+    fun provide(
+        @ApplicationContext context: Context
+    ) = ModDownloader(context)
+
+    @Singleton
+    @Provides
+    fun provideMCLevelManager() = MCLevelManager(
+        Environment.getExternalStorageDirectory()
+            .resolve("games")
+            .resolve("com.mojang")
+            .resolve("minecraftWorlds")
+    )
+
+    @Singleton
+    @Provides
+    fun provideLevelTransporter() = LevelTransporter(
+        Environment.getExternalStorageDirectory()
+            .resolve("games")
+            .resolve("com.mojang")
+            .resolve("minecraftWorlds").absolutePath
+    )
+
+    @Singleton
+    @Provides
+    fun provideResourcePackManager() = ResourcePackManager(
+        Environment.getExternalStorageDirectory()
+            .resolve("games")
+            .resolve("com.mojang")
+            .resolve("resource_packs")
+    )
 }

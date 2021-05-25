@@ -1,4 +1,4 @@
-package org.wvt.horizonmgr.ui.main
+package org.wvt.horizonmgr.ui
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -11,39 +11,25 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
+import org.wvt.horizonmgr.ui.main.InstallHorizonDialog
+import org.wvt.horizonmgr.ui.main.InstallMCDialog
 import org.wvt.horizonmgr.ui.theme.PreviewTheme
 import java.io.File
 
 @Composable
-fun Main(
-    mainVM: MainViewModel = hiltViewModel(),
+fun Root(
+    viewModel: RootViewModel = hiltViewModel(),
     onInstallHZClick: () -> Unit,
     onInstallMCClick: () -> Unit,
     onRequestPermission: () -> Unit,
-    navigateToLogin: () -> Unit,
-    navigateToJoinGroup: () -> Unit,
-    navigateToCommunity: () -> Unit,
-    navigateToDonate: () -> Unit,
-    navigateToSettings: () -> Unit,
-    navigateToOnlineInstall: () -> Unit,
-    navigateToPackageInfo: (uuid: String) -> Unit,
-    navigateToNewsDetail: (newsId: String) -> Unit,
-    requestOpenGame: () -> Unit,
-    selectFileForMod: () -> Unit,
-    selectFileForPackage: () -> Unit,
-    selectLevelForIC: () -> Unit,
-    selectLevelForMC: () -> Unit,
-    selectTextureForIC: () -> Unit,
-    selectTextureForMC: () -> Unit
+    content: @Composable () -> Unit,
 ) {
-    val userInfo by mainVM.userInfo.collectAsState()
-    val showPermissionDialog by mainVM.showPermissionDialog.collectAsState()
-
-    val newVersion by mainVM.newVersion.collectAsState()
+    val showPermissionDialog by viewModel.showPermissionDialog.collectAsState()
+    val newVersion by viewModel.newVersion.collectAsState()
     var displayNewVersionDialog by rememberSaveable { mutableStateOf(false) }
 
-    val showGameNotInstall by mainVM.gameNotInstalled.collectAsState()
-    val showHZNotInstall by mainVM.hzNotInstalled.collectAsState()
+    val showGameNotInstall by viewModel.gameNotInstalled.collectAsState()
+    val showHZNotInstall by viewModel.hzNotInstalled.collectAsState()
 
     DisposableEffect(newVersion) {
         if (newVersion != null) {
@@ -53,45 +39,19 @@ fun Main(
     }
 
     DisposableEffect(Unit) {
-        mainVM.checkUpdate()
+        viewModel.checkUpdate()
         onDispose {
             // TODO: 2021/2/6 添加 Cancel 逻辑
         }
     }
 
     Surface(color = MaterialTheme.colors.background) {
-        if (mainVM.initialized) Home(
-            userInfo = remember(userInfo) {
-                userInfo?.let {
-                    UserInformation(
-                        it.name,
-                        it.account,
-                        it.avatarUrl
-                    )
-                }
-            },
-            requestLogin = navigateToLogin,
-            requestLogout = mainVM::logOut,
-            openGame = requestOpenGame,
-            community = navigateToCommunity,
-            joinGroup = navigateToJoinGroup,
-            donate = navigateToDonate,
-            settings = navigateToSettings,
-            requestOnlineInstall = navigateToOnlineInstall,
-            onAddModClicked = selectFileForMod,
-            onAddPackageClicked = selectFileForPackage,
-            navigateToPackageInfo = navigateToPackageInfo,
-            navigateToNewsDetail = navigateToNewsDetail,
-            onAddMCTextureClick = selectTextureForMC,
-            onAddMCLevelClick = selectLevelForMC,
-            onAddICTextureClick = selectTextureForIC,
-            onAddICLevelClick = selectLevelForIC
-        )
+        content()
     }
 
     if (showPermissionDialog) {
         RequestPermissionDialog {
-            mainVM.dismiss()
+            viewModel.dismiss()
             onRequestPermission()
         }
     }
@@ -105,7 +65,7 @@ fun Main(
             changelog = theNewVersion.changelog,
             onConfirm = { displayNewVersionDialog = false },
             onIgnore = {
-                mainVM.ignoreVersion(theNewVersion.versionCode)
+                viewModel.ignoreVersion(theNewVersion.versionCode)
                 displayNewVersionDialog = false
             }
         )
@@ -113,20 +73,20 @@ fun Main(
 
     if (showHZNotInstall) {
         InstallHorizonDialog(
-            onDismiss = { mainVM.dismissGameNotInstallDialog() },
+            onDismiss = { viewModel.dismissGameNotInstallDialog() },
             onConfirm = {
                 onInstallHZClick()
-                mainVM.dismissHZNotInstallDialog()
+                viewModel.dismissHZNotInstallDialog()
             }
         )
     }
 
     if (showGameNotInstall) {
         InstallMCDialog(
-            onDismiss = { mainVM.dismissGameNotInstallDialog() },
+            onDismiss = { viewModel.dismissGameNotInstallDialog() },
             onConfirm = {
                 onInstallMCClick()
-                mainVM.dismissGameNotInstallDialog()
+                viewModel.dismissGameNotInstallDialog()
             }
         )
     }

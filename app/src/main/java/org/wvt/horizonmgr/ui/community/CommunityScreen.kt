@@ -25,7 +25,7 @@ import org.wvt.horizonmgr.ui.theme.AppBarBackgroundColor
 import org.wvt.horizonmgr.utils.longSizeToString
 
 @Composable
-internal fun Community(
+internal fun CommunityScreen(
     vm: CommunityViewModel,
     onClose: () -> Unit
 ) {

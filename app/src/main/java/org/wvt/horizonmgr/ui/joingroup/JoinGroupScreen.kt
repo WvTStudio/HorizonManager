@@ -17,23 +17,23 @@ import org.wvt.horizonmgr.ui.theme.AppBarBackgroundColor
 fun JoinGroupScreen(
     onClose: () -> Unit,
     openURL: (String) -> Unit,
-    vm: JoinGroupViewModel = hiltViewModel()
+    viewModel: JoinGroupViewModel = hiltViewModel()
 ) {
 
-    val groups by vm.groups.collectAsState()
-    val isLoading by vm.isLoading.collectAsState()
-    val loadError by vm.loadError.collectAsState()
-    val startError by vm.startQQError.collectAsState()
+    val groups by viewModel.groups.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
+    val loadError by viewModel.loadError.collectAsState()
+    val startError by viewModel.startQQError.collectAsState()
     val snackbar = remember { SnackbarHostState() }
 
-    LaunchedEffect(vm) { vm.refresh() }
+    LaunchedEffect(viewModel) { viewModel.refresh() }
     
     LaunchedEffect(startError) {
         if (startError) {
             try {
                 snackbar.showSnackbar("启动 QQ 失败")
             } finally {
-                vm.handledError()
+                viewModel.handledError()
             }
         }
     }
@@ -62,7 +62,7 @@ fun JoinGroupScreen(
                     ErrorPage(
                         modifier = Modifier.fillMaxSize(),
                         message = { Text("加载失败") },
-                        onRetryClick = { vm.refresh() }
+                        onRetryClick = { viewModel.refresh() }
                     )
                 }
             }

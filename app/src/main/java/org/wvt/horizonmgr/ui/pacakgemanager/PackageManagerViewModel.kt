@@ -11,10 +11,10 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.wvt.horizonmgr.DependenciesContainer
 import org.wvt.horizonmgr.service.hzpack.*
 import org.wvt.horizonmgr.ui.components.InputDialogHostState
 import org.wvt.horizonmgr.ui.components.ProgressDialogState
+import org.wvt.horizonmgr.utils.LocalCache
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
@@ -24,10 +24,9 @@ private const val TAG = "PackageManagerVM"
 
 @HiltViewModel
 class PackageManagerViewModel @Inject constructor(
-    dependencies: DependenciesContainer
+    private val mgr: HorizonManager,
+    private val localCache: LocalCache
 ) : ViewModel() {
-    private val mgr = dependencies.manager
-    private val localCache = dependencies.localCache
     private val _packages = MutableStateFlow(emptyList<PackageManagerItem>())
     private val _progressState = MutableStateFlow<ProgressDialogState?>(null)
     private val dateFormatter = SimpleDateFormat.getDateInstance()

@@ -8,7 +8,6 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.material.Surface
 import dagger.hilt.android.AndroidEntryPoint
-import org.wvt.horizonmgr.HorizonManagerApplication
 import org.wvt.horizonmgr.ui.theme.AndroidHorizonManagerTheme
 
 @AndroidEntryPoint
@@ -36,7 +35,7 @@ class PackageDetailActivity : AppCompatActivity() {
         setContent {
             AndroidHorizonManagerTheme {
                 Surface {
-                    PackageInfo(viewModel, onCloseClick = ::finish)
+                    PackageDetailScreen(viewModel, onCloseClick = ::finish)
                 }
             }
         }

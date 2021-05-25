@@ -99,7 +99,8 @@ fun AndroidHorizonManagerTheme(
                 Box(
                     Modifier
                         .fillMaxWidth()
-                        .weight(1f)) {
+                        .weight(1f)
+                ) {
                     content()
                 }
                 Surface(

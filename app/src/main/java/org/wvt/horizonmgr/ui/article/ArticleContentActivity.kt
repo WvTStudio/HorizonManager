@@ -10,7 +10,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import dagger.hilt.android.AndroidEntryPoint
-import dagger.hilt.android.internal.lifecycle.HiltViewModelFactory
 import org.wvt.horizonmgr.ui.theme.AndroidHorizonManagerTheme
 
 class ArticleContentActivityContract : ActivityResultContract<String, Unit>() {
@@ -36,7 +35,7 @@ class ArticleContentActivity : AppCompatActivity() {
         setContent {
             AndroidHorizonManagerTheme {
                 Surface(color = MaterialTheme.colors.background) {
-                    ArticleContent(vm, ::finish)
+                    ArticleContentScreen(vm, ::finish)
                 }
             }
         }

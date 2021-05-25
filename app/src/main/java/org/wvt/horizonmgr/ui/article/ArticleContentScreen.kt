@@ -28,7 +28,7 @@ import org.wvt.horizonmgr.ui.components.NetworkImage
 import org.wvt.horizonmgr.ui.theme.AppBarBackgroundColor
 
 @Composable
-fun ArticleContent(
+fun ArticleContentScreen(
     vm: ArticleContentViewModel,
     onNavClick: () -> Unit
 ) {

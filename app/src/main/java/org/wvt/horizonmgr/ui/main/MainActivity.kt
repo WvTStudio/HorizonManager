@@ -16,6 +16,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import dagger.hilt.android.AndroidEntryPoint
 import org.wvt.horizonmgr.R
+import org.wvt.horizonmgr.ui.Root
 import org.wvt.horizonmgr.ui.article.ArticleContentActivityContract
 import org.wvt.horizonmgr.ui.community.CommunityActivity
 import org.wvt.horizonmgr.ui.donate.DonateActivity
@@ -37,11 +38,11 @@ import org.wvt.horizonmgr.ui.theme.AndroidHorizonManagerTheme
 private const val TAG = "MainActivity"
 
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity() {/*
 //    private val factory by lazy { HiltViewModelFactory(this, NavBackStackEntry.create(this)) }
 
     private val mainVM: MainViewModel by viewModels()
-    private val rootVM: RootViewModel by viewModels()
+//    private val rootVM: RootViewModel by viewModels()
     private val homeVM: HomeViewModel by viewModels()
     private val modTabVM: ModTabViewModel by viewModels()
     private val icLevelTabVM: ICLevelTabViewModel by viewModels ()
@@ -225,7 +226,7 @@ class MainActivity : AppCompatActivity() {
         setContent {
             AndroidHorizonManagerTheme {
                 Surface(color = MaterialTheme.colors.background) {
-                    Main(
+                    Root(
                         onRequestPermission = ::requestPermission,
                         navigateToCommunity = ::startCommunityActivity,
                         navigateToDonate = ::startDonateActivity,
@@ -252,5 +253,5 @@ class MainActivity : AppCompatActivity() {
         this.checkPermission()
         mainVM.checkUpdate()
         checkGameInstalled()
-    }
+    }*/
 }

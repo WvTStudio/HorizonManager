@@ -79,7 +79,7 @@ class LoginActivity : AppCompatActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    Login(viewModel, ::onLoginSucceed, ::onCancel)
+                    LoginScreen(viewModel, ::onLoginSucceed, ::onCancel)
                 }
             }
         }

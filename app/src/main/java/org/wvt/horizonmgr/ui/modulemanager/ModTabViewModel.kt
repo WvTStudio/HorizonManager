@@ -9,11 +9,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.wvt.horizonmgr.DependenciesContainer
+import org.wvt.horizonmgr.service.hzpack.HorizonManager
 import org.wvt.horizonmgr.service.hzpack.InstalledPackage
 import org.wvt.horizonmgr.service.mod.InstalledMod
 import org.wvt.horizonmgr.service.mod.ZipMod
 import org.wvt.horizonmgr.ui.components.ProgressDialogState
+import org.wvt.horizonmgr.utils.LocalCache
 import java.io.File
 import java.util.*
 import javax.inject.Inject
@@ -21,9 +22,10 @@ import javax.inject.Inject
 private const val TAG = "ModTabVM"
 
 @HiltViewModel
-class ModTabViewModel @Inject constructor(dependencies: DependenciesContainer) : ViewModel() {
-    private val manager = dependencies.manager
-    private val localCache = dependencies.localCache
+class ModTabViewModel @Inject constructor(
+    private val manager: HorizonManager,
+    private val localCache: LocalCache
+) : ViewModel() {
 
     private var selectedPackage: InstalledPackage? = null
     private val _progressState = MutableStateFlow<ProgressDialogState?>(null)

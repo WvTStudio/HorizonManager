@@ -22,9 +22,9 @@ import org.wvt.horizonmgr.ui.theme.LocalThemeController
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun Settings(
+fun SettingsScreen(
     versionName: String,
-    onNavClick: () -> Unit,
+    onBackClick: () -> Unit,
     requestCustomTheme: () -> Unit
 ) {
     val themeController = LocalThemeController.current
@@ -37,7 +37,7 @@ fun Settings(
         TopAppBar(title = {
             Text("设置")
         }, navigationIcon = {
-            IconButton(onClick = onNavClick) {
+            IconButton(onClick = onBackClick) {
                 Icon(Icons.Filled.ArrowBack, "返回")
             }
         }, backgroundColor = Color.Transparent, elevation = 0.dp)

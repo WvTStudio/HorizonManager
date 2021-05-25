@@ -4,13 +4,14 @@ import android.graphics.BitmapFactory
 import android.util.Log
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
-import org.wvt.horizonmgr.DependenciesContainer
+import org.wvt.horizonmgr.service.hzpack.HorizonManager
 import org.wvt.horizonmgr.service.hzpack.recommendDescription
 import org.wvt.horizonmgr.service.utils.calcSize
 import org.wvt.horizonmgr.utils.longSizeToString
@@ -22,9 +23,11 @@ private const val TAG = "PackageDetailVM"
 
 @HiltViewModel
 class PackageDetailViewModel @Inject constructor(
-    dependenciesContainer: DependenciesContainer
+    private val manager: HorizonManager,
+    savedStateHandle: SavedStateHandle
 ) : ViewModel() {
-    private val manager = dependenciesContainer.manager
+
+    private var packageUUID: String? = savedStateHandle.get("uuid")
 
     val info = MutableStateFlow<PackageInformation?>(null)
     var pkgSize = MutableStateFlow<PackageSize>(PackageSize.Loading)
@@ -63,7 +66,6 @@ class PackageDetailViewModel @Inject constructor(
         LOADING, FAILED, SUCCEED
     }
 
-    private var packageUUID: String? = null
 
     fun setPackageUUID(uuid: String) {
         packageUUID = uuid

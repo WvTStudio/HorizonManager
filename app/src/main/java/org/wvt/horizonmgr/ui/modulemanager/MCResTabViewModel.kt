@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.launch
-import org.wvt.horizonmgr.DependenciesContainer
+import org.wvt.horizonmgr.service.respack.ResourcePackManager
 import org.wvt.horizonmgr.service.respack.ResourcePackManifest
 import org.wvt.horizonmgr.service.respack.ZipResourcePackage
 import org.wvt.horizonmgr.ui.components.ProgressDialogState
@@ -21,8 +21,9 @@ import javax.inject.Inject
 private const val TAG = "MCResTabVM"
 
 @HiltViewModel
-class MCResTabViewModel @Inject constructor(dependencies: DependenciesContainer) : ViewModel() {
-    private val resManager = dependencies.mcResourcePackManager
+class MCResTabViewModel @Inject constructor(
+    private val resManager: ResourcePackManager
+) : ViewModel() {
 
     private var initialized = false
 

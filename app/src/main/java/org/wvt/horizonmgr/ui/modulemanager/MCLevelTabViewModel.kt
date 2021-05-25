@@ -6,25 +6,25 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
-import org.wvt.horizonmgr.DependenciesContainer
+import org.wvt.horizonmgr.service.hzpack.HorizonManager
 import org.wvt.horizonmgr.service.hzpack.InstalledPackage
-import org.wvt.horizonmgr.service.level.LevelInfo
-import org.wvt.horizonmgr.service.level.MCLevel
-import org.wvt.horizonmgr.service.level.ZipMCLevel
+import org.wvt.horizonmgr.service.level.*
 import org.wvt.horizonmgr.ui.components.InputDialogHostState
 import org.wvt.horizonmgr.ui.components.ProgressDialogState
+import org.wvt.horizonmgr.utils.LocalCache
 import java.io.File
 import javax.inject.Inject
 
 private const val TAG = "MCLevelTabVM"
 
 @HiltViewModel
-class MCLevelTabViewModel @Inject constructor(dependencies: DependenciesContainer) : ViewModel() {
-    private val levelManager = dependencies.mcLevelManager
-    private val levelTransporter = dependencies.levelTransporter
+class MCLevelTabViewModel @Inject constructor(
+    private val levelManager: MCLevelManager,
+    private val levelTransporter: LevelTransporter,
+    private var manager: HorizonManager,
+    private val localCache: LocalCache
+) : ViewModel() {
 
-    private var manager = dependencies.manager
-    private val localCache = dependencies.localCache
     private var currentPackage: InstalledPackage? = null
     private var cachedLevels = emptyMap<LevelInfo, MCLevel>()
     private var initialized = false

@@ -15,7 +15,7 @@ class CustomThemeActivity : AppCompatActivity() {
         setContent {
             AndroidHorizonManagerTheme {
                 Surface(Modifier.fillMaxSize()) {
-                    CustomTheme { finish() }
+                    CustomThemeScreen { finish() }
                 }
             }
         }

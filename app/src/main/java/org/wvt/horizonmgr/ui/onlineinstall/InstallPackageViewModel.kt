@@ -10,23 +10,24 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.receiveAsFlow
-import org.wvt.horizonmgr.DependenciesContainer
+import org.wvt.horizonmgr.service.hzpack.HorizonManager
 import org.wvt.horizonmgr.service.hzpack.PackageManifestWrapper
 import org.wvt.horizonmgr.service.hzpack.ZipPackage
+import org.wvt.horizonmgr.utils.OfficialCDNPackageDownloader
 import org.wvt.horizonmgr.webapi.NetworkException
 import org.wvt.horizonmgr.webapi.pack.OfficialCDNPackage
+import org.wvt.horizonmgr.webapi.pack.OfficialPackageCDNRepository
 import javax.inject.Inject
 
 private const val TAG = "InstallPackageVM"
 
 @HiltViewModel
 class InstallPackageViewModel @Inject constructor(
-    dependencies: DependenciesContainer
-) : ViewModel() {
-    private val packRepository = dependencies.packRepository
-    private val downloader = dependencies.packageDownloader
-    private val mgr = dependencies.manager
+    private val packRepository: OfficialPackageCDNRepository,
+    private val downloader: OfficialCDNPackageDownloader,
+    private val mgr: HorizonManager
 
+) : ViewModel() {
     sealed class State {
         object Loading : State()
         object Succeed : State()

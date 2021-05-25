@@ -8,10 +8,7 @@ import androidx.compose.foundation.selection.selectable
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -20,6 +17,7 @@ import androidx.compose.ui.util.fastForEachIndexed
 import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import org.wvt.horizonmgr.ui.components.HorizonDivider
+import org.wvt.horizonmgr.ui.fileselector.SharedFileChooserViewModel
 import org.wvt.horizonmgr.ui.theme.AppBarBackgroundColor
 
 @Composable
@@ -31,13 +29,50 @@ fun ModuleManagerScreen(
     onAddICTextureClick: () -> Unit,
     onAddMCTextureClick: () -> Unit
 ) {
+    val managerViewModel: ModuleManagerViewModel = hiltViewModel()
+    val moduleViewModel: ModTabViewModel = hiltViewModel()
+    val icLevelViewModel: ICLevelTabViewModel = hiltViewModel()
+    val mcLevelViewModel: MCLevelTabViewModel = hiltViewModel()
+    val icResViewModel: ICResTabViewModel = hiltViewModel()
+    val mcResViewModel: MCResTabViewModel = hiltViewModel()
+
+    val sharedFileChooserViewModel = hiltViewModel<SharedFileChooserViewModel>()
+    val selectedFile by sharedFileChooserViewModel.selected.collectAsState()
+
+    LaunchedEffect(selectedFile) {
+        selectedFile?.let {
+            when (it.requestCode) {
+                "add_mod" -> {
+                    moduleViewModel.fileSelected(it.path)
+                    sharedFileChooserViewModel.handledSelectedFile()
+                }
+                "ic_level" -> {
+                    icLevelViewModel.selectedFileToInstall(it.path)
+                    sharedFileChooserViewModel.handledSelectedFile()
+                }
+                "mc_level" -> {
+                    mcLevelViewModel.selectedFileToInstall(it.path)
+                    sharedFileChooserViewModel.handledSelectedFile()
+                }
+                "ic_texture" -> {
+                    icResViewModel.selectedFileToInstall(it.path)
+                    sharedFileChooserViewModel.handledSelectedFile()
+                }
+                "mc_texture" -> {
+                    mcResViewModel.selectedFileToInstall(it.path)
+                    sharedFileChooserViewModel.handledSelectedFile()
+                }
+            }
+        }
+    }
+
     ModuleManager(
-        managerViewModel = hiltViewModel(),
-        moduleViewModel = hiltViewModel(),
-        icLevelViewModel = hiltViewModel(),
-        icResViewModel = hiltViewModel(),
-        mcLevelViewModel = hiltViewModel(),
-        mcResViewModel = hiltViewModel(),
+        managerViewModel = managerViewModel,
+        moduleViewModel = moduleViewModel,
+        icLevelViewModel = icLevelViewModel,
+        icResViewModel = icResViewModel,
+        mcLevelViewModel = mcLevelViewModel,
+        mcResViewModel = mcResViewModel,
         onNavClicked = onNavClicked,
         onAddModClicked = onAddModClicked,
         onAddICLevelClick = onAddICLevelClick,

@@ -18,9 +18,9 @@ class SettingsActivity : AppCompatActivity() {
         setContent {
             AndroidHorizonManagerTheme(fullScreen = true) {
                 Surface {
-                    Settings(
+                    SettingsScreen(
                         versionName = version,
-                        onNavClick = { finish() },
+                        onBackClick = { finish() },
                         requestCustomTheme = { startActivity<CustomThemeActivity>() }
                     )
                 }

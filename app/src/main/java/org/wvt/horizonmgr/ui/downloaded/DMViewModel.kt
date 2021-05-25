@@ -10,18 +10,21 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import org.wvt.horizonmgr.DependenciesContainer
+import org.wvt.horizonmgr.service.hzpack.HorizonManager
 import org.wvt.horizonmgr.service.hzpack.InstalledPackage
 import org.wvt.horizonmgr.ui.components.ProgressDialogState
+import org.wvt.horizonmgr.utils.LocalCache
 import org.wvt.horizonmgr.utils.ModDownloader
 import java.io.File
 import javax.inject.Inject
 
 @HiltViewModel
-class DMViewModel @Inject constructor(dependencies: DependenciesContainer) : ViewModel() {
-    private val localCache = dependencies.localCache
-    private val downloader = dependencies.modDownloader
-    private val manager = dependencies.manager
+class DMViewModel @Inject constructor(
+    private val localCache: LocalCache,
+    private val downloader: ModDownloader,
+    private val manager: HorizonManager
+) : ViewModel() {
+
     private val _mods = MutableStateFlow(emptyList<DownloadedMod>())
     private val _progressState = MutableStateFlow<ProgressDialogState?>(null)
     private var map: Map<DownloadedMod, ModDownloader.DownloadedMod> = emptyMap()
