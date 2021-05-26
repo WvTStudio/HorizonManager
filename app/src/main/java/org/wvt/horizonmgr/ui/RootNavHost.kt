@@ -36,7 +36,7 @@ fun RootNavHost(
     val navController = rememberNavController()
     NavHost(navController = navController, startDestination = "main") {
         composable("main") {
-            val sharedFileChooserViewModel = hiltViewModel<SharedFileChooserViewModel>()
+            val sharedFileChooserViewModel = SharedFileChooserViewModel
 
             MainScreen(
                 navigateToLogin = { navController.navigate("login") },
@@ -141,7 +141,7 @@ fun RootNavHost(
             )
         }
         composable("file_chooser") {
-            val viewModel = viewModel<SharedFileChooserViewModel>()
+            val viewModel = SharedFileChooserViewModel
             FileSelector(
                 modifier = Modifier.fillMaxSize(),
                 viewModel = hiltViewModel(),

@@ -1,22 +1,12 @@
 package org.wvt.horizonmgr.ui.fileselector
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
-import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.scopes.ActivityScoped
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import javax.inject.Inject
-import javax.inject.Singleton
 
 private const val TAG = "SharedFileChooserVM"
 
-@Singleton
-class SharedFileChooserViewModel @Inject constructor() : ViewModel() {
-    init {
-        Log.d(TAG, "init: ${this.hashCode()}")
-    }
-
+object SharedFileChooserViewModel : ViewModel() {
     private val _selected: MutableStateFlow<SelectData?> = MutableStateFlow(null)
     val selected = _selected.asStateFlow()
 

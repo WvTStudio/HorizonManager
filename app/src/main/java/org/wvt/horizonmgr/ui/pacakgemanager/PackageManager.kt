@@ -48,7 +48,7 @@ fun PackageManagerScreen(
     onLocalInstallClick: () -> Unit,
     onNavClick: () -> Unit
 ) {
-    val sharedFileChooserVM = hiltViewModel<SharedFileChooserViewModel>()
+    val sharedFileChooserVM = SharedFileChooserViewModel
     val selectedFile by sharedFileChooserVM.selected.collectAsState()
     val packageVM = hiltViewModel<PackageManagerViewModel>()
 

@@ -33,7 +33,7 @@ class HorizonManagerApplication : Application() {
 
 @Module
 @InstallIn(SingletonComponent::class)
-object DependenciesModule {
+object SingletonModule {
     @Singleton
     @Provides
     fun provideLocalCache(

@@ -36,7 +36,7 @@ fun ModuleManagerScreen(
     val icResViewModel: ICResTabViewModel = hiltViewModel()
     val mcResViewModel: MCResTabViewModel = hiltViewModel()
 
-    val sharedFileChooserViewModel = hiltViewModel<SharedFileChooserViewModel>()
+    val sharedFileChooserViewModel = SharedFileChooserViewModel
     val selectedFile by sharedFileChooserViewModel.selected.collectAsState()
 
     LaunchedEffect(selectedFile) {
