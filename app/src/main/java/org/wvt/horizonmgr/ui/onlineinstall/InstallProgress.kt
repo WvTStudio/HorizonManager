@@ -79,13 +79,11 @@ fun InstallProgress(
                                 color = contentColor
                             )
                         }, trailing = {
-                            Box(Modifier.width(48.dp)) {
-                                Crossfade(
-                                    modifier = Modifier.align(Alignment.Center),
-                                    targetState = downloadState
-                                ) {
+                            Crossfade(targetState = downloadState) {
+                                Box(Modifier.size(40.dp), contentAlignment = Alignment.Center) {
                                     when (it) {
-                                        StepState.Waiting -> { }
+                                        StepState.Waiting -> {
+                                        }
                                         StepState.Complete -> {
                                             Icon(Icons.Default.Check, contentDescription = "下载完成")
                                         }
@@ -123,13 +121,11 @@ fun InstallProgress(
                                 color = contentColor
                             )
                         }, trailing = {
-                            Box(Modifier.width(48.dp)) {
-                                Crossfade(
-                                    modifier = Modifier.align(Alignment.Center),
-                                    targetState = installState
-                                ) {
+                            Crossfade(targetState = installState) {
+                                Box(Modifier.size(40.dp), contentAlignment = Alignment.Center) {
                                     when (it) {
-                                        StepState.Waiting -> { }
+                                        StepState.Waiting -> {
+                                        }
                                         StepState.Complete -> {
                                             Icon(Icons.Default.Check, contentDescription = "安装完成")
                                         }
@@ -149,7 +145,8 @@ fun InstallProgress(
         }
         AnimatedVisibility(
             visible = totalProgress >= 1f, enter = fadeIn(), exit = fadeOut(),
-            modifier = Modifier.align(Alignment.BottomEnd)
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
                 .padding(16.dp)
         ) {
             Button(onClick = onCompleteClick) {
