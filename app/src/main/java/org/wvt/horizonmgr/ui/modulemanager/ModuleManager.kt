@@ -1,6 +1,5 @@
 package org.wvt.horizonmgr.ui.modulemanager
 
-import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
@@ -16,6 +15,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEachIndexed
 import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.rememberPagerState
 import org.wvt.horizonmgr.ui.components.HorizonDivider
 import org.wvt.horizonmgr.ui.fileselector.SharedFileChooserViewModel
 import org.wvt.horizonmgr.ui.theme.AppBarBackgroundColor
@@ -82,6 +84,7 @@ fun ModuleManagerScreen(
     )
 }
 
+@OptIn(ExperimentalPagerApi::class)
 @Composable
 fun ModuleManager(
     managerViewModel: ModuleManagerViewModel,
@@ -98,35 +101,37 @@ fun ModuleManager(
     onAddMCTextureClick: () -> Unit
 ) {
     val selectedTab by managerViewModel.selectedTab.collectAsState()
+    val pagerState = rememberPagerState(pageCount = 5, initialOffscreenLimit = 5)
 
-    Column {
+    LaunchedEffect(selectedTab) {
+        when (selectedTab) {
+            ModuleManagerViewModel.Tabs.MOD -> pagerState.animateScrollToPage(0)
+            ModuleManagerViewModel.Tabs.IC_MAP -> pagerState.animateScrollToPage(1)
+            ModuleManagerViewModel.Tabs.MC_MAP -> pagerState.animateScrollToPage(2)
+            ModuleManagerViewModel.Tabs.IC_TEXTURE -> pagerState.animateScrollToPage(3)
+            ModuleManagerViewModel.Tabs.MC_TEXTURE -> pagerState.animateScrollToPage(4)
+        }
+    }
+
+
+    Column(Modifier.fillMaxSize()) {
         CustomAppBar(
             tabs = managerViewModel.tabs,
             selectedTab = selectedTab,
             onTabSelected = managerViewModel::selectTab,
             onNavClicked = onNavClicked
         )
-        Box(Modifier.fillMaxSize()) {
-            Crossfade(selectedTab) {
-                when (it) {
-                    ModuleManagerViewModel.Tabs.MOD -> ModTab(moduleViewModel, onAddModClicked)
-                    ModuleManagerViewModel.Tabs.IC_MAP -> ICLevelTab(
-                        icLevelViewModel,
-                        onAddICLevelClick
-                    )
-                    ModuleManagerViewModel.Tabs.MC_MAP -> MCLevelTab(
-                        mcLevelViewModel,
-                        onAddMCLevelClick
-                    )
-                    ModuleManagerViewModel.Tabs.IC_TEXTURE -> ICResTab(
-                        icResViewModel,
-                        onAddICTextureClick
-                    )
-                    ModuleManagerViewModel.Tabs.MC_TEXTURE -> MCResTab(
-                        mcResViewModel,
-                        onAddMCTextureClick
-                    )
-                }
+        HorizontalPager(
+            state = pagerState,
+            modifier = Modifier.fillMaxSize(),
+            dragEnabled = false
+        ) { page ->
+            when (page) {
+                0 -> ModTab(moduleViewModel, onAddModClicked)
+                1 -> ICLevelTab(icLevelViewModel, onAddICLevelClick)
+                2 -> MCLevelTab(mcLevelViewModel, onAddMCLevelClick)
+                3 -> ICResTab(icResViewModel, onAddICTextureClick)
+                4 -> MCResTab(mcResViewModel, onAddMCTextureClick)
             }
         }
     }
