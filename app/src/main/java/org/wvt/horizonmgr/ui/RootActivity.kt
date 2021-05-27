@@ -12,12 +12,9 @@ import android.provider.Settings
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
 import dagger.hilt.android.AndroidEntryPoint
 import org.wvt.horizonmgr.R
 import org.wvt.horizonmgr.ui.joingroup.JoinGroupViewModel
-import org.wvt.horizonmgr.ui.theme.AndroidHorizonManagerTheme
 
 @AndroidEntryPoint
 class RootActivity : AppCompatActivity() {
@@ -27,19 +24,15 @@ class RootActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setTheme(R.style.Theme_HorizonManagerCompose_NoActionBar) // cancel the slash theme
         setContent {
-            AndroidHorizonManagerTheme {
-                Surface(color = MaterialTheme.colors.background) {
-                    Root(
-                        onInstallHZClick = this::openCoolapkURL,
-                        onInstallMCClick = this::openMCGooglePlay,
-                        onRequestPermission = this::requestPermission,
-                    ) {
-                        RootNavHost(
-                            requestOpenGame = this::openGame,
-                            requestOpenURL = this::openURL
-                        )
-                    }
-                }
+            Root(
+                onInstallHZClick = this::openCoolapkURL,
+                onInstallMCClick = this::openMCGooglePlay,
+                onRequestPermission = this::requestPermission,
+            ) {
+                RootNavHost(
+                    requestOpenGame = this::openGame,
+                    requestOpenURL = this::openURL
+                )
             }
         }
         this.checkPermission()
@@ -111,7 +104,9 @@ class RootActivity : AppCompatActivity() {
             }
             return true
         }
-        if (!check()) { rootVM.showPermissionDialog() }
+        if (!check()) {
+            rootVM.showPermissionDialog()
+        }
     }
 
     private fun requestPermission() {
@@ -140,7 +135,11 @@ class RootActivity : AppCompatActivity() {
             }
         }
 
-        if (!hasMC) { rootVM.showGameNotInstallDialog() }
-        if (!hasHZ) { rootVM.showHZNotInstallDialog() }
+        if (!hasMC) {
+            rootVM.showGameNotInstallDialog()
+        }
+        if (!hasHZ) {
+            rootVM.showHZNotInstallDialog()
+        }
     }
 }

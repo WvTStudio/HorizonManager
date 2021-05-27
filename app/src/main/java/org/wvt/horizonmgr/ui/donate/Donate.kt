@@ -23,6 +23,8 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.util.fastForEach
+import com.google.accompanist.insets.navigationBarsPadding
+import com.google.accompanist.insets.statusBarsPadding
 import org.wvt.horizonmgr.R
 import org.wvt.horizonmgr.ui.theme.LocalThemeConfig
 import org.wvt.horizonmgr.ui.theme.PreviewTheme
@@ -47,6 +49,7 @@ fun Donate(
             Surface(
                 color = if (light) alipayColor else MaterialTheme.colors.background,
                 modifier = Modifier
+                    .statusBarsPadding()
                     .weight(1f)
                     .fillMaxWidth()
                     .clickable(
@@ -68,6 +71,7 @@ fun Donate(
             Surface(
                 color = if (light) wechatColor else MaterialTheme.colors.background,
                 modifier = Modifier
+                    .navigationBarsPadding()
                     .weight(1f)
                     .fillMaxWidth()
                     .clickable(
@@ -86,7 +90,7 @@ fun Donate(
                 }
             }
         }
-        Column {
+        Column(Modifier.statusBarsPadding()) {
             TopAppBar(
                 title = { Text("选择捐赠方式") },
                 navigationIcon = {
