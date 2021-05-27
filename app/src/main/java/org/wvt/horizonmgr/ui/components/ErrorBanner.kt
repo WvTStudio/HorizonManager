@@ -5,6 +5,8 @@ import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.unit.dp
 
 @Composable
 fun ErrorBanner(modifier: Modifier, errors: List<String>, text: String) {
@@ -12,6 +14,7 @@ fun ErrorBanner(modifier: Modifier, errors: List<String>, text: String) {
     var displayDetail by remember { mutableStateOf(false) }
     if (displayDetail) {
         AlertDialog(
+            modifier = Modifier.shadow(16.dp, clip = false),
             title = { Text("错误详情") },
             text = {
                 Text(text = remember(errors) {

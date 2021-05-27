@@ -17,6 +17,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -515,16 +516,19 @@ class ConfirmDeleteDialogHostState {
 fun ConfirmDeleteDialogHost(state: ConfirmDeleteDialogHostState) {
     val data = state.currentData
     if (data != null) {
-        AlertDialog(onDismissRequest = {
-            data.dismiss()
-        }, title = {
-            Text("是否确认删除")
-        }, text = {
-            Text("分包内的模组、地图、材质都将一并删除，且无法恢复！")
-        }, dismissButton = {
-            TextButton(onClick = { data.dismiss() }) { Text("取消") }
-        }, confirmButton = {
-            TextButton(onClick = { data.confirm() }) { Text("删除") }
-        })
+        AlertDialog(
+            modifier = Modifier.shadow(16.dp, clip = false),
+            onDismissRequest = {
+                data.dismiss()
+            }, title = {
+                Text("是否确认删除")
+            }, text = {
+                Text("分包内的模组、地图、材质都将一并删除，且无法恢复！")
+            }, dismissButton = {
+                TextButton(onClick = { data.dismiss() }) { Text("取消") }
+            }, confirmButton = {
+                TextButton(onClick = { data.confirm() }) { Text("删除") }
+            }
+        )
     }
 }

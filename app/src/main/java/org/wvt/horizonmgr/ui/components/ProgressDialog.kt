@@ -32,7 +32,7 @@ fun ProgressDialog(
     }) {
         Card(
             modifier = Modifier.fillMaxWidth(),
-            elevation = 24.dp
+            elevation = 16.dp
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth()

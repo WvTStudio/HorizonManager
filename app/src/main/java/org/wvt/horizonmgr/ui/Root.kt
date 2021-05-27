@@ -9,7 +9,9 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import org.wvt.horizonmgr.ui.main.InstallHorizonDialog
 import org.wvt.horizonmgr.ui.main.InstallMCDialog
@@ -97,6 +99,7 @@ private fun RequestPermissionDialog(
     onConfirm: () -> Unit
 ) {
     AlertDialog(
+        modifier = Modifier.shadow(16.dp, clip = false),
         onDismissRequest = { },
         confirmButton = { TextButton(onClick = onConfirm) { Text(text = "授权") } },
         title = { Text("需要权限") },
@@ -112,8 +115,8 @@ private fun NewVersionDialog(
     onConfirm: () -> Unit,
     onIgnore: () -> Unit
 ) {
-    File(".")
     AlertDialog(
+        modifier = Modifier.shadow(16.dp, clip = false),
         title = { Text("发现新版本") },
         text = {
             Column(

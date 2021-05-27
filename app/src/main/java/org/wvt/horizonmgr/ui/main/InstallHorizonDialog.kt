@@ -4,6 +4,9 @@ import androidx.compose.material.AlertDialog
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.unit.dp
 
 @Composable
 fun InstallHorizonDialog(
@@ -11,6 +14,7 @@ fun InstallHorizonDialog(
     onConfirm: () -> Unit
 ) {
     AlertDialog(
+        modifier = Modifier.shadow(16.dp, clip = false),
         onDismissRequest = onDismiss,
         confirmButton = {
             TextButton(onClick = onConfirm) { Text("前往酷安") }

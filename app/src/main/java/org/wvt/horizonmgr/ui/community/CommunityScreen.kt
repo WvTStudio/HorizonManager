@@ -73,7 +73,7 @@ internal fun CommunityScreen(
             Dialog(onDismissRequest = { vm.clearDownloadTask() }) {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
-                    elevation = 24.dp
+                    elevation = 16.dp
                 ) {
                     Column(Modifier.padding(horizontal = 16.dp)) {
                         Text(

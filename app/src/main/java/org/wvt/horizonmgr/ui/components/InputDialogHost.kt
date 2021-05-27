@@ -89,9 +89,7 @@ fun InputDialog(
     onConfirmClick: () -> Unit
 ) {
     Dialog(onDismissRequest = onDismissRequest) {
-        Card(
-            elevation = 24.dp
-        ) {
+        Card(elevation = 16.dp) {
             Column {
                 Text(
                     modifier = Modifier.padding(top = 24.dp, start = 24.dp, end = 24.dp),
