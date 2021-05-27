@@ -99,11 +99,9 @@ fun LoginScreen(
             Icon(Icons.Filled.ArrowBack, contentDescription = "返回")
         }
 
-        // FIXME: 2021/3/7 1.0.0 beta1 卡
         // Login Page
         AnimatedVisibility(
             visible = screen == 0,
-            initiallyVisible = true,
             enter = remember { fadeIn() + slideInHorizontally({ -80 }) },
             exit = remember { fadeOut() + slideOutHorizontally({ -80 }) }
         ) {
@@ -117,7 +115,6 @@ fun LoginScreen(
         // RegisterPage
         AnimatedVisibility(
             visible = screen == 1,
-            initiallyVisible = false,
             enter = remember { fadeIn() + slideInHorizontally({ 80 }) },
             exit = remember { fadeOut() + slideOutHorizontally({ 80 }) }
         ) {
