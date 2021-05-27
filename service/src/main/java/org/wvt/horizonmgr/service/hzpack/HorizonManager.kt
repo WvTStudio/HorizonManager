@@ -70,13 +70,16 @@ class HorizonManager constructor(val horizonDir: File) {
      */
     suspend fun installPackage(
         zipPackage: ZipPackage,
-        graphicsZip: File?
+        graphicsZip: File?,
+        packageUUID: String?,
+        customName: String?
     ): InstalledPackage = withContext(Dispatchers.IO) {
         val manifest = zipPackage.getManifest()
+        val customName = customName ?: manifest.pack
         if (packDir.exists().not()) packDir.mkdirs()
         // 根据指定分包名称生成目录
         val outDir =
-            packDir.resolve(manifest.pack).translateToValidFile().also { it.mkdirs() }
+            packDir.resolve(customName).translateToValidFile().also { it.mkdirs() }
         // 创建开始安装的文件标志
         outDir.resolve(".installation_started").createNewFile()
         // 直接解压到 packs 文件夹
@@ -84,13 +87,13 @@ class HorizonManager constructor(val horizonDir: File) {
         // TODO: 2021/2/20 测试如果没有 graphics 是否能运行
         // 预览图压缩包直接复制改名
         graphicsZip?.copyTo(outDir.resolve(".cached_graphics"))
-        val uuid = UUID.randomUUID().toString().toLowerCase(Locale.ROOT)
+        val packageUUID = packageUUID ?: UUID.randomUUID().toString().toLowerCase(Locale.ENGLISH)
         outDir.resolve(".installation_info").outputStream().writer().use {
             val jsonStr = InstallationInfo(
-                packageId = UUID.randomUUID().toString().toLowerCase(Locale.ROOT),
-                internalId = uuid,
+                packageId = packageUUID,
+                internalId = UUID.randomUUID().toString().toLowerCase(Locale.ENGLISH),
                 timeStamp = Date().time,
-                customName = manifest.pack
+                customName = customName
             ).toJson()
             it.write(jsonStr)
         }

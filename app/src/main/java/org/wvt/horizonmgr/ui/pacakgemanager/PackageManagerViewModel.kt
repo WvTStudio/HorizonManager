@@ -234,7 +234,15 @@ class PackageManagerViewModel @Inject constructor(
                 return@launch
             }
             try {
-                withContext(Dispatchers.IO) { mgr.installPackage(ZipPackage(File(filePath)), null) }
+                // TODO: 2021/5/27 允许自定义一些配置
+                withContext(Dispatchers.IO) {
+                    mgr.installPackage(
+                        ZipPackage(File(filePath)),
+                        null,
+                        null,
+                        null
+                    )
+                }
             } catch (e: Exception) {
                 _progressState.emit(ProgressDialogState.Failed("安装失败", "安装过程中出现错误"))
                 return@launch

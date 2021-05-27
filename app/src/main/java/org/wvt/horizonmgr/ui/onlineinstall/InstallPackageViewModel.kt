@@ -120,7 +120,9 @@ class InstallPackageViewModel @Inject constructor(
             try {
                 mgr.installPackage(
                     ZipPackage(result.packageZipFile),
-                    graphicsZip = result.graphicsFile
+                    graphicsZip = result.graphicsFile,
+                    pack.uuid,
+                    customName
                 )
             } catch (e: Exception) {
                 Log.e(TAG, "安装分包失败", e)
