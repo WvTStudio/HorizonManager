@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.Colors
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.runtime.*
@@ -25,6 +24,8 @@ import com.google.accompanist.insets.statusBarsHeight
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import org.wvt.horizonmgr.ui.donate.alipayColor
 import org.wvt.horizonmgr.ui.donate.wechatColor
+
+// TODO: 2021/5/27 Rewrite this.
 
 private val config = mutableStateOf<ThemeConfig>(DefaultThemeConfig)
 
