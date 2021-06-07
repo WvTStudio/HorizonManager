@@ -1,6 +1,5 @@
 package org.wvt.horizonmgr.ui.onlinemods
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -15,9 +14,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.wvt.horizonmgr.ui.components.ModIcon
 import org.wvt.horizonmgr.ui.components.loadUrlImage
+import org.wvt.horizonmgr.ui.theme.PreviewTheme
 
 @Stable
 data class OfficialMirrorModModel(
@@ -33,6 +34,7 @@ data class OfficialMirrorModModel(
     val dislikes: Int,
 )
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 internal fun OfficialMirrorModItem(
     modifier: Modifier,
@@ -42,12 +44,8 @@ internal fun OfficialMirrorModItem(
 ) {
     val modIcon by loadUrlImage(url = model.iconUrl)
 
-    Card(modifier = modifier, elevation = 1.dp) {
-        Column(
-            Modifier
-                .clickable(onClick = onClick)
-                .padding(top = 16.dp, bottom = 4.dp, start = 16.dp, end = 16.dp)
-        ) {
+    Card(modifier = modifier, elevation = 1.dp, onClick = onClick) {
+        Column(Modifier.padding(top = 16.dp, bottom = 4.dp, start = 16.dp, end = 16.dp)) {
             // Information
             Row {
                 Column(
@@ -94,23 +92,55 @@ internal fun OfficialMirrorModItem(
                             imageVector = Icons.Default.Favorite, contentDescription = "Likes"
                         )
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text(text = model.likes.toString(), style = MaterialTheme.typography.caption)
+                        Text(
+                            text = model.likes.toString(),
+                            style = MaterialTheme.typography.caption
+                        )
                         if (model.lastUpdateTime != null) {
                             Spacer(modifier = Modifier.width(16.dp))
                             Icon(
                                 modifier = Modifier.size(18.dp),
-                                imageVector = Icons.Default.AccessTime, contentDescription = "Last update"
+                                imageVector = Icons.Default.AccessTime,
+                                contentDescription = "Last update"
                             )
                             Spacer(modifier = Modifier.width(4.dp))
-                            Text(text = model.lastUpdateTime, style = MaterialTheme.typography.caption)
+                            Text(
+                                text = model.lastUpdateTime,
+                                style = MaterialTheme.typography.caption
+                            )
                         }
                     }
                 }
                 // Install Button
                 IconButton(onClick = onInstallClick) {
-                    Icon(imageVector = Icons.Filled.Extension, contentDescription = "安装", tint = MaterialTheme.colors.primary)
+                    Icon(
+                        imageVector = Icons.Filled.Extension,
+                        contentDescription = "安装",
+                        tint = MaterialTheme.colors.primary
+                    )
                 }
             }
         }
+    }
+}
+
+@Preview
+@Composable
+private fun Preview() {
+    PreviewTheme {
+        OfficialMirrorModItem(modifier = Modifier.fillMaxWidth(),
+            model = OfficialMirrorModModel(
+                10,
+                "Example",
+                "Example",
+                "",
+                "1.0.0",
+                false,
+                lastUpdateTime = "1 hour ago",
+                false,
+                100,
+                0
+            ), onInstallClick = { /*TODO*/ }, onClick = {}
+        )
     }
 }

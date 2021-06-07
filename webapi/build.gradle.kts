@@ -45,15 +45,15 @@ android {
 
 dependencies {
     implementation("androidx.core:core-ktx:1.5.0")
-    implementation("androidx.appcompat:appcompat:1.2.0")
+    implementation("androidx.appcompat:appcompat:1.3.0")
 
-    val ktorVersion = "1.5.3"
+    val ktorVersion = "1.6.0"
     implementation("io.ktor:ktor-client-cio:$ktorVersion")
     implementation("io.ktor:ktor-client-serialization:$ktorVersion")
 
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.4.3")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.1.0")
-    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.1.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.0-native-mt")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.2.1")
 
     testImplementation("junit:junit:4.13.2")
     testImplementation("androidx.test:core:1.3.0")

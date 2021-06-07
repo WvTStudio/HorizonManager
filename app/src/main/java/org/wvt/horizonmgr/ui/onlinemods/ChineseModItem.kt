@@ -1,6 +1,5 @@
 package org.wvt.horizonmgr.ui.onlinemods
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -31,6 +30,7 @@ data class ChineseModModel(
     val downloads: Int
 )
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 internal fun ChineseModItem(
     modifier: Modifier,
@@ -39,12 +39,8 @@ internal fun ChineseModItem(
     onInstallClick: () -> Unit,
 ) {
     val modIcon by loadUrlImage(url = model.iconUrl)
-    Card(modifier = modifier, elevation = 1.dp) {
-        Column(
-            Modifier
-                .clickable(onClick = onClick)
-                .padding(top = 16.dp, bottom = 4.dp, start = 16.dp, end = 16.dp)
-        ) {
+    Card(modifier = modifier, elevation = 1.dp, onClick = onClick) {
+        Column(Modifier.padding(top = 16.dp, bottom = 4.dp, start = 16.dp, end = 16.dp)) {
             // Information
             Row {
                 Column(
@@ -122,7 +118,6 @@ private fun Preview() {
     PreviewTheme {
         ChineseModItem(
             modifier = Modifier
-                .padding(16.dp)
                 .fillMaxWidth()
                 .wrapContentHeight(),
             model = ChineseModModel(1, "Example", "Example", "", listOf(""), "1.0.0", "2020-2-2", 100),

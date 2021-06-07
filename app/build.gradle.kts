@@ -58,7 +58,7 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.0.0-beta07"
+        kotlinCompilerExtensionVersion = "1.0.0-beta08"
     }
     /*lint {
         disable("InvalidFragmentVersionForActivityResult")
@@ -89,18 +89,17 @@ dependencies {
     implementation(project(":service"))
 
     implementation("androidx.core:core-ktx:1.5.0")
-    implementation("androidx.activity:activity-ktx:1.3.0-alpha08")
-    implementation("androidx.activity:activity-compose:1.3.0-alpha08")
+    implementation("androidx.activity:activity-ktx:1.3.0-beta01")
+    implementation("androidx.activity:activity-compose:1.3.0-beta01")
 
-    implementation("androidx.appcompat:appcompat:1.4.0-alpha01")
+    implementation("androidx.appcompat:appcompat:1.4.0-alpha02")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.1")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:1.0.0-alpha05")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:1.0.0-alpha06")
     implementation("com.google.android.material:material:1.3.0")
 
-    implementation("androidx.navigation:navigation-compose:2.4.0-alpha01")
+    implementation("androidx.navigation:navigation-compose:2.4.0-alpha02")
 
-    val workVersion = "2.5.0"
-    implementation("androidx.work:work-runtime-ktx:$workVersion")
+    implementation("androidx.work:work-runtime-ktx:2.5.0")
 
 
     val hiltVersion = "2.36"
@@ -109,7 +108,7 @@ dependencies {
     
     implementation("androidx.hilt:hilt-navigation-compose:1.0.0-alpha02")
 
-    val accompanistVersion = "0.10.0"
+    val accompanistVersion = "0.11.1"
     implementation("com.google.accompanist:accompanist-coil:$accompanistVersion")
     implementation("com.google.accompanist:accompanist-insets:$accompanistVersion")
     implementation("com.google.accompanist:accompanist-pager:$accompanistVersion")
@@ -117,7 +116,7 @@ dependencies {
     implementation("com.google.accompanist:accompanist-swiperefresh:$accompanistVersion")
     implementation("com.google.accompanist:accompanist-flowlayout:$accompanistVersion")
 
-    val composeVersion = "1.0.0-beta07"
+    val composeVersion = "1.0.0-beta08"
     implementation("androidx.compose.compiler:compiler:$composeVersion")
     implementation("androidx.compose.runtime:runtime:$composeVersion")
     implementation("androidx.compose.foundation:foundation:$composeVersion")
@@ -136,7 +135,7 @@ dependencies {
 //    implementation("com.google.firebase:firebase-analytics-ktx")
     implementation("com.google.firebase:firebase-crashlytics-ktx")
 
-    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.1.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.2.1")
 
     implementation("com.github.bumptech.glide:glide:4.12.0")
     kapt("com.github.bumptech.glide:compiler:4.12.0")

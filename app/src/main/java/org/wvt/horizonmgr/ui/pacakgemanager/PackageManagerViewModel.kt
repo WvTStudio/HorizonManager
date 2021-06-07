@@ -15,6 +15,7 @@ import org.wvt.horizonmgr.service.hzpack.*
 import org.wvt.horizonmgr.ui.components.InputDialogHostState
 import org.wvt.horizonmgr.ui.components.ProgressDialogState
 import org.wvt.horizonmgr.utils.LocalCache
+import org.wvt.horizonmgr.webapi.pack.OfficialPackageCDNRepository
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
@@ -25,7 +26,8 @@ private const val TAG = "PackageManagerVM"
 @HiltViewModel
 class PackageManagerViewModel @Inject constructor(
     private val mgr: HorizonManager,
-    private val localCache: LocalCache
+    private val localCache: LocalCache,
+    private val packageCDNRepository: OfficialPackageCDNRepository
 ) : ViewModel() {
     private val _packages = MutableStateFlow(emptyList<PackageManagerItem>())
     private val _progressState = MutableStateFlow<ProgressDialogState?>(null)
@@ -50,10 +52,12 @@ class PackageManagerViewModel @Inject constructor(
             if (state.value == State.Initializing) {
                 loadData()
                 loadSelectedPackage()
+                launch { checkUpdate() }
             } else {
                 isRefreshing.emit(true)
                 loadData()
                 loadSelectedPackage()
+                launch { checkUpdate() }
                 isRefreshing.emit(false)
             }
         }
@@ -250,5 +254,56 @@ class PackageManagerViewModel @Inject constructor(
             _progressState.emit(ProgressDialogState.Finished("安装完成"))
             loadPackages()
         }
+    }
+
+
+    val updatablePackages: MutableStateFlow<Set<String>> = MutableStateFlow(emptySet())
+
+    val checkingUpdateState: MutableStateFlow<CheckingUpdateState> =
+        MutableStateFlow(CheckingUpdateState.Init)
+
+    sealed class CheckingUpdateState {
+        object Init : CheckingUpdateState()
+        object Checking : CheckingUpdateState()
+        object Succeed : CheckingUpdateState()
+        data class Failed(val message: String) : CheckingUpdateState()
+    }
+
+    private suspend fun checkUpdate() {
+        checkingUpdateState.emit(CheckingUpdateState.Checking)
+        val updatable = mutableSetOf<String>()
+
+        val latestPackages = try {
+            packageCDNRepository.getAllPackages().map {
+                it to PackageManifest.fromJson(it.getManifest())
+            }
+        } catch (e: Exception) {
+            checkingUpdateState.emit(CheckingUpdateState.Failed("在线获取分包失败"))
+            return
+        }
+
+        cachedPackages.forEach { installed ->
+            try {
+                latestPackages.forEach { latest ->
+                    val installationInfo = installed.getInstallationInfo()
+                    
+                    if (installationInfo.packageId == latest.first.uuid) {
+                        val manifest = installed.getManifest()
+                        if (manifest.packVersionCode < latest.second.packVersionCode) {
+                            updatable.add(installationInfo.internalId)
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "checkUpdate", e)
+            }
+        }
+
+        updatablePackages.emit(updatable)
+        checkingUpdateState.emit(CheckingUpdateState.Succeed)
+    }
+    
+    fun updatePackage(uuid: String) {
+        // TODO: 2021/5/27
     }
 }

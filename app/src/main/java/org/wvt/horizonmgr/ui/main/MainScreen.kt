@@ -148,21 +148,6 @@ fun MainScreen(
 }
 
 @Composable
-private fun DrawerTabs(
-    screens: Array<MainViewModel.Screen>,
-    currentScreen: MainViewModel.Screen,
-    onChange: (MainViewModel.Screen) -> Unit,
-) {
-    screens.forEach {
-        NavigationItem(
-            checked = currentScreen == it,
-            onCheckedChange = { checked -> if (checked) onChange(it) },
-            text = it.label, icon = it.icon
-        )
-    }
-}
-
-@Composable
 private fun Drawer(
     state: DrawerState,
     header: @Composable () -> Unit,
@@ -198,12 +183,28 @@ private fun Drawer(
     )
 }
 
+@Composable
+private fun DrawerTabs(
+    screens: Array<MainViewModel.Screen>,
+    currentScreen: MainViewModel.Screen,
+    onChange: (MainViewModel.Screen) -> Unit,
+) {
+    screens.forEach {
+        NavigationItem(
+            checked = currentScreen == it,
+            onCheckedChange = { checked -> if (checked) onChange(it) },
+            text = it.label, icon = it.icon
+        )
+    }
+}
+
 data class UserInformation(
     val name: String,
     val account: String,
     val avatarUrl: String
 )
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun DrawerHeader(
     userInfo: UserInformation?,
@@ -280,15 +281,13 @@ private fun DrawerHeader(
                 Surface(
                     modifier = Modifier.size(48.dp),
                     shape = RoundedCornerShape(percent = 50),
-                    color = MaterialTheme.colors.onSurface.copy(alpha = 0.12f)
+                    color = MaterialTheme.colors.onSurface.copy(alpha = 0.12f),
+                    onClick = {
+                        if (userInfo == null) requestLogin()
+                        else showDialog = true
+                    }
                 ) {
-                    Box(
-                        Modifier
-                            .fillMaxSize()
-                            .clickable {
-                                if (userInfo == null) requestLogin()
-                                else showDialog = true
-                            }) {
+                    Box(Modifier.fillMaxSize()) {
                         userInfo?.let {
                             NetworkImage(
                                 url = it.avatarUrl,
@@ -358,14 +357,17 @@ private fun NavigationItem(
 private fun DrawerPreview() {
     PreviewTheme {
         val state = rememberDrawerState(DrawerValue.Open)
-        Drawer(state = state, header = {
-            DrawerHeader(userInfo = null, requestLogin = {}, requestLogout = {})
-        }, tabs = {
-            DrawerTabs(
-                screens = MainViewModel.Screen.values(),
-                currentScreen = MainViewModel.Screen.HOME,
-                onChange = {}
-            )
-        }, items = {}, setting = {}) {}
+        Drawer(state = state,
+            header = { DrawerHeader(userInfo = null, requestLogin = {}, requestLogout = {}) },
+            tabs = {
+                DrawerTabs(
+                    screens = MainViewModel.Screen.values(),
+                    currentScreen = MainViewModel.Screen.HOME,
+                    onChange = {}
+                )
+            },
+            items = {},
+            setting = {}
+        ) {}
     }
 }

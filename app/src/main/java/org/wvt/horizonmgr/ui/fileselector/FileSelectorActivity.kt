@@ -5,7 +5,6 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContract
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
@@ -54,13 +53,17 @@ class FileSelectorActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
+            val viewModel = SharedFileChooserViewModel
             AndroidHorizonManagerTheme {
                 Surface(color = MaterialTheme.colors.background) {
                     FileSelector(
                         modifier = Modifier.fillMaxSize(),
                         viewModel = hiltViewModel(),
-                        onSelect = ::onFileSelect,
-                        onClose = ::onCancel
+                        onSelect = {
+                            viewModel.setSelected(it)
+                            onFileSelect(it)
+                                   },
+                        onClose = { onCancel() }
                     )
                 }
             }

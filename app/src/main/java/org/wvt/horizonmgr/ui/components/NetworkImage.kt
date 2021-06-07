@@ -5,9 +5,10 @@ import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,10 +37,7 @@ fun NetworkImage(
 ) {
     val image by loadUrlImage(url = url)
 
-    Surface(
-        modifier = modifier,
-        color = backgroundColor
-    ) {
+    Box(modifier = modifier.background(backgroundColor)) {
         Crossfade(image) {
             if (it != null) {
                 Image(

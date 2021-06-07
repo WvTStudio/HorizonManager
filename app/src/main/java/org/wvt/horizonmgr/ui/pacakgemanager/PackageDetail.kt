@@ -5,6 +5,7 @@ import androidx.compose.animation.core.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -87,14 +88,29 @@ fun PackageDetailScreen(
                                     )
                                 }
                             }
-                            ManifestSection(info = info)
-                            FileSection(path = info.installDir, packSize = remember(pkgSize) {
-                                when (val pkgSize = pkgSize) {
-                                    is PackageDetailViewModel.PackageSize.Succeed -> pkgSize.sizeStr + "  共 ${pkgSize.count} 个文件"
-                                    is PackageDetailViewModel.PackageSize.Failed -> "计算出错"
-                                    is PackageDetailViewModel.PackageSize.Loading -> "正在计算"
-                                }
-                            })
+                            ManifestSection(
+                                modifier = Modifier.wrapContentHeight().fillMaxWidth(),
+                                packageName = info.packageName,
+                                developer = info.developer,
+                                versionName = info.version,
+                                versionCode = info.versionCode,
+                                packageUUID = info.packageUUID,
+                                gameVersion = info.gameVersion,
+                                description = info.description
+                            )
+                            InstallationSection(
+                                modifier = Modifier.wrapContentHeight().fillMaxWidth(),
+                                path = info.installDir,
+                                packSize = remember(pkgSize) {
+                                    when (val pkgSize = pkgSize) {
+                                        is PackageDetailViewModel.PackageSize.Succeed -> pkgSize.sizeStr + "  共 ${pkgSize.count} 个文件"
+                                        is PackageDetailViewModel.PackageSize.Failed -> "计算出错"
+                                        is PackageDetailViewModel.PackageSize.Loading -> "正在计算"
+                                    }
+                                },
+                                installUUID = info.installUUID,
+                                installTime = info.installTime
+                            )
                         }
                     }
                 }
@@ -105,133 +121,163 @@ fun PackageDetailScreen(
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-private fun ManifestSection(
-    info: PackageDetailViewModel.PackageInformation,
+fun ManifestSection(
+    modifier: Modifier,
+    packageName: String,
+    developer: String,
+    versionName: String,
+    versionCode: String,
+    packageUUID: String,
+    gameVersion: String,
+    description: String
 ) {
-    Text(
-        text = "清单信息",
-        style = MaterialTheme.typography.subtitle2,
-        color = MaterialTheme.colors.primary,
-        modifier = Modifier.padding(top = 16.dp, bottom = 8.dp, start = 72.dp)
-    )
-    ListItem(icon = {
-        Icon(
-            Icons.Filled.Extension,
-            modifier = Modifier.padding(top = 4.dp),
-            contentDescription = null
+    Column(modifier) {
+
+        Text(
+            text = "清单信息",
+            style = MaterialTheme.typography.subtitle2,
+            color = MaterialTheme.colors.primary,
+            modifier = Modifier.padding(top = 16.dp, bottom = 8.dp, start = 72.dp)
         )
-    }, text = {
-        Text("分包名称")
-    }, secondaryText = {
-        Text(info.packageName)
-    })
-    ListItem(icon = {
-        Icon(
-            Icons.Filled.Person,
-            modifier = Modifier.padding(top = 4.dp),
-            contentDescription = null
-        )
-    }, text = {
-        Text("开发者")
-    }, secondaryText = {
-        Text(info.developer)
-    })
-    ListItem(icon = {
-        Icon(
-            Icons.Filled.Description,
-            modifier = Modifier.padding(top = 4.dp),
-            contentDescription = null
-        )
-    }, text = {
-        Text("版本信息")
-    }, secondaryText = {
-        Text(info.version)
-    })
-    ListItem(icon = {
-        Icon(
-            Icons.Filled.Description,
-            modifier = Modifier.padding(top = 4.dp),
-            contentDescription = null
-        )
-    }, text = {
-        Text("版本号")
-    }, secondaryText = {
-        Text(info.versionCode)
-    })
-    ListItem(icon = {
-        Icon(
-            Icons.Filled.Description,
-            modifier = Modifier.padding(top = 4.dp),
-            contentDescription = null
-        )
-    }, text = {
-        Text("UUID")
-    }, secondaryText = {
-        Text(info.installUUID)
-    })
-    ListItem(icon = {
-        Icon(
-            Icons.Filled.Description,
-            modifier = Modifier.padding(top = 4.dp),
-            contentDescription = null
-        )
-    }, text = {
-        Text("分包 UUID")
-    }, secondaryText = {
-        Text(info.packageUUID)
-    })
-    ListItem(icon = {
-        Icon(
-            Icons.Filled.Gamepad,
-            modifier = Modifier.padding(top = 4.dp),
-            contentDescription = null
-        )
-    }, text = {
-        Text("游戏版本")
-    }, secondaryText = {
-        Text(info.gameVersion)
-    })
-    ListItem(icon = {
-        Icon(Icons.Filled.Notes, modifier = Modifier.padding(top = 4.dp), contentDescription = null)
-    }, text = {
-        Text("分包描述")
-    }, secondaryText = {
-        Text(info.description)
-    })
+        ListItem(icon = {
+            Icon(
+                Icons.Filled.Extension,
+                modifier = Modifier.padding(top = 4.dp),
+                contentDescription = null
+            )
+        }, text = {
+            Text("分包名称")
+        }, secondaryText = {
+            Text(packageName)
+        })
+        ListItem(icon = {
+            Icon(
+                Icons.Filled.Person,
+                modifier = Modifier.padding(top = 4.dp),
+                contentDescription = null
+            )
+        }, text = {
+            Text("开发者")
+        }, secondaryText = {
+            Text(developer)
+        })
+        ListItem(icon = {
+            Icon(
+                Icons.Filled.Description,
+                modifier = Modifier.padding(top = 4.dp),
+                contentDescription = null
+            )
+        }, text = {
+            Text("版本名")
+        }, secondaryText = {
+            Text(versionName)
+        })
+        ListItem(icon = {
+            Icon(
+                Icons.Filled.Description,
+                modifier = Modifier.padding(top = 4.dp),
+                contentDescription = null
+            )
+        }, text = {
+            Text("版本号")
+        }, secondaryText = {
+            Text(versionCode)
+        })
+        ListItem(icon = {
+            Icon(
+                Icons.Filled.Description,
+                modifier = Modifier.padding(top = 4.dp),
+                contentDescription = null
+            )
+        }, text = {
+            Text("UUID")
+        }, secondaryText = {
+            Text(packageUUID)
+        })
+        ListItem(icon = {
+            Icon(
+                Icons.Filled.Gamepad,
+                modifier = Modifier.padding(top = 4.dp),
+                contentDescription = null
+            )
+        }, text = {
+            Text("游戏版本")
+        }, secondaryText = {
+            Text(gameVersion)
+        })
+        ListItem(icon = {
+            Icon(
+                Icons.Filled.Notes,
+                modifier = Modifier.padding(top = 4.dp),
+                contentDescription = null
+            )
+        }, text = {
+            Text("分包描述")
+        }, secondaryText = {
+            SelectionContainer { Text(description) }
+        })
+    }
 }
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-private fun FileSection(
+fun InstallationSection(
+    modifier: Modifier,
     path: String,
-    packSize: String
+    packSize: String,
+    installUUID: String,
+    installTime: String
 ) {
-    Text(
-        text = "文件信息",
-        style = MaterialTheme.typography.subtitle2,
-        color = MaterialTheme.colors.primary,
-        modifier = Modifier.padding(top = 16.dp, bottom = 8.dp, start = 72.dp)
-    )
-    ListItem(icon = {
-        Icon(
-            Icons.Filled.Folder,
-            modifier = Modifier.padding(top = 4.dp),
-            contentDescription = null
+    Column(modifier) {
+        Text(
+            text = "安装信息",
+            style = MaterialTheme.typography.subtitle2,
+            color = MaterialTheme.colors.primary,
+            modifier = Modifier.padding(top = 16.dp, bottom = 8.dp, start = 72.dp)
         )
-    }, text = {
-        Text("分包路径")
-    }, secondaryText = {
-        Text(path)
-    })
-    ListItem(icon = {
-        Icon(
-            Icons.Filled.Storage,
-            modifier = Modifier.padding(top = 4.dp),
-            contentDescription = null
-        )
-    }, text = {
-        Text("分包大小")
-    }, secondaryText = {
-        Text(text = packSize)
-    })
+        ListItem(icon = {
+            Icon(
+                Icons.Filled.Folder,
+                modifier = Modifier.padding(top = 4.dp),
+                contentDescription = null
+            )
+        }, text = {
+            Text("安装路径")
+        }, secondaryText = {
+            Text(path)
+        })
+        ListItem(icon = {
+            Icon(
+                Icons.Filled.Storage,
+                modifier = Modifier.padding(top = 4.dp),
+                contentDescription = null
+            )
+        }, text = {
+            Text("分包大小")
+        }, secondaryText = {
+            Text(text = packSize)
+        })
+        ListItem(icon = {
+            Icon(
+                Icons.Filled.Description,
+                modifier = Modifier.padding(top = 4.dp),
+                contentDescription = null
+            )
+        }, text = {
+            Text("安装 UUID")
+        }, secondaryText = {
+            Text(installUUID)
+        })
+        ListItem(icon = {
+            Icon(
+                Icons.Filled.Description,
+                modifier = Modifier.padding(top = 4.dp),
+                contentDescription = null
+            )
+        }, text = {
+            Text("安装时间")
+        }, secondaryText = {
+            Text(installTime)
+        })
+    }
 }

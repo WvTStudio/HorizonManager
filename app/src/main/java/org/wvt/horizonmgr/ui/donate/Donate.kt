@@ -4,8 +4,6 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -20,7 +18,6 @@ import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Constraints
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.util.fastForEach
@@ -34,7 +31,7 @@ import kotlin.random.Random
 val alipayColor = Color(0xFF1678FF)
 val wechatColor = Color(0xFF19AD19)
 
-@OptIn(ExperimentalAnimationApi::class)
+@OptIn(ExperimentalAnimationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun Donate(
     donates: Set<DonateViewModel.DonateItem>,
@@ -52,12 +49,9 @@ fun Donate(
                 modifier = Modifier
                     .statusBarsPadding()
                     .weight(1f)
-                    .fillMaxWidth()
-                    .clickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = null,
-                        onClick = onAlipayClicked
-                    )
+                    .fillMaxWidth(),
+                onClick = onAlipayClicked,
+                indication = null
             ) {
                 Box(Modifier.fillMaxSize()) {
                     Icon(
@@ -74,12 +68,9 @@ fun Donate(
                 modifier = Modifier
                     .navigationBarsPadding()
                     .weight(1f)
-                    .fillMaxWidth()
-                    .clickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = null,
-                        onClick = onWechatPayClicked
-                    )
+                    .fillMaxWidth(),
+                onClick = onWechatPayClicked,
+                indication = null
             ) {
                 Box(Modifier.fillMaxSize()) {
                     Icon(

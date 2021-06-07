@@ -48,27 +48,32 @@ private fun QRDialog(
     qrUrl: String
 ) {
     Dialog(onDismissRequest = onDismissRequest) {
-        Card(
-            Modifier
-                .width(280.dp)
-                .wrapContentHeight(), elevation = 16.dp
-        ) {
-            Column(modifier = Modifier.padding(16.dp)) {
-                Image(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .aspectRatio(1f),
-                    painter = rememberCoilPainter(request = qrUrl, fadeIn = true),
-                    contentDescription = "QR"
-                )
-                Spacer(Modifier.height(16.dp))
-                Text(
-                    modifier = Modifier.align(Alignment.CenterHorizontally),
-                    text = "请务必备注昵称，感谢您的支持",
-                    color = MaterialTheme.colors.onSurface.copy(ContentAlpha.medium),
-                    fontWeight = FontWeight.Medium
-                )
-            }
+        QRDialogContent(qrUrl)
+    }
+}
+
+@Composable
+private fun QRDialogContent(qrUrl: String) {
+    Card(
+        Modifier
+            .width(280.dp)
+            .wrapContentHeight(), elevation = 16.dp
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Image(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .aspectRatio(1f),
+                painter = rememberCoilPainter(request = qrUrl, fadeIn = true),
+                contentDescription = "QR"
+            )
+            Spacer(Modifier.height(16.dp))
+            Text(
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+                text = "请务必备注昵称，感谢您的支持",
+                color = MaterialTheme.colors.onSurface.copy(ContentAlpha.medium),
+                fontWeight = FontWeight.Medium
+            )
         }
     }
 }
@@ -77,6 +82,6 @@ private fun QRDialog(
 @Composable
 private fun QRDialogPreview() {
     PreviewTheme {
-        QRDialog(onDismissRequest = { }, qrUrl = "")
+        QRDialogContent(qrUrl = "")
     }
 }

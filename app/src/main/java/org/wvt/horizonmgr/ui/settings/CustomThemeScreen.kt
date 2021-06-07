@@ -275,6 +275,7 @@ fun CustomThemeScreen(requestClose: () -> Unit) {
     }
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun SelectColorItem(
     modifier: Modifier = Modifier,
@@ -286,9 +287,9 @@ private fun SelectColorItem(
     val shrinkTween = remember { tween<Float>(250, 0, LinearOutSlowInEasing) }
     val expandTween = remember { tween<Float>(250, 40, LinearOutSlowInEasing) }
 
-
     val interactionSource = remember { MutableInteractionSource() }
     val pressed by interactionSource.collectIsPressedAsState()
+
     val scale by updateTransition(targetState = pressed, label = "transition").animateFloat(
         transitionSpec = { if (targetState) shrinkTween else expandTween },
         targetValueByState = {
@@ -309,11 +310,13 @@ private fun SelectColorItem(
             modifier = Modifier
                 .size(128.dp, 96.dp)
                 .padding(top = 8.dp)
-                .clickable(interactionSource, null, onClick = onSelect)
                 .graphicsLayer(scaleX = scale, scaleY = scale),
             color = animateColorAsState(color).value,
             elevation = animateDpAsState(if (selected) 8.dp else 0.dp).value,
-            shape = RoundedCornerShape(size = 4.dp)
+            shape = RoundedCornerShape(size = 4.dp),
+            onClick = onSelect,
+            interactionSource = interactionSource,
+            indication = null
         ) {}
     }
 }
@@ -392,7 +395,7 @@ private fun MaterialColorPalette(
 }
 
 
-@OptIn(ExperimentalAnimationApi::class)
+@OptIn(ExperimentalAnimationApi::class, ExperimentalMaterialApi::class)
 @Composable
 private fun ColorItem(
     modifier: Modifier = Modifier,
@@ -404,11 +407,10 @@ private fun ColorItem(
     val contentColor = remember(color) { MaterialColors.contentColorFor(color) }
 
     Surface(
-        modifier = modifier
-            .clickable(onClick = onSelect)
-            .size(42.dp),
+        modifier = modifier.size(42.dp),
         color = color,
-        shape = RoundedCornerShape(percent = roundPercent)
+        shape = RoundedCornerShape(percent = roundPercent),
+        onClick = onSelect
     ) {
         AnimatedVisibility(
             visible = selected, enter = remember { fadeIn() }, exit = remember { fadeOut() }
@@ -423,14 +425,15 @@ private fun ColorItem(
 @Preview
 @Composable
 private fun ColorItemPreview() {
-    HorizonManagerTheme {
+    PreviewTheme {
         var selected by remember { mutableStateOf(true) }
         Surface(Modifier.padding(32.dp)) {
             ColorItem(
                 modifier = Modifier.padding(1.dp),
                 color = Color(MaterialColors.purple[500]!!),
                 selected = selected,
-                onSelect = { selected = true })
+                onSelect = { selected = true }
+            )
         }
     }
 }

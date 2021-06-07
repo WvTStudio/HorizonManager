@@ -69,7 +69,7 @@ class LoginActivity : AppCompatActivity() {
         const val EXTRA_AVATAR = "avatar"
     }
 
-    private val viewModel by viewModels<LoginViewModel>() /*{ defaultViewModelFactory }*/
+    private val viewModel by viewModels<LoginViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
