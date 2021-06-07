@@ -6,10 +6,9 @@ import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
-import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import org.wvt.horizonmgr.ui.theme.AndroidHorizonManagerTheme
 
@@ -23,11 +22,12 @@ class JoinGroupActivity : AppCompatActivity() {
 
         setContent {
             AndroidHorizonManagerTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colors.background
-                ) {
-                    JoinGroupScreen(onClose = { finish() }, openURL = ::openURL, viewModel = vm)
+                Surface(color = MaterialTheme.colors.background) {
+                    JoinGroupScreen(
+                        viewModel = hiltViewModel(),
+                        onClose = { finish() },
+                        openURL = ::openURL
+                    )
                 }
             }
         }

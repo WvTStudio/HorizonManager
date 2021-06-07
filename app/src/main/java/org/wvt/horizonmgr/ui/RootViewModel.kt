@@ -1,32 +1,23 @@
 package org.wvt.horizonmgr.ui
 
 import android.util.Log
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.wvt.horizonmgr.BuildConfig
-import org.wvt.horizonmgr.ui.login.LoginResult
 import org.wvt.horizonmgr.utils.LocalCache
 import org.wvt.horizonmgr.webapi.NetworkException
 import org.wvt.horizonmgr.webapi.mgrinfo.MgrInfoModule
 import javax.inject.Inject
+import javax.inject.Singleton
 
-private const val TAG = "MainActivityVM"
+private const val TAG = "RootViewModel"
 
-@HiltViewModel
+@Singleton
 class RootViewModel @Inject constructor(
     private val localCache: LocalCache,
     private val mgrInfo: MgrInfoModule
-) : ViewModel() {
-    var initialized by mutableStateOf(false)
-        private set
-    val userInfo: MutableStateFlow<LocalCache.CachedUserInfo?> = MutableStateFlow(null)
-    val selectedPackage: MutableStateFlow<String?> = MutableStateFlow(null)
+) {
+    val viewModelScope = CoroutineScope(Dispatchers.Default)
     val showPermissionDialog: MutableStateFlow<Boolean> = MutableStateFlow(false)
 
     data class NewVersion(
@@ -42,14 +33,6 @@ class RootViewModel @Inject constructor(
     val gameNotInstalled = MutableStateFlow(false)
 
     val hzNotInstalled = MutableStateFlow(false)
-
-    init {
-        viewModelScope.launch(Dispatchers.IO) {
-            userInfo.value = localCache.getCachedUserInfo()
-            selectedPackage.value = localCache.getSelectedPackageUUID()
-            initialized = true
-        }
-    }
 
     fun checkUpdate() {
         viewModelScope.launch(Dispatchers.IO) {
@@ -109,28 +92,6 @@ class RootViewModel @Inject constructor(
             )
         }
     }
-
-    fun setSelectedPackage(uuid: String?) {
-        viewModelScope.launch(Dispatchers.IO) {
-            localCache.setSelectedPackageUUID(uuid)
-            selectedPackage.value = uuid
-        }
-    }
-
-    fun setUserInfo(userInfo: LoginResult) {
-        viewModelScope.launch(Dispatchers.IO) {
-            if (userInfo is LoginResult.Succeed) {
-                localCache.cacheUserInfo(
-                    userInfo.uid,
-                    userInfo.name,
-                    userInfo.account,
-                    userInfo.avatar
-                )
-            }
-            this@RootViewModel.userInfo.value = localCache.getCachedUserInfo()
-        }
-    }
-
 
     fun dismiss() {
         showPermissionDialog.value = false

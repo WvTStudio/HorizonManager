@@ -15,21 +15,24 @@ import androidx.appcompat.app.AppCompatActivity
 import dagger.hilt.android.AndroidEntryPoint
 import org.wvt.horizonmgr.R
 import org.wvt.horizonmgr.ui.joingroup.JoinGroupViewModel
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class RootActivity : AppCompatActivity() {
-    private val rootVM by viewModels<RootViewModel>()
+
+    @Inject protected lateinit var rootVM: RootViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme(R.style.Theme_HorizonManagerCompose_NoActionBar) // cancel the slash theme
         setContent {
             Root(
+                viewModel = rootVM,
                 onInstallHZClick = this::openCoolapkURL,
                 onInstallMCClick = this::openMCGooglePlay,
                 onRequestPermission = this::requestPermission,
             ) {
-                RootNavHost(
+                RootNavHostActivity(
                     requestOpenGame = this::openGame,
                     requestOpenURL = this::openURL
                 )

@@ -1,44 +1,18 @@
 package org.wvt.horizonmgr.ui.main
 
-import android.Manifest
-import android.annotation.SuppressLint
-import android.content.Intent
-import android.content.pm.PackageManager
-import android.net.Uri
-import android.os.Build
 import android.os.Bundle
-import android.os.Environment
-import android.provider.Settings
-import androidx.activity.compose.setContent
-import androidx.activity.viewModels
+import android.os.PersistableBundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
 import dagger.hilt.android.AndroidEntryPoint
-import org.wvt.horizonmgr.R
-import org.wvt.horizonmgr.ui.Root
-import org.wvt.horizonmgr.ui.article.ArticleContentActivityContract
-import org.wvt.horizonmgr.ui.community.CommunityActivity
-import org.wvt.horizonmgr.ui.donate.DonateActivity
-import org.wvt.horizonmgr.ui.downloaded.DMViewModel
-import org.wvt.horizonmgr.ui.fileselector.FileSelectorResult
-import org.wvt.horizonmgr.ui.fileselector.FileSelectorResultContract
-import org.wvt.horizonmgr.ui.home.HomeViewModel
-import org.wvt.horizonmgr.ui.joingroup.JoinGroupActivity
-import org.wvt.horizonmgr.ui.login.LoginResultContract
-import org.wvt.horizonmgr.ui.modulemanager.*
-import org.wvt.horizonmgr.ui.onlineinstall.InstallPackageResultContract
-import org.wvt.horizonmgr.ui.onlinemods.OnlineModsViewModel
-import org.wvt.horizonmgr.ui.pacakgemanager.PackageDetailActivity
-import org.wvt.horizonmgr.ui.pacakgemanager.PackageManagerViewModel
-import org.wvt.horizonmgr.ui.settings.SettingsActivity
-import org.wvt.horizonmgr.ui.startActivity
-import org.wvt.horizonmgr.ui.theme.AndroidHorizonManagerTheme
 
 private const val TAG = "MainActivity"
 
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity() {/*
+class MainActivity : AppCompatActivity() {
+    override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
+        super.onCreate(savedInstanceState, persistentState)
+    }
+/*
 //    private val factory by lazy { HiltViewModelFactory(this, NavBackStackEntry.create(this)) }
 
     private val mainVM: MainViewModel by viewModels()

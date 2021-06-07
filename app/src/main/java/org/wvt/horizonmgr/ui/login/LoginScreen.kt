@@ -9,6 +9,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
@@ -19,7 +20,7 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import org.wvt.horizonmgr.R
 
-private const val TAG = "ComposeLogin"
+private const val TAG = "LoginScreen"
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
@@ -31,7 +32,7 @@ fun LoginScreen(
     val fabState by viewModel.fabState.collectAsState()
 
     val snackbarHostState = remember { SnackbarHostState() }
-    var screen by remember { mutableStateOf(0) }
+    var screen by rememberSaveable { mutableStateOf(0) }
     val gearResource = ImageVector.vectorResource(id = R.drawable.ic_gear_full)
 
     val gearRotation by rememberInfiniteTransition().animateFloat(

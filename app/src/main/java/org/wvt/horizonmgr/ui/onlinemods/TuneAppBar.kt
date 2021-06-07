@@ -27,6 +27,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -35,6 +36,7 @@ import androidx.compose.ui.util.lerp
 import androidx.compose.ui.zIndex
 import org.wvt.horizonmgr.ui.components.DropDownSelector
 import org.wvt.horizonmgr.ui.theme.AppBarBackgroundColor
+import org.wvt.horizonmgr.ui.theme.PreviewTheme
 
 private val iconFade = tween<Float>(durationMillis = 120, easing = FastOutSlowInEasing)
 
@@ -62,6 +64,8 @@ private val tuneShrink = tween<Float>(225, 0, FastOutSlowInEasing) // Shrink to 
 @Composable
 internal fun TuneAppBar(
     enable: Boolean,
+    expand: Boolean,
+    onExpandStateChange: (Boolean) -> Unit,
     onNavClicked: () -> Unit,
     filterText: String,
     onFilterValueConfirm: (value: String) -> Unit,
@@ -72,32 +76,32 @@ internal fun TuneAppBar(
     selectedSortMode: Int,
     onSortModeSelect: (index: Int) -> Unit
 ) {
-    var expand by remember { mutableStateOf(false) }
     var filterValue by remember(filterText) { mutableStateOf(TextFieldValue(filterText)) }
-    val updateTransition = updateTransition(expand)
+    val updateTransition = updateTransition(expand, label = "tune")
 
     val actionOpacity by updateTransition.animateFloat(
-        targetValueByState = { if (it) 0.72f else 1f }
+        targetValueByState = { if (it) 0.72f else 1f }, label = "opacity"
     )
     val searchBoxPadding by updateTransition.animateDp(
         transitionSpec = { if (targetState) searchBoxEnter else searchBoxExit },
-        targetValueByState = { if (it) 16.dp else 0.dp }
+        targetValueByState = { if (it) 16.dp else 0.dp }, label = "searchbox_padding"
     )
     val searchBoxCorner by updateTransition.animateDp(
         transitionSpec = { if (targetState) searchBoxEnter else searchBoxExit },
-        targetValueByState = { if (it) 4.dp else 0.dp }
+        targetValueByState = { if (it) 4.dp else 0.dp }, label = "searchbox_corner"
     )
     val searchBoxElevation by updateTransition.animateDp(
         transitionSpec = { if (targetState) searchBoxEnter else searchBoxExit },
-        targetValueByState = { if (it) 4.dp else 0.dp }
+        targetValueByState = { if (it) 4.dp else 0.dp }, label = "searchbox_elevation"
     )
     val searchBoxBackgroundColor by updateTransition.animateColor(
         transitionSpec = { if (targetState) searchBoxEnterColor else searchBoxExitColor },
-        targetValueByState = { if (it) MaterialTheme.colors.surface else Color.Transparent }
+        targetValueByState = { if (it) MaterialTheme.colors.surface else Color.Transparent },
+        label = "searchbox_background"
     )
     val contentOpacity by updateTransition.animateFloat(
         transitionSpec = { if (targetState) contentAppear else contentDisappear },
-        targetValueByState = { if (it) 1f else 0f }
+        targetValueByState = { if (it) 1f else 0f }, label = "content_opacity"
     )
     val searchTextFieldFocus = remember { FocusRequester() }
 
@@ -164,7 +168,7 @@ internal fun TuneAppBar(
                         .padding(start = 4.dp)
                         .graphicsLayer(alpha = actionOpacity),
                     onClick = {
-                        if (expand) expand = false
+                        if (expand) onExpandStateChange(false)
                         else onNavClicked()
                     }
                 ) {
@@ -240,7 +244,7 @@ internal fun TuneAppBar(
                                 searchTextFieldFocus.freeFocus()
                                 onFilterValueConfirm(filterValue.text)
                             } else { // Expand
-                                expand = true
+                                onExpandStateChange(true)
                             }
                         }
                     ) {
@@ -282,11 +286,11 @@ private fun AppBarLayout(
     expand: Boolean,
     content: @Composable () -> Unit
 ) {
-    val progress by updateTransition(expand).animateFloat(transitionSpec = {
+    val progress by updateTransition(expand, label = "transition").animateFloat(transitionSpec = {
         if (targetState) tuneExpand else tuneShrink
     }, targetValueByState = {
         if (it) 1f else 0f
-    })
+    }, label = "transitionProgress")
     Layout(content) { m: List<Measurable>, c: Constraints ->
         check(m.size == 3)
 
@@ -338,7 +342,10 @@ private fun TuneContent(
             ) {
                 Icon(Icons.Filled.Language, contentDescription = "源仓库")
                 DropDownSelector(
-                    modifier = Modifier.padding(horizontal = 16.dp).weight(1f).wrapContentHeight(),
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp)
+                        .weight(1f)
+                        .wrapContentHeight(),
                     items = repositories,
                     selectedIndex = selectedRepository,
                     onSelected = { onRepositorySelect(it) }
@@ -363,5 +370,27 @@ private fun TuneContent(
                 )
             }
         }
+    }
+}
+
+@Preview
+@Composable
+private fun Preview() {
+    PreviewTheme {
+        var expand by remember { mutableStateOf(true) }
+        TuneAppBar(
+            enable = true,
+            expand = expand,
+            onExpandStateChange = { expand = it },
+            onNavClicked = {},
+            filterText = "Test",
+            onFilterValueConfirm = { },
+            repositories = listOf("Rep1", "Rep2"),
+            selectedRepository = 0,
+            onRepositorySelect = { /*TODO*/ },
+            sortModes = listOf("Name", "Time"),
+            selectedSortMode = 0,
+            onSortModeSelect = {}
+        )
     }
 }

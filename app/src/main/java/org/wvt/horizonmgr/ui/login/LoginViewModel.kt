@@ -60,7 +60,7 @@ class LoginViewModel @Inject constructor(
                     userInfo.uid,
                     userInfo.name,
                     userInfo.account,
-                    userInfo.avatarUrl!!
+                    userInfo.avatarUrl ?: ""
                 )
             )
             launch { snackbarHostState.showSnackbar("登录成功") } // 此处用 launch 的原因是为了 UX，只希望等待 800ms
@@ -107,7 +107,8 @@ class LoginViewModel @Inject constructor(
                     return@launch
                 }
                 fabState.emit(FabState.SUCCEED)
-                snackbarHostState.showSnackbar("注册成功，注意查收验证邮件", "确认")
+                launch { snackbarHostState.showSnackbar("注册成功，注意查收验证邮件", "确认") }
+                delay(800) // For UX
                 fabState.emit(FabState.TODO)
                 onSucceed(uid, username, pass)
             }

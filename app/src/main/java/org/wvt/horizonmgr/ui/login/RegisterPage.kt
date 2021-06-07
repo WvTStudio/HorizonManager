@@ -7,6 +7,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -16,10 +17,12 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.wvt.horizonmgr.ui.components.FabState
 import org.wvt.horizonmgr.ui.components.StateFab
+import org.wvt.horizonmgr.ui.theme.PreviewTheme
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -28,10 +31,10 @@ fun RegisterPage(
     onRegisterRequest: (username: String, email: String, password: String, confirmPassword: String) -> Unit
 ) {
     val (usernameFocus, emailFocus, passwordFocus, confirmFocus) = FocusRequester.createRefs()
-    var username by remember { mutableStateOf(TextFieldValue()) }
-    var email by remember { mutableStateOf(TextFieldValue()) }
-    var password by remember { mutableStateOf(TextFieldValue()) }
-    var confirmPassword by remember { mutableStateOf(TextFieldValue()) }
+    var username by rememberSaveable(stateSaver = TextFieldValue.Saver) { mutableStateOf(TextFieldValue()) }
+    var email by rememberSaveable(stateSaver = TextFieldValue.Saver) { mutableStateOf(TextFieldValue()) }
+    var password by rememberSaveable(stateSaver = TextFieldValue.Saver) { mutableStateOf(TextFieldValue()) }
+    var confirmPassword by rememberSaveable(stateSaver = TextFieldValue.Saver) { mutableStateOf(TextFieldValue()) }
 
     Box(Modifier.fillMaxSize()) {
         Column(
@@ -147,6 +150,17 @@ fun RegisterPage(
                     }
                 )
             }
+        }
+    }
+}
+
+
+@Preview
+@Composable
+private fun Preview() {
+    PreviewTheme {
+        Surface(color = MaterialTheme.colors.background) {
+            RegisterPage(fabState = FabState.TODO) { username, email, password, confirmPassword -> }
         }
     }
 }

@@ -5,6 +5,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -28,12 +29,14 @@ fun LoginPage(
 ) {
     val (accountFocus, passwordFocus) = FocusRequester.createRefs()
 
-    var account by remember { mutableStateOf(TextFieldValue()) }
-    var password by remember { mutableStateOf(TextFieldValue()) }
+    var account by rememberSaveable(stateSaver = TextFieldValue.Saver) { mutableStateOf(TextFieldValue()) }
+    var password by rememberSaveable(stateSaver = TextFieldValue.Saver) { mutableStateOf(TextFieldValue()) }
 
     Box(Modifier.fillMaxSize()) {
         Column(
-            modifier = Modifier.wrapContentSize().align(Alignment.Center),
+            modifier = Modifier
+                .wrapContentSize()
+                .align(Alignment.Center),
             verticalArrangement = Arrangement.Center,
         ) {
             Text(

@@ -1,4 +1,4 @@
-package org.wvt.horizonmgr.ui.main
+package org.wvt.horizonmgr.ui
 
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Text

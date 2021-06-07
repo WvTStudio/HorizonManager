@@ -3,7 +3,6 @@ package org.wvt.horizonmgr.ui.theme
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.material.Colors
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -84,11 +83,11 @@ fun PreviewTheme(
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit
 ) {
-    MaterialTheme(colors = DefaultThemeConfig.lightColor) {
-        Surface(
-            modifier = modifier,
-            color = MaterialTheme.colors.background, content = content
-        )
+    CompositionLocalProvider(
+        LocalThemeController provides DefaultThemeController,
+        LocalThemeConfig provides DefaultThemeConfig
+    ) {
+        MaterialTheme(colors = LightColorPalette, content = content)
     }
 }
 

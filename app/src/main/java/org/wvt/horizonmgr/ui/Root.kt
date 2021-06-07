@@ -12,15 +12,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
-import org.wvt.horizonmgr.ui.main.InstallHorizonDialog
-import org.wvt.horizonmgr.ui.main.InstallMCDialog
 import org.wvt.horizonmgr.ui.theme.PreviewTheme
-import java.io.File
 
 @Composable
 fun Root(
-    viewModel: RootViewModel = hiltViewModel(),
+    viewModel: RootViewModel,
     onInstallHZClick: () -> Unit,
     onInstallMCClick: () -> Unit,
     onRequestPermission: () -> Unit,
@@ -75,7 +71,7 @@ fun Root(
 
     if (showHZNotInstall) {
         InstallHorizonDialog(
-            onDismiss = { viewModel.dismissGameNotInstallDialog() },
+            onDismiss = { viewModel.dismissHZNotInstallDialog() },
             onConfirm = {
                 onInstallHZClick()
                 viewModel.dismissHZNotInstallDialog()

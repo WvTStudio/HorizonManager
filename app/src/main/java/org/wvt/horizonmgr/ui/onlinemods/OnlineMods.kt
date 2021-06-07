@@ -8,10 +8,8 @@ import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.google.accompanist.swiperefresh.SwipeRefresh
@@ -73,14 +71,21 @@ fun OnlineMods(
     val installState by viewModel.installState.collectAsState()
     val isRefreshing by viewModel.isRefreshing.collectAsState()
 
-    LaunchedEffect(isLogon) { if (isLogon) { viewModel.init() } }
+    LaunchedEffect(isLogon) {
+        if (isLogon) {
+            viewModel.init()
+        }
+    }
 
     installState?.let { ProgressDialog(onCloseRequest = { viewModel.installFinish() }, state = it) }
 
     Column(Modifier.fillMaxSize()) {
+        var expand by rememberSaveable { mutableStateOf(false) }
         // Top App Bar
         TuneAppBar(
             enable = isLogon,
+            expand = expand,
+            onExpandStateChange = { expand = it },
             onNavClicked = onNavClick,
             filterText = filterText,
             onFilterValueConfirm = { viewModel.setFilterText(it) },

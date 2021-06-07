@@ -1,12 +1,7 @@
 package org.wvt.horizonmgr.ui.home
 
 import androidx.compose.animation.Crossfade
-import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -36,11 +31,11 @@ fun HomeScreen(
     onNavClick: () -> Unit,
     onNewsClick: (HomeViewModel.ContentResource) -> Unit
 ) {
-    Home(viewModel = hiltViewModel(), onNavClick = onNavClick, onNewsClick = onNewsClick)
+    HomeScreen(viewModel = hiltViewModel(), onNavClick = onNavClick, onNewsClick = onNewsClick)
 }
 
 @Composable
-fun Home(
+fun HomeScreen(
     viewModel: HomeViewModel,
     onNavClick: () -> Unit,
     onNewsClick: (HomeViewModel.ContentResource) -> Unit
@@ -53,22 +48,22 @@ fun Home(
         onDispose { }
     }
 
-    NewsUI(
+    RecommendArticlesScreen(
         onNavClick = onNavClick,
         state = state,
-        home = news,
-        onNewsClick = { onNewsClick(it) },
+        articles = news,
+        onArticleClick = { onNewsClick(it) },
         onRefresh = { viewModel.refresh() },
         isRefreshing = viewModel.isRefreshing.collectAsState().value
     )
 }
 
 @Composable
-private fun NewsUI(
+private fun RecommendArticlesScreen(
     onNavClick: () -> Unit,
     state: HomeViewModel.State,
-    home: List<HomeViewModel.ContentResource>,
-    onNewsClick: (HomeViewModel.ContentResource) -> Unit,
+    articles: List<HomeViewModel.ContentResource>,
+    onArticleClick: (HomeViewModel.ContentResource) -> Unit,
     isRefreshing: Boolean,
     onRefresh: () -> Unit
 ) {
@@ -91,9 +86,9 @@ private fun NewsUI(
                     CircularProgressIndicator(Modifier.align(Alignment.Center))
                 }
                 is HomeViewModel.State.Succeed -> {
-                    NewsList(
-                        home,
-                        onNewsClick,
+                    ArticleList(
+                        articles,
+                        onArticleClick,
                         isRefreshing,
                         onRefresh
                     )
@@ -112,9 +107,9 @@ private fun NewsUI(
 }
 
 @Composable
-private fun NewsList(
+private fun ArticleList(
     home: List<HomeViewModel.ContentResource>,
-    onNewsClick: (HomeViewModel.ContentResource) -> Unit,
+    onArticleClick: (HomeViewModel.ContentResource) -> Unit,
     isRefreshing: Boolean,
     onRefreshClick: () -> Unit
 ) {
@@ -135,13 +130,13 @@ private fun NewsList(
         ) {
             items(home) { item ->
                 when {
-                    item is HomeViewModel.ContentResource.Article && item.coverUrl != null -> NewsItem(
+                    item is HomeViewModel.ContentResource.Article && item.coverUrl != null -> ArticleItem(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(vertical = 8.dp, horizontal = 16.dp),
                         title = item.title,
                         brief = item.brief,
-                        onClick = { onNewsClick(item) },
+                        onClick = { onArticleClick(item) },
                         coverImage = {
                             NetworkImage(
                                 url = item.coverUrl,
@@ -150,13 +145,13 @@ private fun NewsList(
                             )
                         }
                     )
-                    item is HomeViewModel.ContentResource.Article && item.coverUrl == null -> NewsItemNoCover(
+                    item is HomeViewModel.ContentResource.Article && item.coverUrl == null -> ArticleItemNoCover(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(vertical = 8.dp, horizontal = 16.dp),
                         title = item.title,
                         brief = item.brief,
-                        onClick = { onNewsClick(item) }
+                        onClick = { onArticleClick(item) }
                     )
                 }
             }
@@ -164,29 +159,17 @@ private fun NewsList(
     }
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
-private fun NewsItemNoCover(
+private fun ArticleItemNoCover(
     modifier: Modifier = Modifier,
     title: String,
     brief: String,
     onClick: () -> Unit
 ) {
-    val interactionSource = remember { MutableInteractionSource() }
-    val isPressed by interactionSource.collectIsPressedAsState()
-
-    Card(
-        modifier = modifier,
-        elevation = animateDpAsState(
-            if (isPressed) 8.dp else 1.dp
-        ).value
-    ) {
+    Card(modifier = modifier, onClick = onClick) {
         Column(
             modifier = Modifier
-                .clickable(
-                    onClick = onClick,
-                    interactionSource = interactionSource,
-                    indication = LocalIndication.current
-                )
                 .wrapContentHeight()
                 .fillMaxWidth()
                 .padding(16.dp)
@@ -210,34 +193,27 @@ private fun NewsItemNoCover(
     }
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
-private fun NewsItem(
+private fun ArticleItem(
     modifier: Modifier = Modifier,
     title: String,
     brief: String,
     coverImage: @Composable () -> Unit,
     onClick: () -> Unit
 ) {
-    val interactionSource = remember { MutableInteractionSource() }
-    val isPressed by interactionSource.collectIsPressedAsState()
-
-    Card(modifier = modifier, elevation = animateDpAsState(if (isPressed) 8.dp else 1.dp).value) {
+    Card(modifier = modifier, onClick = onClick) {
         Box(
             Modifier
-                .clickable(
-                    onClick = onClick,
-                    interactionSource = interactionSource,
-                    indication = LocalIndication.current
-                )
                 .fillMaxWidth()
                 .wrapContentHeight()
         ) {
             // Cover Image
-            Surface(
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .aspectRatio(16f / 10f),
-                content = coverImage
+                content = { coverImage() }
             )
             Column(
                 modifier = Modifier
@@ -272,30 +248,32 @@ private fun NewsItem(
 @Composable
 private fun NewsPreview() {
     PreviewTheme {
-        NewsUI(
-            onNavClick = {},
-            state = HomeViewModel.State.Succeed,
-            home = remember {
-                listOf(
-                    HomeViewModel.ContentResource.Article(
-                        "",
-                        "Test article",
-                        "Test brief",
-                        "http://aaa.aaa",
-                        "2020-2020"
-                    ),
-                    HomeViewModel.ContentResource.Article(
-                        "",
-                        "Test article",
-                        "Test brief",
-                        null,
-                        "2020-2020"
+        Surface(color = MaterialTheme.colors.background) {
+            RecommendArticlesScreen(
+                onNavClick = {},
+                state = HomeViewModel.State.Succeed,
+                articles = remember {
+                    listOf(
+                        HomeViewModel.ContentResource.Article(
+                            "",
+                            "Test article",
+                            "Test brief",
+                            "",
+                            "2020-2020"
+                        ),
+                        HomeViewModel.ContentResource.Article(
+                            "",
+                            "Test article",
+                            "Test brief",
+                            null,
+                            "2020-2020"
+                        )
                     )
-                )
-            },
-            onNewsClick = {},
-            onRefresh = {},
-            isRefreshing = false
-        )
+                },
+                onArticleClick = {},
+                onRefresh = {},
+                isRefreshing = false
+            )
+        }
     }
 }
