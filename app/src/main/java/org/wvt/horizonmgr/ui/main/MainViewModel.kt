@@ -1,43 +1,25 @@
 package org.wvt.horizonmgr.ui.main
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.graphics.vector.ImageVector
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.wvt.horizonmgr.utils.LocalCache
 import javax.inject.Inject
 
+private const val TAG = "MainViewModel"
+
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    val localCache: LocalCache
+    private val localCache: LocalCache
 ) : ViewModel() {
     val userInfo = MutableStateFlow<UserInformation?>(null)
 
-    enum class Screen(
-        val label: String,
-        val icon: ImageVector
-    ) {
-        HOME("首页", Icons.Filled.Home),
-        PACKAGE_MANAGE("分包管理", Icons.Filled.Dashboard),
-        LOCAL_MANAGE("模组管理", Icons.Filled.Extension),
-        ONLINE_DOWNLOAD("在线资源", Icons.Filled.Store),
-        DOWNLOADED_MOD("本地资源", Icons.Filled.Storage)
-    }
-
-    var currentScreen by mutableStateOf(Screen.LOCAL_MANAGE)
-        private set
-
-    fun navigate(screen: Screen) {
-        currentScreen = screen
-    }
+    init { resume() }
 
     fun logOut() {
         viewModelScope.launch(Dispatchers.IO) {
@@ -46,15 +28,19 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun resume() {
+    private suspend fun loadUserInfo() = withContext(Dispatchers.IO) {
         try {
-            viewModelScope.launch(Dispatchers.IO) {
-                userInfo.value = localCache.getCachedUserInfo()?.let {
-                    UserInformation(it.name, it.account, it.avatarUrl)
-                }
+            userInfo.value = localCache.getCachedUserInfo()?.let {
+                UserInformation(it.name, it.account, it.avatarUrl)
             }
         } catch (e: Exception) {
-            // TODO: 2021/5/21
+            Log.e(TAG, "loadUserInfo: failed", e)
+        }
+    }
+
+    fun resume() {
+        viewModelScope.launch {
+            loadUserInfo()
         }
     }
 }

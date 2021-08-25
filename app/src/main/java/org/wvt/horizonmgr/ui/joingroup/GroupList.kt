@@ -91,7 +91,6 @@ private fun GroupItem(
             // GroupName
             CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
                 Box(Modifier.fillMaxWidth()) {
-                    // TODO: 2021/3/5 效果还不理想
                     // GroupName
                     Text(
                         text = buildAnnotatedString {

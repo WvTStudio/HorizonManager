@@ -12,6 +12,7 @@ import android.provider.Settings
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.WindowCompat
 import dagger.hilt.android.AndroidEntryPoint
 import org.wvt.horizonmgr.R
 import org.wvt.horizonmgr.ui.joingroup.JoinGroupViewModel
@@ -23,6 +24,7 @@ class RootActivity : AppCompatActivity() {
     @Inject protected lateinit var rootVM: RootViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        WindowCompat.setDecorFitsSystemWindows(window, false)
         super.onCreate(savedInstanceState)
         setTheme(R.style.Theme_HorizonManagerCompose_NoActionBar) // cancel the slash theme
         setContent {
@@ -113,12 +115,7 @@ class RootActivity : AppCompatActivity() {
     }
 
     private fun requestPermission() {
-        // TODO: 2020/10/13 支持挂起，在用户完成操作后恢复
-        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.Q && Build.VERSION.PREVIEW_SDK_INT != 0) {
-            // R Preview
-            @SuppressLint("NewApi")
-            if (!Environment.isExternalStorageManager()) this.startActivity(Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION))
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             if (!Environment.isExternalStorageManager()) this.startActivity(Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION))
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             this.requestPermissions(permissions, 0)

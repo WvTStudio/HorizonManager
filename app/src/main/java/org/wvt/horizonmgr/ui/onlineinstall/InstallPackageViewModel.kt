@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.receiveAsFlow
 import org.wvt.horizonmgr.service.hzpack.HorizonManager
+import org.wvt.horizonmgr.service.hzpack.PackageManifest
 import org.wvt.horizonmgr.service.hzpack.PackageManifestWrapper
 import org.wvt.horizonmgr.service.hzpack.ZipPackage
 import org.wvt.horizonmgr.utils.OfficialCDNPackageDownloader
@@ -34,12 +35,10 @@ class InstallPackageViewModel @Inject constructor(
         class Error(val message: String) : State()
     }
 
-    val state = MutableStateFlow<State>(State.Loading)
+    val getPackageState = MutableStateFlow<State>(State.Loading)
     val packages = MutableStateFlow<List<ChoosePackageItem>>(emptyList())
 
-    var totalProgress = MutableStateFlow<Float>(0f)
-    val downloadState = MutableStateFlow<StepState>(StepState.Waiting)
-    val installState = MutableStateFlow<StepState>(StepState.Waiting)
+    val selectedPackageManifest = MutableStateFlow<PackageManifest?>(null)
 
     private var packs = emptyList<OfficialCDNPackage>()
     private var selectedPackage: OfficialCDNPackage? = null
@@ -47,15 +46,15 @@ class InstallPackageViewModel @Inject constructor(
 
     fun getPackages() {
         viewModelScope.launch(Dispatchers.IO) {
-            state.emit(State.Loading)
+            getPackageState.emit(State.Loading)
             packs = try {
                 packRepository.getAllPackages()
             } catch (e: NetworkException) {
-                state.emit(State.Error("网络错误，请稍后再试"))
+                getPackageState.emit(State.Error("网络错误，请稍后再试"))
                 return@launch
             } catch (e: Exception) {
                 Log.e(TAG, "获取分包列表失败", e)
-                state.emit(State.Error("未知错误，请稍后再试"))
+                getPackageState.emit(State.Error("未知错误，请稍后再试"))
                 return@launch
             }
 
@@ -70,22 +69,40 @@ class InstallPackageViewModel @Inject constructor(
                         it.isSuggested
                     )
                 } catch (e: NetworkException) {
-                    state.emit(State.Error("获取分包清单时出现网络错误"))
+                    getPackageState.emit(State.Error("获取分包清单时出现网络错误"))
                     return@launch
                 } catch (e: Exception) {
                     Log.e(TAG, "获取分包清单失败", e)
-                    state.emit(State.Error("未知错误，请稍后再试"))
+                    getPackageState.emit(State.Error("未知错误，请稍后再试"))
                     return@launch
                 }
             }
 
             packages.emit(mappedPacks)
-            state.emit(State.Succeed)
+            getPackageState.emit(State.Succeed)
         }
     }
 
     fun selectPackage(uuid: String) {
-        selectedPackage = packs.find { it.uuid == uuid }
+        val selectedPackage = packs.find { it.uuid == uuid }
+        selectedPackageManifest.value = null
+        this.selectedPackage = selectedPackage
+        if (selectedPackage != null) viewModelScope.launch {
+            val manifestStr = try {
+                selectedPackage.getManifest()
+            } catch (e: Exception) {
+                Log.e(TAG, "获取分包清单失败", e)
+                return@launch
+            }
+
+            val manifest = try {
+                PackageManifestWrapper.fromJson(manifestStr)
+            } catch (e: Exception) {
+                Log.e(TAG, "解析分包清单失败", e)
+                return@launch
+            }
+            selectedPackageManifest.value = manifest
+        }
     }
 
     fun setCustomName(name: String) {
@@ -94,24 +111,32 @@ class InstallPackageViewModel @Inject constructor(
 
     private var installJob: Job? = null
 
+    var totalProgress = MutableStateFlow<Float>(0f)
+    val mergeState = MutableStateFlow<StepState>(StepState.Waiting)
+    val downloadState = MutableStateFlow<StepState>(StepState.Waiting)
+    val installState = MutableStateFlow<StepState>(StepState.Waiting)
+
     fun startInstall() {
         viewModelScope.launch(Dispatchers.IO) {
             val pack = selectedPackage ?: return@launch
 
             val downloadProgress = mutableStateOf(0f)
             downloadState.emit(StepState.Running(downloadProgress))
+
             val task = downloader.download(pack)
+
             task.progressChannel().receiveAsFlow().conflate().collect {
                 downloadProgress.value = it
                 totalProgress.emit(it / 2)
                 delay(200)
             }
+
             val result = try {
                 task.await()
             } catch (e: Exception) {
                 Log.e(TAG, "下载分包失败", e)
                 // TODO: 2021/2/20 添加显示
-                downloadState.emit(StepState.Error(e))
+                downloadState.emit(StepState.Error(e.message ?: "Unknown Error"))
                 return@launch
             }
             delay(500)
@@ -126,7 +151,7 @@ class InstallPackageViewModel @Inject constructor(
                 )
             } catch (e: Exception) {
                 Log.e(TAG, "安装分包失败", e)
-                installState.emit(StepState.Error(e))
+                installState.emit(StepState.Error(e.message ?: "Unknown Error"))
                 return@launch
             }
 
@@ -141,5 +166,11 @@ class InstallPackageViewModel @Inject constructor(
             installJob?.cancelAndJoin()
         }
         // TODO: 2021/2/20 添加取消安装功能
+    }
+
+    val downloadSteps = MutableStateFlow<List<DownloadStep>>(emptyList())
+
+    fun startInstall2() {
+        // TODO: 2021/6/21 Multi chunk download
     }
 }

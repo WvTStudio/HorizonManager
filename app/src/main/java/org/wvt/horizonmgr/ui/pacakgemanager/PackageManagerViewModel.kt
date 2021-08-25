@@ -15,6 +15,7 @@ import org.wvt.horizonmgr.service.hzpack.*
 import org.wvt.horizonmgr.ui.components.InputDialogHostState
 import org.wvt.horizonmgr.ui.components.ProgressDialogState
 import org.wvt.horizonmgr.utils.LocalCache
+import org.wvt.horizonmgr.webapi.pack.OfficialCDNPackage
 import org.wvt.horizonmgr.webapi.pack.OfficialPackageCDNRepository
 import java.io.File
 import java.text.SimpleDateFormat
@@ -269,6 +270,8 @@ class PackageManagerViewModel @Inject constructor(
         data class Failed(val message: String) : CheckingUpdateState()
     }
 
+    private var latestPackage: List<OfficialCDNPackage> = emptyList()
+
     private suspend fun checkUpdate() {
         checkingUpdateState.emit(CheckingUpdateState.Checking)
         val updatable = mutableSetOf<String>()
@@ -304,6 +307,7 @@ class PackageManagerViewModel @Inject constructor(
     }
     
     fun updatePackage(uuid: String) {
+
         // TODO: 2021/5/27
     }
 }

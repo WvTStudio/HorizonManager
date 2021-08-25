@@ -22,7 +22,11 @@ import io.noties.markwon.inlineparser.MarkwonInlineParserPlugin
 @Composable
 fun MarkdownContent(modifier: Modifier, md: String) {
     val context = LocalContext.current
-    val textColor by rememberUpdatedState(newValue = MaterialTheme.colors.onBackground.copy(ContentAlpha.high))
+    val textColor by rememberUpdatedState(
+        newValue = MaterialTheme.colors.onBackground.copy(
+            ContentAlpha.high
+        )
+    )
     val view = remember {
         TextView(context).apply {
             layoutParams = ViewGroup.LayoutParams(

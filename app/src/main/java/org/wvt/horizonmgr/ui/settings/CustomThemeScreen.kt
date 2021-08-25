@@ -17,10 +17,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import org.wvt.horizonmgr.R
 import org.wvt.horizonmgr.ui.theme.*
 
 private enum class CheckedColorType {
@@ -85,13 +87,14 @@ fun CustomThemeScreen(requestClose: () -> Unit) {
                 modifier = Modifier.zIndex(4f),
                 navigationIcon = {
                     IconButton(onClick = requestClose) {
-                        Icon(imageVector = Icons.Filled.ArrowBack, "返回")
+                        Icon(imageVector = Icons.Filled.ArrowBack, stringResource(id = R.string.custom_theme_screen_appbar_back))
                     }
                 }, title = {
-                    Text("自定义主题")
+                    Text(stringResource(id = R.string.custom_theme_screen_appbar_title))
                 }, backgroundColor = AppBarBackgroundColor
             )
 
+            // Color Palette
             MaterialColorPalette(
                 modifier = Modifier.height(256.dp),
                 colors = colors,
@@ -124,13 +127,17 @@ fun CustomThemeScreen(requestClose: () -> Unit) {
                 }
             )
             Divider(Modifier.fillMaxWidth())
+
+            // Colors
             Column(
                 Modifier
                     .weight(1f)
-                    .verticalScroll(rememberScrollState())) {
+                    .verticalScroll(rememberScrollState())
+            ) {
+                // LightTheme Colors
                 Text(
                     modifier = Modifier.padding(top = 16.dp, start = 24.dp),
-                    text = "亮色主题",
+                    text = stringResource(id = R.string.custom_theme_screen_light_theme),
                     color = MaterialTheme.colors.primary
                 )
                 Row(
@@ -139,11 +146,11 @@ fun CustomThemeScreen(requestClose: () -> Unit) {
                         .padding(top = 16.dp),
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    SelectColorItem(text = "主题色",
+                    SelectColorItem(text = stringResource(id = R.string.custom_theme_screen_color_primary),
                         color = getColor(lightColor.primary),
                         selected = checkedColorType == CheckedColorType.LIGHT_PRIMARY,
                         onSelect = { checkedColorType = CheckedColorType.LIGHT_PRIMARY })
-                    SelectColorItem(text = "主题色 - 变体",
+                    SelectColorItem(text = stringResource(id = R.string.custom_theme_screen_color_primary_variant),
                         color = getColor(lightColor.primaryVariant),
                         selected = checkedColorType == CheckedColorType.LIGHT_PRIMARY_VARIANT,
                         onSelect = {
@@ -157,11 +164,11 @@ fun CustomThemeScreen(requestClose: () -> Unit) {
                         .padding(top = 16.dp),
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    SelectColorItem(text = "补充色",
+                    SelectColorItem(text = stringResource(id = R.string.custom_theme_screen_color_secondary),
                         color = getColor(lightColor.secondary),
                         selected = checkedColorType == CheckedColorType.LIGHT_SECONDARY,
                         onSelect = { checkedColorType = CheckedColorType.LIGHT_SECONDARY })
-                    SelectColorItem(text = "补充色 - 变体",
+                    SelectColorItem(text = stringResource(id = R.string.custom_theme_screen_color_secondary_variant),
                         color = getColor(lightColor.secondaryVariant),
                         selected = checkedColorType == CheckedColorType.LIGHT_SECONDARY_VARIANT,
                         onSelect = {
@@ -189,16 +196,19 @@ fun CustomThemeScreen(requestClose: () -> Unit) {
                         onCheckedChange = { accentColor = it }
                     )
                     Spacer(Modifier.width(8.dp))
-                    Text("强调色状态栏")
+                    Text(stringResource(id = R.string.custom_theme_screen_option_accent_appbar))
                 }
+
+
                 Divider(
                     Modifier
                         .padding(vertical = 16.dp)
-                        .fillMaxWidth()
-                )
+                        .fillMaxWidth())
+
+                // DarkTheme Colors
                 Text(
                     modifier = Modifier.padding(start = 24.dp),
-                    text = "暗色主题",
+                    text = stringResource(R.string.custom_theme_screen_dark_theme),
                     color = MaterialTheme.colors.primary
                 )
                 Row(
@@ -207,11 +217,11 @@ fun CustomThemeScreen(requestClose: () -> Unit) {
                         .padding(top = 16.dp),
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    SelectColorItem(text = "主题色",
+                    SelectColorItem(text = stringResource(id = R.string.custom_theme_screen_color_primary),
                         color = getColor(darkColor.primary),
                         selected = checkedColorType == CheckedColorType.DARK_PRIMARY,
                         onSelect = { checkedColorType = CheckedColorType.DARK_PRIMARY })
-                    SelectColorItem(text = "主题色 - 变体",
+                    SelectColorItem(text = stringResource(id = R.string.custom_theme_screen_color_primary_variant),
                         color = getColor(darkColor.primaryVariant),
                         selected = checkedColorType == CheckedColorType.DARK_PRIMARY_VARIANT,
                         onSelect = {
@@ -225,7 +235,7 @@ fun CustomThemeScreen(requestClose: () -> Unit) {
                         .padding(top = 16.dp),
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    SelectColorItem(text = "补充色",
+                    SelectColorItem(text = stringResource(id = R.string.custom_theme_screen_color_secondary),
                         color = getColor(darkColor.secondary),
                         selected = checkedColorType == CheckedColorType.DARK_SECONDARY,
                         onSelect = { checkedColorType = CheckedColorType.DARK_SECONDARY })
@@ -234,6 +244,7 @@ fun CustomThemeScreen(requestClose: () -> Unit) {
             }
         }
 
+        // Save Button
         Button(
             modifier = Modifier
                 .padding(16.dp)
@@ -261,8 +272,8 @@ fun CustomThemeScreen(requestClose: () -> Unit) {
                 themeController.setAppbarAccent(accentColor)
             }
         ) {
-            Icon(imageVector = Icons.Filled.Check, "保存")
-            Text("保存")
+            Icon(imageVector = Icons.Filled.Check, null)
+            Text(stringResource(R.string.custom_theme_screen_button_save))
         }
         /*Button(modifier = Modifier.padding(16.dp).align(Alignment.BottomStart),
             onClick = {

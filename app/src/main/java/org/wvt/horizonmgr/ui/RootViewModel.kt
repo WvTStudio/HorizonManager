@@ -1,8 +1,10 @@
 package org.wvt.horizonmgr.ui
 
 import android.util.Log
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
 import org.wvt.horizonmgr.BuildConfig
 import org.wvt.horizonmgr.utils.LocalCache
 import org.wvt.horizonmgr.webapi.NetworkException
@@ -111,7 +113,8 @@ class RootViewModel @Inject constructor(
 
     fun showGameNotInstallDialog() {
         viewModelScope.launch {
-            gameNotInstalled.emit(true)
+            if (!localCache.isNeverShowMCInstallationTip())
+                gameNotInstalled.emit(true)
         }
     }
 
@@ -122,14 +125,29 @@ class RootViewModel @Inject constructor(
     }
 
     fun showHZNotInstallDialog() {
-        viewModelScope.launch {
-            hzNotInstalled.emit(true)
+        viewModelScope.launch(Dispatchers.IO) {
+            if (!localCache.isNeverShowHZInstallationTip())
+                hzNotInstalled.emit(true)
         }
     }
 
     fun dismissHZNotInstallDialog() {
         viewModelScope.launch {
             hzNotInstalled.emit(false)
+        }
+    }
+
+    fun neverShowHZInstallationTip() {
+        viewModelScope.launch {
+            hzNotInstalled.emit(false)
+            localCache.setNeverShowHZInstallationTip(true)
+        }
+    }
+
+    fun neverShowMCInstallationTip() {
+        viewModelScope.launch {
+            gameNotInstalled.emit(false)
+            localCache.setNeverShowMCInstallationTip(true)
         }
     }
 }

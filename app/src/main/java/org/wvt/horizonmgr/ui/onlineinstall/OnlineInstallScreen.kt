@@ -1,18 +1,27 @@
 package org.wvt.horizonmgr.ui.onlineinstall
 
+import android.content.ComponentName
+import android.content.Intent
+import android.content.ServiceConnection
+import android.os.IBinder
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.*
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import org.wvt.horizonmgr.service.hzpack.recommendDescription
+import org.wvt.horizonmgr.services.OnlinePackageInstallService
 import org.wvt.horizonmgr.ui.components.ErrorPage
+import org.wvt.horizonmgr.ui.pacakgemanager.ManifestSection
 import org.wvt.horizonmgr.ui.theme.AppBarBackgroundColor
+import org.wvt.horizonmgr.webapi.pack.OfficialCDNPackage
 
 private enum class Screen {
     CHOOSE_PACKAGE, EDIT_NAME, INSTALL
@@ -26,9 +35,8 @@ fun OnlineInstallScreen(
     onSucceed: () -> Unit
 ) {
     val packages by viewModel.packages.collectAsState()
-    val state by viewModel.state.collectAsState()
+    val state by viewModel.getPackageState.collectAsState()
 
-    var prevScreen by remember { mutableStateOf(Screen.CHOOSE_PACKAGE) }
     var screen by remember { mutableStateOf(Screen.CHOOSE_PACKAGE) }
     var chosenIndex by remember { mutableStateOf<Int>(-1) }
 
@@ -37,17 +45,38 @@ fun OnlineInstallScreen(
         onDispose { }
     }
 
+    val context = LocalContext.current.applicationContext
+
+    var serviceBinder by remember { mutableStateOf<OnlinePackageInstallService.MyBinder?>(null) }
+
+    fun startDownload(selectedPackage: OfficialCDNPackage, customName: String?) {
+        val intent = Intent(context, OnlinePackageInstallService::class.java).apply {
+            action = "install_package"
+            putExtra("uuid", selectedPackage.uuid)
+            putExtra("custom_name", customName)
+        }
+        context.bindService(intent, object : ServiceConnection {
+            override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+                val binder = (service as OnlinePackageInstallService.MyBinder)
+                serviceBinder = binder
+            }
+
+            override fun onServiceDisconnected(name: ComponentName?) {
+                serviceBinder = null
+            }
+        }, 0)
+    }
+
     BackHandler {
         when (screen) {
             Screen.CHOOSE_PACKAGE -> onCancel()
-            Screen.EDIT_NAME -> {
-                prevScreen = screen
-                screen = Screen.CHOOSE_PACKAGE
-            }
+            Screen.EDIT_NAME -> { screen = Screen.CHOOSE_PACKAGE }
             Screen.INSTALL -> {
+                viewModel.cancelInstall()
             }
         }
     }
+
     Column {
         TopAppBar(
             navigationIcon = {
@@ -55,12 +84,8 @@ fun OnlineInstallScreen(
                     IconButton(onClick = {
                         when (screen) {
                             Screen.CHOOSE_PACKAGE -> onCancel()
-                            Screen.EDIT_NAME -> {
-                                prevScreen = screen
-                                screen = Screen.CHOOSE_PACKAGE
-                            }
-                            else -> {
-                            }
+                            Screen.EDIT_NAME -> screen = Screen.CHOOSE_PACKAGE
+                            else -> viewModel.cancelInstall()
                         }
                     }) {
                         Icon(
@@ -82,84 +107,89 @@ fun OnlineInstallScreen(
             },
             backgroundColor = AppBarBackgroundColor
         )
-        Box {
-            androidx.compose.animation.AnimatedVisibility(
-                visible = screen == Screen.CHOOSE_PACKAGE,
-                enter = fadeIn() + slideInHorizontally(),
-                exit = fadeOut() + slideOutHorizontally()
+        Box(Modifier.weight(1f)) {
+            AnimatedContent(
+                targetState = screen,
+                transitionSpec = {
+                    ContentTransform(
+                        targetContentEnter =
+                        if (targetState > initialState) fadeIn() + slideIntoContainer(AnimatedContentScope.SlideDirection.Start)
+                        else fadeIn() + slideIntoContainer(AnimatedContentScope.SlideDirection.End),
+                        initialContentExit =
+                        if (targetState > initialState) fadeOut() + slideOutOfContainer(AnimatedContentScope.SlideDirection.Start)
+                        else fadeOut() + slideOutOfContainer(AnimatedContentScope.SlideDirection.End)
+                    )
+                }
             ) {
-                Crossfade(state) { state ->
-                    when (state) {
-                        InstallPackageViewModel.State.Loading -> Box(
-                            Modifier.fillMaxSize(),
-                            Alignment.Center
-                        ) {
-                            CircularProgressIndicator()
+                when (it) {
+                    Screen.CHOOSE_PACKAGE -> Crossfade(state) { state ->
+                        when (state) {
+                            InstallPackageViewModel.State.Loading -> Box(
+                                Modifier.fillMaxSize(),
+                                Alignment.Center
+                            ) {
+                                CircularProgressIndicator()
+                            }
+                            InstallPackageViewModel.State.Succeed -> ChoosePackage(
+                                modifier = Modifier.fillMaxSize(),
+                                items = packages,
+                                onChoose = {
+                                    chosenIndex = it
+                                    viewModel.selectPackage(packages[it].uuid)
+                                    screen = Screen.EDIT_NAME
+                                }
+                            )
+                            is InstallPackageViewModel.State.Error -> ErrorPage(
+                                modifier = Modifier.fillMaxSize(),
+                                message = { Text(state.message) },
+                                onRetryClick = { viewModel.getPackages() }
+                            )
                         }
-                        InstallPackageViewModel.State.Succeed -> ChoosePackage(
-                            modifier = Modifier.fillMaxSize(),
-                            items = packages,
-                            onChoose = {
-                                chosenIndex = it
-                                viewModel.selectPackage(packages[it].uuid)
-                                prevScreen = screen
-                                screen = Screen.EDIT_NAME
+                    }
+                    Screen.EDIT_NAME -> Column(
+                        Modifier
+                            .fillMaxSize()
+                            .verticalScroll(rememberScrollState())
+                    ) {
+                        EditName(
+                            Modifier
+                                .wrapContentHeight()
+                                .fillMaxWidth(),
+                            packages[chosenIndex].name,
+                            packages[chosenIndex].version,
+                            onConfirm = {
+                                viewModel.setCustomName(it)
+                                viewModel.startInstall()
+                                screen = Screen.INSTALL
                             }
                         )
-                        is InstallPackageViewModel.State.Error -> ErrorPage(
-                            modifier = Modifier.fillMaxSize(),
-                            message = { Text(state.message) },
-                            onRetryClick = { viewModel.getPackages() }
-                        )
+                        val manifest by viewModel.selectedPackageManifest.collectAsState()
+                        Crossfade(manifest) {
+                            if (it == null) {
+                                Box(modifier = Modifier.fillMaxSize(), Alignment.Center) {
+                                    CircularProgressIndicator()
+                                }
+                            } else ManifestSection(
+                                modifier = Modifier.wrapContentHeight(),
+                                packageName = it.pack,
+                                developer = it.developer,
+                                versionName = it.packVersion,
+                                versionCode = it.packVersionCode.toString(),
+                                packageUUID = it.pack,
+                                gameVersion = it.gameVersion,
+                                description = it.recommendDescription()
+                            )
+                        }
                     }
+                    Screen.INSTALL -> InstallProgress(
+                        totalProgress = viewModel.totalProgress.collectAsState().value,
+                        installState = viewModel.installState.collectAsState().value,
+                        mergeState = viewModel.mergeState.collectAsState().value,
+                        downloadSteps = viewModel.downloadSteps.collectAsState().value,
+                        onCancelClick = { viewModel.cancelInstall() },
+                        onCompleteClick = onSucceed
+                    )
                 }
-            }
-
-            androidx.compose.animation.AnimatedVisibility(
-                visible = screen == Screen.EDIT_NAME,
-                enter = fadeIn() + slideInHorizontally({
-                    when (prevScreen) {
-                        Screen.CHOOSE_PACKAGE -> it / 2 // Slide in from right
-                        Screen.INSTALL -> -it / 2 // Slide in from left
-                        else -> it
-                    }
-                }),
-                exit = fadeOut() + slideOutHorizontally({
-                    when (screen) {
-                        Screen.CHOOSE_PACKAGE -> it / 2 // Slide out to right
-                        Screen.INSTALL -> -it / 2 // Slide out to left
-                        else -> it
-                    }
-                })
-            ) {
-                EditName(
-                    packages[chosenIndex].name,
-                    packages[chosenIndex].version,
-                    onConfirm = {
-                        viewModel.setCustomName(it)
-                        viewModel.startInstall()
-                        prevScreen = screen
-                        screen = Screen.INSTALL
-                    }
-                )
-            }
-
-            androidx.compose.animation.AnimatedVisibility(
-                visible = screen == Screen.INSTALL,
-                enter = fadeIn() + slideInHorizontally({
-                    it / 2  // Slide in from right
-                }),
-                exit = fadeOut() + slideOutHorizontally({
-                    it / 2 // Slide out to right
-                })
-            ) {
-                InstallProgress(
-                    totalProgress = viewModel.totalProgress.collectAsState().value,
-                    downloadState = viewModel.downloadState.collectAsState().value,
-                    installState = viewModel.installState.collectAsState().value,
-                    onCancelClick = { viewModel.cancelInstall() },
-                    onCompleteClick = onSucceed
-                )
             }
         }
     }

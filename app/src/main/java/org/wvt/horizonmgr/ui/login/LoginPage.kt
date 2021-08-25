@@ -11,14 +11,18 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusOrder
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import org.wvt.horizonmgr.R
 import org.wvt.horizonmgr.ui.components.FabState
 import org.wvt.horizonmgr.ui.components.StateFab
+import org.wvt.horizonmgr.ui.theme.PreviewTheme
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -39,20 +43,24 @@ fun LoginPage(
                 .align(Alignment.Center),
             verticalArrangement = Arrangement.Center,
         ) {
+            // Title
             Text(
-                text = "登录", color = MaterialTheme.colors.primary, fontSize = 64.sp
+                text = stringResource(R.string.login_screen_login_title) , color = MaterialTheme.colors.primary, fontSize = 64.sp
             )
+            // Subtitle
             CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
                 Text(
                     modifier = Modifier.padding(top = 16.dp),
-                    text = "使用 InnerCore 中文社区账号登录",
+                    text = stringResource(R.string.login_screen_login_subtitle),
                 )
             }
+            // Form
             Column(
                 modifier = Modifier.wrapContentSize(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Spacer(modifier = Modifier.height(32.dp))
+                // Account/Email
                 TextField(
                     modifier = Modifier.focusOrder(accountFocus) {
                         next = passwordFocus
@@ -60,7 +68,7 @@ fun LoginPage(
                     },
                     value = account,
                     onValueChange = { account = it },
-                    label = { Text("用户名/邮箱") },
+                    label = { Text( stringResource(R.string.login_screen_login_input_account_or_email)) },
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Text,
                         imeAction = ImeAction.Next
@@ -70,6 +78,7 @@ fun LoginPage(
                     })
                 )
                 Spacer(modifier = Modifier.height(16.dp))
+                // Password
                 TextField(
                     modifier = Modifier.focusOrder(passwordFocus) {
                         previous = accountFocus
@@ -77,7 +86,7 @@ fun LoginPage(
                     },
                     value = password,
                     onValueChange = { password = it },
-                    label = { Text("密码") },
+                    label = { Text(stringResource(R.string.login_screen_login_input_password)) },
                     visualTransformation = PasswordVisualTransformation(),
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Password,
@@ -89,17 +98,32 @@ fun LoginPage(
                     })
                 )
                 Spacer(modifier = Modifier.height(16.dp))
+                // Login Button
                 StateFab(state = fabState, onClicked = {
                     onLoginClicked(account.text, password.text)
                 })
+                // Register Button
                 TextButton(
                     modifier = Modifier.padding(top = 16.dp),
                     onClick = onRegisterRequested
                 ) {
-                    Text("注册")
+                    Text(stringResource(R.string.login_screen_login_button_goto_register))
                 }
             }
         }
     }
 }
 
+@Preview
+@Composable
+private fun Preview() {
+    PreviewTheme {
+        Surface(color = MaterialTheme.colors.background) {
+            LoginPage(
+                onLoginClicked = { account, password ->  },
+                onRegisterRequested = { },
+                fabState = FabState.TODO
+            )
+        }
+    }
+}

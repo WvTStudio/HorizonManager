@@ -13,6 +13,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusOrder
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -20,6 +21,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import org.wvt.horizonmgr.R
 import org.wvt.horizonmgr.ui.components.FabState
 import org.wvt.horizonmgr.ui.components.StateFab
 import org.wvt.horizonmgr.ui.theme.PreviewTheme
@@ -45,11 +47,11 @@ fun RegisterPage(
                 .align(Alignment.Center),
             verticalArrangement = Arrangement.Center
         ) {
-            Text("注册", color = MaterialTheme.colors.primary, fontSize = 64.sp)
+            Text(stringResource(R.string.login_screen_register_title), color = MaterialTheme.colors.primary, fontSize = 64.sp)
             CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
                 Text(
                     modifier = Modifier.padding(top = 16.dp),
-                    text = "注册到 InnerCore 中文社区 ",
+                    text = stringResource(R.string.login_screen_register_subtitle),
                 )
             }
             Column(
@@ -67,7 +69,7 @@ fun RegisterPage(
                     },
                     value = username,
                     onValueChange = { username = it },
-                    label = { Text("用户名") },
+                    label = { Text(stringResource(R.string.login_screen_register_input_account)) },
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Text,
                         imeAction = ImeAction.Next
@@ -87,7 +89,7 @@ fun RegisterPage(
                     },
                     value = email,
                     onValueChange = { email = it },
-                    label = { Text("邮箱") },
+                    label = { Text(stringResource(R.string.login_screen_register_input_email)) },
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Ascii,
                         imeAction = ImeAction.Next
@@ -106,7 +108,7 @@ fun RegisterPage(
                     },
                     value = password,
                     onValueChange = { password = it },
-                    label = { Text("密码") },
+                    label = { Text(stringResource(R.string.login_screen_register_input_password)) },
                     visualTransformation = PasswordVisualTransformation(),
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Password,
@@ -122,7 +124,7 @@ fun RegisterPage(
                     },
                     value = confirmPassword,
                     onValueChange = { confirmPassword = it },
-                    label = { Text("重复密码") },
+                    label = { Text(stringResource(R.string.login_screen_register_input_pass_confirm)) },
                     visualTransformation = PasswordVisualTransformation(),
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Text,

@@ -57,7 +57,7 @@ dependencies {
 
     testImplementation("junit:junit:4.13.2")
     testImplementation("androidx.test:core:1.3.0")
-    testImplementation("org.mockito:mockito-core:3.9.0")
+    testImplementation("org.mockito:mockito-core:3.11.1")
     testImplementation("org.json:json:20210307")
     testImplementation(kotlin("reflect"))
     androidTestImplementation("androidx.test.ext:junit:1.1.2")

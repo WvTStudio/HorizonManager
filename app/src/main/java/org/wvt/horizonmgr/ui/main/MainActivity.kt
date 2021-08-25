@@ -3,14 +3,17 @@ package org.wvt.horizonmgr.ui.main
 import android.os.Bundle
 import android.os.PersistableBundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.WindowCompat
 import dagger.hilt.android.AndroidEntryPoint
 
 private const val TAG = "MainActivity"
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
         super.onCreate(savedInstanceState, persistentState)
+        WindowCompat.setDecorFitsSystemWindows(window, false)
     }
 /*
 //    private val factory by lazy { HiltViewModelFactory(this, NavBackStackEntry.create(this)) }

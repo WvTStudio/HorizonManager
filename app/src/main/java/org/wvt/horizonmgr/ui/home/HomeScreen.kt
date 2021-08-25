@@ -1,7 +1,6 @@
 package org.wvt.horizonmgr.ui.home
 
 import androidx.compose.animation.Crossfade
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -11,9 +10,8 @@ import androidx.compose.material.icons.filled.Menu
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.graphics.painter.BitmapPainter
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
@@ -22,9 +20,10 @@ import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.SwipeRefreshIndicator
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import org.wvt.horizonmgr.ui.components.ErrorPage
-import org.wvt.horizonmgr.ui.components.NetworkImage
+import org.wvt.horizonmgr.ui.components.loadUrlImage
 import org.wvt.horizonmgr.ui.theme.AppBarBackgroundColor
 import org.wvt.horizonmgr.ui.theme.PreviewTheme
+import kotlin.random.Random
 
 @Composable
 fun HomeScreen(
@@ -126,32 +125,30 @@ private fun ArticleList(
     ) {
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(top = 8.dp, bottom = 8.dp)
+            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 24.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             items(home) { item ->
                 when {
-                    item is HomeViewModel.ContentResource.Article && item.coverUrl != null -> ArticleItem(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 8.dp, horizontal = 16.dp),
+                    item is HomeViewModel.ContentResource.Article && item.coverUrl != null -> {
+                        ArticleItem(
+                            modifier = Modifier.fillMaxWidth(),
+                            title = item.title,
+                            brief = item.brief,
+                            sendTime = item.updateTime,
+                            coverImage = loadUrlImage(url = item.coverUrl).value?.let {
+                                remember { BitmapPainter(it) }
+                            }
+                        ) {
+                            onArticleClick(item)
+                        }
+                    }
+                    item is HomeViewModel.ContentResource.Article && item.coverUrl == null -> ArticleItemNoCover(
+                        modifier = Modifier.fillMaxWidth(),
                         title = item.title,
                         brief = item.brief,
                         onClick = { onArticleClick(item) },
-                        coverImage = {
-                            NetworkImage(
-                                url = item.coverUrl,
-                                contentScale = ContentScale.Crop,
-                                contentDescription = "封面"
-                            )
-                        }
-                    )
-                    item is HomeViewModel.ContentResource.Article && item.coverUrl == null -> ArticleItemNoCover(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 8.dp, horizontal = 16.dp),
-                        title = item.title,
-                        brief = item.brief,
-                        onClick = { onArticleClick(item) }
+                        sendTime = item.updateTime
                     )
                 }
             }
@@ -159,88 +156,20 @@ private fun ArticleList(
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
-@Composable
-private fun ArticleItemNoCover(
-    modifier: Modifier = Modifier,
-    title: String,
-    brief: String,
-    onClick: () -> Unit
-) {
-    Card(modifier = modifier, onClick = onClick) {
-        Column(
-            modifier = Modifier
-                .wrapContentHeight()
-                .fillMaxWidth()
-                .padding(16.dp)
-        ) {
-            // Title
-            Text(
-                text = title,
-                style = MaterialTheme.typography.subtitle1,
-                maxLines = 3,
-                overflow = TextOverflow.Ellipsis
-            )
-            // Brief
-            Text(
-                text = brief,
-                style = MaterialTheme.typography.body2,
-                color = MaterialTheme.colors.onSurface.copy(ContentAlpha.medium),
-                maxLines = 5,
-                overflow = TextOverflow.Ellipsis
-            )
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun ArticleItem(
-    modifier: Modifier = Modifier,
     title: String,
     brief: String,
-    coverImage: @Composable () -> Unit,
+    sendTime: String,
+    coverImage: Painter?,
+    modifier: Modifier = Modifier,
+    style: Int = remember { Random.nextInt(0, 3) },
     onClick: () -> Unit
 ) {
-    Card(modifier = modifier, onClick = onClick) {
-        Box(
-            Modifier
-                .fillMaxWidth()
-                .wrapContentHeight()
-        ) {
-            // Cover Image
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .aspectRatio(16f / 10f),
-                content = { coverImage() }
-            )
-            Column(
-                modifier = Modifier
-                    .wrapContentHeight()
-                    .fillMaxWidth()
-                    .background(Color.Black.copy(0.32f))
-                    .padding(16.dp)
-                    .align(Alignment.BottomStart)
-            ) {
-                // Title
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.h6,
-                    color = Color.White,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis
-                )
-                // Brief
-                Text(
-                    text = brief,
-                    style = MaterialTheme.typography.body2,
-                    color = Color.White,
-                    maxLines = 3,
-                    overflow = TextOverflow.Ellipsis
-                )
-            }
-        }
+    when (style) {
+        0 -> ArticleItemStyle1(title, brief, sendTime, coverImage, modifier, onClick)
+        1 -> ArticleItemStyle2(title, brief, sendTime, coverImage, modifier, onClick)
+        2 -> ArticleItemStyle3(title, brief, sendTime, coverImage, modifier, onClick)
     }
 }
 

@@ -461,6 +461,12 @@ fun PackageItem(
                             }) {
                                 Text("重命名")
                             }
+                            DropdownMenuItem(onClick = {
+                                dropdown = false
+                                onRenameClick()
+                            }) {
+                                Text("分享")
+                            }
                             if (updatable) {
                                 DropdownMenuItem(onClick = {
                                     dropdown = false

@@ -71,20 +71,26 @@ fun Root(
 
     if (showHZNotInstall) {
         InstallHorizonDialog(
-            onDismiss = { viewModel.dismissHZNotInstallDialog() },
-            onConfirm = {
+            onDismissClick = { viewModel.dismissHZNotInstallDialog() },
+            onConfirmClick = {
                 onInstallHZClick()
                 viewModel.dismissHZNotInstallDialog()
+            },
+            onNeverShowClick = {
+                viewModel.neverShowHZInstallationTip()
             }
         )
     }
 
     if (showGameNotInstall) {
         InstallMCDialog(
-            onDismiss = { viewModel.dismissGameNotInstallDialog() },
-            onConfirm = {
+            onDismissClick = { viewModel.dismissGameNotInstallDialog() },
+            onConfirmClick = {
                 onInstallMCClick()
                 viewModel.dismissGameNotInstallDialog()
+            },
+            onNeverShowClick = {
+                viewModel.neverShowMCInstallationTip()
             }
         )
     }

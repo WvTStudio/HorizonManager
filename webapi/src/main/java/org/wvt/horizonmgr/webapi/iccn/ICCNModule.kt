@@ -7,6 +7,7 @@ import io.ktor.client.request.*
 import io.ktor.client.request.forms.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
+import io.ktor.util.*
 import io.ktor.utils.io.errors.*
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -20,8 +21,6 @@ import org.wvt.horizonmgr.webapi.*
  * 目前仅提供登录和注册功能，登录功能可以获取用户的一些基本信息
  */
 class ICCNModule {
-    private val client = HttpClient(CIO)
-
     class LoginFailedException : ServiceException("登录失败")
 
     /**
@@ -39,12 +38,19 @@ class ICCNModule {
      *   }
      * }
      * ```
-     *
+     * 失败时返回
+     * ```json
+     * {
+     *   "code": 404,
+     *   "msg": <str>
+     * }
+     * ```
      * @throws [LoginFailedException] 登录失败
      * [NetworkException] 网络错误
      * [JsonParseException] 解析 Json 时出错
      */
     suspend fun login(account: String, password: String): UserClient {
+        val client = HttpClient(CIO)
         val jsonStr = try {
             client.submitForm<String>(
                 url = "https://adodoz.cn/app_login.php",
@@ -64,31 +70,37 @@ class ICCNModule {
         } catch (e: SerializationException) {
             throw JsonParseException(jsonStr, e)
         }
-        val status = try {
-            json["status"]?.jsonPrimitive?.intOrNull ?: throw MissingJsonField("status", jsonStr)
-        } catch (e: SerializationException) {
-            throw LoginFailedException()
+
+        val status = json["status"]?.jsonPrimitive?.intOrNull
+
+        if (status != null) {
+            // 成功流程
+            if (status != 2) throw LoginFailedException()
+
+            val id: Int
+            val username: String
+            val avatarUrl: String
+
+            try {
+                val userInfo = json["user_info"]?.jsonObject
+                    ?: throw MissingJsonField("user_info", jsonStr)
+                id = userInfo["user_id"]?.jsonPrimitive?.intOrNull
+                    ?: throw MissingJsonField("user_id", jsonStr)
+                username = userInfo["user_name"]?.jsonPrimitive?.content
+                    ?: throw MissingJsonField("user_name", jsonStr)
+                avatarUrl = userInfo["user_avatar"]?.jsonPrimitive?.content
+                    ?: throw MissingJsonField("user_avatar", jsonStr)
+            } catch (e: SerializationException) {
+                throw JsonParseException(jsonStr, e)
+            }
+
+            return UserClient(id.toString(), username, avatarUrl, account)
+        } else {
+            // 失败流程
+            val code = json["code"]?.jsonPrimitive?.intOrNull
+            if (code == 404) throw LoginFailedException()
+            else throw ServiceException("Unknown code: $code")
         }
-        if (status != 2) throw LoginFailedException()
-
-        val id: Int
-        val username: String
-        val avatarUrl: String
-
-        try {
-            val userInfo = json["user_info"]?.jsonObject
-                ?: throw MissingJsonField("user_info", jsonStr)
-            id = userInfo["user_id"]?.jsonPrimitive?.intOrNull
-                ?: throw MissingJsonField("user_id", jsonStr)
-            username = userInfo["user_name"]?.jsonPrimitive?.content
-                ?: throw MissingJsonField("user_name", jsonStr)
-            avatarUrl = userInfo["user_avatar"]?.jsonPrimitive?.content
-                ?: throw MissingJsonField("user_avatar", jsonStr)
-        } catch (e: SerializationException) {
-            throw JsonParseException(jsonStr, e)
-        }
-
-        return UserClient(id.toString(), username, avatarUrl, account)
     }
 
     data class RegisterErrorEntry(val status: String, val code: String, val detail: String)
@@ -159,31 +171,50 @@ class ICCNModule {
      * [JsonParseException] 解析 Json 时出错
      */
     suspend fun register(username: String, email: String, password: String): String {
+        val client = HttpClient(CIO)
+
         // Step 1 - Get session and token
-        val session: String
-        val token: String
+        var session: String? = null
+        var token: String? = null
 
         val homePageResponse = try {
-            client.get<HttpResponse>("https://adodoz.cn")
+            client.get<HttpResponse>("https://forum.adodoz.cn") {
+                header(HttpHeaders.UserAgent, "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.106 Safari/537.36")
+            }
         } catch (e: IOException) {
             throw NetworkException("获取 ICCN 主页失败", e)
         } catch (e: Exception) {
             throw UnexpectedException(e)
         }
 
-        session = homePageResponse.headers["set-cookie"]
-            ?.takeIf { it.contains("flarum_session") }
-            ?: throw ServerException("session not found")
-        token = homePageResponse.headers["x-csrf-token"]
-            ?: throw ServerException("token not found")
+        val headers = homePageResponse.headers.toMap()
+
+        // Find session and token
+        for (header in headers) {
+            if (header.key.equals("set-cookie", true)) {
+                val cookie = header.value.joinToString()
+                if (cookie.contains("flarum_session")) {
+                    session = header.value.joinToString()
+                } else {
+                    throw ServiceException("Found cookie, but no flarum_session")
+                }
+            } else if (header.key.equals("x-csrf-token", true)) {
+                token = header.value.getOrNull(0)
+                    ?: throw ServerException("Find x-csrf-token, but no value")
+                break
+            }
+        }
+
+        if (session == null) throw ServerException("flarum_session not found")
+        if (token == null) throw ServerException("x-csrf-token not found")
 
         // Step 2 - Register
         val regResponse = try {
-            client.post<HttpResponse>("https://adodoz.cn/register") {
+            client.post<HttpResponse>("https://forum.adodoz.cn/register") {
                 headers {
                     set("referer", "https://adodoz.cn/")
                     set("cookie", session)
-                    set("user-agent", "Horizon Manager")
+                    set("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.106 Safari/537.36")
                     set("x-csrf-token", token)
                 }
                 contentType(ContentType.Application.Json)

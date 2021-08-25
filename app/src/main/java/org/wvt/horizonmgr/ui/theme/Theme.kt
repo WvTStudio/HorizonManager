@@ -3,9 +3,14 @@ package org.wvt.horizonmgr.ui.theme
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.material.Colors
 import androidx.compose.material.MaterialTheme
-import androidx.compose.runtime.*
+import androidx.compose.material.Typography
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontFamily
 
 val LocalThemeController =
     staticCompositionLocalOf<ThemeController> { error("No theme controller provided") }
@@ -31,7 +36,10 @@ val AppBarBackgroundColor: Color
         }
     }
 
-@Immutable
+val defaultTypography = Typography(
+    defaultFontFamily = FontFamily.Default
+)
+
 data class ThemeConfig(
     val followSystemDarkMode: Boolean,
     val isSystemInDark: Boolean,
@@ -42,7 +50,8 @@ data class ThemeConfig(
 ) {
     val isDark = if (followSystemDarkMode) isSystemInDark else isCustomInDark
     val color = if (isDark) darkColor else lightColor
-    val appbarColor by mutableStateOf(if (appbarAccent && !isDark) color.primary else color.surface)
+    val appbarColor = if (appbarAccent && !isDark) color.primary else color.surface
+    val statusBarColor = if (appbarAccent && !isDark) color.primaryVariant else color.surface
 }
 
 @Composable
@@ -73,7 +82,8 @@ fun HorizonManagerTheme(
     ) {
         MaterialTheme(
             colors = colors,
-            content = content
+            content = content,
+            typography = defaultTypography
         )
     }
 }
@@ -87,7 +97,7 @@ fun PreviewTheme(
         LocalThemeController provides DefaultThemeController,
         LocalThemeConfig provides DefaultThemeConfig
     ) {
-        MaterialTheme(colors = LightColorPalette, content = content)
+        MaterialTheme(colors = LightColorPalette, content = content, typography = defaultTypography)
     }
 }
 

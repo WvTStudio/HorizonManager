@@ -58,17 +58,13 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.0.0-beta08"
+        kotlinCompilerExtensionVersion = "1.0.0-beta09"
     }
     /*lint {
         disable("InvalidFragmentVersionForActivityResult")
     }*/
     kotlinOptions {
         jvmTarget = "1.8"
-        freeCompilerArgs = freeCompilerArgs + listOf(
-            "-Xallow-jvm-ir-dependencies",
-            "-Xskip-prerelease-check"
-        )
     }
     packagingOptions {
         resources {
@@ -89,34 +85,35 @@ dependencies {
     implementation(project(":service"))
 
     implementation("androidx.core:core-ktx:1.5.0")
-    implementation("androidx.activity:activity-ktx:1.3.0-beta01")
-    implementation("androidx.activity:activity-compose:1.3.0-beta01")
+    implementation("androidx.activity:activity-ktx:1.3.0-beta02")
+    implementation("androidx.activity:activity-compose:1.3.0-beta02")
 
     implementation("androidx.appcompat:appcompat:1.4.0-alpha02")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.1")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:1.0.0-alpha06")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:1.0.0-alpha07")
     implementation("com.google.android.material:material:1.3.0")
 
-    implementation("androidx.navigation:navigation-compose:2.4.0-alpha02")
+    implementation("androidx.navigation:navigation-compose:2.4.0-alpha03")
 
-    implementation("androidx.work:work-runtime-ktx:2.5.0")
+    implementation("androidx.work:work-runtime-ktx:2.7.0-alpha04")
 
 
-    val hiltVersion = "2.36"
+    val hiltVersion = "2.37"
     implementation("com.google.dagger:hilt-android:$hiltVersion")
     kapt("com.google.dagger:hilt-android-compiler:$hiltVersion")
     
-    implementation("androidx.hilt:hilt-navigation-compose:1.0.0-alpha02")
+    implementation("androidx.hilt:hilt-navigation-compose:1.0.0-alpha03")
 
-    val accompanistVersion = "0.11.1"
+    val accompanistVersion = "0.12.0"
     implementation("com.google.accompanist:accompanist-coil:$accompanistVersion")
     implementation("com.google.accompanist:accompanist-insets:$accompanistVersion")
     implementation("com.google.accompanist:accompanist-pager:$accompanistVersion")
     implementation("com.google.accompanist:accompanist-systemuicontroller:$accompanistVersion")
     implementation("com.google.accompanist:accompanist-swiperefresh:$accompanistVersion")
     implementation("com.google.accompanist:accompanist-flowlayout:$accompanistVersion")
+    implementation("com.google.accompanist:accompanist-placeholder:$accompanistVersion")
 
-    val composeVersion = "1.0.0-beta08"
+    val composeVersion = "1.0.0-beta09"
     implementation("androidx.compose.compiler:compiler:$composeVersion")
     implementation("androidx.compose.runtime:runtime:$composeVersion")
     implementation("androidx.compose.foundation:foundation:$composeVersion")

@@ -13,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import org.wvt.horizonmgr.R
 import org.wvt.horizonmgr.ui.components.AnimateLogo
@@ -35,16 +36,22 @@ fun SettingsScreen(
 
     Column(Modifier.fillMaxSize()) {
         TopAppBar(title = {
-            Text("设置")
+            Text(stringResource(id = R.string.settings_screen_appbar_title))
         }, navigationIcon = {
             IconButton(onClick = onBackClick) {
-                Icon(Icons.Filled.ArrowBack, "返回")
+                Icon(
+                    Icons.Filled.ArrowBack,
+                    stringResource(id = R.string.settings_screen_appbar_back_desc)
+                )
             }
         }, backgroundColor = Color.Transparent, elevation = 0.dp)
         Row(Modifier.padding(top = 24.dp, start = 54.dp)) {
             AnimateLogo(Modifier.padding(top = 8.dp))
             Column(Modifier.padding(start = 32.dp)) {
-                Text(text = "Horizon 管理器", style = MaterialTheme.typography.h5)
+                Text(
+                    text = stringResource(id = R.string.app_name),
+                    style = MaterialTheme.typography.h5
+                )
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text("By")
                     Image(
@@ -65,9 +72,10 @@ fun SettingsScreen(
                 }
             }
         }
+
         Text(
             modifier = Modifier.padding(top = 48.dp, bottom = 8.dp, start = 72.dp),
-            text = "个性化",
+            text = stringResource(id = R.string.settings_screen_divider_customization),
             style = MaterialTheme.typography.subtitle2,
             color = MaterialTheme.colors.primary
         )
@@ -77,10 +85,13 @@ fun SettingsScreen(
         ListItem(
             modifier = Modifier.clickable(onClick = { dropdownMenuExpanded = true }),
             icon = { Icon(imageVector = Icons.Default.Timelapse, null) },
-            text = { Text("夜间模式") },
+            text = { Text(stringResource(id = R.string.settings_screen_option_darkmode_label)) },
             secondaryText = {
                 Box {
-                    Text(if (followSystemDarkMode) "跟随系统" else "自定义")
+                    Text(
+                        if (followSystemDarkMode) stringResource(id = R.string.settings_screen_option_darkmode_follow_system)
+                        else stringResource(id = R.string.settings_screen_option_darkmode_custom)
+                    )
                     DropdownMenu(
                         expanded = dropdownMenuExpanded,
                         onDismissRequest = { dropdownMenuExpanded = false }
@@ -89,12 +100,12 @@ fun SettingsScreen(
                             followSystemDarkMode = true
                             themeController.setFollowSystemDarkTheme(true)
                             dropdownMenuExpanded = false
-                        }) { Text("跟随系统") }
+                        }) { Text(stringResource(id = R.string.settings_screen_option_darkmode_follow_system)) }
                         DropdownMenuItem(onClick = {
                             followSystemDarkMode = false
                             themeController.setFollowSystemDarkTheme(false)
                             dropdownMenuExpanded = false
-                        }) { Text("自定义") }
+                        }) { Text(stringResource(id = R.string.settings_screen_option_darkmode_custom)) }
                     }
                 }
             },
@@ -121,7 +132,7 @@ fun SettingsScreen(
         ListItem(
             modifier = Modifier.clickable(onClick = requestCustomTheme),
             icon = { Icon(imageVector = Icons.Filled.FormatPaint, null) },
-            text = { Text("自定义主题") }
+            text = { Text(stringResource(id = R.string.settings_screen_option_custom_theme)) }
         )
 
 /*        Text(

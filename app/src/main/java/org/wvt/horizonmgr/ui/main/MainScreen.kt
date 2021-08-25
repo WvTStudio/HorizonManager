@@ -16,6 +16,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
@@ -27,8 +28,8 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.launch
@@ -41,7 +42,10 @@ import org.wvt.horizonmgr.ui.modulemanager.ModuleManagerScreen
 import org.wvt.horizonmgr.ui.onlinemods.OnlineMods
 import org.wvt.horizonmgr.ui.pacakgemanager.PackageManagerScreen
 import org.wvt.horizonmgr.ui.theme.LocalThemeConfig
-import org.wvt.horizonmgr.ui.theme.PreviewTheme
+
+enum class Screen {
+    HOME, PACKAGE_MANAGE, LOCAL_MANAGE, ONLINE_DOWNLOAD, DOWNLOADED_MOD
+}
 
 @Composable
 fun MainScreen(
@@ -64,8 +68,9 @@ fun MainScreen(
 ) {
     val scope = rememberCoroutineScope()
     val drawerState = rememberDrawerState(DrawerValue.Closed)
-    val screens by remember { mutableStateOf(MainViewModel.Screen.values()) }
     val userInfo by viewModel.userInfo.collectAsState()
+
+    var screen by rememberSaveable { mutableStateOf(Screen.PACKAGE_MANAGE) }
 
     LaunchedEffect(Unit) { viewModel.resume() }
 
@@ -79,39 +84,47 @@ fun MainScreen(
             )
         },
         tabs = {
-            DrawerTabs(screens = screens, currentScreen = viewModel.currentScreen, onChange = {
-                viewModel.navigate(it)
+            DrawerTabs(screens = remember { Screen.values() }, currentScreen = screen, onChange = {
+                screen = it
                 scope.launch { drawerState.close() }
             })
         },
         items = {
             NavigationItem(
-                checked = false, onCheckedChange = { navigateToCommunity() },
-                text = "中文社区", icon = Icons.Filled.Forum
+                checked = false,
+                onCheckedChange = { navigateToCommunity() },
+                text = stringResource(id = R.string.main_screen_item_label_community),
+                icon = Icons.Filled.Forum
             )
             NavigationItem(
-                checked = false, onCheckedChange = { requestOpenGame() },
-                text = "进入游戏", icon = Icons.Filled.Gamepad
+                checked = false,
+                onCheckedChange = { requestOpenGame() },
+                text = stringResource(id = R.string.main_screen_item_label_opengame),
+                icon = Icons.Filled.Gamepad
             )
             NavigationItem(
-                checked = false, onCheckedChange = { navigateToJoinGroup() },
-                text = "加入群组", icon = Icons.Filled.Group
+                checked = false,
+                onCheckedChange = { navigateToJoinGroup() },
+                text = stringResource(id = R.string.main_screen_item_label_joingroup),
+                icon = Icons.Filled.Group
             )
             NavigationItem(
-                checked = false, onCheckedChange = { navigateToDonate() },
-                text = "捐赠作者", icon = Icons.Filled.AttachMoney
+                checked = false,
+                onCheckedChange = { navigateToDonate() },
+                text = stringResource(id = R.string.main_screen_item_label_donate),
+                icon = Icons.Filled.AttachMoney
             )
         },
         setting = {
             NavigationItem(
                 checked = false, onCheckedChange = { navigateToSettings() },
-                text = "设置", icon = Icons.Filled.Settings
+                text = stringResource(id = R.string.main_screen_item_label_settings), icon = Icons.Filled.Settings
             )
         }
     ) {
-        Crossfade(targetState = viewModel.currentScreen) { cs ->
+        Crossfade(targetState = screen) { cs ->
             when (cs) {
-                MainViewModel.Screen.HOME -> HomeScreen(
+                Screen.HOME -> HomeScreen(
                     onNavClick = { scope.launch { drawerState.open() } },
                     onNewsClick = {
                         if (it is HomeViewModel.ContentResource.Article) {
@@ -119,7 +132,7 @@ fun MainScreen(
                         }
                     }
                 )
-                MainViewModel.Screen.LOCAL_MANAGE -> ModuleManagerScreen(
+                Screen.LOCAL_MANAGE -> ModuleManagerScreen(
                     onNavClicked = { scope.launch { drawerState.open() } },
                     onAddModClicked = onAddModClicked,
                     onAddICLevelClick = onAddICLevelClick,
@@ -127,18 +140,18 @@ fun MainScreen(
                     onAddMCLevelClick = onAddMCLevelClick,
                     onAddMCTextureClick = onAddMCTextureClick
                 )
-                MainViewModel.Screen.PACKAGE_MANAGE -> PackageManagerScreen(
+                Screen.PACKAGE_MANAGE -> PackageManagerScreen(
                     onNavClick = { scope.launch { drawerState.open() } },
                     onOnlineInstallClick = navigateToOnlineInstall,
                     onLocalInstallClick = onAddPackageClicked,
                     navigateToPackageInfo = navigateToPackageDetail
                 )
-                MainViewModel.Screen.ONLINE_DOWNLOAD -> OnlineMods(
+                Screen.ONLINE_DOWNLOAD -> OnlineMods(
                     viewModel = hiltViewModel(),
                     isLogon = userInfo != null,
                     onNavClick = { scope.launch { drawerState.open() } }
                 )
-                MainViewModel.Screen.DOWNLOADED_MOD -> DownloadedMods(
+                Screen.DOWNLOADED_MOD -> DownloadedMods(
                     vm = hiltViewModel(),
                     onNavClicked = { scope.launch { drawerState.open() } }
                 )
@@ -185,17 +198,53 @@ private fun Drawer(
 
 @Composable
 private fun DrawerTabs(
-    screens: Array<MainViewModel.Screen>,
-    currentScreen: MainViewModel.Screen,
-    onChange: (MainViewModel.Screen) -> Unit,
+    screens: Array<Screen>,
+    currentScreen: Screen,
+    onChange: (Screen) -> Unit,
 ) {
     screens.forEach {
         NavigationItem(
             checked = currentScreen == it,
             onCheckedChange = { checked -> if (checked) onChange(it) },
-            text = it.label, icon = it.icon
+            screen = it
         )
     }
+}
+
+@Composable
+private fun NavigationItem(screen: Screen, checked: Boolean, onCheckedChange: (Boolean) -> Unit) {
+    val text: String
+    val icon: ImageVector
+
+    when (screen) {
+        Screen.HOME -> {
+            text = stringResource(id = R.string.main_screen_nav_label_home)
+            icon = Icons.Filled.Home
+        }
+        Screen.PACKAGE_MANAGE -> {
+            text = stringResource(id = R.string.main_screen_nav_label_package_manage)
+            icon = Icons.Filled.Dashboard
+        }
+        Screen.LOCAL_MANAGE -> {
+            text = stringResource(id = R.string.main_screen_nav_label_local_manage)
+            icon = Icons.Filled.Extension
+        }
+        Screen.ONLINE_DOWNLOAD -> {
+            text = stringResource(id = R.string.main_screen_nav_label_online_download)
+            icon = Icons.Filled.Store
+        }
+        Screen.DOWNLOADED_MOD -> {
+            text = stringResource(id = R.string.main_screen_nav_label_downlaoded_mod)
+            icon = Icons.Filled.Storage
+        }
+    }
+
+    NavigationItem(
+        checked = checked,
+        onCheckedChange = onCheckedChange,
+        text = text,
+        icon = icon
+    )
 }
 
 data class UserInformation(
@@ -203,6 +252,30 @@ data class UserInformation(
     val account: String,
     val avatarUrl: String
 )
+
+@Composable
+private fun LogoutAlertDialog(
+    onDismissRequest: () -> Unit,
+    onLogoutClick: () -> Unit,
+    onCancelClick: () -> Unit
+) {
+    AlertDialog(
+        modifier = Modifier.shadow(16.dp, clip = false),
+        onDismissRequest = onDismissRequest,
+        confirmButton = {
+            TextButton(onClick = onLogoutClick) {
+                Text(stringResource(id = R.string.logout_alert_dialog_logout))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onCancelClick) { Text(stringResource(id = R.string.logout_alert_dialog_cancel)) }
+        }, title = {
+            Text(stringResource(id = R.string.logout_alert_dialog_title))
+        }, text = {
+            Text(stringResource(id = R.string.logout_alert_dialog_text))
+        }
+    )
+}
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -214,23 +287,14 @@ private fun DrawerHeader(
     val theme = LocalThemeConfig.current
     var showDialog by remember { mutableStateOf(false) }
     if (showDialog) {
-        AlertDialog(
-            modifier = Modifier.shadow(16.dp, clip = false),
+        LogoutAlertDialog(
             onDismissRequest = { showDialog = false },
-            confirmButton = {
-                TextButton(onClick = {
-                    showDialog = false
-                    requestLogout()
-                }) {
-                    Text("注销")
-                }
+            onLogoutClick = {
+                requestLogout()
+                showDialog = false
             },
-            dismissButton = {
-                TextButton(onClick = { showDialog = false }) { Text("取消") }
-            }, title = {
-                Text("是否注销登录？")
-            }, text = {
-                Text("注销后需要重新登录才能使用在线下载功能")
+            onCancelClick = {
+                showDialog = false
             }
         )
     }
@@ -291,7 +355,7 @@ private fun DrawerHeader(
                         userInfo?.let {
                             NetworkImage(
                                 url = it.avatarUrl,
-                                contentDescription = "头像",
+                                contentDescription = stringResource(id = R.string.main_screen_drawer_avatar_description),
                                 contentScale = ContentScale.Crop,
                                 modifier = Modifier.fillMaxSize()
                             )
@@ -299,12 +363,16 @@ private fun DrawerHeader(
                     }
                 }
                 Text(
-                    if (userInfo == null) "欢迎！点击头像登录" else userInfo.name + "，欢迎！",
+                    if (userInfo == null) stringResource(id = R.string.main_screen_drawer_logintip) else
+                        stringResource(id = R.string.main_screen_drawer_welcome).replace(
+                            "\${username}",
+                            userInfo.name
+                        ),
                     modifier = Modifier.padding(top = 16.dp),
                     style = MaterialTheme.typography.h5
                 )
                 Text(
-                    userInfo?.account ?: "WvT工作室制作",
+                    userInfo?.account ?: stringResource(id = R.string.main_screen_drawer_banner),
                     modifier = Modifier.padding(top = 8.dp),
                     color = contentColor.copy(alpha = ContentAlpha.medium),
                     style = MaterialTheme.typography.subtitle1
@@ -349,25 +417,5 @@ private fun NavigationItem(
                 )
             }
         }
-    }
-}
-
-@Composable
-@Preview
-private fun DrawerPreview() {
-    PreviewTheme {
-        val state = rememberDrawerState(DrawerValue.Open)
-        Drawer(state = state,
-            header = { DrawerHeader(userInfo = null, requestLogin = {}, requestLogout = {}) },
-            tabs = {
-                DrawerTabs(
-                    screens = MainViewModel.Screen.values(),
-                    currentScreen = MainViewModel.Screen.HOME,
-                    onChange = {}
-                )
-            },
-            items = {},
-            setting = {}
-        ) {}
     }
 }
