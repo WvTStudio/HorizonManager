@@ -11,7 +11,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.google.accompanist.coil.rememberCoilPainter
+import coil.compose.rememberImagePainter
 import org.wvt.horizonmgr.ui.theme.PreviewTheme
 
 @Composable
@@ -64,7 +64,7 @@ private fun QRDialogContent(qrUrl: String) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .aspectRatio(1f),
-                painter = rememberCoilPainter(request = qrUrl, fadeIn = true),
+                painter = rememberImagePainter(qrUrl, builder = { crossfade(true) }),
                 contentDescription = "QR"
             )
             Spacer(Modifier.height(16.dp))
