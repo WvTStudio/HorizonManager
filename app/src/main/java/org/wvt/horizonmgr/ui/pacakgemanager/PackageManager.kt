@@ -180,6 +180,9 @@ fun PackageManager(
                             },
                             onUpdateClick = {
                                 viewModel.updatePackage(item.uuid)
+                            },
+                            onShareClick = {
+                                viewModel.sharePackage(item.uuid)
                             }
                         )
                     }
@@ -208,6 +211,8 @@ fun PackageManager(
                 fabExpand = false
             }
         )
+        SharePackageDialog(viewModel)
+        PackageUpdateDialog(viewModel)
     }
 }
 
@@ -385,6 +390,7 @@ fun PackageItem(
     onRenameClick: () -> Unit,
     onCloneClick: () -> Unit,
     onUpdateClick: () -> Unit,
+    onShareClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val interactionSource = remember { MutableInteractionSource() }
@@ -463,7 +469,7 @@ fun PackageItem(
                             }
                             DropdownMenuItem(onClick = {
                                 dropdown = false
-                                onRenameClick()
+                                onShareClick()
                             }) {
                                 Text("分享")
                             }
@@ -581,6 +587,7 @@ private fun PackageItemPreview() {
             onDeleteClick = { },
             onRenameClick = { },
             onCloneClick = { },
+            onShareClick = {},
             onUpdateClick = {}
         )
     }

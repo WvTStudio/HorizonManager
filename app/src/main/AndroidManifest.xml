@@ -31,6 +31,17 @@
         tools:ignore="RtlEnabled"
         tools:targetApi="donut">
 
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="org.wvt.horizonmgr.provider"
+            android:enabled="true"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths" />
+        </provider>
+
         <service
             android:name=".services.OnlinePackageInstallService"
             android:description="@string/online_package_install_service_description"
