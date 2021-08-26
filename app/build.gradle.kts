@@ -103,6 +103,7 @@ dependencies {
     kapt("com.google.dagger:hilt-android-compiler:$hiltVersion")
     
     implementation("androidx.hilt:hilt-navigation-compose:1.0.0-alpha03")
+    implementation("androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha03")
 
     implementation("io.coil-kt:coil-compose:1.3.2")
 
@@ -128,17 +129,11 @@ dependencies {
     implementation("androidx.compose.ui:ui-tooling:$composeVersion")
     implementation("androidx.compose.ui:ui-test:$composeVersion")
 
-//    implementation("androidx.compose.ui:ui-tooling:$composeVersion")
-//    implementation("androidx.compose.ui:ui-test:$composeVersion")
-
     implementation(platform("com.google.firebase:firebase-bom:26.1.0"))
 //    implementation("com.google.firebase:firebase-analytics-ktx")
     implementation("com.google.firebase:firebase-crashlytics-ktx")
 
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.2.1")
-
-//    implementation("com.github.bumptech.glide:glide:4.12.0")
-//    kapt("com.github.bumptech.glide:compiler:4.12.0")
 
     val markwonVersion = "4.6.2"
     implementation("io.noties.markwon:core:$markwonVersion")
@@ -147,6 +142,7 @@ dependencies {
     implementation("io.noties.markwon:image-coil:$markwonVersion")
     implementation("io.noties.markwon:syntax-highlight:$markwonVersion")
 
+    implementation("net.lingala.zip4j:zip4j:2.9.0")
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.3")
