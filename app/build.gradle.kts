@@ -10,13 +10,13 @@ plugins {
 }
 
 android {
-    compileSdk = 30
+    compileSdk = 31
     buildToolsVersion = "30.0.3"
 
     defaultConfig {
         applicationId = "org.wvt.horizonmgr"
         minSdk = 21
-        targetSdk = 30
+        targetSdk = 31
         versionCode = 24
         versionName = "2.1.2"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -58,7 +58,7 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.0.0-beta09"
+        kotlinCompilerExtensionVersion = "1.0.1"
     }
     /*lint {
         disable("InvalidFragmentVersionForActivityResult")
@@ -84,28 +84,29 @@ dependencies {
     implementation(project(":webapi"))
     implementation(project(":service"))
 
-    implementation("androidx.core:core-ktx:1.5.0")
-    implementation("androidx.activity:activity-ktx:1.3.0-beta02")
-    implementation("androidx.activity:activity-compose:1.3.0-beta02")
+    implementation("androidx.core:core-ktx:1.6.0")
+    implementation("androidx.activity:activity-ktx:1.3.1")
+    implementation("androidx.activity:activity-compose:1.3.1")
 
-    implementation("androidx.appcompat:appcompat:1.4.0-alpha02")
+    implementation("androidx.appcompat:appcompat:1.4.0-alpha03")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.1")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:1.0.0-alpha07")
-    implementation("com.google.android.material:material:1.3.0")
+    implementation("com.google.android.material:material:1.4.0")
 
-    implementation("androidx.navigation:navigation-compose:2.4.0-alpha03")
+    implementation("androidx.navigation:navigation-compose:2.4.0-alpha07")
 
-    implementation("androidx.work:work-runtime-ktx:2.7.0-alpha04")
+    implementation("androidx.work:work-runtime-ktx:2.7.0-alpha05")
 
 
-    val hiltVersion = "2.37"
+    val hiltVersion = "2.38.1"
     implementation("com.google.dagger:hilt-android:$hiltVersion")
     kapt("com.google.dagger:hilt-android-compiler:$hiltVersion")
     
     implementation("androidx.hilt:hilt-navigation-compose:1.0.0-alpha03")
 
-    val accompanistVersion = "0.12.0"
-    implementation("com.google.accompanist:accompanist-coil:$accompanistVersion")
+    implementation("io.coil-kt:coil-compose:1.3.2")
+
+    val accompanistVersion = "0.17.0"
     implementation("com.google.accompanist:accompanist-insets:$accompanistVersion")
     implementation("com.google.accompanist:accompanist-pager:$accompanistVersion")
     implementation("com.google.accompanist:accompanist-systemuicontroller:$accompanistVersion")
@@ -113,7 +114,7 @@ dependencies {
     implementation("com.google.accompanist:accompanist-flowlayout:$accompanistVersion")
     implementation("com.google.accompanist:accompanist-placeholder:$accompanistVersion")
 
-    val composeVersion = "1.0.0-beta09"
+    val composeVersion = "1.0.1"
     implementation("androidx.compose.compiler:compiler:$composeVersion")
     implementation("androidx.compose.runtime:runtime:$composeVersion")
     implementation("androidx.compose.foundation:foundation:$composeVersion")
@@ -124,6 +125,8 @@ dependencies {
     implementation("androidx.compose.material:material-ripple:$composeVersion")
     implementation("androidx.compose.material:material-icons-core:$composeVersion")
     implementation("androidx.compose.material:material-icons-extended:$composeVersion")
+    implementation("androidx.compose.ui:ui-tooling:$composeVersion")
+    implementation("androidx.compose.ui:ui-test:$composeVersion")
 
 //    implementation("androidx.compose.ui:ui-tooling:$composeVersion")
 //    implementation("androidx.compose.ui:ui-test:$composeVersion")
@@ -146,11 +149,9 @@ dependencies {
 
 
     testImplementation("junit:junit:4.13.2")
-    androidTestImplementation("androidx.test.ext:junit:1.1.2")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.3.0")
+    androidTestImplementation("androidx.test.ext:junit:1.1.3")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.4.0")
 
-    implementation("androidx.compose.ui:ui-tooling:$composeVersion")
-    implementation("androidx.compose.ui:ui-test:$composeVersion")
     debugImplementation(kotlin("reflect"))
 }
 
