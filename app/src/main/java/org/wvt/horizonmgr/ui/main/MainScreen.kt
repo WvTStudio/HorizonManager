@@ -27,11 +27,13 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import org.wvt.horizonmgr.R
 import org.wvt.horizonmgr.ui.components.NetworkImage
@@ -72,7 +74,9 @@ fun MainScreen(
 
     var screen by rememberSaveable { mutableStateOf(Screen.PACKAGE_MANAGE) }
 
-    LaunchedEffect(Unit) { viewModel.resume() }
+    LocalLifecycleOwner.current.lifecycleScope.launchWhenResumed {
+        viewModel.resume()
+    }
 
     Drawer(
         state = drawerState,
