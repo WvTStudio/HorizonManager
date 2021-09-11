@@ -28,7 +28,7 @@ fun MaterialBanner(
 ) {
     Box(modifier) {
         AnimatedVisibility(
-            visible = visible, initiallyVisible = false,
+            visible = visible,
             enter = expandVertically(Alignment.Bottom),
             exit = shrinkVertically(Alignment.Bottom)
         ) {

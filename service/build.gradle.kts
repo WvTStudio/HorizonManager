@@ -5,29 +5,32 @@ plugins {
 }
 
 android {
-    compileSdk = 30
+    compileSdk = 31
 
     defaultConfig {
         minSdk = 21
-        targetSdk = 30
+        targetSdk = 31
 //        versionCode = 1
 //        versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
-        create("beta") {
+        val debug by getting
+        val release by getting {
             proguardFiles.apply {
                 add(getDefaultProguardFile("proguard-android-optimize.txt"))
                 add(file("proguard-rules.pro"))
             }
         }
-        create("alpha") {
+        val beta by creating {
+            initWith(release)
             proguardFiles.apply {
                 add(getDefaultProguardFile("proguard-android-optimize.txt"))
                 add(file("proguard-rules.pro"))
             }
         }
-        getByName("release") {
+        val alpha by creating {
+            initWith(release)
             proguardFiles.apply {
                 add(getDefaultProguardFile("proguard-android-optimize.txt"))
                 add(file("proguard-rules.pro"))
@@ -44,10 +47,10 @@ android {
 }
 
 dependencies {
-    implementation("androidx.core:core-ktx:1.3.2")
-    implementation("androidx.appcompat:appcompat:1.2.0")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.1.0")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.4.3")
+    implementation("androidx.core:core-ktx:1.6.0")
+    implementation("androidx.appcompat:appcompat:1.3.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.2")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.1")
     testImplementation("junit:junit:4.13.2")
-    androidTestImplementation("androidx.test.ext:junit:1.1.2")
+    androidTestImplementation("androidx.test.ext:junit:1.1.3")
 }

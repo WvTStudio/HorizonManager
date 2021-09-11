@@ -5,20 +5,26 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import org.wvt.horizonmgr.DependenciesContainer
+import org.wvt.horizonmgr.service.hzpack.HorizonManager
 import org.wvt.horizonmgr.service.hzpack.InstalledPackage
 import org.wvt.horizonmgr.ui.components.ProgressDialogState
+import org.wvt.horizonmgr.utils.LocalCache
 import org.wvt.horizonmgr.utils.ModDownloader
 import java.io.File
+import javax.inject.Inject
 
-class DMViewModel(dependencies: DependenciesContainer) : ViewModel() {
-    private val localCache = dependencies.localCache
-    private val downloader = dependencies.modDownloader
-    private val manager = dependencies.manager
+@HiltViewModel
+class DMViewModel @Inject constructor(
+    private val localCache: LocalCache,
+    private val downloader: ModDownloader,
+    private val manager: HorizonManager
+) : ViewModel() {
+
     private val _mods = MutableStateFlow(emptyList<DownloadedMod>())
     private val _progressState = MutableStateFlow<ProgressDialogState?>(null)
     private var map: Map<DownloadedMod, ModDownloader.DownloadedMod> = emptyMap()

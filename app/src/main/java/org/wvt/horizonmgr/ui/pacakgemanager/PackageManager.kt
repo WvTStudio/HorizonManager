@@ -3,13 +3,14 @@ package org.wvt.horizonmgr.ui.pacakgemanager
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.LocalIndication
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -17,10 +18,14 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.SwipeRefreshIndicator
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
@@ -29,7 +34,9 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import org.wvt.horizonmgr.ui.components.*
+import org.wvt.horizonmgr.ui.fileselector.SharedFileChooserViewModel
 import org.wvt.horizonmgr.ui.theme.AppBarBackgroundColor
+import org.wvt.horizonmgr.ui.theme.PreviewTheme
 import kotlin.coroutines.resume
 
 data class PackageManagerItem(
@@ -40,6 +47,35 @@ data class PackageManagerItem(
 )
 
 @Composable
+fun PackageManagerScreen(
+    navigateToPackageInfo: (uuid: String) -> Unit,
+    onOnlineInstallClick: () -> Unit,
+    onLocalInstallClick: () -> Unit,
+    onNavClick: () -> Unit
+) {
+    val sharedFileChooserVM = SharedFileChooserViewModel
+    val selectedFile by sharedFileChooserVM.selected.collectAsState()
+    val packageVM = hiltViewModel<PackageManagerViewModel>()
+
+    LaunchedEffect(selectedFile) {
+        selectedFile?.let {
+            if (it.requestCode == "add_package") {
+                packageVM.selectedFile(it.path)
+                sharedFileChooserVM.handledSelectedFile()
+            }
+        }
+    }
+
+    PackageManager(
+        viewModel = packageVM,
+        navigateToPackageInfo = navigateToPackageInfo,
+        onOnlineInstallClick = onOnlineInstallClick,
+        onLocalInstallClick = onLocalInstallClick,
+        onNavClick = onNavClick
+    )
+}
+
+@Composable
 fun PackageManager(
     viewModel: PackageManagerViewModel,
     navigateToPackageInfo: (uuid: String) -> Unit,
@@ -48,7 +84,6 @@ fun PackageManager(
     onNavClick: () -> Unit
 ) {
     LaunchedEffect(Unit) { viewModel.loadPackages() }
-
     val packages by viewModel.packages.collectAsState()
     val selectedPackage by viewModel.selectedPackage.collectAsState()
     val progressState by viewModel.progressState.collectAsState()
@@ -61,13 +96,14 @@ fun PackageManager(
     val inputDialogHostState = remember { InputDialogHostState() }
     var fabExpand by rememberSaveable { mutableStateOf(false) }
 
+    val updatablePackages by viewModel.updatablePackages.collectAsState()
     progressState?.let {
         ProgressDialog(onCloseRequest = viewModel::dismiss, state = it)
     }
 
     Box {
         Column {
-            var showMenu by remember { mutableStateOf(false) }
+//            var showMenu by remember { mutableStateOf(false) }
             // Top App Bar
             TopAppBar(
                 modifier = Modifier.zIndex(4.dp.value),
@@ -120,6 +156,11 @@ fun PackageManager(
                             description = item.description,
                             installTime = item.timeStr,
                             selected = item.uuid == selectedPackage,
+                            updatable = remember(updatablePackages) {
+                                updatablePackages.contains(
+                                    item.uuid
+                                )
+                            },
                             onClick = { viewModel.selectPackage(item.uuid) },
                             onInfoClick = { navigateToPackageInfo(item.uuid) },
                             onDeleteClick = {
@@ -136,6 +177,12 @@ fun PackageManager(
                                     item.uuid,
                                     inputDialogHostState
                                 )
+                            },
+                            onUpdateClick = {
+                                viewModel.updatePackage(item.uuid)
+                            },
+                            onShareClick = {
+                                viewModel.sharePackage(item.uuid)
                             }
                         )
                     }
@@ -164,6 +211,8 @@ fun PackageManager(
                 fabExpand = false
             }
         )
+        SharePackageDialog(viewModel)
+        PackageUpdateDialog(viewModel)
     }
 }
 
@@ -327,18 +376,21 @@ private fun FABEntry(
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
+@OptIn(ExperimentalAnimationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun PackageItem(
     title: String,
     description: String,
     installTime: String,
     selected: Boolean,
+    updatable: Boolean,
     onClick: () -> Unit,
     onInfoClick: () -> Unit,
     onDeleteClick: () -> Unit,
     onRenameClick: () -> Unit,
     onCloneClick: () -> Unit,
+    onUpdateClick: () -> Unit,
+    onShareClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val interactionSource = remember { MutableInteractionSource() }
@@ -346,15 +398,12 @@ fun PackageItem(
 
     Card(
         modifier = modifier,
-        elevation = animateDpAsState(if (pressed) 8.dp else 1.dp).value
+        elevation = animateDpAsState(if (pressed) 8.dp else 1.dp).value,
+        onClick = onClick,
+        interactionSource = interactionSource,
+        indication = LocalIndication.current
     ) {
-        Column(
-            Modifier.clickable(
-                onClick = onClick,
-                interactionSource = interactionSource,
-                indication = LocalIndication.current
-            )
-        ) {
+        Column {
             // Body
             Row {
                 Column(
@@ -362,8 +411,18 @@ fun PackageItem(
                         .weight(1f)
                         .padding(16.dp)
                 ) {
-                    // Title
-                    Text(title, style = MaterialTheme.typography.h6)
+                    Row {
+                        // Title
+                        Text(title, style = MaterialTheme.typography.h6)
+                        // Update Indicator
+                        if (updatable) Box(
+                            modifier = Modifier
+                                .size(8.dp)
+                                .clip(CircleShape)
+                                .background(MaterialTheme.colors.secondary)
+                                .align(Alignment.Top)
+                        )
+                    }
                     // Description
                     Text(
                         modifier = Modifier.padding(top = 8.dp),
@@ -376,41 +435,52 @@ fun PackageItem(
                 }
                 // Actions
                 CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-                    Row(Modifier.padding(top = 8.dp, end = 4.dp)) {
-                        var dropdown by remember { mutableStateOf(false) }
-                        Box {
-                            IconButton(onClick = { dropdown = true }) {
-                                Icon(imageVector = Icons.Filled.MoreVert, contentDescription = "更多")
+                    var dropdown by remember { mutableStateOf(false) }
+                    Box(Modifier.padding(top = 8.dp, end = 4.dp)) {
+                        IconButton(onClick = { dropdown = true }) {
+                            Icon(imageVector = Icons.Filled.MoreVert, contentDescription = "更多")
+                        }
+                        DropdownMenu(
+                            expanded = dropdown,
+                            onDismissRequest = { dropdown = false }) {
+                            DropdownMenuItem(onClick = {
+                                dropdown = false
+                                onInfoClick()
+                            }) {
+                                Text("详情")
                             }
-                            DropdownMenu(
-                                expanded = dropdown,
-                                onDismissRequest = { dropdown = false }) {
+                            DropdownMenuItem(onClick = {
+                                dropdown = false
+                                onDeleteClick()
+                            }) {
+                                Text("删除")
+                            }
+                            DropdownMenuItem(onClick = {
+                                dropdown = false
+                                onCloneClick()
+                            }) {
+                                Text("克隆")
+                            }
+                            DropdownMenuItem(onClick = {
+                                dropdown = false
+                                onRenameClick()
+                            }) {
+                                Text("重命名")
+                            }
+                            DropdownMenuItem(onClick = {
+                                dropdown = false
+                                onShareClick()
+                            }) {
+                                Text("分享")
+                            }
+                            if (updatable) {
                                 DropdownMenuItem(onClick = {
                                     dropdown = false
-                                    onInfoClick()
+                                    onUpdateClick()
                                 }) {
-                                    Text("详情")
-                                }
-                                DropdownMenuItem(onClick = {
-                                    dropdown = false
-                                    onDeleteClick()
-                                }) {
-                                    Text("删除")
-                                }
-                                DropdownMenuItem(onClick = {
-                                    dropdown = false
-                                    onCloneClick()
-                                }) {
-                                    Text("克隆")
-                                }
-                                DropdownMenuItem(onClick = {
-                                    dropdown = false
-                                    onRenameClick()
-                                }) {
-                                    Text("重命名")
+                                    Text("更新")
                                 }
                             }
-
                         }
                     }
                 }
@@ -485,16 +555,40 @@ class ConfirmDeleteDialogHostState {
 fun ConfirmDeleteDialogHost(state: ConfirmDeleteDialogHostState) {
     val data = state.currentData
     if (data != null) {
-        AlertDialog(onDismissRequest = {
-            data.dismiss()
-        }, title = {
-            Text("是否确认删除")
-        }, text = {
-            Text("分包内的模组、地图、材质都将一并删除，且无法恢复！")
-        }, dismissButton = {
-            TextButton(onClick = { data.dismiss() }) { Text("取消") }
-        }, confirmButton = {
-            TextButton(onClick = { data.confirm() }) { Text("删除") }
-        })
+        AlertDialog(
+            modifier = Modifier.shadow(16.dp, clip = false),
+            onDismissRequest = {
+                data.dismiss()
+            }, title = {
+                Text("是否确认删除")
+            }, text = {
+                Text("分包内的模组、地图、材质都将一并删除，且无法恢复！")
+            }, dismissButton = {
+                TextButton(onClick = { data.dismiss() }) { Text("取消") }
+            }, confirmButton = {
+                TextButton(onClick = { data.confirm() }) { Text("删除") }
+            }
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun PackageItemPreview() {
+    PreviewTheme {
+        PackageItem(
+            title = "Example",
+            description = "Example Description",
+            installTime = "10 days ago",
+            selected = true,
+            updatable = true,
+            onClick = { },
+            onInfoClick = { },
+            onDeleteClick = { },
+            onRenameClick = { },
+            onCloneClick = { },
+            onShareClick = {},
+            onUpdateClick = {}
+        )
     }
 }

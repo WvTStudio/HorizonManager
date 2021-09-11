@@ -25,7 +25,7 @@ import org.wvt.horizonmgr.ui.theme.AppBarBackgroundColor
 import org.wvt.horizonmgr.utils.longSizeToString
 
 @Composable
-internal fun Community(
+internal fun CommunityScreen(
     vm: CommunityViewModel,
     onClose: () -> Unit
 ) {
@@ -73,7 +73,7 @@ internal fun Community(
             Dialog(onDismissRequest = { vm.clearDownloadTask() }) {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
-                    elevation = 24.dp
+                    elevation = 16.dp
                 ) {
                     Column(Modifier.padding(horizontal = 16.dp)) {
                         Text(

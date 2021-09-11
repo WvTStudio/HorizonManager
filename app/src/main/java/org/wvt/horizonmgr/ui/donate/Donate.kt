@@ -4,8 +4,6 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -13,27 +11,27 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Constraints
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.util.fastForEach
+import com.google.accompanist.insets.navigationBarsPadding
+import com.google.accompanist.insets.statusBarsPadding
 import org.wvt.horizonmgr.R
 import org.wvt.horizonmgr.ui.theme.LocalThemeConfig
+import org.wvt.horizonmgr.ui.theme.PreviewTheme
 import kotlin.random.Random
 
 val alipayColor = Color(0xFF1678FF)
 val wechatColor = Color(0xFF19AD19)
 
-private data class DonateItem(
-    val name: String,
-    val size: TextUnit
-)
-
-@OptIn(ExperimentalAnimationApi::class)
+@OptIn(ExperimentalAnimationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun Donate(
     donates: Set<DonateViewModel.DonateItem>,
@@ -49,13 +47,11 @@ fun Donate(
             Surface(
                 color = if (light) alipayColor else MaterialTheme.colors.background,
                 modifier = Modifier
+                    .statusBarsPadding()
                     .weight(1f)
-                    .fillMaxWidth()
-                    .clickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = null,
-                        onClick = onAlipayClicked
-                    )
+                    .fillMaxWidth(),
+                onClick = onAlipayClicked,
+                indication = null
             ) {
                 Box(Modifier.fillMaxSize()) {
                     Icon(
@@ -70,13 +66,11 @@ fun Donate(
             Surface(
                 color = if (light) wechatColor else MaterialTheme.colors.background,
                 modifier = Modifier
+                    .navigationBarsPadding()
                     .weight(1f)
-                    .fillMaxWidth()
-                    .clickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = null,
-                        onClick = onWechatPayClicked
-                    )
+                    .fillMaxWidth(),
+                onClick = onWechatPayClicked,
+                indication = null
             ) {
                 Box(Modifier.fillMaxSize()) {
                     Icon(
@@ -88,7 +82,7 @@ fun Donate(
                 }
             }
         }
-        Column {
+        Column(Modifier.statusBarsPadding()) {
             TopAppBar(
                 title = { Text("选择捐赠方式") },
                 navigationIcon = {
@@ -105,9 +99,11 @@ fun Donate(
                 enter = fadeIn(),
                 exit = fadeOut()
             ) {
-                RandomPlaceLayout(modifier = Modifier
-                    .fillMaxSize()
-                    .padding(top = 16.dp)) {
+                RandomPlaceLayout(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(top = 16.dp)
+                ) {
                     donates.forEach {
                         Text(
                             fontSize = it.size,
@@ -122,7 +118,8 @@ fun Donate(
         Row(
             Modifier
                 .align(Alignment.BottomEnd)
-                .padding(16.dp)) {
+                .padding(16.dp)
+        ) {
             TextButton(onClick = { displayDialog = true }) {
                 Text(
                     text = "关于",
@@ -133,6 +130,7 @@ fun Donate(
 
         if (displayDialog) {
             AlertDialog(
+                modifier = Modifier.shadow(16.dp, clip = false),
                 onDismissRequest = { displayDialog = false },
                 title = { Text("关于捐赠") },
                 text = {
@@ -165,5 +163,18 @@ fun RandomPlaceLayout(modifier: Modifier, content: @Composable () -> Unit) {
                 it.place(x, y)
             }
         }
+    }
+}
+
+@Preview
+@Composable
+private fun DonatePreview() {
+    PreviewTheme {
+        Donate(
+            donates = setOf(DonateViewModel.DonateItem("User 1", 4.sp), DonateViewModel.DonateItem("User 2", 4.sp)),
+            onClose = { /*TODO*/ },
+            onAlipayClicked = { /*TODO*/ },
+            onWechatPayClicked = { /*TODO*/ }
+        )
     }
 }

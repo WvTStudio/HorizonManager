@@ -5,20 +5,25 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.SnackbarHostState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.wvt.horizonmgr.DependenciesContainer
 import org.wvt.horizonmgr.ui.components.FabState
+import org.wvt.horizonmgr.utils.LocalCache
 import org.wvt.horizonmgr.webapi.NetworkException
 import org.wvt.horizonmgr.webapi.iccn.ICCNModule
+import javax.inject.Inject
 
 private const val TAG = "LoginViewModelLogger"
 
-class LoginViewModel(dependencies: DependenciesContainer) : ViewModel() {
-    private val iccn = dependencies.iccn
+@HiltViewModel
+class LoginViewModel @Inject constructor(
+    private val localCache: LocalCache,
+    private val iccn: ICCNModule
+) : ViewModel() {
     val fabState = MutableStateFlow<FabState>(FabState.TODO)
 
     fun login(
@@ -50,6 +55,14 @@ class LoginViewModel(dependencies: DependenciesContainer) : ViewModel() {
                 return@launch
             }
             fabState.emit(FabState.SUCCEED)
+            localCache.cacheUserInfo(
+                LocalCache.CachedUserInfo(
+                    userInfo.uid,
+                    userInfo.name,
+                    userInfo.account,
+                    userInfo.avatarUrl ?: ""
+                )
+            )
             launch { snackbarHostState.showSnackbar("登录成功") } // 此处用 launch 的原因是为了 UX，只希望等待 800ms
             delay(800)
             onLoginSuccess(userInfo.account, userInfo.avatarUrl, userInfo.name, userInfo.uid)
@@ -94,7 +107,8 @@ class LoginViewModel(dependencies: DependenciesContainer) : ViewModel() {
                     return@launch
                 }
                 fabState.emit(FabState.SUCCEED)
-                snackbarHostState.showSnackbar("注册成功，注意查收验证邮件", "确认")
+                launch { snackbarHostState.showSnackbar("注册成功，注意查收验证邮件", "确认") }
+                delay(800) // For UX
                 fabState.emit(FabState.TODO)
                 onSucceed(uid, username, pass)
             }

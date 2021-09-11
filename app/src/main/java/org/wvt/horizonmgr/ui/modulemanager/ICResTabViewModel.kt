@@ -3,6 +3,7 @@ package org.wvt.horizonmgr.ui.modulemanager
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -10,18 +11,22 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.launch
-import org.wvt.horizonmgr.DependenciesContainer
+import org.wvt.horizonmgr.service.hzpack.HorizonManager
 import org.wvt.horizonmgr.service.respack.ResourcePackManager
 import org.wvt.horizonmgr.service.respack.ResourcePackManifest
 import org.wvt.horizonmgr.service.respack.ZipResourcePackage
 import org.wvt.horizonmgr.ui.components.ProgressDialogState
+import org.wvt.horizonmgr.utils.LocalCache
 import java.io.File
+import javax.inject.Inject
 
 private const val TAG = "ICResTabVM"
 
-class ICResTabViewModel(dependencies: DependenciesContainer) : ViewModel() {
-    private val packMgr = dependencies.manager
-    private val localCache = dependencies.localCache
+@HiltViewModel
+class ICResTabViewModel @Inject constructor(
+    private val packMgr: HorizonManager,
+    private val localCache: LocalCache
+) : ViewModel() {
 
     val state = MutableStateFlow<State>(State.Loading)
     val resPacks = MutableStateFlow<List<ResPack>>(emptyList())

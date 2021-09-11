@@ -3,28 +3,27 @@ package org.wvt.horizonmgr.ui.theme
 import android.app.Activity
 import android.content.Context
 import android.content.res.Configuration
+import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.Colors
-import androidx.compose.material.Surface
 import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import androidx.core.content.edit
 import androidx.core.view.WindowCompat
-import com.google.accompanist.insets.LocalWindowInsets
 import com.google.accompanist.insets.ProvideWindowInsets
+import com.google.accompanist.insets.navigationBarsHeight
+import com.google.accompanist.insets.statusBarsHeight
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import org.wvt.horizonmgr.ui.donate.alipayColor
 import org.wvt.horizonmgr.ui.donate.wechatColor
-
-private val config = mutableStateOf<ThemeConfig>(DefaultThemeConfig)
 
 @Composable
 fun AndroidHorizonManagerTheme(
@@ -33,80 +32,66 @@ fun AndroidHorizonManagerTheme(
 ) {
     val context = LocalContext.current
     val themeController = remember(context) { AndroidThemeController(context) }
+    val systemUiController = rememberSystemUiController()
+    val config by themeController.config
 
-    val controller = rememberSystemUiController()
-
-    DisposableEffect(Unit) {
+    LaunchedEffect(Unit) {
         WindowCompat.setDecorFitsSystemWindows((context as Activity).window, false)
-        onDispose {}
     }
-    DisposableEffect(isSystemInDarkTheme()) {
+
+    LaunchedEffect(isSystemInDarkTheme()) {
         themeController.update()
-        onDispose { }
     }
 
-    var statusBarColor by remember {
-        mutableStateOf(Color.Transparent)
-    }
+    var statusBarColor by remember { mutableStateOf(Color.Transparent) }
+    var navigationBarColor by remember { mutableStateOf(Color.Transparent) }
 
-    var navigationBarColor by remember {
-        mutableStateOf(Color.Transparent)
-    }
-
-    DisposableEffect(config.value) {
-        val config = config.value
+    LaunchedEffect(config) {
+        val config = config
         val color = if (config.isDark) config.darkColor else config.lightColor
+
         statusBarColor = if (fullScreen) {
             color.background
         } else {
             if (config.isDark) {
                 color.surface
             } else {
-                if (config.appbarAccent) color.primaryVariant
-                else color.surface
+                config.statusBarColor
             }
         }
 
-        controller.setStatusBarColor(Color.Transparent, MaterialColors.isLightColor(statusBarColor))
+        systemUiController.setStatusBarColor(Color.Transparent, MaterialColors.isLightColor(statusBarColor))
         navigationBarColor = color.background
-        controller.setNavigationBarColor(
+        systemUiController.setNavigationBarColor(
             Color.Transparent,
             MaterialColors.isLightColor(navigationBarColor)
         )
-        onDispose { }
     }
 
     ProvideWindowInsets {
         HorizonManagerTheme(
             controller = themeController,
-            config = config.value,
+            config = config,
         ) {
-            val insets = LocalWindowInsets.current
-            val statusBarHeight: Dp
-            val navigationBarHeight: Dp
-            with(LocalDensity.current) {
-                statusBarHeight = insets.statusBars.top.toDp()
-                navigationBarHeight = insets.navigationBars.bottom.toDp()
-            }
             Column(Modifier.fillMaxSize()) {
-                Surface(
-                    modifier = Modifier
+                Box(
+                    Modifier
                         .fillMaxWidth()
-                        .height(statusBarHeight),
-                    color = statusBarColor, content = {},
-                    elevation = if (fullScreen) 0.dp else 4.dp
+                        .statusBarsHeight()
+                        .background(statusBarColor)
                 )
                 Box(
                     Modifier
                         .fillMaxWidth()
-                        .weight(1f)) {
+                        .weight(1f)
+                ) {
                     content()
                 }
-                Surface(
-                    modifier = Modifier
+                Box(
+                    Modifier
                         .fillMaxWidth()
-                        .height(navigationBarHeight),
-                    color = navigationBarColor, content = {}
+                        .navigationBarsHeight()
+                        .background(navigationBarColor)
                 )
             }
         }
@@ -117,7 +102,7 @@ fun AndroidHorizonManagerTheme(
 fun AndroidDonateTheme(content: @Composable() () -> Unit) {
     val context = LocalContext.current.applicationContext
     val themeController = remember(context) { AndroidThemeController(context) }
-
+    val config by themeController.config
 
     DisposableEffect(isSystemInDarkTheme()) {
         themeController.update()
@@ -125,8 +110,8 @@ fun AndroidDonateTheme(content: @Composable() () -> Unit) {
     }
 
     val controller = rememberSystemUiController()
-    DisposableEffect(config.value) {
-        val config = config.value
+    DisposableEffect(config) {
+        val config = config
         val color = if (config.isDark) config.darkColor else config.lightColor
 
         if (config.isDark) {
@@ -141,13 +126,13 @@ fun AndroidDonateTheme(content: @Composable() () -> Unit) {
     ProvideWindowInsets {
         HorizonManagerTheme(
             controller = themeController,
-            config = config.value,
+            config = config,
             content = content
         )
     }
 }
 
-private class LocalConfig(context: Context) {
+private class ConfigurationStorage(context: Context) {
     private val themePreference =
         context.getSharedPreferences("theme", Context.MODE_PRIVATE)
     private val lightThemePreference =
@@ -239,25 +224,26 @@ private class LocalConfig(context: Context) {
 internal class AndroidThemeController(
     private val context: Context
 ) : ThemeController {
+    private val _config = mutableStateOf<ThemeConfig>(DefaultThemeConfig)
+    val config: State<ThemeConfig> = _config
 
-    private val localConfig = LocalConfig(context)
+    private val localConfig = ConfigurationStorage(context)
 
     init {
         update()
     }
 
+    @Synchronized
     fun update() {
         val lightColor = localConfig.getLightColor()
         val darkColor = localConfig.getDarkColor()
         val appbarAccent = localConfig.isAppbarAccent()
-//        val followSystem = AppCompatDelegate.getDefaultNightMode()
-
         val configFollowSystem = localConfig.getFollowSystemDarkMode()
         val isConfigCustomInDark = localConfig.getCustomDarkMode()
         val isSystemInDark =
             context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
 
-        config.value = config.value.copy(
+        _config.value = _config.value.copy(
             followSystemDarkMode = configFollowSystem,
             isSystemInDark = isSystemInDark,
             isCustomInDark = isConfigCustomInDark,
@@ -271,26 +257,31 @@ internal class AndroidThemeController(
         return localConfig.getFollowSystemDarkMode()
     }
 
+    @Synchronized
     override fun setFollowSystemDarkTheme(enable: Boolean) {
         localConfig.setFollowSystemDarkMode(enable)
         update()
     }
 
+    @Synchronized
     override fun setCustomDarkTheme(enable: Boolean) {
         localConfig.setCustomDarkMode(enable)
         update()
     }
 
+    @Synchronized
     override fun setLightColor(color: Colors) {
         localConfig.setLightColor(color)
         update()
     }
 
+    @Synchronized
     override fun setDarkColor(color: Colors) {
         localConfig.setDarkColor(color)
         update()
     }
 
+    @Synchronized
     override fun setAppbarAccent(enable: Boolean) {
         localConfig.setAppbarAccent(enable)
         update()

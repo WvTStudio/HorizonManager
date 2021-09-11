@@ -14,7 +14,9 @@ import androidx.compose.material.icons.filled.Clear
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import org.wvt.horizonmgr.ui.theme.PreviewTheme
 
 enum class FabState {
     TODO, LOADING, SUCCEED, FAILED
@@ -49,5 +51,37 @@ fun StateFab(
                 )
             }
         }
+    }
+}
+
+@Preview
+@Composable
+private fun PreviewTodo() {
+    PreviewTheme {
+        StateFab(state = FabState.TODO, {})
+    }
+}
+
+@Preview
+@Composable
+private fun PreviewLoading() {
+    PreviewTheme {
+        StateFab(state = FabState.LOADING, {})
+    }
+}
+
+@Preview
+@Composable
+private fun PreviewSucceed() {
+    PreviewTheme {
+        StateFab(state = FabState.SUCCEED, {})
+    }
+}
+
+@Preview
+@Composable
+private fun PreviewFailed() {
+    PreviewTheme {
+        StateFab(state = FabState.FAILED, {})
     }
 }

@@ -12,7 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.ui.Modifier
-import org.wvt.horizonmgr.defaultViewModelFactory
+import dagger.hilt.android.AndroidEntryPoint
 import org.wvt.horizonmgr.ui.theme.AndroidHorizonManagerTheme
 
 private const val TAG = "LoginActivity"
@@ -57,6 +57,7 @@ class LoginResultContract : ActivityResultContract<Unit, LoginResult>() {
     }
 }
 
+@AndroidEntryPoint
 class LoginActivity : AppCompatActivity() {
     companion object {
         const val LOGIN_CANCELED = 0
@@ -68,7 +69,7 @@ class LoginActivity : AppCompatActivity() {
         const val EXTRA_AVATAR = "avatar"
     }
 
-    private val viewModel by viewModels<LoginViewModel> { defaultViewModelFactory }
+    private val viewModel by viewModels<LoginViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -78,7 +79,7 @@ class LoginActivity : AppCompatActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    Login(viewModel, ::onLoginSucceed, ::onCancel)
+                    LoginScreen(viewModel, ::onLoginSucceed, ::onCancel)
                 }
             }
         }

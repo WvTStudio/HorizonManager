@@ -10,13 +10,13 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.google.accompanist.swiperefresh.SwipeRefresh
@@ -28,15 +28,12 @@ import org.wvt.horizonmgr.ui.components.NetworkImage
 import org.wvt.horizonmgr.ui.theme.AppBarBackgroundColor
 
 @Composable
-fun ArticleContent(
-    id: String,
+fun ArticleContentScreen(
     vm: ArticleContentViewModel,
     onNavClick: () -> Unit
 ) {
     val news by vm.content.collectAsState()
     val refreshing by vm.isRefreshing.collectAsState()
-
-    LaunchedEffect(id) { vm.load(id) }
 
     Column {
         TopAppBar(
@@ -117,20 +114,23 @@ private fun Content(
                 )
             }
 
-            // Title
             SelectionContainer {
+                // Title
                 Text(
-                    modifier = Modifier.padding(
-                        start = 16.dp,
-                        top = 16.dp,
-                        end = 16.dp
-                    ),
-                    text = content.title, style = MaterialTheme.typography.h5
+                    modifier = Modifier
+                        .padding(
+                            start = 16.dp,
+                            top = 16.dp,
+                            end = 16.dp
+                        )
+                        .fillMaxWidth(),
+                    text = content.title, style = MaterialTheme.typography.h4,
+                    textAlign = TextAlign.Center
                 )
             }
 
-            // Brief
-            SelectionContainer {
+            SelectionContainer(Modifier.align(Alignment.CenterHorizontally)) {
+                // Brief
                 Text(
                     modifier = Modifier.padding(
                         start = 24.dp,
@@ -138,7 +138,7 @@ private fun Content(
                         top = 16.dp
                     ),
                     text = content.brief,
-                    style = MaterialTheme.typography.body2,
+                    style = MaterialTheme.typography.subtitle1,
                     color = MaterialTheme.colors.onSurface.copy(0.54f)
                 )
             }
@@ -151,16 +151,7 @@ private fun Content(
             )
 
             // Content
-            /*SelectionContainer {
-                Text(
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp, vertical = 24.dp)
-                        .fillParentMaxWidth(),
-                    text = content.content,
-                    style = MaterialTheme.typography.body1,
-                    color = MaterialTheme.colors.onSurface.copy(0.74f)
-                )
-            }*/
+
             MarkdownContent(
                 modifier = Modifier
                     .padding(horizontal = 16.dp, vertical = 24.dp),

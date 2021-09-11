@@ -9,7 +9,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
-import org.wvt.horizonmgr.HorizonManagerApplication
+import dagger.hilt.android.AndroidEntryPoint
 import org.wvt.horizonmgr.ui.theme.AndroidHorizonManagerTheme
 
 class ArticleContentActivityContract : ActivityResultContract<String, Unit>() {
@@ -24,18 +24,16 @@ class ArticleContentActivityContract : ActivityResultContract<String, Unit>() {
     }
 }
 
+@AndroidEntryPoint
 class ArticleContentActivity : AppCompatActivity() {
-    private val vm by viewModels<ArticleContentViewModel> {
-        (application as HorizonManagerApplication).dependenciesVMFactory
-    }
+    private val vm by viewModels<ArticleContentViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val id = intent.getStringExtra("id") ?: error("Id not specified")
         setContent {
             AndroidHorizonManagerTheme {
                 Surface(color = MaterialTheme.colors.background) {
-                    ArticleContent(id, vm, ::finish)
+                    ArticleContentScreen(vm, ::finish)
                 }
             }
         }

@@ -8,8 +8,10 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import dagger.hilt.android.AndroidEntryPoint
 import org.wvt.horizonmgr.ui.theme.AndroidHorizonManagerTheme
 
+@AndroidEntryPoint
 class CommunityActivity : AppCompatActivity() {
     private val viewModel by viewModels<CommunityViewModel> {
         object : ViewModelProvider.Factory {
@@ -26,7 +28,7 @@ class CommunityActivity : AppCompatActivity() {
         setContent {
             AndroidHorizonManagerTheme {
                 Surface(color = MaterialTheme.colors.background) {
-                    Community(vm = viewModel, onClose = ::close)
+                    CommunityScreen(vm = viewModel, onClose = ::close)
                 }
             }
         }

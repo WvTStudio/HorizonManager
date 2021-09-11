@@ -4,18 +4,22 @@ import android.os.Environment
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.wvt.horizonmgr.DependenciesContainer
+import org.wvt.horizonmgr.utils.LocalCache
 import java.io.File
 import java.util.*
+import javax.inject.Inject
 
 private const val TAG = "FileSelectorVM"
 
-class FileSelectorViewModel(dependencies: DependenciesContainer) : ViewModel() {
-    private val localCache = dependencies.localCache
+@HiltViewModel
+class FileSelectorViewModel @Inject constructor(
+    private val localCache: LocalCache
+) : ViewModel() {
 
     sealed class State {
         object Loading : State()

@@ -1,53 +1,35 @@
 package org.wvt.horizonmgr.ui.main
 
-import android.Manifest
-import android.annotation.SuppressLint
-import android.content.Intent
-import android.content.pm.PackageManager
-import android.net.Uri
-import android.os.Build
 import android.os.Bundle
-import android.os.Environment
-import android.provider.Settings
-import androidx.activity.compose.setContent
-import androidx.activity.viewModels
+import android.os.PersistableBundle
 import androidx.appcompat.app.AppCompatActivity
-import org.wvt.horizonmgr.R
-import org.wvt.horizonmgr.defaultViewModelFactory
-import org.wvt.horizonmgr.ui.community.CommunityActivity
-import org.wvt.horizonmgr.ui.donate.DonateActivity
-import org.wvt.horizonmgr.ui.downloaded.DMViewModel
-import org.wvt.horizonmgr.ui.fileselector.FileSelectorResult
-import org.wvt.horizonmgr.ui.fileselector.FileSelectorResultContract
-import org.wvt.horizonmgr.ui.joingroup.JoinGroupActivity
-import org.wvt.horizonmgr.ui.login.LoginResultContract
-import org.wvt.horizonmgr.ui.modulemanager.*
-import org.wvt.horizonmgr.ui.article.ArticleContentActivityContract
-import org.wvt.horizonmgr.ui.home.HomeViewModel
-import org.wvt.horizonmgr.ui.onlineinstall.InstallPackageResultContract
-import org.wvt.horizonmgr.ui.onlinemods.OnlineModsViewModel
-import org.wvt.horizonmgr.ui.pacakgemanager.PackageDetailActivity
-import org.wvt.horizonmgr.ui.pacakgemanager.PackageManagerViewModel
-import org.wvt.horizonmgr.ui.settings.SettingsActivity
-import org.wvt.horizonmgr.ui.startActivity
+import androidx.core.view.WindowCompat
+import dagger.hilt.android.AndroidEntryPoint
 
 private const val TAG = "MainActivity"
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
-    private val factory by lazy { defaultViewModelFactory }
 
-    private val mainVM: MainViewModel by viewModels { factory }
-    private val rootVM: RootViewModel by viewModels { factory }
-    private val homeVM: HomeViewModel by viewModels { factory }
-    private val modTabVM: ModTabViewModel by viewModels { factory }
-    private val icLevelTabVM: ICLevelTabViewModel by viewModels { factory }
-    private val icResTabVM: ICResTabViewModel by viewModels { factory }
-    private val moduleManagerVM: ModuleManagerViewModel by viewModels { factory }
-    private val packageManagerVM: PackageManagerViewModel by viewModels { factory }
-    private val mcLevelVM: MCLevelTabViewModel by viewModels { factory }
-    private val downloadedModVM: DMViewModel by viewModels { factory }
-    private val onlineModsVM: OnlineModsViewModel by viewModels { factory }
-    private val mcResVM: MCResTabViewModel by viewModels { factory }
+    override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
+        super.onCreate(savedInstanceState, persistentState)
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+    }
+/*
+//    private val factory by lazy { HiltViewModelFactory(this, NavBackStackEntry.create(this)) }
+
+    private val mainVM: MainViewModel by viewModels()
+//    private val rootVM: RootViewModel by viewModels()
+    private val homeVM: HomeViewModel by viewModels()
+    private val modTabVM: ModTabViewModel by viewModels()
+    private val icLevelTabVM: ICLevelTabViewModel by viewModels ()
+    private val icResTabVM: ICResTabViewModel by viewModels()
+    private val moduleManagerVM: ModuleManagerViewModel by viewModels()
+    private val packageManagerVM: PackageManagerViewModel by viewModels()
+    private val mcLevelVM: MCLevelTabViewModel by viewModels()
+    private val downloadedModVM: DMViewModel by viewModels()
+    private val onlineModsVM: OnlineModsViewModel by viewModels()
+    private val mcResVM: MCResTabViewModel by viewModels()
 
     private val newsDetail = registerForActivityResult(ArticleContentActivityContract()) {}
 
@@ -219,42 +201,34 @@ class MainActivity : AppCompatActivity() {
         setTheme(R.style.Theme_HorizonManagerCompose_NoActionBar) // cancel the slash theme
 
         setContent {
-            App(
-                mainVM = mainVM,
-                rootVM = rootVM,
-                homeVM = homeVM,
-                modTabVM = modTabVM,
-                icLevelTabVM = icLevelTabVM,
-                icResTabVM = icResTabVM,
-                moduleManagerVM = moduleManagerVM,
-                packageManagerVM = packageManagerVM,
-                mcLevelVM = mcLevelVM,
-                mcResVM = mcResVM,
-                downloadedModVM = downloadedModVM,
-                onlineModsVM = onlineModsVM,
-                onRequestPermission = ::requestPermission,
-                navigateToCommunity = ::startCommunityActivity,
-                navigateToDonate = ::startDonateActivity,
-                navigateToJoinGroup = ::startJoinGroupActivity,
-                navigateToLogin = { login.launch(Unit) },
-                navigateToSettings = ::startSettingsActivity,
-                navigateToOnlineInstall = ::startOnlineInstallActivity,
-                navigateToPackageInfo = { PackageDetailActivity.start(this, it) },
-                requestOpenGame = ::openGame,
-                selectFileForMod = ::startSelectFileActivityForMod,
-                selectFileForPackage = ::startSelectFileActivityForPackage,
-                selectLevelForIC = { selectLevelForIC.launch(this) },
-                selectLevelForMC = { selectLevelForMC.launch(this) },
-                selectTextureForIC = { selectTextureForIC.launch(this) },
-                selectTextureForMC = { selectTextureForMC.launch(this) },
-                onInstallHZClick = { openCoolapkURL() },
-                onInstallMCClick = { openMCGooglePlay() },
-                navigateToNewsDetail = { newsDetail.launch(it) }
-            )
+            AndroidHorizonManagerTheme {
+                Surface(color = MaterialTheme.colors.background) {
+                    Root(
+                        onRequestPermission = ::requestPermission,
+                        navigateToCommunity = ::startCommunityActivity,
+                        navigateToDonate = ::startDonateActivity,
+                        navigateToJoinGroup = ::startJoinGroupActivity,
+                        navigateToLogin = { login.launch(Unit) },
+                        navigateToSettings = ::startSettingsActivity,
+                        navigateToOnlineInstall = ::startOnlineInstallActivity,
+                        navigateToPackageInfo = { PackageDetailActivity.start(this, it) },
+                        requestOpenGame = ::openGame,
+                        selectFileForMod = ::startSelectFileActivityForMod,
+                        selectFileForPackage = ::startSelectFileActivityForPackage,
+                        selectLevelForIC = { selectLevelForIC.launch(this) },
+                        selectLevelForMC = { selectLevelForMC.launch(this) },
+                        selectTextureForIC = { selectTextureForIC.launch(this) },
+                        selectTextureForMC = { selectTextureForMC.launch(this) },
+                        onInstallHZClick = { openCoolapkURL() },
+                        onInstallMCClick = { openMCGooglePlay() },
+                        navigateToNewsDetail = { newsDetail.launch(it) }
+                    )
+                }
+            }
         }
 
         this.checkPermission()
         mainVM.checkUpdate()
         checkGameInstalled()
-    }
+    }*/
 }

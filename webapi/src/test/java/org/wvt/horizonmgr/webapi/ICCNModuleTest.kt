@@ -23,7 +23,18 @@ class ICCNModuleTest {
     @Test
     fun login() = runBlocking {
         val user = module.login("hzmgr010102@adodoz.cn", "hzmgrtestpassword")
-        println(user)
+        assert(user.account == "hzmgr010102@adodoz.cn")
+    }
+
+    @Test
+    fun `Test error login`() = runBlocking {
+        try {
+            module.login("hzmgr01010@adodoz.cn", "testsetset")
+        } catch (e: Exception) {
+            assert(e is ICCNModule.LoginFailedException)
+            return@runBlocking
+        }
+        error("Failed")
     }
 
     @Test

@@ -8,13 +8,16 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 private const val TAG = "LocalCache"
+
 class LocalCache constructor(context: Context) {
     private val fixedFoldersPref: SharedPreferences =
         context.getSharedPreferences(FIXED_FOLDERS, Context.MODE_PRIVATE)
-    private val userInfoPref: SharedPreferences = context.getSharedPreferences(USER_INFO, Context.MODE_PRIVATE)
+    private val userInfoPref: SharedPreferences =
+        context.getSharedPreferences(USER_INFO, Context.MODE_PRIVATE)
     private val selectedPackagePref: SharedPreferences =
         context.getSharedPreferences(SELECTED_PACKAGE, Context.MODE_PRIVATE)
-    private val optionsPref: SharedPreferences = context.getSharedPreferences(OPTIONS, Context.MODE_PRIVATE)
+    private val optionsPref: SharedPreferences =
+        context.getSharedPreferences(OPTIONS, Context.MODE_PRIVATE)
 
     companion object {
         private const val USER_INFO = "user_info"
@@ -120,6 +123,26 @@ class LocalCache constructor(context: Context) {
     fun clearIgnoreVersion() {
         optionsPref.edit {
             remove("ignore_version")
+        }
+    }
+
+    fun isNeverShowHZInstallationTip(): Boolean {
+        return optionsPref.getBoolean("never_show_hz_installation_tip", false)
+    }
+
+    fun setNeverShowHZInstallationTip(value: Boolean) {
+        optionsPref.edit {
+            putBoolean("never_show_hz_installation_tip", value)
+        }
+    }
+
+    fun isNeverShowMCInstallationTip(): Boolean {
+        return optionsPref.getBoolean("never_show_mc_installation_tip", false)
+    }
+
+    fun setNeverShowMCInstallationTip(value: Boolean) {
+        optionsPref.edit {
+            putBoolean("never_show_mc_installation_tip", value)
         }
     }
 }

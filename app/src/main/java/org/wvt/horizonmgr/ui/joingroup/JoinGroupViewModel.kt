@@ -3,18 +3,20 @@ package org.wvt.horizonmgr.ui.joingroup
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.wvt.horizonmgr.DependenciesContainer
+import org.wvt.horizonmgr.webapi.mgrinfo.MgrInfoModule
+import javax.inject.Inject
 
 private const val TAG = "JoinGroupVMLogger"
 
-class JoinGroupViewModel(
-    dependencies: DependenciesContainer
+@HiltViewModel
+class JoinGroupViewModel @Inject constructor(
+    private val mgrInfo: MgrInfoModule
 ) : ViewModel() {
-    private val mgrInfo = dependencies.mgrInfo
 
     val groups = MutableStateFlow<List<QQGroupEntry>>(emptyList())
     val isLoading = MutableStateFlow(true)

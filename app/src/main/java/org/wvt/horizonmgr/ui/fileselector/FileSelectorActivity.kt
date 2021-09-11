@@ -5,12 +5,13 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContract
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.ui.Modifier
-import org.wvt.horizonmgr.defaultViewModelFactory
+import androidx.hilt.navigation.compose.hiltViewModel
+import dagger.hilt.android.AndroidEntryPoint
 import org.wvt.horizonmgr.ui.theme.AndroidHorizonManagerTheme
 
 sealed class FileSelectorResult {
@@ -41,6 +42,7 @@ class FileSelectorResultContract : ActivityResultContract<Context, FileSelectorR
 }
 
 
+@AndroidEntryPoint
 class FileSelectorActivity : AppCompatActivity() {
     companion object {
         const val CANCEL = 0
@@ -48,16 +50,20 @@ class FileSelectorActivity : AppCompatActivity() {
         const val FILE_PATH = "file_path"
     }
 
-    private val viewModel by viewModels<FileSelectorViewModel> { defaultViewModelFactory }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
+            val viewModel = SharedFileChooserViewModel
             AndroidHorizonManagerTheme {
-                Surface {
+                Surface(color = MaterialTheme.colors.background) {
                     FileSelector(
                         modifier = Modifier.fillMaxSize(),
-                        viewModel = viewModel, onSelect = ::onFileSelect, onClose = ::onCancel
+                        viewModel = hiltViewModel(),
+                        onSelect = {
+                            viewModel.setSelected(it)
+                            onFileSelect(it)
+                                   },
+                        onClose = { onCancel() }
                     )
                 }
             }

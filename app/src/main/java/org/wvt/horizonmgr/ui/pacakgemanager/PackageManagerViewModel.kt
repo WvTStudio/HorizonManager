@@ -1,8 +1,13 @@
 package org.wvt.horizonmgr.ui.pacakgemanager
 
+import android.os.Environment
 import android.util.Log
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -10,21 +15,29 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.wvt.horizonmgr.DependenciesContainer
+import net.lingala.zip4j.ZipFile
 import org.wvt.horizonmgr.service.hzpack.*
 import org.wvt.horizonmgr.ui.components.InputDialogHostState
 import org.wvt.horizonmgr.ui.components.ProgressDialogState
+import org.wvt.horizonmgr.utils.LocalCache
+import org.wvt.horizonmgr.webapi.pack.OfficialCDNPackage
+import org.wvt.horizonmgr.webapi.pack.OfficialPackageCDNRepository
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
+import javax.inject.Inject
+import kotlin.coroutines.Continuation
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 private const val TAG = "PackageManagerVM"
 
-class PackageManagerViewModel(
-    dependencies: DependenciesContainer
+@HiltViewModel
+class PackageManagerViewModel @Inject constructor(
+    private val mgr: HorizonManager,
+    private val localCache: LocalCache,
+    private val packageCDNRepository: OfficialPackageCDNRepository
 ) : ViewModel() {
-    private val mgr = dependencies.manager
-    private val localCache = dependencies.localCache
     private val _packages = MutableStateFlow(emptyList<PackageManagerItem>())
     private val _progressState = MutableStateFlow<ProgressDialogState?>(null)
     private val dateFormatter = SimpleDateFormat.getDateInstance()
@@ -48,10 +61,12 @@ class PackageManagerViewModel(
             if (state.value == State.Initializing) {
                 loadData()
                 loadSelectedPackage()
+                launch { checkUpdate() }
             } else {
                 isRefreshing.emit(true)
                 loadData()
                 loadSelectedPackage()
+                launch { checkUpdate() }
                 isRefreshing.emit(false)
             }
         }
@@ -232,7 +247,15 @@ class PackageManagerViewModel(
                 return@launch
             }
             try {
-                withContext(Dispatchers.IO) { mgr.installPackage(ZipPackage(File(filePath)), null) }
+                // TODO: 2021/5/27 允许自定义一些配置
+                withContext(Dispatchers.IO) {
+                    mgr.installPackage(
+                        ZipPackage(File(filePath)),
+                        null,
+                        null,
+                        null
+                    )
+                }
             } catch (e: Exception) {
                 _progressState.emit(ProgressDialogState.Failed("安装失败", "安装过程中出现错误"))
                 return@launch
@@ -240,5 +263,132 @@ class PackageManagerViewModel(
             _progressState.emit(ProgressDialogState.Finished("安装完成"))
             loadPackages()
         }
+    }
+
+
+    val updatablePackages: MutableStateFlow<Set<String>> = MutableStateFlow(emptySet())
+
+    val checkingUpdateState: MutableStateFlow<CheckingUpdateState> =
+        MutableStateFlow(CheckingUpdateState.Init)
+
+    sealed class CheckingUpdateState {
+        object Init : CheckingUpdateState()
+        object Checking : CheckingUpdateState()
+        object Succeed : CheckingUpdateState()
+        data class Failed(val message: String) : CheckingUpdateState()
+    }
+
+    private suspend fun checkUpdate() {
+        checkingUpdateState.emit(CheckingUpdateState.Checking)
+        val updatable = mutableSetOf<String>()
+
+        val latestPackages = try {
+            packageCDNRepository.getAllPackages().map {
+                it to PackageManifest.fromJson(it.getManifest())
+            }
+        } catch (e: Exception) {
+            checkingUpdateState.emit(CheckingUpdateState.Failed("在线获取分包失败"))
+            return
+        }
+
+        cachedPackages.forEach { installed ->
+            try {
+                latestPackages.forEach { latest ->
+                    val installationInfo = installed.getInstallationInfo()
+
+                    if (installationInfo.packageId == latest.first.uuid) {
+                        val manifest = installed.getManifest()
+                        if (manifest.packVersionCode < latest.second.packVersionCode) {
+                            updatable.add(installationInfo.internalId)
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "checkUpdate", e)
+            }
+        }
+
+        updatablePackages.emit(updatable)
+        checkingUpdateState.emit(CheckingUpdateState.Succeed)
+    }
+
+
+    var updateState by mutableStateOf<UpdateState?>(null)
+        private set
+
+    sealed class UpdateState {
+        object Parsing : UpdateState()
+        data class Downloading(val progress: androidx.compose.runtime.State<Float>) : UpdateState()
+        object Installing : UpdateState()
+        object Succeed : UpdateState()
+        object Failed : UpdateState()
+    }
+
+    fun updatePackage(uuid: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            updateState = UpdateState.Parsing
+            val pkg = cachedPackages.find {
+                it.getInstallationInfo().internalId == uuid
+            } ?: run {
+                updateState = UpdateState.Failed
+                return@launch
+            }
+            val pkgId = pkg.getInstallationInfo().packageId
+            val onlinePkg = packageCDNRepository.getAllPackages().find {
+                it.uuid == pkgId
+            } ?: run {
+                updateState = UpdateState.Failed
+                return@launch
+            }
+            val progress = mutableStateOf(0f)
+            updateState = UpdateState.Downloading(progress)
+            delay(1000)
+            // TODO
+            updateState = UpdateState.Installing
+            delay(1000)
+            updateState = UpdateState.Succeed
+        }
+    }
+
+    var sharePackageState by mutableStateOf<SharePackageState?>(null)
+        private set
+
+    sealed class SharePackageState {
+        object EditName : SharePackageState()
+        object Processing : SharePackageState()
+        data class Succeed(val file: File) : SharePackageState()
+        object Failed : SharePackageState()
+    }
+
+    fun sharePackage(uuid: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            sharePackageState = SharePackageState.EditName
+            val name = waitForShareName()
+            val pkg = mgr.getInstalledPackage(uuid) ?: return@launch
+
+            val outputFile = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).resolve("$name.zip")
+
+            sharePackageState = SharePackageState.Processing
+            try {
+                ZipFile(outputFile).addFolder(pkg.packageDirectory)
+            } catch (e: Exception) {
+                sharePackageState = SharePackageState.Failed
+                e.printStackTrace()
+                return@launch
+            }
+            sharePackageState = SharePackageState.Succeed(outputFile)
+        }
+    }
+
+    private var cont: Continuation<String>? = null
+
+    private suspend fun waitForShareName(): String {
+        return suspendCoroutine<String> {
+            cont = it
+        }
+    }
+
+    fun setShareName(name: String) {
+        cont?.resume(name)
     }
 }

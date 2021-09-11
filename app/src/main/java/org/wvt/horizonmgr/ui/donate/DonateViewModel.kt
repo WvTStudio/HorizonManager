@@ -1,26 +1,27 @@
 package org.wvt.horizonmgr.ui.donate
 
 import android.util.Log
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import org.wvt.horizonmgr.DependenciesContainer
 import org.wvt.horizonmgr.webapi.NetworkException
+import org.wvt.horizonmgr.webapi.mgrinfo.MgrInfoModule
+import javax.inject.Inject
 import kotlin.math.log
 
 private const val TAG = "DonateVMLogger"
 
-class DonateViewModel(
-    dependencies: DependenciesContainer
+@HiltViewModel
+class DonateViewModel @Inject constructor(
+    private val mgrInfoModule: MgrInfoModule
 ) : ViewModel() {
-    private val mgrInfo = dependencies.mgrInfo
 
     data class DonateItem(
         val name: String,
@@ -30,14 +31,14 @@ class DonateViewModel(
     private val _donates = MutableStateFlow(emptySet<DonateItem>())
     val donates: StateFlow<Set<DonateItem>> = _donates.asStateFlow()
 
-    val alipayQrCodeURL = mgrInfo.getAlipayQRCodeURL()
-    val wechatQrCodeURL = mgrInfo.getWechatQRCodeURL()
+    val alipayQrCodeURL = mgrInfoModule.getAlipayQRCodeURL()
+    val wechatQrCodeURL = mgrInfoModule.getWechatQRCodeURL()
 
     fun refresh() {
         viewModelScope.launch(Dispatchers.IO) {
             val result = mutableSetOf<DonateItem>()
             try {
-                mgrInfo.getDonateList().forEach {
+                mgrInfoModule.getDonateList().forEach {
                     result.add(
                         DonateItem(
                             name = it.donorName,
