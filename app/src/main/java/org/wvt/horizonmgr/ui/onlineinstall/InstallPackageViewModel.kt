@@ -27,7 +27,6 @@ class InstallPackageViewModel @Inject constructor(
     private val packRepository: OfficialPackageCDNRepository,
     private val downloader: OfficialCDNPackageDownloader,
     private val mgr: HorizonManager
-
 ) : ViewModel() {
     sealed class State {
         object Loading : State()
@@ -113,7 +112,6 @@ class InstallPackageViewModel @Inject constructor(
 
     var totalProgress = MutableStateFlow<Float>(0f)
     val mergeState = MutableStateFlow<StepState>(StepState.Waiting)
-    val downloadState = MutableStateFlow<StepState>(StepState.Waiting)
     val installState = MutableStateFlow<StepState>(StepState.Waiting)
 
     fun startInstall() {
@@ -121,7 +119,9 @@ class InstallPackageViewModel @Inject constructor(
             val pack = selectedPackage ?: return@launch
 
             val downloadProgress = mutableStateOf(0f)
-            downloadState.emit(StepState.Running(downloadProgress))
+            val downloadState = mutableStateOf<StepState>(StepState.Running(downloadProgress))
+
+            downloadSteps.emit(listOf(DownloadStep(0, downloadState)))
 
             val task = downloader.download(pack)
 
@@ -136,11 +136,12 @@ class InstallPackageViewModel @Inject constructor(
             } catch (e: Exception) {
                 Log.e(TAG, "下载分包失败", e)
                 // TODO: 2021/2/20 添加显示
-                downloadState.emit(StepState.Error(e.message ?: "Unknown Error"))
+                downloadState.value = StepState.Error(e.message ?: "Unknown Error")
                 return@launch
             }
             delay(500)
-            downloadState.emit(StepState.Complete)
+            downloadState.value = StepState.Complete
+            mergeState.emit(StepState.Complete)
             installState.emit(StepState.Running(mutableStateOf(0f)))
             try {
                 mgr.installPackage(
@@ -169,8 +170,4 @@ class InstallPackageViewModel @Inject constructor(
     }
 
     val downloadSteps = MutableStateFlow<List<DownloadStep>>(emptyList())
-
-    fun startInstall2() {
-        // TODO: 2021/6/21 Multi chunk download
-    }
 }

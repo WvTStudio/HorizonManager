@@ -1,9 +1,5 @@
 package org.wvt.horizonmgr.ui.onlineinstall
 
-import android.content.ComponentName
-import android.content.Intent
-import android.content.ServiceConnection
-import android.os.IBinder
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.*
 import androidx.compose.foundation.layout.*
@@ -15,13 +11,10 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import org.wvt.horizonmgr.service.hzpack.recommendDescription
-import org.wvt.horizonmgr.services.OnlinePackageInstallService
 import org.wvt.horizonmgr.ui.components.ErrorPage
 import org.wvt.horizonmgr.ui.pacakgemanager.ManifestSection
 import org.wvt.horizonmgr.ui.theme.AppBarBackgroundColor
-import org.wvt.horizonmgr.webapi.pack.OfficialCDNPackage
 
 private enum class Screen {
     CHOOSE_PACKAGE, EDIT_NAME, INSTALL
@@ -45,7 +38,7 @@ fun OnlineInstallScreen(
         onDispose { }
     }
 
-    val context = LocalContext.current.applicationContext
+    /*val context = LocalContext.current.applicationContext
 
     var serviceBinder by remember { mutableStateOf<OnlinePackageInstallService.MyBinder?>(null) }
 
@@ -65,12 +58,14 @@ fun OnlineInstallScreen(
                 serviceBinder = null
             }
         }, 0)
-    }
+    }*/
 
     BackHandler {
         when (screen) {
             Screen.CHOOSE_PACKAGE -> onCancel()
-            Screen.EDIT_NAME -> { screen = Screen.CHOOSE_PACKAGE }
+            Screen.EDIT_NAME -> {
+                screen = Screen.CHOOSE_PACKAGE
+            }
             Screen.INSTALL -> {
                 viewModel.cancelInstall()
             }
@@ -113,39 +108,44 @@ fun OnlineInstallScreen(
                 transitionSpec = {
                     ContentTransform(
                         targetContentEnter =
-                        if (targetState > initialState) fadeIn() + slideIntoContainer(AnimatedContentScope.SlideDirection.Start)
+                        if (targetState > initialState) fadeIn() + slideIntoContainer(
+                            AnimatedContentScope.SlideDirection.Start
+                        )
                         else fadeIn() + slideIntoContainer(AnimatedContentScope.SlideDirection.End),
                         initialContentExit =
-                        if (targetState > initialState) fadeOut() + slideOutOfContainer(AnimatedContentScope.SlideDirection.Start)
+                        if (targetState > initialState) fadeOut() + slideOutOfContainer(
+                            AnimatedContentScope.SlideDirection.Start
+                        )
                         else fadeOut() + slideOutOfContainer(AnimatedContentScope.SlideDirection.End)
                     )
                 }
             ) {
                 when (it) {
-                    Screen.CHOOSE_PACKAGE -> Crossfade(state) { state ->
-                        when (state) {
-                            InstallPackageViewModel.State.Loading -> Box(
-                                Modifier.fillMaxSize(),
-                                Alignment.Center
-                            ) {
-                                CircularProgressIndicator()
-                            }
-                            InstallPackageViewModel.State.Succeed -> ChoosePackage(
-                                modifier = Modifier.fillMaxSize(),
-                                items = packages,
-                                onChoose = {
-                                    chosenIndex = it
-                                    viewModel.selectPackage(packages[it].uuid)
-                                    screen = Screen.EDIT_NAME
+                    Screen.CHOOSE_PACKAGE ->
+                        Crossfade(state) { state ->
+                            when (state) {
+                                InstallPackageViewModel.State.Loading -> Box(
+                                    Modifier.fillMaxSize(),
+                                    Alignment.Center
+                                ) {
+                                    CircularProgressIndicator()
                                 }
-                            )
-                            is InstallPackageViewModel.State.Error -> ErrorPage(
-                                modifier = Modifier.fillMaxSize(),
-                                message = { Text(state.message) },
-                                onRetryClick = { viewModel.getPackages() }
-                            )
+                                InstallPackageViewModel.State.Succeed -> ChoosePackage(
+                                    modifier = Modifier.fillMaxSize(),
+                                    items = packages,
+                                    onChoose = {
+                                        chosenIndex = it
+                                        viewModel.selectPackage(packages[it].uuid)
+                                        screen = Screen.EDIT_NAME
+                                    }
+                                )
+                                is InstallPackageViewModel.State.Error -> ErrorPage(
+                                    modifier = Modifier.fillMaxSize(),
+                                    message = { Text(state.message) },
+                                    onRetryClick = { viewModel.getPackages() }
+                                )
+                            }
                         }
-                    }
                     Screen.EDIT_NAME -> Column(
                         Modifier
                             .fillMaxSize()
@@ -164,7 +164,7 @@ fun OnlineInstallScreen(
                             }
                         )
                         val manifest by viewModel.selectedPackageManifest.collectAsState()
-                        Crossfade(manifest) {
+                        AnimatedContent(manifest) {
                             if (it == null) {
                                 Box(modifier = Modifier.fillMaxSize(), Alignment.Center) {
                                     CircularProgressIndicator()

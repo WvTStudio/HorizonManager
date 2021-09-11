@@ -1,9 +1,6 @@
 package org.wvt.horizonmgr.ui.onlineinstall
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Extension
@@ -11,7 +8,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import org.wvt.horizonmgr.ui.theme.PreviewTheme
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -43,5 +42,13 @@ fun EditName(
                 onClick = { onConfirm(customName.text) }
             ) { Text("下一步") }
         }
+    }
+}
+
+@Preview
+@Composable
+private fun Preview() {
+    PreviewTheme {
+        EditName(modifier = Modifier.wrapContentHeight(), name = "Example Package", version = "example version", onConfirm = {})
     }
 }

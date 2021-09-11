@@ -9,6 +9,17 @@ import org.wvt.horizonmgr.webapi.pack.OfficialCDNPackage
 import java.io.File
 import kotlin.coroutines.EmptyCoroutineContext
 
+/**
+ * 下载一个 OfficialCDN Package 需要以下步骤：
+ * 要求每一步都可以回显
+ * 解析：
+ *  知道分包的 UUID
+ *  获取分包文件的 Chunk
+ * 下载：
+ *  下载每一个 Chunk
+ *  合并 Chunk 为一个文件
+ * 安装
+ */
 class OfficialCDNPackageDownloader(context: Context) {
     private val downloadDir = context.filesDir.resolve("downloads")
         get() = field.also { if (!it.exists()) it.mkdirs() }
@@ -148,7 +159,7 @@ class PackageDownloadTask internal constructor(
                 val chunkFile = File(zipFile.absolutePath + chunk.index)
                 chunkFile.outputStream().use { stream ->
                     val task = CoroutineDownloader.download(chunk.url, stream)
-// TODO: 2021/6/11  
+                    // TODO: 2021/6/11
                 }
             }
         }
