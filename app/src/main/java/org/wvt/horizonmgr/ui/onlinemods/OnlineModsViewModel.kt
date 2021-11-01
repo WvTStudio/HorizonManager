@@ -238,10 +238,10 @@ class OnlineModsViewModel @Inject constructor(
             var processed = mods.sorted(sortMode)
             if (filterText != null) {
                 processed = processed.filter {
-                    it.title.toLowerCase(Locale.ROOT)
-                        .contains(filterText.toLowerCase(Locale.ROOT)) ||
-                            it.description.toLowerCase(Locale.ROOT)
-                                .contains(filterText.toLowerCase(Locale.ROOT))
+                    it.title.lowercase()
+                        .contains(filterText.lowercase()) ||
+                            it.description.lowercase()
+                                .contains(filterText.lowercase())
                 }
             }
             val mapped = processed.map {
@@ -268,10 +268,10 @@ class OnlineModsViewModel @Inject constructor(
             var processed = mods.sorted(sortMode)
             if (filterText != null) {
                 processed = processed.filter {
-                    it.name.toLowerCase(Locale.ROOT)
-                        .contains(filterText.toLowerCase(Locale.ROOT)) ||
-                            it.description.toLowerCase(Locale.ROOT)
-                                .contains(filterText.toLowerCase(Locale.ROOT))
+                    it.name.lowercase()
+                        .contains(filterText.lowercase()) ||
+                            it.description.lowercase()
+                                .contains(filterText.lowercase())
                 }
             }
             val mapped = processed.map {

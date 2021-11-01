@@ -20,7 +20,7 @@ class InstallPackageResultContract : ActivityResultContract<Context, Boolean>() 
         const val SUCCEED = 1
     }
 
-    override fun createIntent(context: Context, input: Context?): Intent {
+    override fun createIntent(context: Context, input: Context): Intent {
         return Intent(context, InstallPackageActivity::class.java)
     }
 

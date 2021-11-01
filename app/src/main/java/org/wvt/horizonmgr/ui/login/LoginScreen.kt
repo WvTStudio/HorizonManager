@@ -61,7 +61,7 @@ fun LoginScreen(
     var screen by rememberSaveable { mutableStateOf(Screen.LOGIN) }
 
     fun back() {
-        when(screen) {
+        when (screen) {
             Screen.REGISTER -> screen = Screen.LOGIN
             Screen.LOGIN -> onCancel()
         }
@@ -99,8 +99,8 @@ fun LoginScreen(
         // Login Page
         AnimatedVisibility(
             visible = screen == Screen.LOGIN,
-            enter = fadeIn() + slideInHorizontally({ -80 }),
-            exit = fadeOut() + slideOutHorizontally({ -80 })
+            enter = fadeIn() + slideInHorizontally(initialOffsetX = { -80 }),
+            exit = fadeOut() + slideOutHorizontally(targetOffsetX = { -80 })
         ) {
             LoginPage(onLoginClicked = { account, password ->
                 viewModel.login(account, password, snackbarHostState, onLoginSuccess)
@@ -112,8 +112,8 @@ fun LoginScreen(
         // RegisterPage
         AnimatedVisibility(
             visible = screen == Screen.REGISTER,
-            enter = fadeIn() + slideInHorizontally({ 80 }),
-            exit = fadeOut() + slideOutHorizontally({ 80 })
+            enter = fadeIn() + slideInHorizontally(initialOffsetX = { 80 }),
+            exit = fadeOut() + slideOutHorizontally(targetOffsetX = { 80 })
         ) {
             RegisterPage(
                 fabState = fabState,

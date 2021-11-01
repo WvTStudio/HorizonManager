@@ -12,8 +12,8 @@ import androidx.navigation.NavType
 import androidx.navigation.activity
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.navArgument
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import org.wvt.horizonmgr.BuildConfig
 import org.wvt.horizonmgr.ui.article.ArticleContentActivity
 import org.wvt.horizonmgr.ui.article.ArticleContentScreen

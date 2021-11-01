@@ -11,6 +11,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
+import coil.annotation.ExperimentalCoilApi
 import coil.compose.rememberImagePainter
 import org.wvt.horizonmgr.ui.theme.PreviewTheme
 
@@ -52,6 +53,7 @@ private fun QRDialog(
     }
 }
 
+@OptIn(ExperimentalCoilApi::class)
 @Composable
 private fun QRDialogContent(qrUrl: String) {
     Card(

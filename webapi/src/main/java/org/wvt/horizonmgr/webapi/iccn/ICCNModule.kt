@@ -55,8 +55,8 @@ class ICCNModule {
             client.submitForm<String>(
                 url = "https://adodoz.cn/app_login.php",
                 formParameters = Parameters.build {
-                    set("username", account)
-                    set("password", password)
+                    append("username", account)
+                    append("password", password)
                 }
             )
         } catch (e: IOException) {
@@ -211,12 +211,10 @@ class ICCNModule {
         // Step 2 - Register
         val regResponse = try {
             client.post<HttpResponse>("https://forum.adodoz.cn/register") {
-                headers {
-                    set("referer", "https://adodoz.cn/")
-                    set("cookie", session)
-                    set("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.106 Safari/537.36")
-                    set("x-csrf-token", token)
-                }
+                header("referer", "https://adodoz.cn/")
+                header("cookie", session)
+                header("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.106 Safari/537.36")
+                header("x-csrf-token", token)
                 contentType(ContentType.Application.Json)
                 body = Json.encodeToString(RegisterJson(username, email, password))
             }

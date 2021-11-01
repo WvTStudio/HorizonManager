@@ -58,7 +58,7 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.0.1"
+        kotlinCompilerExtensionVersion = "1.1.0-beta01"
     }
     /*lint {
         disable("InvalidFragmentVersionForActivityResult")
@@ -84,21 +84,21 @@ dependencies {
     implementation(project(":webapi"))
     implementation(project(":service"))
 
-    implementation("androidx.core:core-ktx:1.6.0")
-    implementation("androidx.activity:activity-ktx:1.3.1")
-    implementation("androidx.activity:activity-compose:1.3.1")
+    implementation("androidx.core:core-ktx:1.7.0")
+    implementation("androidx.activity:activity-ktx:1.4.0")
+    implementation("androidx.activity:activity-compose:1.4.0")
 
-    implementation("androidx.appcompat:appcompat:1.4.0-alpha03")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.1")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:1.0.0-alpha07")
+    implementation("androidx.appcompat:appcompat:1.4.0-rc01")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.0")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.4.0")
     implementation("com.google.android.material:material:1.4.0")
 
-    implementation("androidx.navigation:navigation-compose:2.4.0-alpha07")
+    implementation("androidx.navigation:navigation-compose:2.4.0-beta01")
 
-    implementation("androidx.work:work-runtime-ktx:2.7.0-alpha05")
+    implementation("androidx.work:work-runtime-ktx:2.7.0")
 
 
-    val hiltVersion = "2.38.1"
+    val hiltVersion = "2.40"
     implementation("com.google.dagger:hilt-android:$hiltVersion")
     kapt("com.google.dagger:hilt-android-compiler:$hiltVersion")
     
@@ -115,7 +115,7 @@ dependencies {
     implementation("com.google.accompanist:accompanist-flowlayout:$accompanistVersion")
     implementation("com.google.accompanist:accompanist-placeholder:$accompanistVersion")
 
-    val composeVersion = "1.0.1"
+    val composeVersion = "1.1.0-beta01"
     implementation("androidx.compose.compiler:compiler:$composeVersion")
     implementation("androidx.compose.runtime:runtime:$composeVersion")
     implementation("androidx.compose.foundation:foundation:$composeVersion")
@@ -130,10 +130,9 @@ dependencies {
     implementation("androidx.compose.ui:ui-test:$composeVersion")
 
     implementation(platform("com.google.firebase:firebase-bom:26.1.0"))
-//    implementation("com.google.firebase:firebase-analytics-ktx")
-    implementation("com.google.firebase:firebase-crashlytics-ktx")
+    implementation("com.google.firebase:firebase-crashlytics-ktx:18.2.4")
 
-    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.2.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.3.1")
 
     val markwonVersion = "4.6.2"
     implementation("io.noties.markwon:core:$markwonVersion")

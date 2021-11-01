@@ -29,8 +29,8 @@ fun MaterialBanner(
     Box(modifier) {
         AnimatedVisibility(
             visible = visible,
-            enter = expandVertically(Alignment.Bottom),
-            exit = shrinkVertically(Alignment.Bottom)
+            enter = expandVertically(expandFrom = Alignment.Bottom),
+            exit = shrinkVertically(shrinkTowards = Alignment.Bottom)
         ) {
             Card(Modifier.padding(16.dp), backgroundColor = backgroundColor, contentColor = contentColor) {
                 Column(Modifier.fillMaxWidth()) {

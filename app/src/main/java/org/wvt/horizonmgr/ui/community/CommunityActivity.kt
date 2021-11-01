@@ -15,7 +15,7 @@ import org.wvt.horizonmgr.ui.theme.AndroidHorizonManagerTheme
 class CommunityActivity : AppCompatActivity() {
     private val viewModel by viewModels<CommunityViewModel> {
         object : ViewModelProvider.Factory {
-            override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 return modelClass.getConstructor(ContextFactory::class.java).newInstance(ContextFactory {
                     this@CommunityActivity
                 })

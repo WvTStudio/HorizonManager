@@ -220,7 +220,7 @@ class FileSelectorViewModel @Inject constructor(
         }
         val files = folder.listFiles() ?: throw CannotReadFolderException(folder.absolutePath)
         val sorted = files.asSequence()
-            .sortedBy { it.name.toLowerCase(Locale.ROOT) }
+            .sortedBy { it.name.lowercase() }
             .sortedByDescending { it.isDirectory }
             .toList()
         mListFiles = sorted

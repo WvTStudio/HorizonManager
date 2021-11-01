@@ -22,14 +22,14 @@ android {
                 add(file("proguard-rules.pro"))
             }
         }
-        val beta by creating {
+        create("beta") {
             initWith(release)
             proguardFiles.apply {
                 add(getDefaultProguardFile("proguard-android-optimize.txt"))
                 add(file("proguard-rules.pro"))
             }
         }
-        val alpha by creating {
+        create("alpha") {
             initWith(release)
             proguardFiles.apply {
                 add(getDefaultProguardFile("proguard-android-optimize.txt"))
@@ -47,10 +47,10 @@ android {
 }
 
 dependencies {
-    implementation("androidx.core:core-ktx:1.6.0")
+    implementation("androidx.core:core-ktx:1.7.0")
     implementation("androidx.appcompat:appcompat:1.3.1")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.2")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.2")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.3")
 }
