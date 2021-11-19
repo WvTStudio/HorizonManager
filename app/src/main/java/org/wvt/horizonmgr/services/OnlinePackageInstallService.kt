@@ -15,10 +15,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import org.wvt.horizonmgr.R
 import org.wvt.horizonmgr.service.hzpack.HorizonManager
-import org.wvt.horizonmgr.ui.onlineinstall.DownloadStep
 import org.wvt.horizonmgr.ui.onlineinstall.InstallPackageActivity
-import org.wvt.horizonmgr.ui.onlineinstall.InstallPackageViewModel
-import org.wvt.horizonmgr.ui.onlineinstall.StepState
+import org.wvt.horizonmgr.ui.onlineinstall.InstallPackageViewModel.*
 import org.wvt.horizonmgr.utils.OfficialCDNPackageDownloader
 import org.wvt.horizonmgr.webapi.pack.OfficialPackageCDNRepository
 import javax.inject.Inject
@@ -134,8 +132,7 @@ class OnlinePackageInstallService : Service() {
 
     inner class MyBinder : Binder() {
         inner class Task {
-            val state =
-                MutableStateFlow<InstallPackageViewModel.State>(InstallPackageViewModel.State.Loading)
+            val state = MutableStateFlow<State>(State.Loading)
             var totalProgress = MutableStateFlow<Float>(0f)
             val downloadSteps = MutableStateFlow<List<DownloadStep>>(emptyList())
             val mergeState = MutableStateFlow<StepState>(StepState.Waiting)

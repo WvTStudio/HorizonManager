@@ -16,17 +16,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.wvt.horizonmgr.ui.theme.PreviewTheme
 
-sealed class StepState {
-    object Waiting : StepState()
-    class Running(val progress: State<Float>) : StepState()
-    class Error(val message: String) : StepState()
-    object Complete : StepState()
-}
-
-data class DownloadStep(
-    val chunk: Int,
-    val state: State<StepState>
-)
 
 /**
  * 分包经过解析、分区块下载、合并区块、安装几个步骤
@@ -35,9 +24,9 @@ data class DownloadStep(
 @Composable
 fun InstallProgress(
     totalProgress: Float,
-    downloadSteps: List<DownloadStep>,
-    mergeState: StepState,
-    installState: StepState,
+    downloadSteps: List<InstallPackageViewModel.DownloadStep>,
+    mergeState: InstallPackageViewModel.StepState,
+    installState: InstallPackageViewModel.StepState,
     onCancelClick: () -> Unit,
     onCompleteClick: () -> Unit
 ) {
@@ -62,7 +51,7 @@ fun InstallProgress(
                     .fillMaxSize()
             ) {
                 itemsIndexed(downloadSteps) { index, item ->
-                    DownloadStep(remember { DownloadStep(index, item.state)})
+                    DownloadStep(remember { InstallPackageViewModel.DownloadStep(index, item.state)})
                 }
                 item {
                     MergeStep(mergeState)

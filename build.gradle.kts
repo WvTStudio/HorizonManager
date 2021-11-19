@@ -10,7 +10,7 @@ buildscript {
         classpath("com.google.firebase:firebase-crashlytics-gradle:2.8.0")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.5.31")
         classpath(kotlin("serialization", version = "1.5.31"))
-        classpath("com.google.dagger:hilt-android-gradle-plugin:2.38.1")
+        classpath("com.google.dagger:hilt-android-gradle-plugin:2.40.1")
     }
 }
 

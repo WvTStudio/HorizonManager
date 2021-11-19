@@ -1,15 +1,10 @@
 package org.wvt.horizonmgr.utils
 
 import android.content.Context
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
+import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.conflate
-import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.withContext
 import org.wvt.horizonmgr.service.ProgressDeferred
 import org.wvt.horizonmgr.service.mod.ZipMod
 import java.io.File
@@ -44,12 +39,22 @@ class ModDownloader(context: Context) {
             private val channel = Channel<Float>(Channel.UNLIMITED)
             private val job = scope.async<File> {
                 val file = downloadModsDir.resolve("$name.zip")
-                val output = file.outputStream()
-                val task = CoroutineDownloader.download(url, output)
-                task.progressChannel().receiveAsFlow().conflate().collect {
-                    channel.send(it)
+                file.outputStream().use { output ->
+                    val task = FileDownloader.newTask(url)
+                    val total = task.connect()
+                    task.setOutput(output)
+                    val state = task.start()
+                    val job = launch {
+                        state.collect {
+                            channel.send((it.toDouble() / total.toDouble()).toFloat())
+                        }
+                    }
+                    try {
+                        task.await()
+                    } finally {
+                        job.cancel()
+                    }
                 }
-                task.await()
                 return@async file
             }
 

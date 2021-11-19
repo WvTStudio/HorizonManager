@@ -5,9 +5,13 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import org.wvt.horizonmgr.webapi.pack.OfficialCDNPackage
 import java.io.File
 import kotlin.coroutines.EmptyCoroutineContext
+
+private const val TAG = "OfficialCDNPackageDownl"
 
 /**
  * 下载一个 OfficialCDN Package 需要以下步骤：
@@ -32,50 +36,108 @@ class OfficialCDNPackageDownloader(context: Context) {
         val graphicsFile: File
     )
 
-    fun download(pack: OfficialCDNPackage) =
-        object : org.wvt.horizonmgr.service.ProgressDeferred<Float, DownloadResult> {
-            private val scope = CoroutineScope(EmptyCoroutineContext + Dispatchers.IO)
-            private val channel = Channel<Float>(Channel.UNLIMITED)
-            private val job = scope.async {
-                val zipFile = downloadPacksDir.resolve("${pack.uuid}.zip")
-                val graphicsFile = downloadDir.resolve("${pack.uuid}_graphics.zip")
+    fun download(pack: OfficialCDNPackage): DownloadTask {
+        return DownloadTask(pack)
+    }
 
-                channel.send(0f)
+    inner class DownloadTask(private val pack: OfficialCDNPackage) {
+        private val scope = CoroutineScope(EmptyCoroutineContext + Dispatchers.IO)
 
-                // 这个比较小就不算进度了吧
-                val graphicsJob = async {
-                    graphicsFile.outputStream().use {
-                        CoroutineDownloader.download(pack.graphicsUrl, it).await()
+        // Chunk index, progress
+        private val _progress = MutableStateFlow<Pair<Long, Long>>(0L to -1L)
+        val progress = _progress.asStateFlow()
+
+        private lateinit var job: Deferred<DownloadResult>
+
+        private val zipFile = downloadPacksDir.resolve("${pack.uuid}.zip")
+        private val graphicsFile = downloadDir.resolve("${pack.uuid}_graphics.zip")
+
+        init {
+            start()
+        }
+
+        private fun start() {
+            job = scope.async {
+                coroutineScope {
+                    // Graphics
+                    launch {
+                        downloadGraphic()
+                    }
+
+                    launch {
+                        val files = downloadChunks()
+                        // Merge
+                        mergeFiles(files)
                     }
                 }
+                return@async DownloadResult(zipFile, graphicsFile)
+            }
+        }
 
-                val packJob = async {
-                    // TODO: Use multi-thread download
-                    zipFile.outputStream().use { stream ->
-                        // 遍历区块
-                        pack.chunks.sortedBy { it.index }.forEach { chunk ->
-                            val task = CoroutineDownloader.download(chunk.url, stream)
-                            task.progressChannel().receiveAsFlow().conflate().collect {
-                                channel.send((chunk.index + it) / pack.chunks.size)
+        private suspend fun downloadGraphic() {
+            val task = FileDownloader.newTask(pack.graphicsUrl)
+            graphicsFile.outputStream().use {
+                task.setOutput(it)
+                task.connect()
+                task.start()
+                task.await()
+            }
+        }
+
+        private suspend fun downloadChunks(): List<File> {
+            val files = pack.chunks.map { File(zipFile.absolutePath + ".part_${it.index}") }
+            var total: Long = 0L
+
+            // Download to files
+            val tasks = pack.chunks.map { chunk ->
+                val task = FileDownloader.newTask(chunk.url)
+                val size = task.connect()
+                total += size
+                task
+            }
+
+            val mutex = Mutex()
+            val downloaded = LongArray(tasks.size) { 0L }
+
+            coroutineScope {
+                tasks.forEachIndexed { index, task ->
+                    launch {
+                        val file = files[index]
+                        val output = file.outputStream().buffered()
+                        task.setOutput(output)
+                        val state = task.start()
+                        val job = launch {
+                            state.collect {
+                                mutex.withLock {
+                                    downloaded[index] = it
+                                    _progress.emit(downloaded.sum() to total)
+                                }
+                                delay(500)
                             }
-                            task.await() // 等待该区块下载完成后再下载其他区块
+                        }
+                        try {
+                            task.await()
+                        } finally {
+                            job.cancel()
+                            output.close()
                         }
                     }
                 }
-
-                graphicsJob.await()
-                packJob.await()
-                channel.close()
-                return@async DownloadResult(zipFile, graphicsFile)
             }
 
-            override suspend fun await(): DownloadResult = job.await()
-
-            override suspend fun progressChannel(): ReceiveChannel<Float> = channel
+            return files
         }
 
-    fun download2(pack: OfficialCDNPackage): PackageDownloadTask {
-        return PackageDownloadTask(pack, downloadPacksDir, downloadDir)
+        private suspend fun mergeFiles(files: List<File>) = withContext(Dispatchers.IO) {
+            zipFile.outputStream().use { output ->
+                files.forEach {
+                    output.write(it.readBytes())
+                    it.delete()
+                }
+            }
+        }
+
+        suspend fun await(): DownloadResult = job.await()
     }
 }
 
@@ -85,8 +147,10 @@ class OfficialCDNPackageDownloader(context: Context) {
  * 下载区块文件，汇报进度
  * 合并区块文件
  * 完成
+ * TODO: Should I complete this?
  */
-class PackageDownloadTask internal constructor(
+@Deprecated("Not implemented")
+private class PackageDownloadTask internal constructor(
     private val pack: OfficialCDNPackage,
     private val downloadPacksDir: File,
     private val downloadDir: File
@@ -148,8 +212,7 @@ class PackageDownloadTask internal constructor(
         val state = DownloadState.Downloading(0, downloaded.asStateFlow())
 
         graphicsFile.outputStream().use {
-            val task = CoroutineDownloader.download(pack.graphicsUrl, it)
-            // TODO: 2021/6/11  
+            // TODO: 2021/6/11
         }
     }
 
@@ -158,7 +221,6 @@ class PackageDownloadTask internal constructor(
             launch {
                 val chunkFile = File(zipFile.absolutePath + chunk.index)
                 chunkFile.outputStream().use { stream ->
-                    val task = CoroutineDownloader.download(chunk.url, stream)
                     // TODO: 2021/6/11
                 }
             }
