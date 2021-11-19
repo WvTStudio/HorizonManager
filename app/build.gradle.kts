@@ -17,8 +17,8 @@ android {
         applicationId = "org.wvt.horizonmgr"
         minSdk = 21
         targetSdk = 31
-        versionCode = 25
-        versionName = "2.1.3"
+        versionCode = 24
+        versionName = "2.1.2"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
