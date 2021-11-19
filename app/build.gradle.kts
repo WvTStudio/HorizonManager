@@ -58,7 +58,7 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.1.0-beta01"
+        kotlinCompilerExtensionVersion = "1.1.0-beta03"
     }
     /*lint {
         disable("InvalidFragmentVersionForActivityResult")
@@ -88,21 +88,21 @@ dependencies {
     implementation("androidx.activity:activity-ktx:1.4.0")
     implementation("androidx.activity:activity-compose:1.4.0")
 
-    implementation("androidx.appcompat:appcompat:1.4.0-rc01")
+    implementation("androidx.appcompat:appcompat:1.4.0")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.0")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.4.0")
     implementation("com.google.android.material:material:1.4.0")
 
-    implementation("androidx.navigation:navigation-compose:2.4.0-beta01")
+    implementation("androidx.navigation:navigation-compose:2.4.0-beta02")
 
-    implementation("androidx.work:work-runtime-ktx:2.7.0")
+    implementation("androidx.work:work-runtime-ktx:2.7.1")
 
 
-    val hiltVersion = "2.40"
+    val hiltVersion = "2.40.1"
     implementation("com.google.dagger:hilt-android:$hiltVersion")
     kapt("com.google.dagger:hilt-android-compiler:$hiltVersion")
     
-    implementation("androidx.hilt:hilt-navigation-compose:1.0.0-alpha03")
+    implementation("androidx.hilt:hilt-navigation-compose:1.0.0-beta01")
     implementation("androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha03")
 
     implementation("io.coil-kt:coil-compose:1.3.2")
@@ -115,7 +115,7 @@ dependencies {
     implementation("com.google.accompanist:accompanist-flowlayout:$accompanistVersion")
     implementation("com.google.accompanist:accompanist-placeholder:$accompanistVersion")
 
-    val composeVersion = "1.1.0-beta01"
+    val composeVersion = "1.1.0-beta03"
     implementation("androidx.compose.compiler:compiler:$composeVersion")
     implementation("androidx.compose.runtime:runtime:$composeVersion")
     implementation("androidx.compose.foundation:foundation:$composeVersion")
@@ -141,7 +141,7 @@ dependencies {
     implementation("io.noties.markwon:image-coil:$markwonVersion")
     implementation("io.noties.markwon:syntax-highlight:$markwonVersion")
 
-    implementation("net.lingala.zip4j:zip4j:2.9.0")
+    implementation("net.lingala.zip4j:zip4j:2.9.1")
 
     testImplementation(kotlin("test-junit5"))
     testImplementation("junit:junit:4.13.2")
