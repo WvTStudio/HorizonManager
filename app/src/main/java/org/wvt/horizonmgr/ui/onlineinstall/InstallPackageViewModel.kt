@@ -1,6 +1,7 @@
 package org.wvt.horizonmgr.ui.onlineinstall
 
 import android.util.Log
+import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -28,6 +29,28 @@ class InstallPackageViewModel @Inject constructor(
     private val downloader: OfficialCDNPackageDownloader,
     private val mgr: HorizonManager
 ) : ViewModel() {
+
+    sealed class StepState {
+        object Waiting : StepState()
+        class Running(val progress: androidx.compose.runtime.State<Float>) : StepState()
+        class Error(val message: String) : StepState()
+        object Complete : StepState()
+    }
+
+    data class DownloadStep(
+        val chunk: Int,
+        val state: androidx.compose.runtime.State<State>
+    ) {
+        sealed class State {
+            object Waiting : State()
+            class Running(val progress: androidx.compose.runtime.State<Long>, val total: Long) :
+                State()
+
+            class Error(val message: String) : State()
+            object Complete : State()
+        }
+    }
+
     sealed class State {
         object Loading : State()
         object Succeed : State()
@@ -110,25 +133,31 @@ class InstallPackageViewModel @Inject constructor(
 
     private var installJob: Job? = null
 
-    var totalProgress = MutableStateFlow<Float>(0f)
+    var totalProgress = MutableStateFlow(0f)
     val mergeState = MutableStateFlow<StepState>(StepState.Waiting)
     val installState = MutableStateFlow<StepState>(StepState.Waiting)
 
     fun startInstall() {
         viewModelScope.launch(Dispatchers.IO) {
             val pack = selectedPackage ?: return@launch
-
-            val downloadProgress = mutableStateOf(0f)
-            val downloadState = mutableStateOf<StepState>(StepState.Running(downloadProgress))
-
+            val downloaded = mutableStateOf(0L)
+            val downloadState = mutableStateOf<DownloadStep.State>(DownloadStep.State.Waiting)
             downloadSteps.emit(listOf(DownloadStep(0, downloadState)))
 
+            // TODO: Code cleanup
             val task = downloader.download(pack)
-
-            task.progressChannel().receiveAsFlow().conflate().collect {
-                downloadProgress.value = it
-                totalProgress.emit(it / 2)
-                delay(200)
+            var sentTotalSize = false
+            val job = launch {
+                task.progress.collect { state ->
+                    val progress = state.first.toDouble() / state.second.toDouble()
+                    downloaded.value = state.first
+                    if (!sentTotalSize && state.second > 0L) {
+                        downloadState.value = DownloadStep.State.Running(downloaded, state.second)
+                        sentTotalSize = true
+                    }
+                    totalProgress.emit(progress.toFloat() / 2f)
+                    delay(200)
+                }
             }
 
             val result = try {
@@ -136,13 +165,18 @@ class InstallPackageViewModel @Inject constructor(
             } catch (e: Exception) {
                 Log.e(TAG, "下载分包失败", e)
                 // TODO: 2021/2/20 添加显示
-                downloadState.value = StepState.Error(e.message ?: "Unknown Error")
+                downloadState.value = DownloadStep.State.Error(e.message ?: "Unknown Error")
                 return@launch
+            } finally {
+                job.cancel()
             }
-            delay(500)
-            downloadState.value = StepState.Complete
+
+            downloadState.value = DownloadStep.State.Complete
+
             mergeState.emit(StepState.Complete)
             installState.emit(StepState.Running(mutableStateOf(0f)))
+
+            // Download succeed, install this package.
             try {
                 mgr.installPackage(
                     ZipPackage(result.packageZipFile),

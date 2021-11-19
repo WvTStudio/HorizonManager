@@ -81,7 +81,7 @@ class OfficialPackageCDNRepository {
                             val index = key.removePrefix("part").toInt() - 1
                             add(OfficialCDNPackage.Chunk(index, url))
                         }
-                    }
+                    }.sortedBy { it.index }
                 }
 
                 val data = OfficialCDNPackage(
