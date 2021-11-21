@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.Colors
+import androidx.compose.material.LocalElevationOverlay
 import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
@@ -18,6 +19,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import androidx.core.content.edit
 import androidx.core.view.WindowCompat
 import com.google.accompanist.insets.ProvideWindowInsets
@@ -76,7 +78,16 @@ fun AndroidHorizonManagerTheme(
                     Modifier
                         .fillMaxWidth()
                         .statusBarsHeight()
-                        .background(statusBarColor)
+                        .background(
+                            if (fullScreen) {
+                                statusBarColor
+                            } else {
+                                LocalElevationOverlay.current?.apply(
+                                    color = statusBarColor,
+                                    elevation = 4.dp
+                                ) ?: statusBarColor
+                            }
+                        )
                 )
                 // Content
                 Box(
