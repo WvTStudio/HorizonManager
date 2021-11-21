@@ -405,24 +405,24 @@ private fun NavigationItem(
             .fillMaxWidth()
             .padding(horizontal = 8.dp, vertical = 2.dp)
     ) {
-        CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
-            Row(
-                Modifier
-                    .fillMaxSize()
-                    .clickable { onCheckedChange(!checked) },
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    imageVector = icon,
-                    modifier = Modifier.padding(start = 8.dp),
-                    contentDescription = null
-                )
-                Text(
-                    text = text,
-                    modifier = Modifier.padding(start = 24.dp, end = 8.dp),
-                    fontWeight = FontWeight.Medium
-                )
-            }
+        Row(
+            Modifier
+                .fillMaxSize()
+                .clickable { onCheckedChange(!checked) },
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = icon,
+                modifier = Modifier.padding(start = 8.dp),
+                contentDescription = null,
+                tint = LocalContentColor.current.copy(if (checked) ContentAlpha.high else ContentAlpha.medium)
+            )
+            Text(
+                text = text,
+                modifier = Modifier.padding(start = 24.dp, end = 8.dp),
+                fontWeight = FontWeight.Medium,
+                color = LocalContentColor.current.copy(ContentAlpha.high)
+            )
         }
     }
 }
