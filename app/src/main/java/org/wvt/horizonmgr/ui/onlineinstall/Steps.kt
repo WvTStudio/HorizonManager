@@ -11,21 +11,19 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.wvt.horizonmgr.ui.theme.PreviewTheme
+import org.wvt.horizonmgr.utils.longSizeToString
 import org.wvt.horizonmgr.viewmodel.InstallPackageViewModel.DownloadStep
 import org.wvt.horizonmgr.viewmodel.InstallPackageViewModel.StepState
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun StepItem(
+private fun StepItem(
     icon: @Composable () -> Unit,
     text: @Composable () -> Unit,
     trailing: @Composable () -> Unit
@@ -43,23 +41,26 @@ fun DownloadStep(data: DownloadStep) {
     val downloadState by data.state
     val contentColor = when (downloadState) {
         is DownloadStep.State.Waiting -> MaterialTheme.colors.onBackground.copy(ContentAlpha.disabled)
+        is DownloadStep.State.Error -> MaterialTheme.colors.error
         else -> MaterialTheme.colors.onBackground
     }
     StepItem(
         icon = {
             Icon(Icons.Default.CloudDownload, null)
         }, text = {
-            Text(
-                text = when (val downloadState = downloadState) {
-                    DownloadStep.State.Waiting -> "等待下载"
-                    DownloadStep.State.Complete -> "下载完成"
-                    is DownloadStep.State.Running -> {
-                        "正在下载 (${downloadState.progress.value}/${downloadState.total})"
+            when (val downloadState = downloadState) {
+                DownloadStep.State.Waiting -> Text(text = "等待下载", color = contentColor)
+                DownloadStep.State.Complete -> Text(text = "下载完成", color = contentColor)
+                is DownloadStep.State.Running -> {
+                    val downloaded = remember(downloadState.progress.value) {
+                        longSizeToString(downloadState.progress.value)
                     }
-                    is DownloadStep.State.Error -> "下载失败"
-                },
-                color = contentColor
-            )
+                    val total = remember { longSizeToString(downloadState.total) }
+                    Text(text = "正在下载（$downloaded / $total）", color = contentColor)
+                }
+                is DownloadStep.State.Error -> Text(text = "下载失败", color = contentColor)
+            }
+
         }, trailing = {
             Crossfade(targetState = downloadState) {
                 Box(Modifier.size(40.dp), contentAlignment = Alignment.Center) {
@@ -75,7 +76,24 @@ fun DownloadStep(data: DownloadStep) {
                             )
                         }
                         is DownloadStep.State.Error -> {
-                            Icon(Icons.Default.Error, null)
+                            var showError by remember { mutableStateOf(false) }
+                            IconButton(onClick = { showError = true }) {
+                                Icon(
+                                    Icons.Default.Error,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colors.error
+                                )
+                            }
+                            if (showError) AlertDialog(
+                                onDismissRequest = { showError = false },
+                                title = { Text("Error detail") },
+                                text = { Text(it.message) },
+                                confirmButton = {
+                                    TextButton(onClick = {
+                                        showError = false
+                                    }) { Text("确认") }
+                                }
+                            )
                         }
                     }
                 }
@@ -182,7 +200,12 @@ private fun DownloadStepPreview() {
                 DownloadStep(remember {
                     DownloadStep(
                         2,
-                        mutableStateOf(DownloadStep.State.Running(mutableStateOf(2000), 1000))
+                        mutableStateOf(
+                            DownloadStep.State.Running(
+                                mutableStateOf(20_000_000),
+                                125_000_000
+                            )
+                        )
                     )
                 })
                 DownloadStep(remember {
