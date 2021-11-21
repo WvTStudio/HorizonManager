@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import org.wvt.horizonmgr.ui.components.ErrorPage
 import org.wvt.horizonmgr.ui.theme.AppBarBackgroundColor
+import org.wvt.horizonmgr.viewmodel.JoinGroupViewModel
 
 @Composable
 fun JoinGroupScreen(

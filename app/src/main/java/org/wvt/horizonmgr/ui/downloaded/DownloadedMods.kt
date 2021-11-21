@@ -25,6 +25,7 @@ import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import org.wvt.horizonmgr.ui.components.ModIcon
 import org.wvt.horizonmgr.ui.components.ProgressDialog
 import org.wvt.horizonmgr.ui.theme.AppBarBackgroundColor
+import org.wvt.horizonmgr.viewmodel.DMViewModel
 
 @Composable
 fun DownloadedMods(

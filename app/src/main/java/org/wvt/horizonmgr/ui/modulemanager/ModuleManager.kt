@@ -19,8 +19,8 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
 import org.wvt.horizonmgr.ui.components.HorizonDivider
-import org.wvt.horizonmgr.ui.fileselector.SharedFileChooserViewModel
 import org.wvt.horizonmgr.ui.theme.AppBarBackgroundColor
+import org.wvt.horizonmgr.viewmodel.*
 
 @Composable
 fun ModuleManagerScreen(

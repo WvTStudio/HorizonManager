@@ -26,6 +26,7 @@ import com.google.accompanist.insets.statusBarsPadding
 import org.wvt.horizonmgr.R
 import org.wvt.horizonmgr.ui.theme.LocalThemeConfig
 import org.wvt.horizonmgr.ui.theme.PreviewTheme
+import org.wvt.horizonmgr.viewmodel.DonateViewModel
 import kotlin.random.Random
 
 val alipayColor = Color(0xFF1678FF)

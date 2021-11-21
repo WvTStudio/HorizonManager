@@ -26,6 +26,7 @@ import org.wvt.horizonmgr.ui.components.ErrorPage
 import org.wvt.horizonmgr.ui.components.MarkdownContent
 import org.wvt.horizonmgr.ui.components.NetworkImage
 import org.wvt.horizonmgr.ui.theme.AppBarBackgroundColor
+import org.wvt.horizonmgr.viewmodel.ArticleContentViewModel
 
 @Composable
 fun ArticleContentScreen(

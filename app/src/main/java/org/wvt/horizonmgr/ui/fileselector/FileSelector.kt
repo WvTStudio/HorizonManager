@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.util.fastMap
 import org.wvt.horizonmgr.ui.components.ErrorPage
+import org.wvt.horizonmgr.viewmodel.FileSelectorViewModel
 
 @Composable
 fun FileSelector(

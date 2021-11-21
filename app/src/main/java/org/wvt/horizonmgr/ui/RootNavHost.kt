@@ -15,32 +15,23 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import org.wvt.horizonmgr.BuildConfig
-import org.wvt.horizonmgr.ui.article.ArticleContentActivity
+import org.wvt.horizonmgr.activity.*
 import org.wvt.horizonmgr.ui.article.ArticleContentScreen
-import org.wvt.horizonmgr.ui.article.ArticleContentViewModel
-import org.wvt.horizonmgr.ui.community.CommunityActivity
 import org.wvt.horizonmgr.ui.community.CommunityScreen
-import org.wvt.horizonmgr.ui.community.CommunityViewModel
-import org.wvt.horizonmgr.ui.donate.DonateActivity
 import org.wvt.horizonmgr.ui.donate.DonateScreen
 import org.wvt.horizonmgr.ui.fileselector.FileSelector
-import org.wvt.horizonmgr.ui.fileselector.FileSelectorActivity
-import org.wvt.horizonmgr.ui.fileselector.SharedFileChooserViewModel
-import org.wvt.horizonmgr.ui.joingroup.JoinGroupActivity
 import org.wvt.horizonmgr.ui.joingroup.JoinGroupScreen
-import org.wvt.horizonmgr.ui.login.LoginActivity
 import org.wvt.horizonmgr.ui.login.LoginScreen
 import org.wvt.horizonmgr.ui.main.MainScreen
-import org.wvt.horizonmgr.ui.onlineinstall.InstallPackageActivity
 import org.wvt.horizonmgr.ui.onlineinstall.OnlineInstallScreen
-import org.wvt.horizonmgr.ui.pacakgemanager.PackageDetailActivity
 import org.wvt.horizonmgr.ui.pacakgemanager.PackageDetailScreen
-import org.wvt.horizonmgr.ui.settings.CustomThemeActivity
 import org.wvt.horizonmgr.ui.settings.CustomThemeScreen
-import org.wvt.horizonmgr.ui.settings.SettingsActivity
 import org.wvt.horizonmgr.ui.settings.SettingsScreen
 import org.wvt.horizonmgr.ui.theme.AndroidDonateTheme
 import org.wvt.horizonmgr.ui.theme.AndroidHorizonManagerTheme
+import org.wvt.horizonmgr.viewmodel.ArticleContentViewModel
+import org.wvt.horizonmgr.viewmodel.CommunityViewModel
+import org.wvt.horizonmgr.viewmodel.SharedFileChooserViewModel
 
 @Composable
 fun RootNavHost(
@@ -222,46 +213,41 @@ fun RootNavHostActivity(
     NavHost(navController = navController, startDestination = "main") {
         composable("main") {
             val sharedFileChooserViewModel = SharedFileChooserViewModel
-
-            AndroidHorizonManagerTheme {
-                Surface(color = MaterialTheme.colors.background) {
-                    MainScreen(
-                        navigateToLogin = { navController.navigate("login") },
-                        navigateToCommunity = { navController.navigate("community") },
-                        navigateToJoinGroup = { navController.navigate("join_group") },
-                        navigateToDonate = { navController.navigate("donate") },
-                        navigateToSettings = { navController.navigate("settings") },
-                        navigateToOnlineInstall = { navController.navigate("online_install") },
-                        navigateToPackageDetail = { navController.navigate("package_detail/${it}") },
-                        navigateToArticleDetail = { navController.navigate("article_detail/${it}") },
-                        onAddPackageClicked = {
-                            sharedFileChooserViewModel.setRequestCode("add_package")
-                            navController.navigate("file_chooser")
-                        },
-                        onAddICTextureClick = {
-                            sharedFileChooserViewModel.setRequestCode("ic_texture")
-                            navController.navigate("file_chooser")
-                        },
-                        onAddICLevelClick = {
-                            sharedFileChooserViewModel.setRequestCode("ic_level")
-                            navController.navigate("file_chooser")
-                        },
-                        onAddMCLevelClick = {
-                            sharedFileChooserViewModel.setRequestCode("mc_level")
-                            navController.navigate("file_chooser")
-                        },
-                        onAddMCTextureClick = {
-                            sharedFileChooserViewModel.setRequestCode("mc_texture")
-                            navController.navigate("file_chooser")
-                        },
-                        onAddModClicked = {
-                            sharedFileChooserViewModel.setRequestCode("add_mod")
-                            navController.navigate("file_chooser")
-                        },
-                        requestOpenGame = requestOpenGame,
-                    )
-                }
-            }
+            MainScreen(
+                navigateToLogin = { navController.navigate("login") },
+                navigateToCommunity = { navController.navigate("community") },
+                navigateToJoinGroup = { navController.navigate("join_group") },
+                navigateToDonate = { navController.navigate("donate") },
+                navigateToSettings = { navController.navigate("settings") },
+                navigateToOnlineInstall = { navController.navigate("online_install") },
+                navigateToPackageDetail = { navController.navigate("package_detail/${it}") },
+                navigateToArticleDetail = { navController.navigate("article_detail/${it}") },
+                onAddPackageClicked = {
+                    sharedFileChooserViewModel.setRequestCode("add_package")
+                    navController.navigate("file_chooser")
+                },
+                onAddICTextureClick = {
+                    sharedFileChooserViewModel.setRequestCode("ic_texture")
+                    navController.navigate("file_chooser")
+                },
+                onAddICLevelClick = {
+                    sharedFileChooserViewModel.setRequestCode("ic_level")
+                    navController.navigate("file_chooser")
+                },
+                onAddMCLevelClick = {
+                    sharedFileChooserViewModel.setRequestCode("mc_level")
+                    navController.navigate("file_chooser")
+                },
+                onAddMCTextureClick = {
+                    sharedFileChooserViewModel.setRequestCode("mc_texture")
+                    navController.navigate("file_chooser")
+                },
+                onAddModClicked = {
+                    sharedFileChooserViewModel.setRequestCode("add_mod")
+                    navController.navigate("file_chooser")
+                },
+                requestOpenGame = requestOpenGame,
+            )
         }
         activity("login") {
             activityClass = LoginActivity::class

@@ -39,11 +39,12 @@ import org.wvt.horizonmgr.R
 import org.wvt.horizonmgr.ui.components.NetworkImage
 import org.wvt.horizonmgr.ui.downloaded.DownloadedMods
 import org.wvt.horizonmgr.ui.home.HomeScreen
-import org.wvt.horizonmgr.ui.home.HomeViewModel
 import org.wvt.horizonmgr.ui.modulemanager.ModuleManagerScreen
 import org.wvt.horizonmgr.ui.onlinemods.OnlineMods
 import org.wvt.horizonmgr.ui.pacakgemanager.PackageManagerScreen
 import org.wvt.horizonmgr.ui.theme.LocalThemeConfig
+import org.wvt.horizonmgr.viewmodel.HomeViewModel
+import org.wvt.horizonmgr.viewmodel.MainViewModel
 
 enum class Screen {
     HOME, PACKAGE_MANAGE, LOCAL_MANAGE, ONLINE_DOWNLOAD, DOWNLOADED_MOD

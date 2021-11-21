@@ -19,9 +19,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import org.wvt.horizonmgr.ui.onlineinstall.InstallPackageViewModel.DownloadStep
-import org.wvt.horizonmgr.ui.onlineinstall.InstallPackageViewModel.StepState
 import org.wvt.horizonmgr.ui.theme.PreviewTheme
+import org.wvt.horizonmgr.viewmodel.InstallPackageViewModel.DownloadStep
+import org.wvt.horizonmgr.viewmodel.InstallPackageViewModel.StepState
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable

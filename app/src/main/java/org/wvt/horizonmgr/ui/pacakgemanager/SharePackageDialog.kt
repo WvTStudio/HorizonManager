@@ -12,6 +12,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.core.content.FileProvider
 import org.wvt.horizonmgr.BuildConfig
+import org.wvt.horizonmgr.viewmodel.PackageManagerViewModel
 import java.io.File
 
 

@@ -14,6 +14,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.annotation.ExperimentalCoilApi
 import coil.compose.rememberImagePainter
 import org.wvt.horizonmgr.ui.theme.PreviewTheme
+import org.wvt.horizonmgr.viewmodel.DonateViewModel
 
 @Composable
 fun DonateScreen(

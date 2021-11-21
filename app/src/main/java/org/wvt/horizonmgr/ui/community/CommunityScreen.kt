@@ -23,6 +23,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.zIndex
 import org.wvt.horizonmgr.ui.theme.AppBarBackgroundColor
 import org.wvt.horizonmgr.utils.longSizeToString
+import org.wvt.horizonmgr.viewmodel.CommunityViewModel
 
 @Composable
 internal fun CommunityScreen(

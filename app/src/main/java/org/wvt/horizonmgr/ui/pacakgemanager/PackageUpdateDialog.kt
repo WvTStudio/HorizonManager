@@ -8,6 +8,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import org.wvt.horizonmgr.viewmodel.PackageManagerViewModel
 
 /**
  * 更新界面
@@ -52,7 +53,6 @@ fun PackageUpdateDialog(viewModel: PackageManagerViewModel) {
                         PackageManagerViewModel.UpdateState.Succeed -> {
                             Text("安装成功")
                         }
-
                         PackageManagerViewModel.UpdateState.Failed -> {
                             Text("更新失败")
                         }

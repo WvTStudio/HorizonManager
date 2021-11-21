@@ -19,6 +19,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import org.wvt.horizonmgr.R
+import org.wvt.horizonmgr.viewmodel.LoginViewModel
 
 private const val TAG = "LoginScreen"
 

@@ -34,9 +34,10 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import org.wvt.horizonmgr.ui.components.*
-import org.wvt.horizonmgr.ui.fileselector.SharedFileChooserViewModel
 import org.wvt.horizonmgr.ui.theme.AppBarBackgroundColor
 import org.wvt.horizonmgr.ui.theme.PreviewTheme
+import org.wvt.horizonmgr.viewmodel.PackageManagerViewModel
+import org.wvt.horizonmgr.viewmodel.SharedFileChooserViewModel
 import kotlin.coroutines.resume
 
 data class PackageManagerItem(
