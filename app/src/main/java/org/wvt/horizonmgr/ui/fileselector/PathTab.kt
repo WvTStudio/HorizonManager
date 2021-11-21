@@ -10,7 +10,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.LocalContentColor
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.rounded.ChevronRight
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -56,7 +56,7 @@ internal fun PathTab(
                         indication = null
                     ) { onSelectDepth(index) } // TODO: 2021/2/26 希望 Tab 的点击能有涟漪
                     .padding(top = 16.dp, bottom = 16.dp)
-                .onGloballyPositioned { sizes.add(index, it.size.width) },
+                    .onGloballyPositioned { sizes.add(index, it.size.width) },
                 contentAlignment = Alignment.Center
             ) {
                 Text(
@@ -77,7 +77,7 @@ internal fun PathTab(
             if (index + 1 < data.paths.size) {
                 Icon(
                     modifier = Modifier.padding(start = 8.dp, end = 8.dp),
-                    imageVector = Icons.Filled.ChevronRight,
+                    imageVector = Icons.Rounded.ChevronRight,
                     tint = contentColor.copy(alpha = 0.5f),
                     contentDescription = null
                 )

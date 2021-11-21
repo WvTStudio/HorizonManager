@@ -7,8 +7,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowForward
-import androidx.compose.material.icons.filled.Extension
+import androidx.compose.material.icons.rounded.ArrowForward
+import androidx.compose.material.icons.rounded.Extension
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -55,7 +55,7 @@ fun ChoosePackageItem(
         icon = {
             Icon(
                 modifier = Modifier.padding(top = 4.dp),
-                imageVector = Icons.Filled.Extension,
+                imageVector = Icons.Rounded.Extension,
                 contentDescription = "安装"
             )
         },
@@ -63,7 +63,7 @@ fun ChoosePackageItem(
         secondaryText = { Text(version) },
         trailing = {
             Icon(
-                imageVector = Icons.Filled.ArrowForward,
+                imageVector = Icons.Rounded.ArrowForward,
                 contentDescription = "选择"
             )
         }

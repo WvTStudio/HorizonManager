@@ -8,7 +8,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.OutlinedButton
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
@@ -28,7 +28,7 @@ fun ErrorPage(
         OutlinedButton(
             modifier = Modifier.padding(top = 16.dp),
             onClick = onRetryClick) {
-            Icon(imageVector = Icons.Filled.Refresh, contentDescription = "重试")
+            Icon(imageVector = Icons.Rounded.Refresh, contentDescription = "重试")
         }
     }
 }

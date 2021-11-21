@@ -8,7 +8,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.rounded.Add
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -87,7 +87,7 @@ fun MCResTab(
                             .padding(16.dp)
                             .align(Alignment.BottomEnd),
                         onClick = onAddButtonClick
-                    ) { Icon(Icons.Default.Add, "Add") }
+                    ) { Icon(Icons.Rounded.Add, "Add") }
                 }
                 MCResTabViewModel.State.Loading -> Box(Modifier.fillMaxSize()) {
                     CircularProgressIndicator(

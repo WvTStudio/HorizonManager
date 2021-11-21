@@ -9,8 +9,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.rounded.ArrowBack
+import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -87,7 +87,10 @@ fun CustomThemeScreen(requestClose: () -> Unit) {
                 modifier = Modifier.zIndex(4f),
                 navigationIcon = {
                     IconButton(onClick = requestClose) {
-                        Icon(imageVector = Icons.Filled.ArrowBack, stringResource(id = R.string.custom_theme_screen_appbar_back))
+                        Icon(
+                            imageVector = Icons.Rounded.ArrowBack,
+                            stringResource(id = R.string.custom_theme_screen_appbar_back)
+                        )
                     }
                 }, title = {
                     Text(stringResource(id = R.string.custom_theme_screen_appbar_title))
@@ -272,7 +275,7 @@ fun CustomThemeScreen(requestClose: () -> Unit) {
                 themeController.setAppbarAccent(accentColor)
             }
         ) {
-            Icon(imageVector = Icons.Filled.Check, null)
+            Icon(imageVector = Icons.Rounded.Check, null)
             Text(stringResource(R.string.custom_theme_screen_button_save))
         }
         /*Button(modifier = Modifier.padding(16.dp).align(Alignment.BottomStart),
@@ -280,7 +283,7 @@ fun CustomThemeScreen(requestClose: () -> Unit) {
                 themeController.setLightColor(LightColorPalette)
                 themeController.setDarkColor(DarkColorPalette)
             }) {
-            Icon(asset = Icons.Filled.Restore)
+            Icon(asset = Icons.Rounded.Restore)
             Text("重置")
         }*/
     }

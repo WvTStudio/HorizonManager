@@ -8,9 +8,9 @@ import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowForward
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.rounded.ArrowForward
+import androidx.compose.material.icons.rounded.Check
+import androidx.compose.material.icons.rounded.Clear
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,16 +36,16 @@ fun StateFab(
                     onClick = onClicked,
                     contentColor = MaterialTheme.colors.onSecondary
                 ) {
-                    Icon(Icons.Filled.ArrowForward, contentDescription = "下一步")
+                    Icon(Icons.Rounded.ArrowForward, contentDescription = "下一步")
                 }
                 FabState.LOADING -> CircularProgressIndicator()
                 FabState.SUCCEED -> Icon(
-                    imageVector = Icons.Filled.Check,
+                    imageVector = Icons.Rounded.Check,
                     tint = MaterialTheme.colors.secondary,
                     contentDescription = "成功"
                 )
                 FabState.FAILED -> Icon(
-                    imageVector = Icons.Filled.Clear,
+                    imageVector = Icons.Rounded.Clear,
                     tint = MaterialTheme.colors.error,
                     contentDescription = "失败"
                 )

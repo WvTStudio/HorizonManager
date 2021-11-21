@@ -10,7 +10,7 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.rounded.Close
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -49,7 +49,7 @@ internal fun CommunityScreen(
                     Text("Inner Core 中文社区")
                 }, navigationIcon = {
                     IconButton(onClick = onClose) {
-                        Icon(Icons.Filled.Close, "关闭")
+                        Icon(Icons.Rounded.Close, "关闭")
                     }
                 }, backgroundColor = AppBarBackgroundColor, actions = {
                     Crossfade(loading) {

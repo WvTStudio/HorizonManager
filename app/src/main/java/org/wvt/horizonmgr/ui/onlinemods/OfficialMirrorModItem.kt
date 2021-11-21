@@ -4,9 +4,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccessTime
-import androidx.compose.material.icons.filled.Extension
-import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.rounded.AccessTime
+import androidx.compose.material.icons.rounded.Extension
+import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Stable
@@ -89,7 +89,7 @@ internal fun OfficialMirrorModItem(
                     CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
                         Icon(
                             modifier = Modifier.size(18.dp),
-                            imageVector = Icons.Default.Favorite, contentDescription = "Likes"
+                            imageVector = Icons.Rounded.Favorite, contentDescription = "Likes"
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
@@ -100,7 +100,7 @@ internal fun OfficialMirrorModItem(
                             Spacer(modifier = Modifier.width(16.dp))
                             Icon(
                                 modifier = Modifier.size(18.dp),
-                                imageVector = Icons.Default.AccessTime,
+                                imageVector = Icons.Rounded.AccessTime,
                                 contentDescription = "Last update"
                             )
                             Spacer(modifier = Modifier.width(4.dp))
@@ -114,7 +114,7 @@ internal fun OfficialMirrorModItem(
                 // Install Button
                 IconButton(onClick = onInstallClick) {
                     Icon(
-                        imageVector = Icons.Filled.Extension,
+                        imageVector = Icons.Rounded.Extension,
                         contentDescription = "安装",
                         tint = MaterialTheme.colors.primary
                     )

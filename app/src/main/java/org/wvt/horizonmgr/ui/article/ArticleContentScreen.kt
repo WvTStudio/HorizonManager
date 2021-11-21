@@ -8,7 +8,7 @@ import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -41,7 +41,7 @@ fun ArticleContentScreen(
             modifier = Modifier.zIndex(4.dp.value),
             navigationIcon = {
                 IconButton(onClick = onNavClick) {
-                    Icon(Icons.Filled.ArrowBack, contentDescription = "返回")
+                    Icon(Icons.Rounded.ArrowBack, contentDescription = "返回")
                 }
             }, title = {
                 Text("文章正文")

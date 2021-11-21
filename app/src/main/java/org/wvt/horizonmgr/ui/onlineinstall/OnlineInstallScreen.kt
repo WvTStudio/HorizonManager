@@ -7,7 +7,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -63,7 +63,7 @@ fun OnlineInstallScreen(
                         }
                     }) {
                         Icon(
-                            Icons.Filled.ArrowBack,
+                            Icons.Rounded.ArrowBack,
                             contentDescription = "返回"
                         )
                     }

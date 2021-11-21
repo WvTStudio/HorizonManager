@@ -7,7 +7,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -92,7 +92,7 @@ fun LoginScreen(
             onClick = ::back
         ) {
             Icon(
-                Icons.Filled.ArrowBack,
+                Icons.Rounded.ArrowBack,
                 contentDescription = stringResource(R.string.login_screen_back_desc)
             )
         }

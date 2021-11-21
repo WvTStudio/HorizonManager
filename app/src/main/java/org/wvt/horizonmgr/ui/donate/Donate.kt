@@ -7,7 +7,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -88,7 +88,7 @@ fun Donate(
                 title = { Text("选择捐赠方式") },
                 navigationIcon = {
                     IconButton(onClick = onClose) {
-                        Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "返回")
+                        Icon(imageVector = Icons.Rounded.ArrowBack, contentDescription = "返回")
                     }
                 },
                 elevation = 0.dp,

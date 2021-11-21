@@ -10,7 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.rounded.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -52,7 +52,7 @@ fun DownloadStep(data: DownloadStep) {
     StepItem(
         contentColor = contentColor,
         icon = {
-            Icon(Icons.Default.CloudDownload, null)
+            Icon(Icons.Rounded.CloudDownload, null)
         },
         text = {
             when (val downloadState = downloadState) {
@@ -75,7 +75,7 @@ fun DownloadStep(data: DownloadStep) {
                         DownloadStep.State.Waiting -> {
                         }
                         DownloadStep.State.Complete -> {
-                            Icon(Icons.Default.Check, null)
+                            Icon(Icons.Rounded.Check, null)
                         }
                         is DownloadStep.State.Running -> {
                             val progress by rememberUpdatedState(it.progress.value.toFloat() / it.total.toFloat())
@@ -84,7 +84,7 @@ fun DownloadStep(data: DownloadStep) {
                         is DownloadStep.State.Error -> {
                             var showError by remember { mutableStateOf(false) }
                             IconButton(onClick = { showError = true }) {
-                                Icon(Icons.Default.Error, contentDescription = null)
+                                Icon(Icons.Rounded.Error, contentDescription = null)
                             }
                             if (showError) AlertDialog(
                                 onDismissRequest = { showError = false },
@@ -112,7 +112,7 @@ fun MergeStep(mergeState: StepState) {
     }
     StepItem(
         icon = {
-            Icon(Icons.Default.Inbox, null)
+            Icon(Icons.Rounded.Inbox, null)
         }, text = {
             Text(
                 text = when (mergeState) {
@@ -130,13 +130,13 @@ fun MergeStep(mergeState: StepState) {
                         StepState.Waiting -> {
                         }
                         StepState.Complete -> {
-                            Icon(Icons.Default.Check, null)
+                            Icon(Icons.Rounded.Check, null)
                         }
                         is StepState.Running -> {
                             CircularProgressIndicator()
                         }
                         is StepState.Error -> {
-                            Icon(Icons.Default.Error, null)
+                            Icon(Icons.Rounded.Error, null)
                         }
                     }
                 }
@@ -154,7 +154,7 @@ fun InstallStep(installState: StepState) {
     }
     StepItem(
         icon = {
-            Icon(Icons.Default.GetApp, null)
+            Icon(Icons.Rounded.GetApp, null)
         }, text = {
             Text(
                 text = when (installState) {
@@ -172,13 +172,13 @@ fun InstallStep(installState: StepState) {
                         StepState.Waiting -> {
                         }
                         StepState.Complete -> {
-                            Icon(Icons.Default.Check, null)
+                            Icon(Icons.Rounded.Check, null)
                         }
                         is StepState.Running -> {
                             CircularProgressIndicator()
                         }
                         is StepState.Error -> {
-                            Icon(Icons.Default.Error, null)
+                            Icon(Icons.Rounded.Error, null)
                         }
                     }
                 }

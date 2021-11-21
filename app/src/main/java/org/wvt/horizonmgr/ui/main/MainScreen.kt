@@ -14,7 +14,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.rounded.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -99,31 +99,33 @@ fun MainScreen(
                 checked = false,
                 onCheckedChange = { navigateToCommunity() },
                 text = stringResource(id = R.string.main_screen_item_label_community),
-                icon = Icons.Filled.Forum
+                icon = Icons.Rounded.Forum
             )
             NavigationItem(
                 checked = false,
                 onCheckedChange = { requestOpenGame() },
                 text = stringResource(id = R.string.main_screen_item_label_opengame),
-                icon = Icons.Filled.Gamepad
+                icon = Icons.Rounded.Gamepad
             )
             NavigationItem(
                 checked = false,
                 onCheckedChange = { navigateToJoinGroup() },
                 text = stringResource(id = R.string.main_screen_item_label_joingroup),
-                icon = Icons.Filled.Group
+                icon = Icons.Rounded.Group
             )
             NavigationItem(
                 checked = false,
                 onCheckedChange = { navigateToDonate() },
                 text = stringResource(id = R.string.main_screen_item_label_donate),
-                icon = Icons.Filled.AttachMoney
+                icon = Icons.Rounded.AttachMoney
             )
         },
         setting = {
             NavigationItem(
-                checked = false, onCheckedChange = { navigateToSettings() },
-                text = stringResource(id = R.string.main_screen_item_label_settings), icon = Icons.Filled.Settings
+                checked = false,
+                onCheckedChange = { navigateToSettings() },
+                text = stringResource(id = R.string.main_screen_item_label_settings),
+                icon = Icons.Rounded.Settings
             )
         }
     ) {
@@ -224,23 +226,23 @@ private fun NavigationItem(screen: Screen, checked: Boolean, onCheckedChange: (B
     when (screen) {
         Screen.HOME -> {
             text = stringResource(id = R.string.main_screen_nav_label_home)
-            icon = Icons.Filled.Home
+            icon = Icons.Rounded.Home
         }
         Screen.PACKAGE_MANAGE -> {
             text = stringResource(id = R.string.main_screen_nav_label_package_manage)
-            icon = Icons.Filled.Dashboard
+            icon = Icons.Rounded.Dashboard
         }
         Screen.LOCAL_MANAGE -> {
             text = stringResource(id = R.string.main_screen_nav_label_local_manage)
-            icon = Icons.Filled.Extension
+            icon = Icons.Rounded.Extension
         }
         Screen.ONLINE_DOWNLOAD -> {
             text = stringResource(id = R.string.main_screen_nav_label_online_download)
-            icon = Icons.Filled.Store
+            icon = Icons.Rounded.Store
         }
         Screen.DOWNLOADED_MOD -> {
             text = stringResource(id = R.string.main_screen_nav_label_downlaoded_mod)
-            icon = Icons.Filled.Storage
+            icon = Icons.Rounded.Storage
         }
     }
 

@@ -4,9 +4,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccessTime
-import androidx.compose.material.icons.filled.Extension
-import androidx.compose.material.icons.filled.GetApp
+import androidx.compose.material.icons.rounded.AccessTime
+import androidx.compose.material.icons.rounded.Extension
+import androidx.compose.material.icons.rounded.GetApp
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
@@ -84,7 +84,7 @@ internal fun ChineseModItem(
                     CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
                         Icon(
                             modifier = Modifier.size(18.dp),
-                            imageVector = Icons.Default.GetApp, contentDescription = "Downloads"
+                            imageVector = Icons.Rounded.GetApp, contentDescription = "Downloads"
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
@@ -94,7 +94,7 @@ internal fun ChineseModItem(
                         Spacer(modifier = Modifier.width(16.dp))
                         Icon(
                             modifier = Modifier.size(18.dp),
-                            imageVector = Icons.Default.AccessTime,
+                            imageVector = Icons.Rounded.AccessTime,
                             contentDescription = "Last update"
                         )
                         Spacer(modifier = Modifier.width(4.dp))
@@ -104,7 +104,7 @@ internal fun ChineseModItem(
                 CompositionLocalProvider(LocalContentColor provides MaterialTheme.colors.primary) {
                     // Install Button
                     IconButton(onClick = onInstallClick) {
-                        Icon(Icons.Filled.Extension, contentDescription = "安装")
+                        Icon(Icons.Rounded.Extension, contentDescription = "安装")
                     }
                 }
             }

@@ -4,8 +4,8 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.rounded.Check
+import androidx.compose.material.icons.rounded.Close
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
@@ -35,7 +35,8 @@ fun ProgressDialog(
             elevation = 16.dp
         ) {
             Row(
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
                     .wrapContentHeight()
                     .padding(32.dp),
                 verticalAlignment = Alignment.CenterVertically
@@ -52,7 +53,7 @@ fun ProgressDialog(
                     is ProgressDialogState.Failed -> {
                         Box(Modifier.size(40.dp), Alignment.Center) {
                             Icon(
-                                imageVector = Icons.Filled.Close,
+                                imageVector = Icons.Rounded.Close,
                                 tint = MaterialTheme.colors.error,
                                 contentDescription = "错误"
                             )
@@ -62,7 +63,7 @@ fun ProgressDialog(
                     is ProgressDialogState.Finished -> {
                         Box(Modifier.size(40.dp), Alignment.Center) {
                             Icon(
-                                imageVector = Icons.Filled.Check,
+                                imageVector = Icons.Rounded.Check,
                                 tint = MaterialTheme.colors.secondary,
                                 contentDescription = "成功"
                             )

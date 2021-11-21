@@ -13,7 +13,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.rounded.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -111,14 +111,14 @@ fun PackageManager(
                 title = {
                     Text("分包管理")
                 }, navigationIcon = {
-                    IconButton(onClick = onNavClick) { Icon(Icons.Filled.Menu, "菜单") }
+                    IconButton(onClick = onNavClick) { Icon(Icons.Rounded.Menu, "菜单") }
                 }, backgroundColor = AppBarBackgroundColor,
                 actions = {
                     // TODO: 2021/4/27 Retain this for future features.
                     /*Box {
                         // Menu Icon
                         IconButton(onClick = { showMenu = true }) {
-                            Icon(Icons.Filled.MoreVert, "更多")
+                            Icon(Icons.Rounded.MoreVert, "更多")
                         }
                         DropdownMenu(
                             expanded = showMenu,
@@ -284,7 +284,7 @@ private fun FABs(
                 enterAnim = fab2Enter,
                 exitAnim = fab2Exit,
                 text = { Text("在线安装") },
-                icon = { Icon(Icons.Filled.CloudDownload, null) },
+                icon = { Icon(Icons.Rounded.CloudDownload, null) },
                 onClick = onOnlineInstallClick
             )
             FABEntry(
@@ -293,7 +293,7 @@ private fun FABs(
                 enterAnim = fab1Enter,
                 exitAnim = fab1Exit,
                 text = { Text("本地导入") },
-                icon = { Icon(Icons.Filled.Storage, null) },
+                icon = { Icon(Icons.Rounded.Storage, null) },
                 onClick = onLocalInstallClick
             )
             FloatingActionButton(
@@ -305,7 +305,7 @@ private fun FABs(
                 // TODO: 2020/11/13 Use animation icon to instead this.
                 Icon(
                     modifier = Modifier.graphicsLayer(rotationZ = rotate),
-                    imageVector = Icons.Filled.Add,
+                    imageVector = Icons.Rounded.Add,
                     contentDescription = "添加"
                 )
             }
@@ -439,7 +439,7 @@ fun PackageItem(
                     var dropdown by remember { mutableStateOf(false) }
                     Box(Modifier.padding(top = 8.dp, end = 4.dp)) {
                         IconButton(onClick = { dropdown = true }) {
-                            Icon(imageVector = Icons.Filled.MoreVert, contentDescription = "更多")
+                            Icon(imageVector = Icons.Rounded.MoreVert, contentDescription = "更多")
                         }
                         DropdownMenu(
                             expanded = dropdown,
@@ -505,7 +505,7 @@ fun PackageItem(
                         enter = fadeIn(),
                         exit = fadeOut()
                     ) {
-                        Icon(Icons.Filled.CheckCircle, "已选择")
+                        Icon(Icons.Rounded.CheckCircle, "已选择")
                     }
                 }
                 Row(Modifier.weight(1f), horizontalArrangement = Arrangement.End) {
