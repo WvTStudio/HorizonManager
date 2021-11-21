@@ -14,6 +14,7 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.wvt.horizonmgr.ui.theme.PreviewTheme
@@ -26,12 +27,15 @@ import org.wvt.horizonmgr.viewmodel.InstallPackageViewModel.StepState
 private fun StepItem(
     icon: @Composable () -> Unit,
     text: @Composable () -> Unit,
-    trailing: @Composable () -> Unit
+    trailing: @Composable () -> Unit,
+    contentColor: Color = LocalContentColor.current
 ) {
-    ListItem(
-        modifier = Modifier.height(72.dp),
-        icon = icon, text = text, trailing = trailing
-    )
+    CompositionLocalProvider(LocalContentColor provides contentColor) {
+        ListItem(
+            modifier = Modifier.height(72.dp),
+            icon = icon, text = text, trailing = trailing
+        )
+    }
 }
 
 
@@ -42,23 +46,26 @@ fun DownloadStep(data: DownloadStep) {
     val contentColor = when (downloadState) {
         is DownloadStep.State.Waiting -> MaterialTheme.colors.onBackground.copy(ContentAlpha.disabled)
         is DownloadStep.State.Error -> MaterialTheme.colors.error
+        is DownloadStep.State.Complete -> Color(0xFF33691E)
         else -> MaterialTheme.colors.onBackground
     }
     StepItem(
+        contentColor = contentColor,
         icon = {
             Icon(Icons.Default.CloudDownload, null)
-        }, text = {
+        },
+        text = {
             when (val downloadState = downloadState) {
-                DownloadStep.State.Waiting -> Text(text = "等待下载", color = contentColor)
-                DownloadStep.State.Complete -> Text(text = "下载完成", color = contentColor)
+                DownloadStep.State.Waiting -> Text(text = "等待下载")
+                DownloadStep.State.Complete -> Text(text = "下载完成")
                 is DownloadStep.State.Running -> {
                     val downloaded = remember(downloadState.progress.value) {
                         longSizeToString(downloadState.progress.value)
                     }
                     val total = remember { longSizeToString(downloadState.total) }
-                    Text(text = "正在下载（$downloaded / $total）", color = contentColor)
+                    Text(text = "正在下载（$downloaded / $total）")
                 }
-                is DownloadStep.State.Error -> Text(text = "下载失败", color = contentColor)
+                is DownloadStep.State.Error -> Text(text = "下载失败")
             }
 
         }, trailing = {
@@ -71,18 +78,13 @@ fun DownloadStep(data: DownloadStep) {
                             Icon(Icons.Default.Check, null)
                         }
                         is DownloadStep.State.Running -> {
-                            CircularProgressIndicator(
-                                progress = animateFloatAsState(it.progress.value.toFloat() / it.total.toFloat()).value
-                            )
+                            val progress by rememberUpdatedState(it.progress.value.toFloat() / it.total.toFloat())
+                            CircularProgressIndicator(progress = animateFloatAsState(progress).value)
                         }
                         is DownloadStep.State.Error -> {
                             var showError by remember { mutableStateOf(false) }
                             IconButton(onClick = { showError = true }) {
-                                Icon(
-                                    Icons.Default.Error,
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colors.error
-                                )
+                                Icon(Icons.Default.Error, contentDescription = null)
                             }
                             if (showError) AlertDialog(
                                 onDismissRequest = { showError = false },
