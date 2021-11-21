@@ -2,9 +2,7 @@ package org.wvt.horizonmgr.utils
 
 import android.util.Log
 import androidx.test.platform.app.InstrumentationRegistry
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.junit.Test

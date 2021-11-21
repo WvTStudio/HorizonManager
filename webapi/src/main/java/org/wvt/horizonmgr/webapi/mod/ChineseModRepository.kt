@@ -2,7 +2,6 @@ package org.wvt.horizonmgr.webapi.mod
 
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
-import io.ktor.client.features.*
 import io.ktor.client.request.*
 import org.json.JSONException
 import org.json.JSONObject

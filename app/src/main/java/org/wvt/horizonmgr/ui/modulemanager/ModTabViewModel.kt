@@ -16,7 +16,6 @@ import org.wvt.horizonmgr.service.mod.ZipMod
 import org.wvt.horizonmgr.ui.components.ProgressDialogState
 import org.wvt.horizonmgr.utils.LocalCache
 import java.io.File
-import java.util.*
 import javax.inject.Inject
 
 private const val TAG = "ModTabVM"

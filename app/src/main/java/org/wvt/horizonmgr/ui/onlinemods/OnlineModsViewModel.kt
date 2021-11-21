@@ -19,7 +19,6 @@ import org.wvt.horizonmgr.webapi.mod.ChineseMod
 import org.wvt.horizonmgr.webapi.mod.ChineseModRepository
 import org.wvt.horizonmgr.webapi.mod.OfficialMirrorMod
 import org.wvt.horizonmgr.webapi.mod.OfficialModMirrorRepository
-import java.util.*
 import javax.inject.Inject
 
 private const val TAG = "OnlineModsVM"

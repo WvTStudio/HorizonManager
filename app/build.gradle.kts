@@ -100,7 +100,7 @@ dependencies {
 
     val hiltVersion = "2.40.1"
     implementation("com.google.dagger:hilt-android:$hiltVersion")
-    kapt("com.google.dagger:hilt-android-compiler:$hiltVersion")
+    kapt("com.google.dagger:hilt-compiler:$hiltVersion")
     
     implementation("androidx.hilt:hilt-navigation-compose:1.0.0-beta01")
     implementation("androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha03")

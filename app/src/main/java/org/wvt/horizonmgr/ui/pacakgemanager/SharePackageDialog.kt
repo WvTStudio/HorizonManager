@@ -2,9 +2,6 @@ package org.wvt.horizonmgr.ui.pacakgemanager
 
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
-import android.provider.MediaStore
-import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.*
