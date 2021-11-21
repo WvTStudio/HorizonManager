@@ -23,6 +23,7 @@ import org.wvt.horizonmgr.ui.components.ErrorPage
 import org.wvt.horizonmgr.ui.components.loadUrlImage
 import org.wvt.horizonmgr.ui.theme.AppBarBackgroundColor
 import org.wvt.horizonmgr.ui.theme.PreviewTheme
+import org.wvt.horizonmgr.viewmodel.HomeViewModel
 import kotlin.random.Random
 
 @Composable

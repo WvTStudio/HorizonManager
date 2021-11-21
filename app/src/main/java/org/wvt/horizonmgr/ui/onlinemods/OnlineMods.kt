@@ -17,6 +17,7 @@ import com.google.accompanist.swiperefresh.SwipeRefreshIndicator
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import org.wvt.horizonmgr.ui.components.ErrorPage
 import org.wvt.horizonmgr.ui.components.ProgressDialog
+import org.wvt.horizonmgr.viewmodel.OnlineModsViewModel
 
 private val repositories = listOf(
     "官方镜像源" to OnlineModsViewModel.Repository.OfficialMirror,

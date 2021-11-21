@@ -18,6 +18,7 @@ import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.SwipeRefreshIndicator
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import org.wvt.horizonmgr.ui.components.*
+import org.wvt.horizonmgr.viewmodel.MCLevelTabViewModel
 
 @Composable
 internal fun MCLevelTab(

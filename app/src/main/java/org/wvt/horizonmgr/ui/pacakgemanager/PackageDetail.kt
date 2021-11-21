@@ -20,6 +20,7 @@ import androidx.compose.ui.zIndex
 import org.wvt.horizonmgr.ui.components.ErrorPage
 import org.wvt.horizonmgr.ui.components.ImageWithoutQualityFilter
 import org.wvt.horizonmgr.ui.theme.AppBarBackgroundColor
+import org.wvt.horizonmgr.viewmodel.PackageDetailViewModel
 
 @Composable
 fun PackageDetailScreen(
@@ -89,7 +90,9 @@ fun PackageDetailScreen(
                                 }
                             }
                             ManifestSection(
-                                modifier = Modifier.wrapContentHeight().fillMaxWidth(),
+                                modifier = Modifier
+                                    .wrapContentHeight()
+                                    .fillMaxWidth(),
                                 packageName = info.packageName,
                                 developer = info.developer,
                                 versionName = info.version,
@@ -99,7 +102,9 @@ fun PackageDetailScreen(
                                 description = info.description
                             )
                             InstallationSection(
-                                modifier = Modifier.wrapContentHeight().fillMaxWidth(),
+                                modifier = Modifier
+                                    .wrapContentHeight()
+                                    .fillMaxWidth(),
                                 path = info.installDir,
                                 packSize = remember(pkgSize) {
                                     when (val pkgSize = pkgSize) {

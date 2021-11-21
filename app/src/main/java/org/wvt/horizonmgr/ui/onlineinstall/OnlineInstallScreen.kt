@@ -15,6 +15,7 @@ import org.wvt.horizonmgr.service.hzpack.recommendDescription
 import org.wvt.horizonmgr.ui.components.ErrorPage
 import org.wvt.horizonmgr.ui.pacakgemanager.ManifestSection
 import org.wvt.horizonmgr.ui.theme.AppBarBackgroundColor
+import org.wvt.horizonmgr.viewmodel.InstallPackageViewModel
 
 private enum class Screen {
     CHOOSE_PACKAGE, EDIT_NAME, INSTALL
@@ -37,28 +38,6 @@ fun OnlineInstallScreen(
         viewModel.getPackages()
         onDispose { }
     }
-
-    /*val context = LocalContext.current.applicationContext
-
-    var serviceBinder by remember { mutableStateOf<OnlinePackageInstallService.MyBinder?>(null) }
-
-    fun startDownload(selectedPackage: OfficialCDNPackage, customName: String?) {
-        val intent = Intent(context, OnlinePackageInstallService::class.java).apply {
-            action = "install_package"
-            putExtra("uuid", selectedPackage.uuid)
-            putExtra("custom_name", customName)
-        }
-        context.bindService(intent, object : ServiceConnection {
-            override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-                val binder = (service as OnlinePackageInstallService.MyBinder)
-                serviceBinder = binder
-            }
-
-            override fun onServiceDisconnected(name: ComponentName?) {
-                serviceBinder = null
-            }
-        }, 0)
-    }*/
 
     BackHandler {
         when (screen) {

@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import org.wvt.horizonmgr.ui.theme.AndroidHorizonManagerTheme
 import org.wvt.horizonmgr.ui.theme.PreviewTheme
 
 @Composable
@@ -43,56 +44,58 @@ fun Root(
         }
     }
 
-    Surface(color = MaterialTheme.colors.background) {
-        content()
-    }
-
-    if (showPermissionDialog) {
-        RequestPermissionDialog {
-            viewModel.dismiss()
-            onRequestPermission()
+    AndroidHorizonManagerTheme {
+        Surface(Modifier.fillMaxSize(), color = MaterialTheme.colors.background) {
+            content()
         }
-    }
 
-    val theNewVersion = newVersion
-
-    if (theNewVersion != null && displayNewVersionDialog) {
-        NewVersionDialog(
-            versionName = theNewVersion.versionName,
-            versionCode = theNewVersion.versionCode,
-            changelog = theNewVersion.changelog,
-            onConfirm = { displayNewVersionDialog = false },
-            onIgnore = {
-                viewModel.ignoreVersion(theNewVersion.versionCode)
-                displayNewVersionDialog = false
+        if (showPermissionDialog) {
+            RequestPermissionDialog {
+                viewModel.dismiss()
+                onRequestPermission()
             }
-        )
-    }
+        }
 
-    if (showHZNotInstall) {
-        InstallHorizonDialog(
-            onDismissClick = { viewModel.dismissHZNotInstallDialog() },
-            onConfirmClick = {
-                onInstallHZClick()
-                viewModel.dismissHZNotInstallDialog()
-            },
-            onNeverShowClick = {
-                viewModel.neverShowHZInstallationTip()
-            }
-        )
-    }
+        val theNewVersion = newVersion
 
-    if (showGameNotInstall) {
-        InstallMCDialog(
-            onDismissClick = { viewModel.dismissGameNotInstallDialog() },
-            onConfirmClick = {
-                onInstallMCClick()
-                viewModel.dismissGameNotInstallDialog()
-            },
-            onNeverShowClick = {
-                viewModel.neverShowMCInstallationTip()
-            }
-        )
+        if (theNewVersion != null && displayNewVersionDialog) {
+            NewVersionDialog(
+                versionName = theNewVersion.versionName,
+                versionCode = theNewVersion.versionCode,
+                changelog = theNewVersion.changelog,
+                onConfirm = { displayNewVersionDialog = false },
+                onIgnore = {
+                    viewModel.ignoreVersion(theNewVersion.versionCode)
+                    displayNewVersionDialog = false
+                }
+            )
+        }
+
+        if (showHZNotInstall) {
+            InstallHorizonDialog(
+                onDismissClick = { viewModel.dismissHZNotInstallDialog() },
+                onConfirmClick = {
+                    onInstallHZClick()
+                    viewModel.dismissHZNotInstallDialog()
+                },
+                onNeverShowClick = {
+                    viewModel.neverShowHZInstallationTip()
+                }
+            )
+        }
+
+        if (showGameNotInstall) {
+            InstallMCDialog(
+                onDismissClick = { viewModel.dismissGameNotInstallDialog() },
+                onConfirmClick = {
+                    onInstallMCClick()
+                    viewModel.dismissGameNotInstallDialog()
+                },
+                onNeverShowClick = {
+                    viewModel.neverShowMCInstallationTip()
+                }
+            )
+        }
     }
 }
 
