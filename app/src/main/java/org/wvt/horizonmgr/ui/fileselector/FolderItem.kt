@@ -268,7 +268,7 @@ private fun SwitchIcon(
 @Preview
 @Composable
 private fun FolderEntryPreview() {
-    PreviewTheme(Modifier) {
+    PreviewTheme {
         FolderItem(
             name = "Test File",
             onClick = {},

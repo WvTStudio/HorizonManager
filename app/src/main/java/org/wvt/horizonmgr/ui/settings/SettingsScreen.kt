@@ -31,8 +31,8 @@ fun SettingsScreen(
     val themeController = LocalThemeController.current
     val themeConfig = LocalThemeConfig.current
 
-    var followSystemDarkMode by remember { mutableStateOf(themeConfig.followSystemDarkMode) }
-    var customIsDark by remember { mutableStateOf(themeConfig.isCustomInDark) }
+    val followSystemDarkMode by rememberUpdatedState(themeConfig.followSystemDarkMode)
+    val customIsDark by rememberUpdatedState(themeConfig.isCustomInDark)
 
     Column(Modifier.fillMaxSize()) {
         TopAppBar(title = {
@@ -97,12 +97,10 @@ fun SettingsScreen(
                         onDismissRequest = { dropdownMenuExpanded = false }
                     ) {
                         DropdownMenuItem(onClick = {
-                            followSystemDarkMode = true
                             themeController.setFollowSystemDarkTheme(true)
                             dropdownMenuExpanded = false
                         }) { Text(stringResource(id = R.string.settings_screen_option_darkmode_follow_system)) }
                         DropdownMenuItem(onClick = {
-                            followSystemDarkMode = false
                             themeController.setFollowSystemDarkTheme(false)
                             dropdownMenuExpanded = false
                         }) { Text(stringResource(id = R.string.settings_screen_option_darkmode_custom)) }
@@ -120,7 +118,6 @@ fun SettingsScreen(
                         enabled = !followSystemDarkMode, // 自定义时可以修改
                         checked = customIsDark,
                         onCheckedChange = {
-                            customIsDark = it
                             themeController.setCustomDarkTheme(it)
                         }
                     )

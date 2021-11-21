@@ -12,7 +12,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.Colors
 import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -22,8 +24,13 @@ import com.google.accompanist.insets.ProvideWindowInsets
 import com.google.accompanist.insets.navigationBarsHeight
 import com.google.accompanist.insets.statusBarsHeight
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import org.wvt.horizonmgr.HorizonManagerApplication
 import org.wvt.horizonmgr.ui.donate.alipayColor
 import org.wvt.horizonmgr.ui.donate.wechatColor
+import javax.inject.Singleton
 
 @Composable
 fun AndroidHorizonManagerTheme(
@@ -31,37 +38,27 @@ fun AndroidHorizonManagerTheme(
     content: @Composable () -> Unit
 ) {
     val context = LocalContext.current
-    val themeController = remember(context) { AndroidThemeController(context) }
+    val themeController =
+        remember(context) { (context.applicationContext as HorizonManagerApplication).themeController }
     val systemUiController = rememberSystemUiController()
-    val config by themeController.config
+    val config = themeController.config
 
     LaunchedEffect(Unit) {
         WindowCompat.setDecorFitsSystemWindows((context as Activity).window, false)
     }
 
     LaunchedEffect(isSystemInDarkTheme()) {
-        themeController.update()
+        themeController.updateSystemDarkState()
     }
 
-    var statusBarColor by remember { mutableStateOf(Color.Transparent) }
-    var navigationBarColor by remember { mutableStateOf(Color.Transparent) }
+    val statusBarColor = if (fullScreen) config.color.background else config.statusBarColor
+    val navigationBarColor = config.color.background
 
-    LaunchedEffect(config) {
-        val config = config
-        val color = if (config.isDark) config.darkColor else config.lightColor
-
-        statusBarColor = if (fullScreen) {
-            color.background
-        } else {
-            if (config.isDark) {
-                color.surface
-            } else {
-                config.statusBarColor
-            }
-        }
-
-        systemUiController.setStatusBarColor(Color.Transparent, MaterialColors.isLightColor(statusBarColor))
-        navigationBarColor = color.background
+    LaunchedEffect(statusBarColor, navigationBarColor) {
+        systemUiController.setStatusBarColor(
+            Color.Transparent,
+            MaterialColors.isLightColor(statusBarColor)
+        )
         systemUiController.setNavigationBarColor(
             Color.Transparent,
             MaterialColors.isLightColor(navigationBarColor)
@@ -74,12 +71,14 @@ fun AndroidHorizonManagerTheme(
             config = config,
         ) {
             Column(Modifier.fillMaxSize()) {
+                // Status bar
                 Box(
                     Modifier
                         .fillMaxWidth()
                         .statusBarsHeight()
                         .background(statusBarColor)
                 )
+                // Content
                 Box(
                     Modifier
                         .fillMaxWidth()
@@ -87,6 +86,7 @@ fun AndroidHorizonManagerTheme(
                 ) {
                     content()
                 }
+                // Navigation Bar
                 Box(
                     Modifier
                         .fillMaxWidth()
@@ -99,28 +99,27 @@ fun AndroidHorizonManagerTheme(
 }
 
 @Composable
-fun AndroidDonateTheme(content: @Composable() () -> Unit) {
+fun AndroidDonateTheme(content: @Composable () -> Unit) {
     val context = LocalContext.current.applicationContext
     val themeController = remember(context) { AndroidThemeController(context) }
-    val config by themeController.config
+    val config = themeController.config
 
-    DisposableEffect(isSystemInDarkTheme()) {
-        themeController.update()
-        onDispose { }
+    LaunchedEffect(isSystemInDarkTheme()) {
+        themeController.updateSystemDarkState()
     }
 
     val controller = rememberSystemUiController()
-    DisposableEffect(config) {
-        val config = config
-        val color = if (config.isDark) config.darkColor else config.lightColor
+    val color = config.color
+    val background = color.background
+    val isDark = config.isDark
 
-        if (config.isDark) {
-            controller.setSystemBarsColor(color.background)
+    LaunchedEffect(config.isDark) {
+        if (isDark) {
+            controller.setSystemBarsColor(background)
         } else {
             controller.setStatusBarColor(alipayColor)
             controller.setNavigationBarColor(wechatColor)
         }
-        onDispose { }
     }
 
     ProvideWindowInsets {
@@ -221,20 +220,16 @@ private class ConfigurationStorage(context: Context) {
     }
 }
 
-internal class AndroidThemeController(
+@Singleton
+class AndroidThemeController(
     private val context: Context
 ) : ThemeController {
-    private val _config = mutableStateOf<ThemeConfig>(DefaultThemeConfig)
-    val config: State<ThemeConfig> = _config
-
     private val localConfig = ConfigurationStorage(context)
+    private val scope = CoroutineScope(Dispatchers.IO)
 
-    init {
-        update()
-    }
+    val config: ThemeConfig = getThemeConfig()
 
-    @Synchronized
-    fun update() {
+    private fun getThemeConfig(): ThemeConfig {
         val lightColor = localConfig.getLightColor()
         val darkColor = localConfig.getDarkColor()
         val appbarAccent = localConfig.isAppbarAccent()
@@ -243,7 +238,7 @@ internal class AndroidThemeController(
         val isSystemInDark =
             context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
 
-        _config.value = _config.value.copy(
+        return ThemeConfig(
             followSystemDarkMode = configFollowSystem,
             isSystemInDark = isSystemInDark,
             isCustomInDark = isConfigCustomInDark,
@@ -253,38 +248,45 @@ internal class AndroidThemeController(
         )
     }
 
-    fun isFollowingSystemDarkTheme(): Boolean {
-        return localConfig.getFollowSystemDarkMode()
+    fun updateSystemDarkState() {
+        val isSystemInDark =
+            context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
+        config.isSystemInDark = isSystemInDark
     }
 
-    @Synchronized
     override fun setFollowSystemDarkTheme(enable: Boolean) {
-        localConfig.setFollowSystemDarkMode(enable)
-        update()
+        config.followSystemDarkMode = enable
+        scope.launch {
+            localConfig.setFollowSystemDarkMode(enable)
+        }
     }
 
-    @Synchronized
     override fun setCustomDarkTheme(enable: Boolean) {
-        localConfig.setCustomDarkMode(enable)
-        update()
+        config.isCustomInDark = enable
+        scope.launch {
+            localConfig.setCustomDarkMode(enable)
+        }
     }
 
-    @Synchronized
     override fun setLightColor(color: Colors) {
-        localConfig.setLightColor(color)
-        update()
+        config.lightColor = color
+        scope.launch {
+            localConfig.setLightColor(color)
+        }
     }
 
-    @Synchronized
     override fun setDarkColor(color: Colors) {
-        localConfig.setDarkColor(color)
-        update()
+        config.darkColor = color
+        scope.launch {
+            localConfig.setDarkColor(color)
+        }
     }
 
-    @Synchronized
     override fun setAppbarAccent(enable: Boolean) {
-        localConfig.setAppbarAccent(enable)
-        update()
+        config.appbarAccent = enable
+        scope.launch {
+            localConfig.setAppbarAccent(enable)
+        }
     }
 }
 
