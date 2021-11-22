@@ -1,18 +1,18 @@
 package org.wvt.horizonmgr.ui.modulemanager
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.MoreVert
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import org.wvt.horizonmgr.R
 import org.wvt.horizonmgr.ui.components.LocalImage
 import org.wvt.horizonmgr.ui.theme.HorizonManagerTheme
 
@@ -33,7 +33,8 @@ internal fun LevelItem(
             LocalImage(
                 modifier = Modifier
                     .matchParentSize(),
-                path = screenshot, contentDescription = "存档预览图",
+                path = screenshot,
+                contentDescription = stringResource(R.string.module_screen_level_item_image_desc),
                 contentScale = ContentScale.Crop
             )
             Text(
@@ -54,7 +55,7 @@ internal fun LevelItem(
                 ) {
                     Icon(
                         imageVector = Icons.Rounded.MoreVert,
-                        contentDescription = "选项",
+                        contentDescription = stringResource(R.string.module_screen_level_item_options),
                         tint = Color.White
                     )
                 }
@@ -66,95 +67,27 @@ internal fun LevelItem(
                         onCopyClick()
                         dropdownExpand = false
                     }) {
-                        Text(text = "复制")
+                        Text(text = stringResource(R.string.module_screen_level_item_action_copy))
                     }
                     DropdownMenuItem(onClick = {
                         onMoveClick()
                         dropdownExpand = false
                     }) {
-                        Text(text = "移动")
+                        Text(text = stringResource(R.string.module_screen_level_item_action_move))
                     }
                     DropdownMenuItem(onClick = {
                         onRenameClicked()
                         dropdownExpand = false
                     }) {
-                        Text(text = "重命名")
+                        Text(text = stringResource(R.string.module_screen_level_item_action_rename))
                     }
                     DropdownMenuItem(onClick = {
                         onDeleteClicked()
                         dropdownExpand = false
                     }) {
-                        Text(text = "删除")
+                        Text(text = stringResource(R.string.module_screen_level_item_action_delete))
                     }
                 }
-            }
-        }
-    }
-}
-
-@Composable
-internal fun LegacyLevelItem(
-    modifier: Modifier = Modifier,
-    levelName: String,
-    screenshot: String?,
-    onRenameClicked: () -> Unit,
-    onDeleteClicked: () -> Unit,
-    onCopyClick: () -> Unit,
-    onMoveClick: () -> Unit
-) {
-    Card(modifier = modifier) {
-        Column {
-            Row(
-                Modifier
-                    .fillMaxWidth()
-                    .wrapContentHeight()
-            ) {
-                Column(
-                    modifier = Modifier
-                        .padding(
-                            top = 16.dp,
-                            start = 16.dp,
-                            bottom = 16.dp
-                        )
-                        .weight(1f)
-                ) {
-                    Text(text = levelName, style = MaterialTheme.typography.h6)
-                }
-                LocalImage(
-                    path = screenshot,
-                    contentDescription = "存档预览图",
-                    modifier = Modifier
-                        .padding(16.dp)
-                        .height(72.dp)
-                        .clip(RoundedCornerShape(4.dp))
-                        .aspectRatio(16f / 9f)
-                )
-            }
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 8.dp, vertical = 4.dp),
-                horizontalArrangement = Arrangement.End
-            ) {
-                Row(
-                    Modifier
-                        .weight(1f)
-                ) {
-                    TextButton(onClick = onCopyClick) {
-                        Text("复制")
-                    }
-                    Spacer(modifier = Modifier.width(16.dp))
-                    TextButton(onClick = onMoveClick) {
-                        Text("移动")
-                    }
-                }
-                TextButton(
-                    onClick = onRenameClicked
-                ) { Text("重命名") }
-                Spacer(modifier = Modifier.width(16.dp))
-                TextButton(
-                    onClick = onDeleteClicked
-                ) { Text("删除") }
             }
         }
     }
@@ -165,7 +98,7 @@ internal fun LegacyLevelItem(
 private fun LevelItemPreview() {
     HorizonManagerTheme {
         Surface(modifier = Modifier.wrapContentHeight()) {
-            LegacyLevelItem(
+            LevelItem(
                 levelName = "My world",
                 screenshot = null,
                 onRenameClicked = {},

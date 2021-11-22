@@ -17,12 +17,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.PlaceholderVerticalAlign
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import org.wvt.horizonmgr.R
 import org.wvt.horizonmgr.ui.components.NetworkImage
 import org.wvt.horizonmgr.ui.theme.PreviewTheme
 
@@ -79,7 +81,7 @@ private fun GroupItem(
                     .size(42.dp)
                     .clip(RoundedCornerShape(percent = 50)),
                 url = avatarUrl,
-                contentDescription = "头像"
+                contentDescription = stringResource(R.string.group_screen_avatar_desc)
             )
         }
         // Information
@@ -122,7 +124,7 @@ private fun GroupItem(
                 .wrapContentSize(),
             verticalArrangement = Arrangement.Center
         ) {
-            Icon(Icons.Rounded.ArrowForward, "加入")
+            Icon(Icons.Rounded.ArrowForward, stringResource(R.string.group_screen_action_join))
         }
     }
 }

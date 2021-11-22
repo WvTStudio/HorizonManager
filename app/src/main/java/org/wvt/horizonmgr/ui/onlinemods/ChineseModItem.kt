@@ -13,8 +13,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import org.wvt.horizonmgr.R
 import org.wvt.horizonmgr.ui.components.ModIcon
 import org.wvt.horizonmgr.ui.components.loadUrlImage
 import org.wvt.horizonmgr.ui.theme.PreviewTheme
@@ -84,7 +86,8 @@ internal fun ChineseModItem(
                     CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
                         Icon(
                             modifier = Modifier.size(18.dp),
-                            imageVector = Icons.Rounded.GetApp, contentDescription = "Downloads"
+                            imageVector = Icons.Rounded.GetApp,
+                            contentDescription = stringResource(R.string.olmod_screen_icon_downloads)
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
@@ -95,7 +98,7 @@ internal fun ChineseModItem(
                         Icon(
                             modifier = Modifier.size(18.dp),
                             imageVector = Icons.Rounded.AccessTime,
-                            contentDescription = "Last update"
+                            contentDescription = stringResource(R.string.olmod_screen_icon_last_update)
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(text = model.time, style = MaterialTheme.typography.caption)
@@ -104,7 +107,10 @@ internal fun ChineseModItem(
                 CompositionLocalProvider(LocalContentColor provides MaterialTheme.colors.primary) {
                     // Install Button
                     IconButton(onClick = onInstallClick) {
-                        Icon(Icons.Rounded.Extension, contentDescription = "安装")
+                        Icon(
+                            Icons.Rounded.Extension,
+                            stringResource(R.string.olmod_screen_action_install)
+                        )
                     }
                 }
             }

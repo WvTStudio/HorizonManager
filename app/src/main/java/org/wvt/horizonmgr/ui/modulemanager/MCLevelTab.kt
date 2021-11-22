@@ -13,10 +13,12 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.SwipeRefreshIndicator
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import org.wvt.horizonmgr.R
 import org.wvt.horizonmgr.ui.components.*
 import org.wvt.horizonmgr.viewmodel.MCLevelTabViewModel
 
@@ -38,7 +40,7 @@ internal fun MCLevelTab(
         ErrorBanner(
             modifier = Modifier.fillMaxWidth(),
             errors = errors,
-            text = "解析地图时发生 ${errors.size} 个错误"
+            text = stringResource(R.string.md_level_tab_banner).format(errors.size)
         )
     }
 
@@ -63,7 +65,7 @@ internal fun MCLevelTab(
                         if (items.isEmpty()) item {
                             Box(Modifier.fillParentMaxSize()) {
                                 EmptyPage(Modifier.fillMaxSize()) {
-                                    Text("当前还没有地图")
+                                    Text(stringResource(R.string.mc_level_tab_tip_empty))
                                 }
                                 banner()
                             }
@@ -88,7 +90,7 @@ internal fun MCLevelTab(
                         .align(Alignment.BottomEnd)
                         .padding(16.dp), onClick = onAddClick
                 ) {
-                    Icon(imageVector = Icons.Rounded.Add, contentDescription = "Add")
+                    Icon(Icons.Rounded.Add, stringResource(R.string.mc_level_tab_action_add))
                 }
             }
             is MCLevelTabViewModel.State.Error -> ErrorPage(

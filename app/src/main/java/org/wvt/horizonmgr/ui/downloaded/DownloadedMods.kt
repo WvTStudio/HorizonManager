@@ -17,11 +17,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.SwipeRefreshIndicator
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import org.wvt.horizonmgr.R
 import org.wvt.horizonmgr.ui.components.ModIcon
 import org.wvt.horizonmgr.ui.components.ProgressDialog
 import org.wvt.horizonmgr.ui.theme.AppBarBackgroundColor
@@ -41,10 +43,10 @@ fun DownloadedMods(
     Column(Modifier.fillMaxSize()) {
         TopAppBar(
             modifier = Modifier.zIndex(4.dp.value), title = {
-                Text("本地资源")
+                Text(stringResource(R.string.downloaded_screen_title))
             }, navigationIcon = {
                 IconButton(onClick = onNavClicked, content = {
-                    Icon(Icons.Rounded.Menu, "菜单")
+                    Icon(Icons.Rounded.Menu, stringResource(R.string.navigation_action_menu))
                 })
             }, backgroundColor = AppBarBackgroundColor
         )
@@ -112,7 +114,7 @@ private fun ModList(
                             .padding(16.dp), Alignment.Center
                     ) {
                         Text(
-                            "未找到本地资源，请从在线资源中下载",
+                            stringResource(R.string.downloaded_screen_notfound),
                             color = MaterialTheme.colors.onSurface.copy(ContentAlpha.medium)
                         )
                     }
@@ -163,7 +165,12 @@ private fun ModItem(
                         .padding(start = 16.dp)
                         .align(Alignment.CenterStart),
                     onClick = onDeleteClicked
-                ) { Text("删除", color = MaterialTheme.colors.primary) }
+                ) {
+                    Text(
+                        stringResource(R.string.downloaded_screen_action_delete),
+                        color = MaterialTheme.colors.primary
+                    )
+                }
                 // Install Button
                 IconButton(
                     modifier = Modifier
@@ -174,7 +181,7 @@ private fun ModItem(
                     Icon(
                         imageVector = Icons.Rounded.Extension,
                         tint = MaterialTheme.colors.primary,
-                        contentDescription = null
+                        contentDescription = stringResource(R.string.downloaded_screen_action_install)
                     )
                 }
             }

@@ -11,7 +11,9 @@ import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import org.wvt.horizonmgr.R
 import org.wvt.horizonmgr.service.hzpack.recommendDescription
 import org.wvt.horizonmgr.ui.components.ErrorPage
 import org.wvt.horizonmgr.ui.pacakgemanager.ManifestSection
@@ -65,7 +67,7 @@ fun OnlineInstallScreen(
                     }) {
                         Icon(
                             Icons.Rounded.ArrowBack,
-                            contentDescription = "返回"
+                            contentDescription = stringResource(R.string.navigation_action_back)
                         )
                     }
                 }
@@ -73,9 +75,13 @@ fun OnlineInstallScreen(
             title = {
                 Crossfade(targetState = screen) { screen ->
                     when (screen) {
-                        Screen.CHOOSE_PACKAGE -> Text("在线安装分包")
-                        Screen.EDIT_NAME -> Text("输入分包的名字")
-                        Screen.INSTALL -> Text(if (viewModel.totalProgress.collectAsState().value >= 1f) "安装完成" else "正在安装")
+                        Screen.CHOOSE_PACKAGE -> Text(stringResource(R.string.ol_install_screen_title_choose))
+                        Screen.EDIT_NAME -> Text(stringResource(R.string.ol_install_screen_title_edit))
+                        Screen.INSTALL -> Text(
+                            if (viewModel.totalProgress.collectAsState().value >= 1f)
+                                stringResource(R.string.ol_install_screen_title_install_completed)
+                            else stringResource(R.string.ol_install_screen_title_install_doing)
+                        )
                     }
                 }
 
@@ -152,7 +158,8 @@ fun OnlineInstallScreen(
                                 Box(
                                     Modifier
                                         .padding(32.dp)
-                                        .fillMaxWidth()) {
+                                        .fillMaxWidth()
+                                ) {
                                     CircularProgressIndicator(Modifier.align(Alignment.Center))
                                 }
                             } else with(state) {

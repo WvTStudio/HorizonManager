@@ -15,8 +15,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEachIndexed
+import org.wvt.horizonmgr.R
 
 sealed class PathListEntry {
     @Immutable
@@ -40,7 +42,7 @@ internal fun PathList(
     val header = @Composable {
         Text(
             modifier = Modifier.padding(16.dp),
-            text = "已固定",
+            text = stringResource(R.string.fileselector_screen_label_fixed),
             color = MaterialTheme.colors.primary,
             style = MaterialTheme.typography.subtitle1
         )
@@ -67,7 +69,7 @@ internal fun PathList(
                         .fillMaxWidth()) {
                     Text(
                         modifier = Modifier.align(Alignment.Center),
-                        text = "空文件夹"
+                        text = stringResource(R.string.fileselector_screen_tip_empty)
                     )
                 }
             }

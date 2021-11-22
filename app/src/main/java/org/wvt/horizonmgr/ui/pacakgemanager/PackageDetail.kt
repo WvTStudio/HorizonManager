@@ -15,8 +15,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.compositeOver
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import org.wvt.horizonmgr.R
 import org.wvt.horizonmgr.ui.components.ErrorPage
 import org.wvt.horizonmgr.ui.components.ImageWithoutQualityFilter
 import org.wvt.horizonmgr.ui.theme.AppBarBackgroundColor
@@ -37,10 +39,10 @@ fun PackageDetailScreen(
         TopAppBar(
             modifier = Modifier.zIndex(4f),
             title = {
-                Text("分包详情")
+                Text(stringResource(R.string.pkg_detail_screen_title))
             }, navigationIcon = {
                 IconButton(onClick = onCloseClick) {
-                    Icon(Icons.Rounded.ArrowBack, "返回")
+                    Icon(Icons.Rounded.ArrowBack, stringResource(R.string.navigation_action_back))
                 }
             }, backgroundColor = AppBarBackgroundColor
         )
@@ -55,7 +57,10 @@ fun PackageDetailScreen(
                     }
                 }
                 PackageDetailViewModel.State.FAILED -> {
-                    ErrorPage(message = { Text("获取分包详情失败") }, onRetryClick = { viewModel.load() })
+                    ErrorPage(
+                        message = { Text(stringResource(R.string.pkg_detail_screen_state_error)) },
+                        onRetryClick = { viewModel.load() }
+                    )
                 }
                 PackageDetailViewModel.State.SUCCEED -> {
                     val info = info
@@ -101,18 +106,26 @@ fun PackageDetailScreen(
                                 gameVersion = info.gameVersion,
                                 description = info.description
                             )
+
+                            val errorStr = stringResource(R.string.pkg_detail_screen_pkgsize_error)
+                            val calcStr = stringResource(R.string.pkg_detail_screen_pkgsize_calc)
+                            val countStr = stringResource(R.string.pkg_detail_screen_pkgsize_count)
+
+                            val pkgSizeStr = remember(pkgSize) {
+                                when (val pkgSize = pkgSize) {
+                                    is PackageDetailViewModel.PackageSize.Succeed -> pkgSize.sizeStr + countStr.format(
+                                        pkgSize.count
+                                    )
+                                    is PackageDetailViewModel.PackageSize.Failed -> errorStr
+                                    is PackageDetailViewModel.PackageSize.Loading -> calcStr
+                                }
+                            }
                             InstallationSection(
                                 modifier = Modifier
                                     .wrapContentHeight()
                                     .fillMaxWidth(),
                                 path = info.installDir,
-                                packSize = remember(pkgSize) {
-                                    when (val pkgSize = pkgSize) {
-                                        is PackageDetailViewModel.PackageSize.Succeed -> pkgSize.sizeStr + "  共 ${pkgSize.count} 个文件"
-                                        is PackageDetailViewModel.PackageSize.Failed -> "计算出错"
-                                        is PackageDetailViewModel.PackageSize.Loading -> "正在计算"
-                                    }
-                                },
+                                packSize = pkgSizeStr,
                                 installUUID = info.installUUID,
                                 installTime = info.installTime
                             )
@@ -139,7 +152,7 @@ fun ManifestSection(
     Column(modifier) {
 
         Text(
-            text = "清单信息",
+            text = stringResource(R.string.pkg_detail_screen_section_manifest),
             style = MaterialTheme.typography.subtitle2,
             color = MaterialTheme.colors.primary,
             modifier = Modifier.padding(top = 16.dp, bottom = 8.dp, start = 72.dp)
@@ -151,7 +164,7 @@ fun ManifestSection(
                 contentDescription = null
             )
         }, text = {
-            Text("分包名称")
+            Text(stringResource(R.string.pkg_detail_screen_pkgname))
         }, secondaryText = {
             Text(packageName)
         })
@@ -162,7 +175,7 @@ fun ManifestSection(
                 contentDescription = null
             )
         }, text = {
-            Text("开发者")
+            Text(stringResource(R.string.pkg_detail_screen_developer))
         }, secondaryText = {
             Text(developer)
         })
@@ -173,7 +186,7 @@ fun ManifestSection(
                 contentDescription = null
             )
         }, text = {
-            Text("版本名")
+            Text(stringResource(R.string.pkg_detail_screen_versionname))
         }, secondaryText = {
             Text(versionName)
         })
@@ -184,7 +197,7 @@ fun ManifestSection(
                 contentDescription = null
             )
         }, text = {
-            Text("版本号")
+            Text(stringResource(R.string.pkg_detail_screen_versioncode))
         }, secondaryText = {
             Text(versionCode)
         })
@@ -195,7 +208,7 @@ fun ManifestSection(
                 contentDescription = null
             )
         }, text = {
-            Text("UUID")
+            Text(stringResource(R.string.pkg_detail_screen_uuid))
         }, secondaryText = {
             Text(packageUUID)
         })
@@ -206,7 +219,7 @@ fun ManifestSection(
                 contentDescription = null
             )
         }, text = {
-            Text("游戏版本")
+            Text(stringResource(R.string.pkg_detail_screen_gameversion))
         }, secondaryText = {
             Text(gameVersion)
         })
@@ -217,7 +230,7 @@ fun ManifestSection(
                 contentDescription = null
             )
         }, text = {
-            Text("分包描述")
+            Text(stringResource(R.string.pkg_detail_screen_pkg_desc))
         }, secondaryText = {
             SelectionContainer { Text(description) }
         })
@@ -235,7 +248,7 @@ fun InstallationSection(
 ) {
     Column(modifier) {
         Text(
-            text = "安装信息",
+            text = stringResource(R.string.pkg_detail_screen_section_installation),
             style = MaterialTheme.typography.subtitle2,
             color = MaterialTheme.colors.primary,
             modifier = Modifier.padding(top = 16.dp, bottom = 8.dp, start = 72.dp)
@@ -247,7 +260,7 @@ fun InstallationSection(
                 contentDescription = null
             )
         }, text = {
-            Text("安装路径")
+            Text(stringResource(R.string.pkg_detail_screen_install_path))
         }, secondaryText = {
             Text(path)
         })
@@ -258,7 +271,7 @@ fun InstallationSection(
                 contentDescription = null
             )
         }, text = {
-            Text("分包大小")
+            Text(stringResource(R.string.pkg_detail_screen_pkgsize))
         }, secondaryText = {
             Text(text = packSize)
         })
@@ -269,7 +282,7 @@ fun InstallationSection(
                 contentDescription = null
             )
         }, text = {
-            Text("安装 UUID")
+            Text(stringResource(R.string.pkg_detail_screen_installuuid))
         }, secondaryText = {
             Text(installUUID)
         })
@@ -280,7 +293,7 @@ fun InstallationSection(
                 contentDescription = null
             )
         }, text = {
-            Text("安装时间")
+            Text(stringResource(R.string.pkg_detail_screen_installtime))
         }, secondaryText = {
             Text(installTime)
         })

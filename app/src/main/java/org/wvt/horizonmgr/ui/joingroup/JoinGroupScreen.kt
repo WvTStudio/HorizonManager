@@ -9,7 +9,9 @@ import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
+import org.wvt.horizonmgr.R
 import org.wvt.horizonmgr.ui.components.ErrorPage
 import org.wvt.horizonmgr.ui.theme.AppBarBackgroundColor
 import org.wvt.horizonmgr.viewmodel.JoinGroupViewModel
@@ -28,11 +30,12 @@ fun JoinGroupScreen(
     val snackbar = remember { SnackbarHostState() }
 
     LaunchedEffect(viewModel) { viewModel.refresh() }
-    
+
+    val errorText = stringResource(R.string.group_screen_tip_qq_failed)
     LaunchedEffect(startError) {
         if (startError) {
             try {
-                snackbar.showSnackbar("启动 QQ 失败")
+                snackbar.showSnackbar(errorText)
             } finally {
                 viewModel.handledError()
             }
@@ -42,10 +45,13 @@ fun JoinGroupScreen(
     Box(Modifier.fillMaxSize()) {
         Column(Modifier.fillMaxSize()) {
             TopAppBar(
-                title = { Text("加入群组") },
+                title = { Text(stringResource(R.string.group_screen_title)) },
                 navigationIcon = {
                     IconButton(onClick = onClose) {
-                        Icon(Icons.Rounded.ArrowBack, contentDescription = "返回")
+                        Icon(
+                            Icons.Rounded.ArrowBack,
+                            stringResource(R.string.navigation_action_back)
+                        )
                     }
                 },
                 backgroundColor = AppBarBackgroundColor
@@ -62,7 +68,7 @@ fun JoinGroupScreen(
                 !isLoading && loadError != null -> {
                     ErrorPage(
                         modifier = Modifier.fillMaxSize(),
-                        message = { Text("加载失败") },
+                        message = { Text(stringResource(R.string.group_screen_tip_load_failed)) },
                         onRetryClick = { viewModel.refresh() }
                     )
                 }

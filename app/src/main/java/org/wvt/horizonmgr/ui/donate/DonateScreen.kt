@@ -6,6 +6,7 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -13,6 +14,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.annotation.ExperimentalCoilApi
 import coil.compose.rememberImagePainter
+import org.wvt.horizonmgr.R
 import org.wvt.horizonmgr.ui.theme.PreviewTheme
 import org.wvt.horizonmgr.viewmodel.DonateViewModel
 
@@ -68,12 +70,12 @@ private fun QRDialogContent(qrUrl: String) {
                     .fillMaxWidth()
                     .aspectRatio(1f),
                 painter = rememberImagePainter(qrUrl, builder = { crossfade(true) }),
-                contentDescription = "QR"
+                contentDescription = stringResource(R.string.donate_dialog_qrcode_desc)
             )
             Spacer(Modifier.height(16.dp))
             Text(
                 modifier = Modifier.align(Alignment.CenterHorizontally),
-                text = "请务必备注昵称，感谢您的支持",
+                text = stringResource(R.string.donate_dialog_tip),
                 color = MaterialTheme.colors.onSurface.copy(ContentAlpha.medium),
                 fontWeight = FontWeight.Medium
             )

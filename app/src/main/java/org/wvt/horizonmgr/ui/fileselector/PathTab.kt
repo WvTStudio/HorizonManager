@@ -15,8 +15,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEachIndexed
+import org.wvt.horizonmgr.R
 
 @Immutable
 data class PathTabData(
@@ -60,7 +62,7 @@ internal fun PathTab(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = if(index == 0) "内部存储空间" else item,
+                    text = if (index == 0) stringResource(R.string.fileselector_screen_label_root) else item,
                     color = animateColorAsState(
                         if (data.depth == index) contentColor
                         else contentColor.copy(alpha = 0.5f)

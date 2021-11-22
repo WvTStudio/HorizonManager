@@ -16,6 +16,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
@@ -59,7 +60,7 @@ fun Donate(
                         modifier = Modifier.align(Alignment.Center),
                         painter = painterResource(id = R.drawable.ic_alipay),
                         tint = if (light) Color.White else alipayColor,
-                        contentDescription = "支付宝支付"
+                        contentDescription = stringResource(R.string.donate_screen_op_alipay)
                     )
                 }
             }
@@ -78,17 +79,20 @@ fun Donate(
                         modifier = Modifier.align(Alignment.Center),
                         painter = painterResource(id = R.drawable.ic_wechatpay),
                         tint = if (light) Color.White else wechatColor,
-                        contentDescription = "微信支付"
+                        contentDescription = stringResource(R.string.donate_screen_op_wechat)
                     )
                 }
             }
         }
         Column(Modifier.statusBarsPadding()) {
             TopAppBar(
-                title = { Text("选择捐赠方式") },
+                title = { Text(stringResource(R.string.donate_screen_title)) },
                 navigationIcon = {
                     IconButton(onClick = onClose) {
-                        Icon(imageVector = Icons.Rounded.ArrowBack, contentDescription = "返回")
+                        Icon(
+                            imageVector = Icons.Rounded.ArrowBack,
+                            contentDescription = stringResource(R.string.navigation_action_back)
+                        )
                     }
                 },
                 elevation = 0.dp,
@@ -123,7 +127,7 @@ fun Donate(
         ) {
             TextButton(onClick = { displayDialog = true }) {
                 Text(
-                    text = "关于",
+                    text = stringResource(R.string.donate_screen_about),
                     color = if (light) Color.White else MaterialTheme.colors.primary
                 )
             }
@@ -133,15 +137,15 @@ fun Donate(
             AlertDialog(
                 modifier = Modifier.shadow(16.dp, clip = false),
                 onDismissRequest = { displayDialog = false },
-                title = { Text("关于捐赠") },
+                title = { Text(stringResource(R.string.donate_screen_about_title)) },
                 text = {
-                    Text(
-                        "本应用由几位爱好者开发维护，皆为在校学生。" +
-                                "您的捐款将用于支付服务器费用，如有多余将用来改善生活。\n" +
-                                "请在捐赠时务必留下您的名称，感谢您的支持！"
-                    )
+                    Text(stringResource(R.string.donate_screen_about_content))
                 },
-                confirmButton = { TextButton(onClick = { displayDialog = false }) { Text("关闭") } }
+                confirmButton = {
+                    TextButton(onClick = { displayDialog = false }) {
+                        Text(stringResource(R.string.button_action_confirm))
+                    }
+                }
             )
         }
     }
@@ -172,7 +176,10 @@ fun RandomPlaceLayout(modifier: Modifier, content: @Composable () -> Unit) {
 private fun DonatePreview() {
     PreviewTheme {
         Donate(
-            donates = setOf(DonateViewModel.DonateItem("User 1", 4.sp), DonateViewModel.DonateItem("User 2", 4.sp)),
+            donates = setOf(
+                DonateViewModel.DonateItem("User 1", 4.sp),
+                DonateViewModel.DonateItem("User 2", 4.sp)
+            ),
             onClose = { /*TODO*/ },
             onAlipayClicked = { /*TODO*/ },
             onWechatPayClicked = { /*TODO*/ }
