@@ -12,7 +12,9 @@ import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import org.wvt.horizonmgr.R
 
 @Composable
 fun DropDownSelector(
@@ -41,7 +43,7 @@ fun DropDownSelector(
                 rememberRipple(bounded = false, radius = 24.dp)
             ),
             onClick = { dropDown = true }
-        ) { Icon(Icons.Rounded.ArrowDropDown, "展开") }
+        ) { Icon(Icons.Rounded.ArrowDropDown, stringResource(R.string.button_action_expand)) }
         DropdownMenu(
             expanded = dropDown,
             onDismissRequest = { dropDown = false }

@@ -16,12 +16,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.SwipeRefreshIndicator
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import org.wvt.horizonmgr.R
 import org.wvt.horizonmgr.ui.components.ErrorPage
 import org.wvt.horizonmgr.ui.components.MarkdownContent
 import org.wvt.horizonmgr.ui.components.NetworkImage
@@ -41,10 +43,13 @@ fun ArticleContentScreen(
             modifier = Modifier.zIndex(4.dp.value),
             navigationIcon = {
                 IconButton(onClick = onNavClick) {
-                    Icon(Icons.Rounded.ArrowBack, contentDescription = "返回")
+                    Icon(
+                        Icons.Rounded.ArrowBack,
+                        contentDescription = stringResource(R.string.navigation_action_back)
+                    )
                 }
             }, title = {
-                Text("文章正文")
+                Text(stringResource(R.string.article_content_screen_appbar))
             }, backgroundColor = AppBarBackgroundColor
         )
         Crossfade(news) {
@@ -55,21 +60,21 @@ fun ArticleContentScreen(
                 ArticleContentViewModel.Result.NetworkError -> {
                     ErrorPage(
                         modifier = Modifier.fillMaxSize(),
-                        message = { Text("网络错误，请稍后再试") },
+                        message = { Text(stringResource(R.string.article_content_screen_error_network)) },
                         onRetryClick = { vm.refresh() }
                     )
                 }
                 ArticleContentViewModel.Result.ArticleNotFound -> {
                     ErrorPage(
                         modifier = Modifier.fillMaxSize(),
-                        message = { Text("该文章可能已被删除") },
+                        message = { Text(stringResource(R.string.article_content_screen_error_deleted)) },
                         onRetryClick = { vm.refresh() }
                     )
                 }
                 ArticleContentViewModel.Result.OtherError -> {
                     ErrorPage(
                         modifier = Modifier.fillMaxSize(),
-                        message = { Text("未知错误，请稍后再试") },
+                        message = { Text(stringResource(R.string.article_content_screen_error_unknown)) },
                         onRetryClick = { vm.refresh() }
                     )
                 }
@@ -110,7 +115,7 @@ private fun Content(
                         .aspectRatio(16f / 9f)
                         .clip(RoundedCornerShape(4.dp)),
                     url = content.coverImage,
-                    contentDescription = "封面",
+                    contentDescription = stringResource(R.string.article_content_screen_cover_desc),
                     contentScale = ContentScale.Crop
                 )
             }

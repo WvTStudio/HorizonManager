@@ -7,7 +7,9 @@ import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import org.wvt.horizonmgr.R
 
 @Composable
 fun InstallMCDialog(
@@ -22,19 +24,26 @@ fun InstallMCDialog(
             Row(
                 Modifier
                     .fillMaxWidth()
-                    .padding(8.dp)) {
+                    .padding(8.dp)
+            ) {
                 Row(Modifier.weight(1f)) {
-                    TextButton(onClick = onNeverShowClick) { Text("不再显示") }
+                    TextButton(onClick = onNeverShowClick) {
+                        Text(stringResource(R.string.install_mc_dialog_hide_forever))
+                    }
                 }
                 Spacer(Modifier.width(8.dp))
-                TextButton(onClick = onDismissClick) { Text("取消") }
+                TextButton(onClick = onDismissClick) {
+                    Text(stringResource(R.string.install_mc_dialog_cancel))
+                }
                 Spacer(Modifier.width(8.dp))
-                TextButton(onClick = onConfirmClick) { Text("前往 Google Play") }
+                TextButton(onClick = onConfirmClick) {
+                    Text(stringResource(R.string.install_mc_dialog_confirm))
+                }
             }
         },
-        title = { Text("您还未安装 Minecraft 游戏本体") },
+        title = { Text(stringResource(R.string.install_mc_dialog_title)) },
         text = {
-            Text("Horizon 已内嵌 Minecraft，但需要安装 Minecraft 本体以验证您是否为正版玩家")
+            Text(stringResource(R.string.install_mc_dialog_text))
         }
     )
 }

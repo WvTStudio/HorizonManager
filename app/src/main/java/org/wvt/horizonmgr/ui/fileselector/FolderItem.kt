@@ -24,12 +24,14 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
 import kotlinx.coroutines.launch
+import org.wvt.horizonmgr.R
 import org.wvt.horizonmgr.ui.theme.PreviewTheme
 import kotlin.math.roundToInt
 
@@ -62,7 +64,7 @@ internal fun FolderItem(
     }
 
     val starState = remember(state.offset.value, swipePoint, isStared) {
-        val offset = if(state.offset.value.isNaN()) 0f else state.offset.value
+        val offset = if (state.offset.value.isNaN()) 0f else state.offset.value
         (offset > -swipePoint - 10) xor !isStared
     }
 
@@ -92,7 +94,12 @@ internal fun FolderItem(
                 .clickable(onClick = onClick)
                 .offset(offset = { IntOffset(x = state.offset.value.roundToInt(), y = 0) })
                 .background(MaterialTheme.colors.surface),
-            icon = { Icon(Icons.Rounded.Folder, contentDescription = "文件夹") },
+            icon = {
+                Icon(
+                    Icons.Rounded.Folder,
+                    stringResource(R.string.fileselector_screen_item_type_folder)
+                )
+            },
             text = { Text(name) }
         )
     }
@@ -142,7 +149,6 @@ private fun ToggleBackgroundWithIcon(
     var backgroundColor by remember { mutableStateOf(if (check) activeColor else inactiveColor) }
 
     DisposableEffect(check) {
-        Log.d(TAG, "Check: $check")
         if (initialized) {
             scope.launch {
                 val animatable = Animatable(0f)
@@ -161,11 +167,7 @@ private fun ToggleBackgroundWithIcon(
         onDispose { }
     }
 
-    Box(
-        modifier.background(
-            backgroundColor
-        )
-    ) {
+    Box(modifier.background(backgroundColor)) {
         // Ripple
         BoxWithConstraints {
             for (ripple in ripples) {
@@ -237,7 +239,8 @@ private fun SwitchIcon(
         else inactiveColor
     ).value
 
-    val transition = updateTransition(targetState = if (isActive) IconState.ON else IconState.OFF,
+    val transition = updateTransition(
+        targetState = if (isActive) IconState.ON else IconState.OFF,
         label = "transition"
     )
     val scale by transition.animateFloat(
@@ -250,7 +253,7 @@ private fun SwitchIcon(
             }
         },
         targetValueByState = {
-            if(it == IconState.ON) 1f else 1f
+            if (it == IconState.ON) 1f else 1f
         }, label = "scale"
     )
 

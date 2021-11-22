@@ -18,11 +18,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.SwipeRefreshIndicator
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import org.wvt.horizonmgr.R
 import org.wvt.horizonmgr.ui.components.*
 import org.wvt.horizonmgr.viewmodel.ModTabViewModel
 
@@ -42,7 +44,7 @@ internal fun ModTab(
         ErrorBanner(
             modifier = Modifier.fillMaxWidth(),
             errors = errors,
-            text = "解析模组时发生 ${errors.size} 个错误"
+            text = stringResource(R.string.ic_mod_tab_banner).format(errors.size)
         )
     }
 
@@ -57,7 +59,7 @@ internal fun ModTab(
             }
             is ModTabViewModel.State.PackageNotSelected -> {
                 EmptyPage(Modifier.fillMaxSize()) {
-                    Text(text = "你还没有选择分包")
+                    Text(text = stringResource(R.string.ic_mod_tab_unselected))
                 }
             }
             is ModTabViewModel.State.OK -> Box(Modifier.fillMaxSize()) {
@@ -77,7 +79,7 @@ internal fun ModTab(
                         if (mods.isEmpty()) item {
                             Box(Modifier.fillParentMaxSize()) {
                                 EmptyPage(Modifier.fillMaxSize()) {
-                                    Text("当前分包内没有已安装的模组")
+                                    Text(stringResource(R.string.ic_mod_tab_tip_empty))
                                 }
                                 banner()
                             }
@@ -113,10 +115,10 @@ internal fun ModTab(
                         .padding(16.dp)
                         .align(Alignment.BottomEnd),
                     onClick = onAddModClicked
-                ) { Icon(imageVector = Icons.Rounded.Add, contentDescription = "安装") }
+                ) { Icon(Icons.Rounded.Add, stringResource(R.string.ic_mod_tab_action_install)) }
             }
             is ModTabViewModel.State.Error -> ErrorPage(
-                message = { Text("解析模组列表失败") },
+                message = { Text(stringResource(R.string.ic_mod_tab_tip_error)) },
                 onRetryClick = { vm.refresh() }
             )
         }
@@ -195,7 +197,7 @@ private fun ModItem(
             ) {
                 // Delete button
                 Box(Modifier.weight(1f)) {
-                    TextButton(onClick = onDeleteClick) { Text("删除") }
+                    TextButton(onClick = onDeleteClick) { Text(stringResource(R.string.ic_mod_tab_action_delete)) }
                 }
                 // Enable switcher
                 Switch(checked = enable, onCheckedChange = onEnabledChange)

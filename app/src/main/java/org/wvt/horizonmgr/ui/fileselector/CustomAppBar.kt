@@ -7,9 +7,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import org.wvt.horizonmgr.R
 import org.wvt.horizonmgr.ui.theme.AppBarBackgroundColor
 import org.wvt.horizonmgr.ui.theme.PreviewTheme
 
@@ -26,12 +28,12 @@ internal fun CustomAppBar(
     ) {
         Column {
             TopAppBar(
-                title = { Text("选择文件") },
+                title = { Text(stringResource(R.string.fileselector_screen_title)) },
                 navigationIcon = {
                     IconButton(onClick = onCancel) {
                         Icon(
                             Icons.Rounded.ArrowBack,
-                            "返回"
+                            stringResource(R.string.navigation_action_back)
                         )
                     }
                 },

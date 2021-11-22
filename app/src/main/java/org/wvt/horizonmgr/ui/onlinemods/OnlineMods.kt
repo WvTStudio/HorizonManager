@@ -12,9 +12,11 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.SwipeRefreshIndicator
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import org.wvt.horizonmgr.R
 import org.wvt.horizonmgr.ui.components.ErrorPage
 import org.wvt.horizonmgr.ui.components.ProgressDialog
 import org.wvt.horizonmgr.viewmodel.OnlineModsViewModel
@@ -170,7 +172,7 @@ private fun NotLoginTip() {
     Box(Modifier.fillMaxSize()) {
         Text(
             modifier = Modifier.align(Alignment.Center),
-            text = "此功能仅在登录后可用",
+            text = stringResource(R.string.olmod_screen_tip_login_only),
             color = MaterialTheme.colors.onSurface.copy(ContentAlpha.medium)
         )
     }

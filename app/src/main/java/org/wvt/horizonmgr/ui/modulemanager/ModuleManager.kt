@@ -8,9 +8,11 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Menu
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEachIndexed
 import androidx.compose.ui.zIndex
@@ -18,6 +20,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
+import org.wvt.horizonmgr.R
 import org.wvt.horizonmgr.ui.components.HorizonDivider
 import org.wvt.horizonmgr.ui.theme.AppBarBackgroundColor
 import org.wvt.horizonmgr.viewmodel.*
@@ -31,7 +34,6 @@ fun ModuleManagerScreen(
     onAddICTextureClick: () -> Unit,
     onAddMCTextureClick: () -> Unit
 ) {
-    val managerViewModel: ModuleManagerViewModel = hiltViewModel()
     val moduleViewModel: ModTabViewModel = hiltViewModel()
     val icLevelViewModel: ICLevelTabViewModel = hiltViewModel()
     val mcLevelViewModel: MCLevelTabViewModel = hiltViewModel()
@@ -69,7 +71,6 @@ fun ModuleManagerScreen(
     }
 
     ModuleManager(
-        managerViewModel = managerViewModel,
         moduleViewModel = moduleViewModel,
         icLevelViewModel = icLevelViewModel,
         icResViewModel = icResViewModel,
@@ -84,10 +85,13 @@ fun ModuleManagerScreen(
     )
 }
 
+private enum class Tabs {
+    MOD, HZ_MAP, MC_MAP, HZ_RESPACK, MC_RESPACK
+}
+
 @OptIn(ExperimentalPagerApi::class)
 @Composable
 fun ModuleManager(
-    managerViewModel: ModuleManagerViewModel,
     moduleViewModel: ModTabViewModel,
     icLevelViewModel: ICLevelTabViewModel,
     icResViewModel: ICResTabViewModel,
@@ -100,25 +104,25 @@ fun ModuleManager(
     onAddICTextureClick: () -> Unit,
     onAddMCTextureClick: () -> Unit
 ) {
-    val selectedTab by managerViewModel.selectedTab.collectAsState()
+    var selectedTab by rememberSaveable { mutableStateOf(Tabs.MOD) }
     val pagerState = rememberPagerState(pageCount = 5, initialOffscreenLimit = 5)
 
     LaunchedEffect(selectedTab) {
         when (selectedTab) {
-            ModuleManagerViewModel.Tabs.MOD -> pagerState.animateScrollToPage(0)
-            ModuleManagerViewModel.Tabs.IC_MAP -> pagerState.animateScrollToPage(1)
-            ModuleManagerViewModel.Tabs.MC_MAP -> pagerState.animateScrollToPage(2)
-            ModuleManagerViewModel.Tabs.IC_TEXTURE -> pagerState.animateScrollToPage(3)
-            ModuleManagerViewModel.Tabs.MC_TEXTURE -> pagerState.animateScrollToPage(4)
+            Tabs.MOD -> pagerState.animateScrollToPage(0)
+            Tabs.HZ_MAP -> pagerState.animateScrollToPage(1)
+            Tabs.MC_MAP -> pagerState.animateScrollToPage(2)
+            Tabs.HZ_RESPACK -> pagerState.animateScrollToPage(3)
+            Tabs.MC_RESPACK -> pagerState.animateScrollToPage(4)
         }
     }
 
 
     Column(Modifier.fillMaxSize()) {
         CustomAppBar(
-            tabs = managerViewModel.tabs,
+            tabs = remember { Tabs.values().toList() },
             selectedTab = selectedTab,
-            onTabSelected = managerViewModel::selectTab,
+            onTabSelected = { selectedTab = it },
             onNavClicked = onNavClicked
         )
         HorizontalPager(
@@ -137,11 +141,21 @@ fun ModuleManager(
     }
 }
 
+@Stable
+@Composable
+private fun Tabs.getLabel(): String = when (this) {
+    Tabs.MOD -> stringResource(R.string.mm_screen_tab_mod)
+    Tabs.HZ_MAP -> stringResource(R.string.mm_screen_tab_hzmap)
+    Tabs.MC_MAP -> stringResource(R.string.mm_screen_tab_mcmap)
+    Tabs.HZ_RESPACK -> stringResource(R.string.mm_screen_tab_hzres)
+    Tabs.MC_RESPACK -> stringResource(R.string.mm_screen_tab_mcres)
+}
+
 @Composable
 private fun CustomAppBar(
-    tabs: List<ModuleManagerViewModel.Tabs>,
-    selectedTab: ModuleManagerViewModel.Tabs,
-    onTabSelected: (index: ModuleManagerViewModel.Tabs) -> Unit,
+    tabs: List<Tabs>,
+    selectedTab: Tabs,
+    onTabSelected: (index: Tabs) -> Unit,
     onNavClicked: () -> Unit
 ) {
     TopAppBar(
@@ -164,7 +178,7 @@ private fun CustomAppBar(
                     tabs.fastForEachIndexed { index, tab ->
                         val selected = tab == selectedTab
                         TabItem(
-                            label = tab.label,
+                            label = tab.getLabel(),
                             selected = selected,
                             onTabSelected = { onTabSelected(tab) }
                         )
@@ -173,7 +187,7 @@ private fun CustomAppBar(
             }
         }, navigationIcon = {
             IconButton(onClick = onNavClicked, content = {
-                Icon(Icons.Rounded.Menu, contentDescription = "菜单")
+                Icon(Icons.Rounded.Menu, stringResource(R.string.navigation_action_menu))
             })
         }, backgroundColor = AppBarBackgroundColor
     )

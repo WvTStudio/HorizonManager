@@ -13,10 +13,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.SwipeRefreshIndicator
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import org.wvt.horizonmgr.R
 import org.wvt.horizonmgr.ui.components.*
 import org.wvt.horizonmgr.viewmodel.ICResTabViewModel
 
@@ -37,7 +39,7 @@ fun ICResTab(
         ErrorBanner(
             modifier = Modifier.fillMaxWidth(),
             errors = errors,
-            text = "解析资源包时发生 ${errors.size} 个错误"
+            text = stringResource(R.string.ic_res_tab_banner).format(errors.size)
         )
     }
 
@@ -60,7 +62,7 @@ fun ICResTab(
                             if (packs.isEmpty()) item {
                                 Box(Modifier.fillParentMaxSize()) {
                                     EmptyPage(Modifier.fillMaxSize()) {
-                                        Text("没有找到资源包")
+                                        Text(stringResource(R.string.ic_res_tab_tip_empty))
                                     }
                                     banner()
                                 }
@@ -87,7 +89,7 @@ fun ICResTab(
                             .padding(16.dp)
                             .align(Alignment.BottomEnd),
                         onClick = onAddButtonClick
-                    ) { Icon(Icons.Rounded.Add, "Add") }
+                    ) { Icon(Icons.Rounded.Add, stringResource(R.string.ic_res_tab_action_add)) }
                 }
                 ICResTabViewModel.State.Loading -> Box(Modifier.fillMaxSize(), Alignment.Center) {
                     CircularProgressIndicator(Modifier.align(Alignment.Center))

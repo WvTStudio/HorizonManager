@@ -15,8 +15,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import org.wvt.horizonmgr.R
 import org.wvt.horizonmgr.ui.theme.PreviewTheme
 import org.wvt.horizonmgr.utils.longSizeToString
 import org.wvt.horizonmgr.viewmodel.InstallPackageViewModel.DownloadStep
@@ -56,16 +58,16 @@ fun DownloadStep(data: DownloadStep) {
         },
         text = {
             when (val downloadState = downloadState) {
-                DownloadStep.State.Waiting -> Text(text = "等待下载")
-                DownloadStep.State.Complete -> Text(text = "下载完成")
+                DownloadStep.State.Waiting -> Text(text = stringResource(R.string.ol_install_screen_step_download_waiting))
+                DownloadStep.State.Complete -> Text(text = stringResource(R.string.ol_install_screen_step_download_completed))
                 is DownloadStep.State.Running -> {
                     val downloaded = remember(downloadState.progress.value) {
                         longSizeToString(downloadState.progress.value)
                     }
                     val total = remember { longSizeToString(downloadState.total) }
-                    Text(text = "正在下载（$downloaded / $total）")
+                    Text(text = stringResource(R.string.ol_install_screen_step_download_running) + " ($downloaded / $total)")
                 }
-                is DownloadStep.State.Error -> Text(text = "下载失败")
+                is DownloadStep.State.Error -> Text(text = stringResource(R.string.ol_install_screen_step_download_failed))
             }
 
         }, trailing = {
@@ -88,12 +90,12 @@ fun DownloadStep(data: DownloadStep) {
                             }
                             if (showError) AlertDialog(
                                 onDismissRequest = { showError = false },
-                                title = { Text("Error detail") },
+                                title = { Text(stringResource(R.string.ol_install_screen_step_download_dialog_title)) },
                                 text = { Text(it.message) },
                                 confirmButton = {
                                     TextButton(onClick = {
                                         showError = false
-                                    }) { Text("确认") }
+                                    }) { Text(stringResource(R.string.button_action_confirm)) }
                                 }
                             )
                         }
@@ -116,10 +118,10 @@ fun MergeStep(mergeState: StepState) {
         }, text = {
             Text(
                 text = when (mergeState) {
-                    StepState.Waiting -> "等待合并"
-                    StepState.Complete -> "合并完成"
-                    is StepState.Running -> "正在合并"
-                    is StepState.Error -> "合并失败"
+                    StepState.Waiting -> stringResource(R.string.ol_install_screen_step_merge_waiting)
+                    StepState.Complete -> stringResource(R.string.ol_install_screen_step_merge_completed)
+                    is StepState.Running -> stringResource(R.string.ol_install_screen_step_merge_running)
+                    is StepState.Error -> stringResource(R.string.ol_install_screen_step_merge_failed)
                 },
                 color = contentColor
             )
@@ -158,10 +160,10 @@ fun InstallStep(installState: StepState) {
         }, text = {
             Text(
                 text = when (installState) {
-                    StepState.Waiting -> "等待安装"
-                    StepState.Complete -> "安装完成"
-                    is StepState.Running -> "正在安装"
-                    is StepState.Error -> "安装失败"
+                    StepState.Waiting -> stringResource(R.string.ol_install_screen_step_install_waiting)
+                    StepState.Complete -> stringResource(R.string.ol_install_screen_step_install_completed)
+                    is StepState.Running -> stringResource(R.string.ol_install_screen_step_install_running)
+                    is StepState.Error -> stringResource(R.string.ol_install_screen_step_install_failed)
                 },
                 color = contentColor
             )

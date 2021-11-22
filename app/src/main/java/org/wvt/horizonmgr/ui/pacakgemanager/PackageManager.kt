@@ -21,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -33,6 +34,7 @@ import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import org.wvt.horizonmgr.R
 import org.wvt.horizonmgr.ui.components.*
 import org.wvt.horizonmgr.ui.theme.AppBarBackgroundColor
 import org.wvt.horizonmgr.ui.theme.PreviewTheme
@@ -104,34 +106,18 @@ fun PackageManager(
 
     Box {
         Column {
-//            var showMenu by remember { mutableStateOf(false) }
-            // Top App Bar
             TopAppBar(
                 modifier = Modifier.zIndex(4.dp.value),
                 title = {
-                    Text("分包管理")
+                    Text(stringResource(R.string.pm_screen_title))
                 }, navigationIcon = {
-                    IconButton(onClick = onNavClick) { Icon(Icons.Rounded.Menu, "菜单") }
-                }, backgroundColor = AppBarBackgroundColor,
-                actions = {
-                    // TODO: 2021/4/27 Retain this for future features.
-                    /*Box {
-                        // Menu Icon
-                        IconButton(onClick = { showMenu = true }) {
-                            Icon(Icons.Rounded.MoreVert, "更多")
-                        }
-                        DropdownMenu(
-                            expanded = showMenu,
-                            onDismissRequest = { showMenu = false }
-                        ) {
-                            // Menu
-                            DropdownMenuItem(onClick = {
-                                viewModel.loadPackages()
-                                showMenu = false
-                            }) { Text("刷新") }
-                        }
-                    }*/
-                }
+                    IconButton(onClick = onNavClick) {
+                        Icon(
+                            Icons.Rounded.Menu,
+                            stringResource(R.string.navigation_action_menu)
+                        )
+                    }
+                }, backgroundColor = AppBarBackgroundColor
             )
 
             Crossfade(state) {
@@ -229,7 +215,7 @@ private fun PackageList(
         ErrorBanner(
             modifier = Modifier.fillMaxWidth(),
             errors = errors,
-            text = "解析分包时发生 ${errors.size} 个错误"
+            text = stringResource(R.string.pm_screen_banner).format(errors.size)
         )
     }
     SwipeRefresh(state = rememberSwipeRefreshState(isRefreshing),
@@ -244,7 +230,7 @@ private fun PackageList(
         LazyColumn(modifier = Modifier.fillMaxSize()) {
             if (packages.isNullOrEmpty()) item {
                 Box(Modifier.fillParentMaxSize()) {
-                    EmptyPage(Modifier.fillMaxSize()) { Text("你还没有安装分包") }
+                    EmptyPage(Modifier.fillMaxSize()) { Text(stringResource(R.string.pm_screen_tip_empty)) }
                     banner()
                 }
             } else {
@@ -283,7 +269,7 @@ private fun FABs(
                 expand = expand,
                 enterAnim = fab2Enter,
                 exitAnim = fab2Exit,
-                text = { Text("在线安装") },
+                text = { Text(stringResource(R.string.pm_screen_fab_ol)) },
                 icon = { Icon(Icons.Rounded.CloudDownload, null) },
                 onClick = onOnlineInstallClick
             )
@@ -292,7 +278,7 @@ private fun FABs(
                 expand = expand,
                 enterAnim = fab1Enter,
                 exitAnim = fab1Exit,
-                text = { Text("本地导入") },
+                text = { Text(stringResource(R.string.pm_screen_fab_local)) },
                 icon = { Icon(Icons.Rounded.Storage, null) },
                 onClick = onLocalInstallClick
             )
@@ -306,7 +292,7 @@ private fun FABs(
                 Icon(
                     modifier = Modifier.graphicsLayer(rotationZ = rotate),
                     imageVector = Icons.Rounded.Add,
-                    contentDescription = "添加"
+                    contentDescription = stringResource(R.string.pm_screen_action_add)
                 )
             }
         }
@@ -439,7 +425,10 @@ fun PackageItem(
                     var dropdown by remember { mutableStateOf(false) }
                     Box(Modifier.padding(top = 8.dp, end = 4.dp)) {
                         IconButton(onClick = { dropdown = true }) {
-                            Icon(imageVector = Icons.Rounded.MoreVert, contentDescription = "更多")
+                            Icon(
+                                Icons.Rounded.MoreVert,
+                                stringResource(R.string.pm_screen_item_more)
+                            )
                         }
                         DropdownMenu(
                             expanded = dropdown,
@@ -448,38 +437,38 @@ fun PackageItem(
                                 dropdown = false
                                 onInfoClick()
                             }) {
-                                Text("详情")
+                                Text(stringResource(R.string.pm_screen_item_action_detail))
                             }
                             DropdownMenuItem(onClick = {
                                 dropdown = false
                                 onDeleteClick()
                             }) {
-                                Text("删除")
+                                Text(stringResource(R.string.pm_screen_item_action_delete))
                             }
                             DropdownMenuItem(onClick = {
                                 dropdown = false
                                 onCloneClick()
                             }) {
-                                Text("克隆")
+                                Text(stringResource(R.string.pm_screen_item_action_clone))
                             }
                             DropdownMenuItem(onClick = {
                                 dropdown = false
                                 onRenameClick()
                             }) {
-                                Text("重命名")
+                                Text(stringResource(R.string.pm_screen_item_action_rename))
                             }
                             DropdownMenuItem(onClick = {
                                 dropdown = false
                                 onShareClick()
                             }) {
-                                Text("分享")
+                                Text(stringResource(R.string.pm_screen_item_action_share))
                             }
                             if (updatable) {
                                 DropdownMenuItem(onClick = {
                                     dropdown = false
                                     onUpdateClick()
                                 }) {
-                                    Text("更新")
+                                    Text(stringResource(R.string.pm_screen_item_action_update))
                                 }
                             }
                         }
@@ -505,7 +494,10 @@ fun PackageItem(
                         enter = fadeIn(),
                         exit = fadeOut()
                     ) {
-                        Icon(Icons.Rounded.CheckCircle, "已选择")
+                        Icon(
+                            Icons.Rounded.CheckCircle,
+                            stringResource(R.string.pm_screen_item_icon_selected)
+                        )
                     }
                 }
                 Row(Modifier.weight(1f), horizontalArrangement = Arrangement.End) {
@@ -561,13 +553,17 @@ fun ConfirmDeleteDialogHost(state: ConfirmDeleteDialogHostState) {
             onDismissRequest = {
                 data.dismiss()
             }, title = {
-                Text("是否确认删除")
+                Text(stringResource(R.string.pm_screen_delete_title))
             }, text = {
-                Text("分包内的模组、地图、材质都将一并删除，且无法恢复！")
+                Text(stringResource(R.string.pm_screen_delete_text))
             }, dismissButton = {
-                TextButton(onClick = { data.dismiss() }) { Text("取消") }
+                TextButton(onClick = { data.dismiss() }) {
+                    Text(stringResource(R.string.pm_screen_delete_cancel))
+                }
             }, confirmButton = {
-                TextButton(onClick = { data.confirm() }) { Text("删除") }
+                TextButton(onClick = { data.confirm() }) {
+                    Text(stringResource(R.string.pm_screen_delete_confirm))
+                }
             }
         )
     }

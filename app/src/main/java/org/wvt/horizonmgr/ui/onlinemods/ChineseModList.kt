@@ -7,7 +7,9 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import org.wvt.horizonmgr.R
 import org.wvt.horizonmgr.ui.components.EmptyPage
 
 @Composable
@@ -23,7 +25,7 @@ fun ChineseModList(
     ) {
         if (mods.isEmpty()) item {
             EmptyPage(Modifier.fillParentMaxSize()) {
-                Text("什么模组都没有")
+                Text(stringResource(R.string.olmod_screen_tip_empty))
             }
         } else itemsIndexed(mods) { index: Int, item: ChineseModModel ->
             ChineseModItem(

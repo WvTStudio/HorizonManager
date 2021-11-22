@@ -12,6 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
@@ -19,6 +20,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.SwipeRefreshIndicator
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import org.wvt.horizonmgr.R
 import org.wvt.horizonmgr.ui.components.ErrorPage
 import org.wvt.horizonmgr.ui.components.loadUrlImage
 import org.wvt.horizonmgr.ui.theme.AppBarBackgroundColor
@@ -72,10 +74,10 @@ private fun RecommendArticlesScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .zIndex(4.dp.value),
-            title = { Text("首页") },
+            title = { Text(stringResource(R.string.home_screen_title)) },
             navigationIcon = {
                 IconButton(onClick = onNavClick) {
-                    Icon(imageVector = Icons.Rounded.Menu, contentDescription = "菜单")
+                    Icon(Icons.Rounded.Menu, stringResource(R.string.navigation_action_menu))
                 }
             },
             backgroundColor = AppBarBackgroundColor
@@ -97,7 +99,7 @@ private fun RecommendArticlesScreen(
                     ErrorPage(
                         modifier = Modifier.align(Alignment.Center),
                         message = {
-                            Text("加载出错")
+                            Text(stringResource(R.string.home_screen_tip_error))
                         }, onRetryClick = onRefresh
                     )
                 }

@@ -23,6 +23,7 @@ import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -34,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.util.lerp
 import androidx.compose.ui.zIndex
+import org.wvt.horizonmgr.R
 import org.wvt.horizonmgr.ui.components.DropDownSelector
 import org.wvt.horizonmgr.ui.theme.AppBarBackgroundColor
 import org.wvt.horizonmgr.ui.theme.PreviewTheme
@@ -175,10 +177,13 @@ internal fun TuneAppBar(
                     Crossfade(targetState = expand, animationSpec = iconFade) {
                         if (it) Icon(
                             imageVector = Icons.Rounded.ArrowBack,
-                            contentDescription = "关闭",
+                            contentDescription = stringResource(R.string.navigation_action_close),
                             tint = MaterialTheme.colors.onSurface
                         )
-                        else Icon(imageVector = Icons.Rounded.Menu, contentDescription = "菜单")
+                        else Icon(
+                            Icons.Rounded.Menu,
+                            stringResource(R.string.navigation_action_menu)
+                        )
                     }
                 }
                 Crossfade(targetState = expand, animationSpec = iconFade) {
@@ -196,7 +201,7 @@ internal fun TuneAppBar(
                             // Hint
                             if (filterValue.text.isEmpty()) Text(
                                 modifier = Modifier.align(Alignment.CenterStart),
-                                text = "搜索",
+                                text = stringResource(R.string.olmod_screen_action_search),
                                 style = TextStyle(
                                     color = MaterialTheme.colors.onSurface.copy(0.32f),
                                     fontWeight = FontWeight.Bold,
@@ -227,7 +232,7 @@ internal fun TuneAppBar(
                         } else { // Title
                             Text(
                                 modifier = Modifier.align(Alignment.CenterStart),
-                                text = "在线资源",
+                                text = stringResource(R.string.olmod_screen_title),
                                 style = MaterialTheme.typography.h6
                             )
                         }
@@ -251,10 +256,13 @@ internal fun TuneAppBar(
                         Crossfade(targetState = expand, animationSpec = iconFade) {
                             if (it) Icon(
                                 imageVector = Icons.Rounded.Search,
-                                contentDescription = "搜索",
+                                contentDescription = stringResource(R.string.olmod_screen_action_search),
                                 tint = MaterialTheme.colors.onSurface
                             )
-                            else Icon(imageVector = Icons.Rounded.Tune, contentDescription = "过滤选项")
+                            else Icon(
+                                Icons.Rounded.Tune,
+                                stringResource(R.string.olmod_screen_action_filter)
+                            )
                         }
                     }
                 }
@@ -340,7 +348,7 @@ private fun TuneContent(
                     .fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(Icons.Rounded.Language, contentDescription = "源仓库")
+                Icon(Icons.Rounded.Language, stringResource(R.string.olmod_screen_icon_repo))
                 DropDownSelector(
                     modifier = Modifier
                         .padding(horizontal = 16.dp)
@@ -358,7 +366,7 @@ private fun TuneContent(
                     .fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(imageVector = Icons.Rounded.Sort, contentDescription = "排序方式")
+                Icon(Icons.Rounded.Sort, stringResource(R.string.olmod_screen_icon_sortmode))
                 DropDownSelector(
                     modifier = Modifier
                         .padding(horizontal = 16.dp)

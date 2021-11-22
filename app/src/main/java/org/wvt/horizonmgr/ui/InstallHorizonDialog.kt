@@ -7,7 +7,9 @@ import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import org.wvt.horizonmgr.R
 
 @Composable
 fun InstallHorizonDialog(
@@ -19,16 +21,21 @@ fun InstallHorizonDialog(
         modifier = Modifier.shadow(16.dp, clip = false),
         onDismissRequest = onDismissClick,
         buttons = {
-            Row(Modifier.fillMaxWidth().padding(8.dp)) {
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp)) {
                 Row(Modifier.weight(1f)) {
-                    TextButton(onClick = onNeverShowClick) { Text("不再显示") }
+                    TextButton(onClick = onNeverShowClick) {
+                        Text(stringResource(R.string.install_hz_dialog_hide_forever))
+                    }
                 }
                 Spacer(Modifier.width(8.dp))
-                TextButton(onClick = onDismissClick) { Text("取消") }
+                TextButton(onClick = onDismissClick) { Text(stringResource(R.string.install_hz_dialog_cancel)) }
                 Spacer(Modifier.width(8.dp))
-                TextButton(onClick = onConfirmClick) { Text("前往酷安") }
+                TextButton(onClick = onConfirmClick) { Text(stringResource(R.string.install_hz_dialog_confirm)) }
             }
         },
-        title = { Text("您还未安装 Horizon，是否前往酷安安装？") }
+        title = { Text(stringResource(R.string.install_hz_dialog_title)) }
     )
 }

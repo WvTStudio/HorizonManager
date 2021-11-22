@@ -8,10 +8,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.core.content.FileProvider
 import org.wvt.horizonmgr.BuildConfig
+import org.wvt.horizonmgr.R
 import org.wvt.horizonmgr.viewmodel.PackageManagerViewModel
 import java.io.File
 
@@ -45,33 +47,37 @@ fun SharePackageDialog(viewModel: PackageManagerViewModel) {
                     Modifier.padding(16.dp),
                     Arrangement.spacedBy(16.dp)
                 ) {
-                    Text("输入名称")
+                    Text(stringResource(R.string.pm_screen_share_name))
                     var input by remember { mutableStateOf("") }
                     TextField(value = input, onValueChange = { input = it })
                     Button(
                         modifier = Modifier.align(Alignment.End),
                         onClick = { viewModel.setShareName(input) }) {
-                        Text("确定")
+                        Text(stringResource(R.string.pm_screen_share_confirm))
                     }
                 }
                 PackageManagerViewModel.SharePackageState.Failed -> Row(Modifier.padding(16.dp)) {
-                    Text("打包失败")
+                    Text(stringResource(R.string.pm_screen_share_failed))
                 }
                 PackageManagerViewModel.SharePackageState.Processing -> Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Text(modifier = Modifier.weight(1f), text = "正在打包")
+                    Text(
+                        modifier = Modifier.weight(1f),
+                        text = stringResource(R.string.pm_screen_share_running)
+                    )
                     CircularProgressIndicator()
                 }
                 is PackageManagerViewModel.SharePackageState.Succeed -> Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Text(modifier = Modifier.weight(1f), text = "打包成功")
+                    Text(
+                        modifier = Modifier.weight(1f),
+                        text = stringResource(R.string.pm_screen_share_succeed)
+                    )
                     val context = LocalContext.current
 
                     Button(onClick = {
                         share(context, state.file)
                     }) {
-                        Text("分享")
+                        Text(stringResource(R.string.pm_screen_share_action_share))
                     }
-                }
-                null -> {
                 }
             }
         }

@@ -10,13 +10,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import org.wvt.horizonmgr.R
 
 sealed class ProgressDialogState(val message: String) {
     class Loading(message: String) : ProgressDialogState(message)
     class ProgressLoading(message: String, val progress: Float) : ProgressDialogState(message)
-    class Failed(val title: String, message: String, val detail: String? = null) : ProgressDialogState(message)
+    class Failed(val title: String, message: String, val detail: String? = null) :
+        ProgressDialogState(message)
+
     class Finished(message: String) : ProgressDialogState(message)
 }
 
@@ -55,7 +59,7 @@ fun ProgressDialog(
                             Icon(
                                 imageVector = Icons.Rounded.Close,
                                 tint = MaterialTheme.colors.error,
-                                contentDescription = "错误"
+                                contentDescription = stringResource(R.string.progress_dialog_status_failed)
                             )
                         }
                         Content(state.message)
@@ -65,7 +69,7 @@ fun ProgressDialog(
                             Icon(
                                 imageVector = Icons.Rounded.Check,
                                 tint = MaterialTheme.colors.secondary,
-                                contentDescription = "成功"
+                                contentDescription = stringResource(R.string.progress_dialog_status_succeed)
                             )
                         }
                         Content(state.message)

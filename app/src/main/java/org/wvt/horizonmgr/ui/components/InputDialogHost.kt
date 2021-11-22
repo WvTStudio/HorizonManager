@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -12,6 +13,7 @@ import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import org.wvt.horizonmgr.R
 import kotlin.coroutines.resume
 
 class InputDialogHostState {
@@ -116,13 +118,11 @@ fun InputDialog(
                     TextButton(
                         modifier = Modifier.padding(end = 8.dp),
                         onClick = onCancelClick
-                    ) { Text("取消") }
+                    ) { Text(stringResource(R.string.button_action_cancel)) }
                     TextButton(
                         onClick = onConfirmClick,
                         enabled = onConfirmEnabled
-                    ) {
-                        Text("确定")
-                    }
+                    ) { Text(stringResource(R.string.button_action_confirm)) }
                 }
             }
         }

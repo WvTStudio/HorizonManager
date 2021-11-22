@@ -10,7 +10,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.InsertDriveFile
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import org.wvt.horizonmgr.R
 import org.wvt.horizonmgr.ui.theme.PreviewTheme
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -18,7 +20,12 @@ import org.wvt.horizonmgr.ui.theme.PreviewTheme
 internal fun FileItem(name: String, onClick: () -> Unit) {
     ListItem(
         modifier = Modifier.clickable(onClick = onClick),
-        icon = { Icon(Icons.Rounded.InsertDriveFile, contentDescription = "文件") },
+        icon = {
+            Icon(
+                Icons.Rounded.InsertDriveFile,
+                stringResource(R.string.fileselector_screen_item_type_file)
+            )
+        },
         text = { Text(name) }
     )
 }

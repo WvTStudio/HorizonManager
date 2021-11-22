@@ -7,9 +7,11 @@ import androidx.compose.material.icons.rounded.Extension
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import org.wvt.horizonmgr.R
 import org.wvt.horizonmgr.ui.theme.PreviewTheme
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -28,7 +30,7 @@ fun EditName(
                 .fillMaxWidth(),
             value = customName,
             onValueChange = { customName = it },
-            label = { Text("分包名称") })
+            label = { Text(stringResource(R.string.ol_install_screen_edit_name_label)) })
 
         Row(verticalAlignment = Alignment.CenterVertically) {
             ListItem(
@@ -37,7 +39,7 @@ fun EditName(
                     Icon(
                         modifier = Modifier.padding(top = 4.dp),
                         imageVector = Icons.Rounded.Extension,
-                        contentDescription = "信息"
+                        contentDescription = stringResource(R.string.ol_install_screen_edit_info)
                     )
                 },
                 text = { Text(name) },
@@ -46,7 +48,7 @@ fun EditName(
             Button(
                 modifier = Modifier.padding(horizontal = 16.dp),
                 onClick = { onConfirm(customName.text) }
-            ) { Text("下一步") }
+            ) { Text(stringResource(R.string.ol_install_screen_action_next)) }
         }
     }
 }

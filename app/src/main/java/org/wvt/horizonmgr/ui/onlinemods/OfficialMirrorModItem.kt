@@ -14,8 +14,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import org.wvt.horizonmgr.R
 import org.wvt.horizonmgr.ui.components.ModIcon
 import org.wvt.horizonmgr.ui.components.loadUrlImage
 import org.wvt.horizonmgr.ui.theme.PreviewTheme
@@ -89,7 +91,8 @@ internal fun OfficialMirrorModItem(
                     CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
                         Icon(
                             modifier = Modifier.size(18.dp),
-                            imageVector = Icons.Rounded.Favorite, contentDescription = "Likes"
+                            imageVector = Icons.Rounded.Favorite,
+                            contentDescription = stringResource(R.string.olmod_screen_icon_likes)
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
@@ -101,7 +104,7 @@ internal fun OfficialMirrorModItem(
                             Icon(
                                 modifier = Modifier.size(18.dp),
                                 imageVector = Icons.Rounded.AccessTime,
-                                contentDescription = "Last update"
+                                contentDescription = stringResource(R.string.olmod_screen_icon_last_update)
                             )
                             Spacer(modifier = Modifier.width(4.dp))
                             Text(
@@ -115,7 +118,7 @@ internal fun OfficialMirrorModItem(
                 IconButton(onClick = onInstallClick) {
                     Icon(
                         imageVector = Icons.Rounded.Extension,
-                        contentDescription = "安装",
+                        contentDescription = stringResource(R.string.olmod_screen_action_install),
                         tint = MaterialTheme.colors.primary
                     )
                 }

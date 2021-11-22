@@ -14,8 +14,10 @@ import androidx.compose.material.icons.rounded.Clear
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import org.wvt.horizonmgr.R
 import org.wvt.horizonmgr.ui.theme.PreviewTheme
 
 enum class FabState {
@@ -36,18 +38,18 @@ fun StateFab(
                     onClick = onClicked,
                     contentColor = MaterialTheme.colors.onSecondary
                 ) {
-                    Icon(Icons.Rounded.ArrowForward, contentDescription = "下一步")
+                    Icon(Icons.Rounded.ArrowForward, stringResource(R.string.statefab_action_next))
                 }
                 FabState.LOADING -> CircularProgressIndicator()
                 FabState.SUCCEED -> Icon(
                     imageVector = Icons.Rounded.Check,
                     tint = MaterialTheme.colors.secondary,
-                    contentDescription = "成功"
+                    contentDescription = stringResource(R.string.statefab_state_succeed)
                 )
                 FabState.FAILED -> Icon(
                     imageVector = Icons.Rounded.Clear,
                     tint = MaterialTheme.colors.error,
-                    contentDescription = "失败"
+                    contentDescription = stringResource(R.string.statefab_state_failed)
                 )
             }
         }

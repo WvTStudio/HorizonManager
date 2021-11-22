@@ -17,10 +17,12 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.zIndex
+import org.wvt.horizonmgr.R
 import org.wvt.horizonmgr.ui.theme.AppBarBackgroundColor
 import org.wvt.horizonmgr.utils.longSizeToString
 import org.wvt.horizonmgr.viewmodel.CommunityViewModel
@@ -46,10 +48,10 @@ internal fun CommunityScreen(
                     )
                     .shadow(4.dp),
                 title = {
-                    Text("Inner Core 中文社区")
+                    Text(stringResource(R.string.community_screen_appbar_title))
                 }, navigationIcon = {
                     IconButton(onClick = onClose) {
-                        Icon(Icons.Rounded.Close, "关闭")
+                        Icon(Icons.Rounded.Close, stringResource(R.string.navigation_action_close))
                     }
                 }, backgroundColor = AppBarBackgroundColor, actions = {
                     Crossfade(loading) {
@@ -79,19 +81,21 @@ internal fun CommunityScreen(
                     Column(Modifier.padding(horizontal = 16.dp)) {
                         Text(
                             modifier = Modifier.padding(top = 24.dp),
-                            text = "新下载任务", style = MaterialTheme.typography.h6
+                            text = stringResource(R.string.community_screen_task_title),
+                            style = MaterialTheme.typography.h6
                         )
                         Text(
                             modifier = Modifier.padding(top = 16.dp),
-                            text = "文件名: " + it.filename
+                            text = stringResource(R.string.community_screen_task_file).format(it.filename)
                         )
                         Text(
                             modifier = Modifier.padding(top = 8.dp),
-                            text = "地址: " + it.url
+                            text = stringResource(R.string.community_screen_task_url).format(it.url)
                         )
                         Text(
                             modifier = Modifier.padding(top = 8.dp),
-                            text = "大小: " + longSizeToString(it.size)
+                            text = stringResource(R.string.community_screen_task_size)
+                                .format(longSizeToString(it.size))
                         )
                         Row(
                             Modifier
@@ -100,7 +104,7 @@ internal fun CommunityScreen(
                             horizontalArrangement = Arrangement.End
                         ) {
                             TextButton(onClick = { vm.download() }) {
-                                Text("下载")
+                                Text(stringResource(R.string.community_screen_task_action))
                             }
                         }
                     }

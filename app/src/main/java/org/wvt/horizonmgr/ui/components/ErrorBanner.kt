@@ -6,7 +6,9 @@ import androidx.compose.material.TextButton
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import org.wvt.horizonmgr.R
 
 @Composable
 fun ErrorBanner(modifier: Modifier, errors: List<String>, text: String) {
@@ -15,7 +17,7 @@ fun ErrorBanner(modifier: Modifier, errors: List<String>, text: String) {
     if (displayDetail) {
         AlertDialog(
             modifier = Modifier.shadow(16.dp, clip = false),
-            title = { Text("错误详情") },
+            title = { Text(stringResource(R.string.error_banner_title)) },
             text = {
                 Text(text = remember(errors) {
                     errors.foldIndexed("") { index, acc, e ->
@@ -24,7 +26,9 @@ fun ErrorBanner(modifier: Modifier, errors: List<String>, text: String) {
                 })
             },
             confirmButton = {
-                TextButton(onClick = { displayDetail = false }) { Text("确定") }
+                TextButton(onClick = { displayDetail = false }) {
+                    Text(stringResource(R.string.button_action_confirm))
+                }
             },
             onDismissRequest = { displayDetail = false }
         )
@@ -33,11 +37,11 @@ fun ErrorBanner(modifier: Modifier, errors: List<String>, text: String) {
         Text(text)
     }, dismissButton = {
         TextButton(onClick = { visible = false }) {
-            Text("关闭")
+            Text(stringResource(R.string.error_banner_action_close))
         }
     }, confirmButton = {
         TextButton(onClick = { displayDetail = true }) {
-            Text("详情")
+            Text(stringResource(R.string.error_banner_action_detail))
         }
     })
 }

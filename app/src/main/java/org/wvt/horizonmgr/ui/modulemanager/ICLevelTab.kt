@@ -13,10 +13,12 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.SwipeRefreshIndicator
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import org.wvt.horizonmgr.R
 import org.wvt.horizonmgr.ui.components.*
 import org.wvt.horizonmgr.viewmodel.ICLevelTabViewModel
 
@@ -36,7 +38,7 @@ internal fun ICLevelTab(
         ErrorBanner(
             modifier = Modifier.fillMaxWidth(),
             errors = errors,
-            text = "解析地图时发生 ${errors.size} 个错误"
+            text = stringResource(R.string.ic_level_tab_error_banner).format(errors.size)
         )
     }
 
@@ -51,7 +53,7 @@ internal fun ICLevelTab(
             }
             ICLevelTabViewModel.State.PackageNotSelected -> {
                 EmptyPage(Modifier.fillMaxSize()) {
-                    Text("你还没有选择分包")
+                    Text(stringResource(R.string.ic_level_tab_tip_unselected))
                 }
             }
             ICLevelTabViewModel.State.OK -> Box(Modifier.fillMaxSize()) {
@@ -74,7 +76,7 @@ internal fun ICLevelTab(
                         if (levels.isEmpty()) item {
                             Box(Modifier.fillParentMaxSize()) {
                                 EmptyPage(Modifier.fillMaxSize()) {
-                                    Text("当前还没有地图")
+                                    Text(stringResource(R.string.ic_level_tab_tip_empty))
                                 }
                                 banner()
                             }
@@ -102,7 +104,7 @@ internal fun ICLevelTab(
                         .align(Alignment.BottomEnd),
                     onClick = onAddButtonClicked
                 ) {
-                    Icon(Icons.Rounded.Add, contentDescription = "Add")
+                    Icon(Icons.Rounded.Add, stringResource(R.string.ic_level_tab_action_add))
                 }
             }
             is ICLevelTabViewModel.State.Error -> ErrorPage(
