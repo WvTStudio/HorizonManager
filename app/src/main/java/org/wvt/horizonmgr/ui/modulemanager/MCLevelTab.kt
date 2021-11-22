@@ -6,7 +6,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.rounded.Add
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -88,7 +88,7 @@ internal fun MCLevelTab(
                         .align(Alignment.BottomEnd)
                         .padding(16.dp), onClick = onAddClick
                 ) {
-                    Icon(imageVector = Icons.Default.Add, contentDescription = "Add")
+                    Icon(imageVector = Icons.Rounded.Add, contentDescription = "Add")
                 }
             }
             is MCLevelTabViewModel.State.Error -> ErrorPage(

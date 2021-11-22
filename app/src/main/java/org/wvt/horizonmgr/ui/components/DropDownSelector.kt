@@ -7,7 +7,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.rounded.ArrowDropDown
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -41,7 +41,7 @@ fun DropDownSelector(
                 rememberRipple(bounded = false, radius = 24.dp)
             ),
             onClick = { dropDown = true }
-        ) { Icon(Icons.Filled.ArrowDropDown, "展开") }
+        ) { Icon(Icons.Rounded.ArrowDropDown, "展开") }
         DropdownMenu(
             expanded = dropDown,
             onDismissRequest = { dropDown = false }

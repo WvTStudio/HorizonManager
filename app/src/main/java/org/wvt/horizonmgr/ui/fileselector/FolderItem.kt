@@ -10,9 +10,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Folder
-import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.filled.StarBorder
+import androidx.compose.material.icons.rounded.Folder
+import androidx.compose.material.icons.rounded.Star
+import androidx.compose.material.icons.rounded.StarBorder
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -92,7 +92,7 @@ internal fun FolderItem(
                 .clickable(onClick = onClick)
                 .offset(offset = { IntOffset(x = state.offset.value.roundToInt(), y = 0) })
                 .background(MaterialTheme.colors.surface),
-            icon = { Icon(Icons.Filled.Folder, contentDescription = "文件夹") },
+            icon = { Icon(Icons.Rounded.Folder, contentDescription = "文件夹") },
             text = { Text(name) }
         )
     }
@@ -212,9 +212,9 @@ private fun ToggleBackgroundWithIcon(
                 )
                 .padding(horizontal = 28.dp),
             isActive = check,
-            activeIcon = Icons.Filled.Star,
+            activeIcon = Icons.Rounded.Star,
             activeColor = iconActiveColor,
-            inactiveIcon = Icons.Filled.StarBorder,
+            inactiveIcon = Icons.Rounded.StarBorder,
             inactiveColor = iconInactiveColor,
         )
     }
@@ -268,7 +268,7 @@ private fun SwitchIcon(
 @Preview
 @Composable
 private fun FolderEntryPreview() {
-    PreviewTheme(Modifier) {
+    PreviewTheme {
         FolderItem(
             name = "Test File",
             onClick = {},

@@ -6,7 +6,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.rounded.Menu
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -173,7 +173,7 @@ private fun CustomAppBar(
             }
         }, navigationIcon = {
             IconButton(onClick = onNavClicked, content = {
-                Icon(Icons.Filled.Menu, contentDescription = "菜单")
+                Icon(Icons.Rounded.Menu, contentDescription = "菜单")
             })
         }, backgroundColor = AppBarBackgroundColor
     )

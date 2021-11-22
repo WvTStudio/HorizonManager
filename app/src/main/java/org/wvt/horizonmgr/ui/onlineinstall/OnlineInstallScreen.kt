@@ -7,10 +7,11 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import org.wvt.horizonmgr.service.hzpack.recommendDescription
 import org.wvt.horizonmgr.ui.components.ErrorPage
 import org.wvt.horizonmgr.ui.pacakgemanager.ManifestSection
@@ -63,7 +64,7 @@ fun OnlineInstallScreen(
                         }
                     }) {
                         Icon(
-                            Icons.Filled.ArrowBack,
+                            Icons.Rounded.ArrowBack,
                             contentDescription = "返回"
                         )
                     }
@@ -143,21 +144,29 @@ fun OnlineInstallScreen(
                             }
                         )
                         val manifest by viewModel.selectedPackageManifest.collectAsState()
-                        AnimatedContent(manifest) {
-                            if (it == null) {
-                                Box(modifier = Modifier.fillMaxSize(), Alignment.Center) {
-                                    CircularProgressIndicator()
+                        AnimatedContent(
+                            targetState = manifest,
+                            transitionSpec = { ContentTransform(fadeIn(), fadeOut()) }
+                        ) { state ->
+                            if (state == null) {
+                                Box(
+                                    Modifier
+                                        .padding(32.dp)
+                                        .fillMaxWidth()) {
+                                    CircularProgressIndicator(Modifier.align(Alignment.Center))
                                 }
-                            } else ManifestSection(
-                                modifier = Modifier.wrapContentHeight(),
-                                packageName = it.pack,
-                                developer = it.developer,
-                                versionName = it.packVersion,
-                                versionCode = it.packVersionCode.toString(),
-                                packageUUID = it.pack,
-                                gameVersion = it.gameVersion,
-                                description = it.recommendDescription()
-                            )
+                            } else with(state) {
+                                ManifestSection(
+                                    modifier = Modifier.wrapContentHeight(),
+                                    packageName = pack,
+                                    developer = developer,
+                                    versionName = packVersion,
+                                    versionCode = packVersionCode.toString(),
+                                    packageUUID = pack,
+                                    gameVersion = gameVersion,
+                                    description = recommendDescription()
+                                )
+                            }
                         }
                     }
                     Screen.INSTALL -> InstallProgress(

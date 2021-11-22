@@ -13,6 +13,7 @@ import org.wvt.horizonmgr.service.hzpack.HorizonManager
 import org.wvt.horizonmgr.service.level.LevelTransporter
 import org.wvt.horizonmgr.service.level.MCLevelManager
 import org.wvt.horizonmgr.service.respack.ResourcePackManager
+import org.wvt.horizonmgr.ui.theme.AndroidThemeController
 import org.wvt.horizonmgr.utils.LocalCache
 import org.wvt.horizonmgr.utils.ModDownloader
 import org.wvt.horizonmgr.utils.OfficialCDNPackageDownloader
@@ -26,8 +27,10 @@ import javax.inject.Singleton
 
 @HiltAndroidApp
 class HorizonManagerApplication : Application() {
+    lateinit var themeController: AndroidThemeController
     override fun onCreate() {
         super.onCreate()
+        themeController = AndroidThemeController(this)
     }
 }
 

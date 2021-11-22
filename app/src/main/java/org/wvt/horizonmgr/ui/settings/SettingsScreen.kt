@@ -5,9 +5,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.FormatPaint
-import androidx.compose.material.icons.filled.Timelapse
+import androidx.compose.material.icons.rounded.ArrowBack
+import androidx.compose.material.icons.rounded.FormatPaint
+import androidx.compose.material.icons.rounded.Timelapse
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,8 +31,8 @@ fun SettingsScreen(
     val themeController = LocalThemeController.current
     val themeConfig = LocalThemeConfig.current
 
-    var followSystemDarkMode by remember { mutableStateOf(themeConfig.followSystemDarkMode) }
-    var customIsDark by remember { mutableStateOf(themeConfig.isCustomInDark) }
+    val followSystemDarkMode by rememberUpdatedState(themeConfig.followSystemDarkMode)
+    val customIsDark by rememberUpdatedState(themeConfig.isCustomInDark)
 
     Column(Modifier.fillMaxSize()) {
         TopAppBar(title = {
@@ -40,7 +40,7 @@ fun SettingsScreen(
         }, navigationIcon = {
             IconButton(onClick = onBackClick) {
                 Icon(
-                    Icons.Filled.ArrowBack,
+                    Icons.Rounded.ArrowBack,
                     stringResource(id = R.string.settings_screen_appbar_back_desc)
                 )
             }
@@ -84,7 +84,7 @@ fun SettingsScreen(
 
         ListItem(
             modifier = Modifier.clickable(onClick = { dropdownMenuExpanded = true }),
-            icon = { Icon(imageVector = Icons.Default.Timelapse, null) },
+            icon = { Icon(imageVector = Icons.Rounded.Timelapse, null) },
             text = { Text(stringResource(id = R.string.settings_screen_option_darkmode_label)) },
             secondaryText = {
                 Box {
@@ -97,12 +97,10 @@ fun SettingsScreen(
                         onDismissRequest = { dropdownMenuExpanded = false }
                     ) {
                         DropdownMenuItem(onClick = {
-                            followSystemDarkMode = true
                             themeController.setFollowSystemDarkTheme(true)
                             dropdownMenuExpanded = false
                         }) { Text(stringResource(id = R.string.settings_screen_option_darkmode_follow_system)) }
                         DropdownMenuItem(onClick = {
-                            followSystemDarkMode = false
                             themeController.setFollowSystemDarkTheme(false)
                             dropdownMenuExpanded = false
                         }) { Text(stringResource(id = R.string.settings_screen_option_darkmode_custom)) }
@@ -120,7 +118,6 @@ fun SettingsScreen(
                         enabled = !followSystemDarkMode, // 自定义时可以修改
                         checked = customIsDark,
                         onCheckedChange = {
-                            customIsDark = it
                             themeController.setCustomDarkTheme(it)
                         }
                     )
@@ -131,7 +128,7 @@ fun SettingsScreen(
 
         ListItem(
             modifier = Modifier.clickable(onClick = requestCustomTheme),
-            icon = { Icon(imageVector = Icons.Filled.FormatPaint, null) },
+            icon = { Icon(imageVector = Icons.Rounded.FormatPaint, null) },
             text = { Text(stringResource(id = R.string.settings_screen_option_custom_theme)) }
         )
 
@@ -144,13 +141,13 @@ fun SettingsScreen(
 
         ListItem(
             modifier = Modifier.clickable(onClick = {}),
-            icon = { Icon(imageVector = Icons.Filled.Storage, null) },
+            icon = { Icon(imageVector = Icons.Rounded.Storage, null) },
             text = { Text("清除下载缓存") }
         )
 
         ListItem(
             modifier = Modifier.clickable(onClick = {}),
-            icon = { Icon(Icons.Filled.PushPin, null) },
+            icon = { Icon(Icons.Rounded.PushPin, null) },
             text = { Text("固定文件夹") }
         )*/
     }

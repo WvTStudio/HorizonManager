@@ -4,11 +4,7 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.material.Colors
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Typography
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.ReadOnlyComposable
-import androidx.compose.runtime.staticCompositionLocalOf
-import androidx.compose.ui.Modifier
+import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
 
@@ -26,7 +22,6 @@ interface ThemeController {
 
 val AppBarBackgroundColor: Color
     @Composable
-    @ReadOnlyComposable
     get() {
         val config = LocalThemeConfig.current
         return if (config.appbarAccent && !config.isDark) {
@@ -40,27 +35,45 @@ val defaultTypography = Typography(
     defaultFontFamily = FontFamily.Default
 )
 
-data class ThemeConfig(
-    val followSystemDarkMode: Boolean,
-    val isSystemInDark: Boolean,
-    val isCustomInDark: Boolean,
-    val lightColor: Colors,
-    val darkColor: Colors,
-    val appbarAccent: Boolean
+@Stable
+class ThemeConfig(
+    followSystemDarkMode: Boolean,
+    isSystemInDark: Boolean,
+    isCustomInDark: Boolean,
+    lightColor: Colors,
+    darkColor: Colors,
+    appbarAccent: Boolean
 ) {
-    val isDark = if (followSystemDarkMode) isSystemInDark else isCustomInDark
-    val color = if (isDark) darkColor else lightColor
-    val appbarColor = if (appbarAccent && !isDark) color.primary else color.surface
-    val statusBarColor = if (appbarAccent && !isDark) color.primaryVariant else color.surface
+    var followSystemDarkMode by mutableStateOf(followSystemDarkMode)
+        internal set
+    var isSystemInDark by mutableStateOf(isSystemInDark)
+        internal set
+    var isCustomInDark by mutableStateOf(isCustomInDark)
+        internal set
+    var lightColor by mutableStateOf(lightColor)
+        internal set
+    var darkColor by mutableStateOf(darkColor)
+        internal set
+    var appbarAccent by mutableStateOf(appbarAccent)
+        internal set
+
+    val isDark: Boolean
+        @Composable get() = rememberUpdatedState(if (followSystemDarkMode) isSystemInDark else isCustomInDark).value
+    val color: Colors
+        @Composable get() = rememberUpdatedState(if (isDark) darkColor else lightColor).value
+    val appbarColor: Color
+        @Composable get() = rememberUpdatedState(if (appbarAccent && !isDark) color.primary else color.surface).value
+    val statusBarColor: Color
+        @Composable get() = rememberUpdatedState(if (appbarAccent && !isDark) color.primaryVariant else color.surface).value
 }
 
 @Composable
 fun HorizonManagerTheme(
     controller: ThemeController = DefaultThemeController,
-    config: ThemeConfig = DefaultThemeConfig,
+    config: ThemeConfig = DefaultThemeConfig2,
     content: @Composable () -> Unit
 ) {
-    val targetColors = if (config.isDark) config.darkColor else config.lightColor
+    val targetColors = config.color
     val colors = Colors(
         primary = animateColorAsState(targetColors.primary).value,
         primaryVariant = animateColorAsState(targetColors.primaryVariant).value,
@@ -89,13 +102,10 @@ fun HorizonManagerTheme(
 }
 
 @Composable
-fun PreviewTheme(
-    modifier: Modifier = Modifier,
-    content: @Composable () -> Unit
-) {
+fun PreviewTheme(content: @Composable () -> Unit) {
     CompositionLocalProvider(
         LocalThemeController provides DefaultThemeController,
-        LocalThemeConfig provides DefaultThemeConfig
+        LocalThemeConfig provides DefaultThemeConfig2
     ) {
         MaterialTheme(colors = LightColorPalette, content = content, typography = defaultTypography)
     }
@@ -109,7 +119,7 @@ object DefaultThemeController : ThemeController {
     override fun setAppbarAccent(enable: Boolean) {}
 }
 
-val DefaultThemeConfig = ThemeConfig(
+val DefaultThemeConfig2 = ThemeConfig(
     followSystemDarkMode = true,
     isSystemInDark = false,
     isCustomInDark = false,

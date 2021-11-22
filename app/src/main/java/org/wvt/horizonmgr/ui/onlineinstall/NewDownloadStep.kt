@@ -7,9 +7,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Download
-import androidx.compose.material.icons.filled.Error
+import androidx.compose.material.icons.rounded.Check
+import androidx.compose.material.icons.rounded.Download
+import androidx.compose.material.icons.rounded.Error
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -38,12 +38,12 @@ fun NewDownloadStep(
     state: State
 ) {
     ListItem(
-        icon = { Icon(Icons.Filled.Download, contentDescription = null) },
+        icon = { Icon(Icons.Rounded.Download, contentDescription = null) },
         overlineText = {
             Text(text = "区块 $chunk")
         },
         text = {
-            when(state) {
+            when (state) {
                 State.WAITING -> Text("等待下载")
                 State.DOWNLOADING -> Text("正在下载")
                 State.FAILED -> Text("下载失败")
@@ -56,11 +56,11 @@ fun NewDownloadStep(
         trailing = {
             AnimatedContent(targetState = state) {
                 Box(modifier = Modifier.size(48.dp), contentAlignment = Alignment.Center) {
-                    when(it) {
+                    when (it) {
                         State.WAITING -> CircularProgressIndicator()
                         State.DOWNLOADING -> CircularProgressIndicator(progress = (downloaded.toDouble() / total).toFloat())
-                        State.FAILED -> Icon(Icons.Default.Error, "Failed")
-                        State.COMPLETED -> Icon(Icons.Default.Check, "Completed")
+                        State.FAILED -> Icon(Icons.Rounded.Error, "Failed")
+                        State.COMPLETED -> Icon(Icons.Rounded.Check, "Completed")
                     }
                 }
             }

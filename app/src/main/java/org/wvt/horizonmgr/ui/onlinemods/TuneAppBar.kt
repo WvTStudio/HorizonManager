@@ -11,7 +11,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.rounded.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -174,11 +174,11 @@ internal fun TuneAppBar(
                 ) {
                     Crossfade(targetState = expand, animationSpec = iconFade) {
                         if (it) Icon(
-                            imageVector = Icons.Filled.ArrowBack,
+                            imageVector = Icons.Rounded.ArrowBack,
                             contentDescription = "关闭",
                             tint = MaterialTheme.colors.onSurface
                         )
-                        else Icon(imageVector = Icons.Filled.Menu, contentDescription = "菜单")
+                        else Icon(imageVector = Icons.Rounded.Menu, contentDescription = "菜单")
                     }
                 }
                 Crossfade(targetState = expand, animationSpec = iconFade) {
@@ -250,11 +250,11 @@ internal fun TuneAppBar(
                     ) {
                         Crossfade(targetState = expand, animationSpec = iconFade) {
                             if (it) Icon(
-                                imageVector = Icons.Filled.Search,
+                                imageVector = Icons.Rounded.Search,
                                 contentDescription = "搜索",
                                 tint = MaterialTheme.colors.onSurface
                             )
-                            else Icon(imageVector = Icons.Filled.Tune, contentDescription = "过滤选项")
+                            else Icon(imageVector = Icons.Rounded.Tune, contentDescription = "过滤选项")
                         }
                     }
                 }
@@ -340,7 +340,7 @@ private fun TuneContent(
                     .fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(Icons.Filled.Language, contentDescription = "源仓库")
+                Icon(Icons.Rounded.Language, contentDescription = "源仓库")
                 DropDownSelector(
                     modifier = Modifier
                         .padding(horizontal = 16.dp)
@@ -358,7 +358,7 @@ private fun TuneContent(
                     .fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(imageVector = Icons.Filled.Sort, contentDescription = "排序方式")
+                Icon(imageVector = Icons.Rounded.Sort, contentDescription = "排序方式")
                 DropDownSelector(
                     modifier = Modifier
                         .padding(horizontal = 16.dp)

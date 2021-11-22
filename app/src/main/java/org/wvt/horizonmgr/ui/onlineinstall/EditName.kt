@@ -3,7 +3,7 @@ package org.wvt.horizonmgr.ui.onlineinstall
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Extension
+import androidx.compose.material.icons.rounded.Extension
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,7 +33,13 @@ fun EditName(
         Row(verticalAlignment = Alignment.CenterVertically) {
             ListItem(
                 modifier = Modifier.weight(1f),
-                icon = { Icon(modifier = Modifier.padding(top = 4.dp),imageVector = Icons.Filled.Extension, contentDescription = "信息") },
+                icon = {
+                    Icon(
+                        modifier = Modifier.padding(top = 4.dp),
+                        imageVector = Icons.Rounded.Extension,
+                        contentDescription = "信息"
+                    )
+                },
                 text = { Text(name) },
                 secondaryText = { Text(version) }
             )

@@ -6,7 +6,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.rounded.Menu
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -75,7 +75,7 @@ private fun RecommendArticlesScreen(
             title = { Text("首页") },
             navigationIcon = {
                 IconButton(onClick = onNavClick) {
-                    Icon(imageVector = Icons.Filled.Menu, contentDescription = "菜单")
+                    Icon(imageVector = Icons.Rounded.Menu, contentDescription = "菜单")
                 }
             },
             backgroundColor = AppBarBackgroundColor

@@ -12,7 +12,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.rounded.Add
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -113,7 +113,7 @@ internal fun ModTab(
                         .padding(16.dp)
                         .align(Alignment.BottomEnd),
                     onClick = onAddModClicked
-                ) { Icon(imageVector = Icons.Filled.Add, contentDescription = "安装") }
+                ) { Icon(imageVector = Icons.Rounded.Add, contentDescription = "安装") }
             }
             is ModTabViewModel.State.Error -> ErrorPage(
                 message = { Text("解析模组列表失败") },

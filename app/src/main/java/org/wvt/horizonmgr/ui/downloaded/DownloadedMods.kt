@@ -8,8 +8,8 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Extension
-import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.rounded.Extension
+import androidx.compose.material.icons.rounded.Menu
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -44,7 +44,7 @@ fun DownloadedMods(
                 Text("本地资源")
             }, navigationIcon = {
                 IconButton(onClick = onNavClicked, content = {
-                    Icon(Icons.Filled.Menu, "菜单")
+                    Icon(Icons.Rounded.Menu, "菜单")
                 })
             }, backgroundColor = AppBarBackgroundColor
         )
@@ -172,7 +172,7 @@ private fun ModItem(
                     onClick = onInstallClicked
                 ) {
                     Icon(
-                        imageVector = Icons.Filled.Extension,
+                        imageVector = Icons.Rounded.Extension,
                         tint = MaterialTheme.colors.primary,
                         contentDescription = null
                     )

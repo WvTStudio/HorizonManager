@@ -9,7 +9,7 @@ import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.rounded.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -40,7 +40,7 @@ fun PackageDetailScreen(
                 Text("分包详情")
             }, navigationIcon = {
                 IconButton(onClick = onCloseClick) {
-                    Icon(Icons.Filled.ArrowBack, "返回")
+                    Icon(Icons.Rounded.ArrowBack, "返回")
                 }
             }, backgroundColor = AppBarBackgroundColor
         )
@@ -146,7 +146,7 @@ fun ManifestSection(
         )
         ListItem(icon = {
             Icon(
-                Icons.Filled.Extension,
+                Icons.Rounded.Extension,
                 modifier = Modifier.padding(top = 4.dp),
                 contentDescription = null
             )
@@ -157,7 +157,7 @@ fun ManifestSection(
         })
         ListItem(icon = {
             Icon(
-                Icons.Filled.Person,
+                Icons.Rounded.Person,
                 modifier = Modifier.padding(top = 4.dp),
                 contentDescription = null
             )
@@ -168,7 +168,7 @@ fun ManifestSection(
         })
         ListItem(icon = {
             Icon(
-                Icons.Filled.Description,
+                Icons.Rounded.Description,
                 modifier = Modifier.padding(top = 4.dp),
                 contentDescription = null
             )
@@ -179,7 +179,7 @@ fun ManifestSection(
         })
         ListItem(icon = {
             Icon(
-                Icons.Filled.Description,
+                Icons.Rounded.Description,
                 modifier = Modifier.padding(top = 4.dp),
                 contentDescription = null
             )
@@ -190,7 +190,7 @@ fun ManifestSection(
         })
         ListItem(icon = {
             Icon(
-                Icons.Filled.Description,
+                Icons.Rounded.Description,
                 modifier = Modifier.padding(top = 4.dp),
                 contentDescription = null
             )
@@ -201,7 +201,7 @@ fun ManifestSection(
         })
         ListItem(icon = {
             Icon(
-                Icons.Filled.Gamepad,
+                Icons.Rounded.Gamepad,
                 modifier = Modifier.padding(top = 4.dp),
                 contentDescription = null
             )
@@ -212,7 +212,7 @@ fun ManifestSection(
         })
         ListItem(icon = {
             Icon(
-                Icons.Filled.Notes,
+                Icons.Rounded.Notes,
                 modifier = Modifier.padding(top = 4.dp),
                 contentDescription = null
             )
@@ -242,7 +242,7 @@ fun InstallationSection(
         )
         ListItem(icon = {
             Icon(
-                Icons.Filled.Folder,
+                Icons.Rounded.Folder,
                 modifier = Modifier.padding(top = 4.dp),
                 contentDescription = null
             )
@@ -253,7 +253,7 @@ fun InstallationSection(
         })
         ListItem(icon = {
             Icon(
-                Icons.Filled.Storage,
+                Icons.Rounded.Storage,
                 modifier = Modifier.padding(top = 4.dp),
                 contentDescription = null
             )
@@ -264,7 +264,7 @@ fun InstallationSection(
         })
         ListItem(icon = {
             Icon(
-                Icons.Filled.Description,
+                Icons.Rounded.Description,
                 modifier = Modifier.padding(top = 4.dp),
                 contentDescription = null
             )
@@ -275,7 +275,7 @@ fun InstallationSection(
         })
         ListItem(icon = {
             Icon(
-                Icons.Filled.Description,
+                Icons.Rounded.Description,
                 modifier = Modifier.padding(top = 4.dp),
                 contentDescription = null
             )
