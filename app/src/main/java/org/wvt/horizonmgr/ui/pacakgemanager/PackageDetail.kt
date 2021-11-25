@@ -2,6 +2,7 @@ package org.wvt.horizonmgr.ui.pacakgemanager
 
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.*
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -14,13 +15,14 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.compositeOver
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import org.wvt.horizonmgr.R
 import org.wvt.horizonmgr.ui.components.ErrorPage
-import org.wvt.horizonmgr.ui.components.ImageWithoutQualityFilter
 import org.wvt.horizonmgr.ui.theme.AppBarBackgroundColor
 import org.wvt.horizonmgr.viewmodel.PackageDetailViewModel
 
@@ -84,13 +86,16 @@ fun PackageDetailScreen(
                                     .compositeOver(MaterialTheme.colors.background),
                                 elevation = 1.dp
                             ) {
-                                val image = info.packageGraphic.collectAsState()
-                                Crossfade(targetState = image.value) {
-                                    if (it != null) ImageWithoutQualityFilter(
+                                val image = info.packageGraphic.collectAsState().value
+                                Crossfade(targetState = image, modifier = Modifier.fillMaxSize()) {
+                                    if (it != null) Image(
                                         modifier = Modifier
                                             .fillMaxSize()
                                             .scale(scale),
-                                        imageBitmap = it,
+                                        bitmap = it,
+                                        contentDescription = stringResource(R.string.pkg_detail_screen_cover_desc),
+                                        filterQuality = FilterQuality.None,
+                                        contentScale = ContentScale.Crop
                                     )
                                 }
                             }
