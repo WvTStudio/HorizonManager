@@ -9,14 +9,12 @@ import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -182,9 +180,7 @@ private fun ModItem(
                 Spacer(modifier = Modifier.width(8.dp))
                 // Mod Icon
                 ModIcon(
-                    modifier = Modifier
-                        .size(80.dp)
-                        .clip(RoundedCornerShape(4.dp)),
+                    modifier = Modifier.size(80.dp),
                     image = icon?.value
                 )
             }

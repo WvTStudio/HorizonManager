@@ -225,4 +225,6 @@
     <string name="mm_screen_tab_mcmap">MC Maps</string>
     <string name="mm_screen_tab_hzres">HZ Res</string>
     <string name="mm_screen_tab_mcres">MC Res</string>
+    <string name="pkg_detail_screen_cover_desc">Cover Image</string>
+    <string name="comp_mod_icon_desc">Mod Icon</string>
 </resources>

@@ -226,4 +226,6 @@
     <string name="mm_screen_tab_mcmap">MC 地图</string>
     <string name="mm_screen_tab_hzres">HZ 资源包</string>
     <string name="mm_screen_tab_mcres">MC 资源包</string>
+    <string name="pkg_detail_screen_cover_desc">封面图</string>
+    <string name="comp_mod_icon_desc">Mod Icon</string>
 </resources>
