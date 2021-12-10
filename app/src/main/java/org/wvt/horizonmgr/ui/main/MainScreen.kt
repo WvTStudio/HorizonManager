@@ -1,7 +1,6 @@
 package org.wvt.horizonmgr.ui.main
 
-import androidx.compose.animation.Crossfade
-import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.*
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
@@ -34,6 +33,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.wvt.horizonmgr.R
 import org.wvt.horizonmgr.ui.components.NetworkImage
@@ -50,6 +50,7 @@ enum class Screen {
     HOME, PACKAGE_MANAGE, LOCAL_MANAGE, ONLINE_DOWNLOAD, DOWNLOADED_MOD
 }
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun MainScreen(
     viewModel: MainViewModel = hiltViewModel(),
@@ -90,8 +91,11 @@ fun MainScreen(
         },
         tabs = {
             DrawerTabs(screens = remember { Screen.values() }, currentScreen = screen, onChange = {
-                screen = it
-                scope.launch { drawerState.close() }
+                scope.launch {
+                    delay(100)
+                    drawerState.close()
+                    screen = it
+                }
             })
         },
         items = {
@@ -129,7 +133,13 @@ fun MainScreen(
             )
         }
     ) {
-        Crossfade(targetState = screen) { cs ->
+        AnimatedContent(
+            modifier = Modifier.fillMaxSize(),
+            targetState = screen,
+            transitionSpec = {
+                ContentTransform(targetContentEnter = fadeIn(), initialContentExit = fadeOut())
+            }
+        ) { cs ->
             when (cs) {
                 Screen.HOME -> HomeScreen(
                     onNavClick = { scope.launch { drawerState.open() } },
@@ -309,44 +319,16 @@ private fun DrawerHeader(
         modifier = Modifier.fillMaxWidth(),
         color = theme.appbarColor
     ) {
-        val contentColor = LocalContentColor.current
-        val gear = painterResource(id = R.drawable.ic_gear_full)
-
-        val gearRotation = remember { Animatable(0f) }
-
         Box {
             BoxWithConstraints(Modifier.matchParentSize()) {
                 val size = with(LocalDensity.current) { constraints.maxHeight.toDp() }
-                val animationScope = rememberCoroutineScope()
                 Box(
                     Modifier
-                        .size(size, size)
                         .align(Alignment.CenterEnd)
+                        .size(size, size)
                         .offset(x = size * 0.35f, y = -size * 0.35f)
-                        .rotate(gearRotation.value)
-                        .pointerInput(Unit) {
-                            forEachGesture {
-                                detectTapGestures {
-                                    animationScope.launch {
-                                        if (!gearRotation.isRunning) {
-                                            gearRotation.animateTo(720f, tween(1000))
-                                            gearRotation.snapTo(0f)
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                ) {
-                    Image(
-                        modifier = Modifier.fillMaxSize(),
-                        painter = gear,
-                        alpha = 0.12f,
-                        colorFilter = ColorFilter.tint(contentColor),
-                        contentDescription = null
-                    )
-                }
+                ) { AnimationGear() }
             }
-
             Column(Modifier.padding(16.dp)) {
                 // Avatar
                 Surface(
@@ -381,11 +363,43 @@ private fun DrawerHeader(
                 Text(
                     userInfo?.account ?: stringResource(id = R.string.main_screen_drawer_banner),
                     modifier = Modifier.padding(top = 8.dp),
-                    color = contentColor.copy(alpha = ContentAlpha.medium),
+                    color = LocalContentColor.current.copy(alpha = ContentAlpha.medium),
                     style = MaterialTheme.typography.subtitle1
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun AnimationGear() {
+    val gear = painterResource(id = R.drawable.ic_gear_full)
+    val gearRotation = remember { Animatable(0f) }
+    val animationScope = rememberCoroutineScope()
+    Box(
+        Modifier
+            .fillMaxSize()
+            .rotate(gearRotation.value)
+            .pointerInput(Unit) {
+                forEachGesture {
+                    detectTapGestures {
+                        animationScope.launch {
+                            if (!gearRotation.isRunning) {
+                                gearRotation.animateTo(720f, tween(1000))
+                                gearRotation.snapTo(0f)
+                            }
+                        }
+                    }
+                }
+            }
+    ) {
+        Image(
+            modifier = Modifier.fillMaxSize(),
+            painter = gear,
+            alpha = 0.12f,
+            colorFilter = ColorFilter.tint(LocalContentColor.current),
+            contentDescription = null
+        )
     }
 }
 

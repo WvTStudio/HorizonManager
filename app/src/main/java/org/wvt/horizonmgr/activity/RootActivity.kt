@@ -12,7 +12,6 @@ import android.provider.Settings
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.WindowCompat
 import dagger.hilt.android.AndroidEntryPoint
 import org.wvt.horizonmgr.R
 import org.wvt.horizonmgr.ui.Root
@@ -24,12 +23,12 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class RootActivity : AppCompatActivity() {
 
-    @Inject protected lateinit var rootVM: RootViewModel
+    @Inject
+    lateinit var rootVM: RootViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        WindowCompat.setDecorFitsSystemWindows(window, false)
         super.onCreate(savedInstanceState)
-        setTheme(R.style.Theme_HorizonManagerCompose_NoActionBar) // cancel the slash theme
+        setTheme(R.style.Theme_HorizonManagerCompose_NoActionBar) // cancel the splash theme
         setContent {
             Root(
                 viewModel = rootVM,

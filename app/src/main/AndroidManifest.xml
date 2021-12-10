@@ -98,8 +98,7 @@
             android:configChanges="orientation|uiMode" />
         <activity
             android:name=".activity.DonateActivity"
-            android:configChanges="orientation|uiMode"
-            android:theme="@style/Theme.HorizonManagerCompose.Donate" />
+            android:configChanges="orientation|uiMode" />
     </application>
 
 </manifest>
