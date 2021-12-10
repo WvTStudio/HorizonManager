@@ -11,7 +11,7 @@ plugins {
 
 android {
     compileSdk = 31
-    buildToolsVersion = "30.0.3"
+    buildToolsVersion = "31.0.0"
 
     defaultConfig {
         applicationId = "org.wvt.horizonmgr"
@@ -58,7 +58,7 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.1.0-beta03"
+        kotlinCompilerExtensionVersion = "1.1.0-beta04"
     }
     /*lint {
         disable("InvalidFragmentVersionForActivityResult")
@@ -98,7 +98,7 @@ dependencies {
     implementation("androidx.work:work-runtime-ktx:2.7.1")
 
 
-    val hiltVersion = "2.40.1"
+    val hiltVersion = "2.40.5"
     implementation("com.google.dagger:hilt-android:$hiltVersion")
     kapt("com.google.dagger:hilt-compiler:$hiltVersion")
     
@@ -115,7 +115,7 @@ dependencies {
     implementation("com.google.accompanist:accompanist-flowlayout:$accompanistVersion")
     implementation("com.google.accompanist:accompanist-placeholder:$accompanistVersion")
 
-    val composeVersion = "1.1.0-beta03"
+    val composeVersion = "1.1.0-beta04"
     implementation("androidx.compose.compiler:compiler:$composeVersion")
     implementation("androidx.compose.runtime:runtime:$composeVersion")
     implementation("androidx.compose.foundation:foundation:$composeVersion")
@@ -130,7 +130,7 @@ dependencies {
     implementation("androidx.compose.ui:ui-test:$composeVersion")
 
     implementation(platform("com.google.firebase:firebase-bom:26.1.0"))
-    implementation("com.google.firebase:firebase-crashlytics-ktx:18.2.4")
+    implementation("com.google.firebase:firebase-crashlytics-ktx:18.2.5")
 
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.3.1")
 
@@ -145,9 +145,9 @@ dependencies {
 
     implementation("androidx.test:monitor:1.4.0")
     testImplementation(kotlin("test-junit5"))
-    androidTestImplementation("junit:junit:4.12")
+    androidTestImplementation("junit:junit:4.13.2")
 
-    debugImplementation(kotlin("reflect"))
+//    debugImplementation(kotlin("reflect"))
 }
 
 tasks.withType<Test> {

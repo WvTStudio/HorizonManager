@@ -20,8 +20,6 @@ class MainViewModel @Inject constructor(
 ) : ViewModel() {
     val userInfo = MutableStateFlow<UserInformation?>(null)
 
-    init { resume() }
-
     fun logOut() {
         viewModelScope.launch(Dispatchers.IO) {
             localCache.clearCachedUserInfo()

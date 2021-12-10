@@ -79,6 +79,7 @@ fun SharePackageDialog(viewModel: PackageManagerViewModel) {
                         Text(stringResource(R.string.pm_screen_share_action_share))
                     }
                 }
+                else -> {}
             }
         }
     }
