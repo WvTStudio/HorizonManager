@@ -68,10 +68,7 @@ android {
     }
     packagingOptions {
         resources {
-            pickFirsts.apply {
-                add("META-INF/AL2.0")
-                add("META-INF/LGPL2.1")
-            }
+            pickFirsts.add("**")
         }
     }
 }
@@ -97,11 +94,13 @@ dependencies {
 
     implementation("androidx.work:work-runtime-ktx:2.7.1")
 
+    val ktorVersion = "1.6.7"
+    implementation("io.ktor:ktor-client-cio:$ktorVersion")
 
     val hiltVersion = "2.40.5"
     implementation("com.google.dagger:hilt-android:$hiltVersion")
     kapt("com.google.dagger:hilt-compiler:$hiltVersion")
-    
+
     implementation("androidx.hilt:hilt-navigation-compose:1.0.0-beta01")
     implementation("androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha03")
 
@@ -144,14 +143,20 @@ dependencies {
     implementation("net.lingala.zip4j:zip4j:2.9.1")
 
     implementation("androidx.test:monitor:1.4.0")
+
     testImplementation(kotlin("test-junit5"))
-    androidTestImplementation("junit:junit:4.13.2")
+//    androidTestImplementation(kotlin("test-junit5"))
+
+    testImplementation("org.json:json:20211205")
+    testImplementation("io.ktor:ktor-client-cio:$ktorVersion")
+    androidTestImplementation("junit:junit:4.12")
 
 //    debugImplementation(kotlin("reflect"))
 }
 
 tasks.withType<Test> {
     useJUnitPlatform()
+    jvmArgs("-Djava.net.useSystemProxies=true")
 }
 
 configurations.all {

@@ -33,6 +33,7 @@ fun InstallProgress(
     mergeState: InstallPackageViewModel.StepState,
     installState: InstallPackageViewModel.StepState,
     onCancelClick: () -> Unit,
+    onCloseClick: () -> Unit,
     onCompleteClick: () -> Unit
 ) {
     Box(Modifier.fillMaxSize()) {

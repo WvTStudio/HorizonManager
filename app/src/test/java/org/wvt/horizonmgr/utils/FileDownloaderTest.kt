@@ -1,5 +1,6 @@
 package org.wvt.horizonmgr.utils
 
+import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -18,16 +19,16 @@ class FileDownloaderTest {
 
     @Test
     fun testDownloadPackage() = runBlocking {
-        val task = FileDownloader.newTask("https://cdn.jsdelivr.net/gh/WvTStudio/horizon-cloud-config@master/innercore/part0011")
+        val task =
+            FileDownloader.newTask("https://cdn.jsdelivr.net/gh/WvTStudio/horizon-cloud-config@master/innercore/part0011")
         task.setOutput(testFile.outputStream().buffered())
         val total = task.connect()
-        println(total)
-        val state = task.start()
+        println("Total: $total")
         val job = launch {
-            state.collect { println(it) }
+            task.progress.collect { println(it) }
         }
-        task.await()
-        job.cancel()
+        task.download()
+        job.cancelAndJoin()
     }
 
     @AfterTest

@@ -1,8 +1,8 @@
 package org.wvt.horizonmgr.webapi
 
 import kotlinx.coroutines.runBlocking
-import org.junit.Test
 import org.wvt.horizonmgr.webapi.mod.ChineseModRepository
+import kotlin.test.Test
 
 class ChineseModRepositoryTest {
     private val repository = ChineseModRepository()

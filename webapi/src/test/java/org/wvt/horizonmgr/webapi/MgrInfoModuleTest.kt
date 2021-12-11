@@ -1,9 +1,9 @@
 package org.wvt.horizonmgr.webapi
 
 import kotlinx.coroutines.runBlocking
-import org.junit.Test
 import org.wvt.horizonmgr.webapi.mgrinfo.MgrInfoModule
 import java.math.BigDecimal
+import kotlin.test.Test
 
 class MgrInfoModuleTest {
     private val mgrInfo = MgrInfoModule()

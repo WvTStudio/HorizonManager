@@ -1,15 +1,21 @@
 package org.wvt.horizonmgr.utils
 
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withContext
 import java.io.OutputStream
 import java.net.HttpURLConnection
 import java.net.URL
+import kotlin.coroutines.resume
 
 object FileDownloader {
     interface Task {
+        val progress: StateFlow<Long>
+        fun getSize(): Long
+
         /**
          * Return size of the file
          */
@@ -17,25 +23,18 @@ object FileDownloader {
         fun setOutput(output: OutputStream)
 
         /**
-         * Start download, return an state flow represents the downloaded bytes.
+         * Download
          */
-        fun start(): StateFlow<Long>
-
-        /**
-         * Wait for downloading completely, or throws an exception
-         */
-        suspend fun await()
+        suspend fun download()
     }
 
     private class TaskImpl(
         private val url: String
     ) : Task {
-        private val scope = CoroutineScope(Dispatchers.IO)
-
+        override val progress = MutableStateFlow(0L)
         private var connected = false
         private var size: Long = 0L
         private lateinit var conn: HttpURLConnection
-        private lateinit var job: Deferred<Unit>
         private lateinit var output: OutputStream
 
         override suspend fun connect(): Long {
@@ -48,7 +47,7 @@ object FileDownloader {
             return size
         }
 
-        fun getSize(): Long {
+        override fun getSize(): Long {
             if (connected) return size
             else error("Not connected")
         }
@@ -57,33 +56,25 @@ object FileDownloader {
             this.output = output
         }
 
-        override fun start(): StateFlow<Long> {
+        override suspend fun download() = withContext(Dispatchers.IO) {
             if (!connected) error("Not connected")
-            val state = MutableStateFlow(0L)
 
-            job = scope.async {
-                conn.inputStream.buffered().use { input ->
-                    var bytesCopied: Long = 0
-                    val buffer = ByteArray(8 * 1024)
-                    var bytes = input.read(buffer)
+            var bytesCopied = 0L
 
-                    while (bytes >= 0 && isActive) {
-                        output.write(buffer, 0, bytes)
-                        bytesCopied += bytes
-                        state.emit(bytesCopied)
-                        bytes = input.read(buffer)
-                    }
-
-                    conn.disconnect()
+            val byteArray = ByteArray(1024)
+            val input = conn.inputStream.buffered(1024)
+            while (isActive) {
+                val size = suspendCancellableCoroutine<Int> {
+                    it.resume(input.read(byteArray, 0, byteArray.size))
                 }
+                if (size <= 0) break
+                suspendCancellableCoroutine<Unit> {
+                    output.write(byteArray, 0, size)
+                    it.resume(Unit)
+                }
+                bytesCopied += size
+                progress.emit(bytesCopied)
             }
-
-            return state.asStateFlow()
-        }
-
-
-        override suspend fun await() {
-            job.await()
         }
     }
 

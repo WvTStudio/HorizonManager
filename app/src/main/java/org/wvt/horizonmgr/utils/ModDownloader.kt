@@ -43,17 +43,13 @@ class ModDownloader(context: Context) {
                     val task = FileDownloader.newTask(url)
                     val total = task.connect()
                     task.setOutput(output)
-                    val state = task.start()
                     val job = launch {
-                        state.collect {
+                        task.progress.collect {
                             channel.send((it.toDouble() / total.toDouble()).toFloat())
                         }
                     }
-                    try {
-                        task.await()
-                    } finally {
-                        job.cancel()
-                    }
+                    task.download()
+                    job.cancel()
                 }
                 return@async file
             }

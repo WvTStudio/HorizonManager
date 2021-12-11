@@ -1,9 +1,9 @@
 package org.wvt.horizonmgr.webapi
 
 import kotlinx.coroutines.runBlocking
-import org.junit.Test
 import org.wvt.horizonmgr.webapi.iccn.ICCNModule
 import kotlin.random.Random
+import kotlin.test.Test
 
 class ICCNModuleTest {
     private val module = ICCNModule()
@@ -39,8 +39,9 @@ class ICCNModuleTest {
 
     @Test
     fun register() = runBlocking {
+        val random = Random.nextInt()
         val user = try {
-            module.register("hzmgr010106", "hzmgr010103@adodoz.cn", "hzmgrtestpassword")
+            module.register("hzmgr$random", "hzmgr$random@adodoz.cn", "hzmgrtestpassword")
         } catch (e: ICCNModule.RegisterFailedException) {
             e.errors.forEach {
                 println(it)

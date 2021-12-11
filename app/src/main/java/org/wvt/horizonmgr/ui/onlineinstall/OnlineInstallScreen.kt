@@ -182,6 +182,7 @@ fun OnlineInstallScreen(
                         mergeState = viewModel.mergeState.collectAsState().value,
                         downloadSteps = viewModel.downloadSteps.collectAsState().value,
                         onCancelClick = { viewModel.cancelInstall() },
+                        onCloseClick = { onCancel() },
                         onCompleteClick = onSucceed
                     )
                 }

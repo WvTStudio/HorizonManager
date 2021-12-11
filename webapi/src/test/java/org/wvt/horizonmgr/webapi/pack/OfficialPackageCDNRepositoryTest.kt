@@ -1,7 +1,7 @@
 package org.wvt.horizonmgr.webapi.pack
 
 import kotlinx.coroutines.runBlocking
-import org.junit.Test
+import kotlin.test.Test
 
 class OfficialPackageCDNRepositoryTest {
 

@@ -1,8 +1,8 @@
 package org.wvt.horizonmgr.webapi
 
 import kotlinx.coroutines.runBlocking
-import org.junit.Test
 import org.wvt.horizonmgr.webapi.news.MgrNewsModule
+import kotlin.test.Test
 
 class MgrNewsModuleTest {
     private val module = MgrNewsModule()
