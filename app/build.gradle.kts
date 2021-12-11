@@ -17,8 +17,8 @@ android {
         applicationId = "org.wvt.horizonmgr"
         minSdk = 21
         targetSdk = 31
-        versionCode = 25
-        versionName = "2.1.3"
+        versionCode = 26
+        versionName = "2.1.4"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -68,7 +68,8 @@ android {
     }
     packagingOptions {
         resources {
-            pickFirsts.add("**")
+            pickFirsts.add("META-INF/AL2.0")
+            pickFirsts.add("META-INF/LGPL2.1")
         }
     }
 }
