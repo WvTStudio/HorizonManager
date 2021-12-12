@@ -13,3 +13,10 @@
 ## 更新日志
 
 详情看 [Changelog](assets/changelog.md)
+
+## 鸣谢
+
+![JetBrains Logo (Main) logo](https://resources.jetbrains.com/storage/products/company/brand/logos/jb_beam.svg)
+
+感谢 [Jetbrains's Licenses for Open Source Development](https://jb.gg/OpenSourceSupport) 计划对本项目的支持
+
