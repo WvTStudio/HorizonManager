@@ -58,7 +58,7 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.1.0-beta04"
+        kotlinCompilerExtensionVersion = "1.2.0-alpha01"
     }
     /*lint {
         disable("InvalidFragmentVersionForActivityResult")
@@ -91,7 +91,7 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.4.0")
     implementation("com.google.android.material:material:1.4.0")
 
-    implementation("androidx.navigation:navigation-compose:2.4.0-beta02")
+    implementation("androidx.navigation:navigation-compose:2.4.0-rc01")
 
     implementation("androidx.work:work-runtime-ktx:2.7.1")
 
@@ -102,7 +102,7 @@ dependencies {
     implementation("com.google.dagger:hilt-android:$hiltVersion")
     kapt("com.google.dagger:hilt-compiler:$hiltVersion")
 
-    implementation("androidx.hilt:hilt-navigation-compose:1.0.0-beta01")
+    implementation("androidx.hilt:hilt-navigation-compose:1.0.0-rc01")
     implementation("androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha03")
 
     implementation("io.coil-kt:coil-compose:1.3.2")
@@ -115,7 +115,7 @@ dependencies {
     implementation("com.google.accompanist:accompanist-flowlayout:$accompanistVersion")
     implementation("com.google.accompanist:accompanist-placeholder:$accompanistVersion")
 
-    val composeVersion = "1.1.0-beta04"
+    val composeVersion = "1.2.0-alpha01"
     implementation("androidx.compose.compiler:compiler:$composeVersion")
     implementation("androidx.compose.runtime:runtime:$composeVersion")
     implementation("androidx.compose.foundation:foundation:$composeVersion")
@@ -130,9 +130,9 @@ dependencies {
     implementation("androidx.compose.ui:ui-test:$composeVersion")
 
     implementation(platform("com.google.firebase:firebase-bom:26.1.0"))
-    implementation("com.google.firebase:firebase-crashlytics-ktx:18.2.5")
+    implementation("com.google.firebase:firebase-crashlytics-ktx:18.2.6")
 
-    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.3.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.3.2")
 
     val markwonVersion = "4.6.2"
     implementation("io.noties.markwon:core:$markwonVersion")
@@ -143,7 +143,7 @@ dependencies {
 
     implementation("net.lingala.zip4j:zip4j:2.9.1")
 
-    implementation("androidx.test:monitor:1.4.0")
+    implementation("androidx.test:monitor:1.5.0")
 
     testImplementation(kotlin("test-junit5"))
 //    androidTestImplementation(kotlin("test-junit5"))

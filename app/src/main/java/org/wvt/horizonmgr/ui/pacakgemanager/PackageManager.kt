@@ -2,6 +2,7 @@ package org.wvt.horizonmgr.ui.pacakgemanager
 
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -78,6 +79,7 @@ fun PackageManagerScreen(
     )
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun PackageManager(
     viewModel: PackageManagerViewModel,
@@ -138,7 +140,9 @@ fun PackageManager(
                         errors = errors
                     ) { index, item ->
                         PackageItem(
-                            modifier = Modifier.padding(16.dp, 8.dp),
+                            modifier = Modifier
+                                .padding(16.dp, 8.dp)
+                                .animateItemPlacement(),
                             title = item.name,
                             description = item.description,
                             installTime = item.timeStr,

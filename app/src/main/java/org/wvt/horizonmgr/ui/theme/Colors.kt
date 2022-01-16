@@ -12,8 +12,7 @@ val DarkColorPalette = darkColors(
     secondaryVariant = Color(MaterialColors.cyan[700]!!),
     onSecondary = Color.White,
     onPrimary = Color.White,
-    onSurface = Color.White,
-    background = Color(0xFF212121)
+    onSurface = Color.White
 )
 
 val LightColorPalette = lightColors(
