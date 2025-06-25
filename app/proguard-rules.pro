@@ -19,10 +19,5 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
--keep class * extends androidx.lifecycle.ViewModel {
-*;
-}
-
--keepclassmembers class * extends androidx.lifecycle.ViewModel {
-*;
-}
+-dontwarn com.google.errorprone.annotations.MustBeClosed
+-dontwarn org.slf4j.impl.StaticLoggerBinder
