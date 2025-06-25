@@ -5,7 +5,7 @@
     android:versionName="1">
 
     <queries>
-        <package android:name="com.mojang.minecraft" />
+        <package android:name="com.mojang.minecraftpe" />
         <package android:name="com.zheka.horizon" />
         <package android:name="com.zheka.horizon64" />
     </queries>

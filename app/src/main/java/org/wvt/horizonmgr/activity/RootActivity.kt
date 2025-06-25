@@ -120,23 +120,19 @@ class RootActivity : ComponentActivity() {
         }
     }
 
-    @SuppressLint("QueryPermissionsNeeded", "WrongConstant")
+    @SuppressLint("QueryPermissionsNeeded")
     private fun checkGameInstalled() {
-        val apps = packageManager.getInstalledApplications(PackageManager.GET_ACTIVITIES)
-        var hasMC = false
-        var hasHZ = false
-
-        for (app in apps) {
-            when (app.packageName) {
-                "com.mojang.minecraftpe" -> hasMC = true
-                "com.zheka.horizon" -> hasHZ = true
-            }
+        val packages = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            packageManager.getInstalledApplications(PackageManager.ApplicationInfoFlags.of(0))
+        } else {
+            packageManager.getInstalledApplications(0)
         }
+        val apps = packages.asSequence().map { it.packageName }.toSet()
 
-        if (!hasMC) {
+        if ("com.mojang.minecraftpe" !in apps) {
             rootVM.showGameNotInstallDialog()
         }
-        if (!hasHZ) {
+        if ("com.zheka.horizon" !in apps && "com.zheka.horizon64" !in apps) {
             rootVM.showHZNotInstallDialog()
         }
     }
