@@ -1,8 +1,9 @@
 plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.android.application)
+    alias(libs.plugins.compose.compiler)
     alias(libs.plugins.ksp)
-    alias(libs.plugins.hilt)
+//    alias(libs.plugins.hilt)
 //    alias(libs.plugins.gms)
 //    alias(libs.plugins.kotlin.serialization)
 //    alias(libs.plugins.buildkonfig)
@@ -50,21 +51,15 @@ android {
     }
     compileOptions {
         isCoreLibraryDesugaringEnabled = true
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     buildFeatures {
         compose = true
         buildConfig = true
     }
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.2.0-alpha01"
-    }
-    /*lint {
-        disable("InvalidFragmentVersionForActivityResult")
-    }*/
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "17"
     }
     packaging {
         resources {
@@ -82,11 +77,11 @@ dependencies {
     implementation(project(":webapi"))
     implementation(project(":service"))
 
-//    implementation(project.dependencies.platform(libs.koin.bom))
-//    implementation(libs.koin.core)
-//    implementation(libs.koin.compose)
-//    implementation(libs.koin.compose.viewmodel)
-//    implementation(libs.koin.compose.viewmodel.navigation)
+    implementation(project.dependencies.platform(libs.koin.bom))
+    implementation(libs.koin.core)
+    implementation(libs.koin.compose)
+    implementation(libs.koin.compose.viewmodel)
+    implementation(libs.koin.compose.viewmodel.navigation)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.activity.ktx)
@@ -103,11 +98,11 @@ dependencies {
 
     implementation(libs.ktor.client.cio)
 
-    implementation(libs.hilt.android)
-    ksp(libs.hilt.compiler)
+//    implementation(libs.hilt.android)
+//    ksp(libs.hilt.compiler)
 
-    implementation(libs.androidx.hilt.navigation.compose)
-    implementation(libs.androidx.hilt.lifecycle.viewmodel)
+//    implementation(libs.androidx.hilt.navigation.compose)
+//    implementation(libs.androidx.hilt.lifecycle.viewmodel)
 
     implementation(libs.coil.compose)
 
@@ -118,18 +113,18 @@ dependencies {
     implementation(libs.accompanist.flowlayout)
     implementation(libs.accompanist.placeholder)
 
-    implementation(libs.compose.compiler)
-    implementation(libs.compose.runtime)
-    implementation(libs.compose.foundation)
-    implementation(libs.compose.animation)
-    implementation(libs.compose.ui)
-    implementation(libs.compose.ui.util)
-    implementation(libs.compose.material)
-    implementation(libs.compose.material.ripple)
-    implementation(libs.compose.material.icons.core)
-    implementation(libs.compose.material.icons.extended)
-    implementation(libs.compose.ui.tooling)
-    implementation(libs.compose.ui.test)
+    implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.compose.runtime)
+    implementation(libs.androidx.compose.foundation)
+    implementation(libs.androidx.compose.animation)
+    implementation(libs.androidx.compose.ui)
+    implementation(libs.androidx.compose.ui.util)
+    implementation(libs.androidx.compose.material)
+//    implementation(libs.androidx.compose.material.ripple)
+//    implementation(libs.androidx.compose.material.icons.core)
+    implementation(libs.androidx.compose.material.icons.extended)
+    implementation(libs.androidx.compose.ui.tooling)
+//    implementation(libs.androidx.compose.ui.test)
 
 //    implementation(platform(libs.firebase.bom))
 //    implementation(libs.firebase.crashlytics.ktx)

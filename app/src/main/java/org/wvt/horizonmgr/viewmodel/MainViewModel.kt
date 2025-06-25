@@ -3,19 +3,16 @@ package org.wvt.horizonmgr.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.wvt.horizonmgr.ui.main.UserInformation
 import org.wvt.horizonmgr.utils.LocalCache
-import javax.inject.Inject
 
 private const val TAG = "MainViewModel"
 
-@HiltViewModel
-class MainViewModel @Inject constructor(
+class MainViewModel(
     private val localCache: LocalCache
 ) : ViewModel() {
     val userInfo = MutableStateFlow<UserInformation?>(null)

@@ -4,20 +4,17 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContract
-import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.ui.Modifier
-import dagger.hilt.android.AndroidEntryPoint
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.wvt.horizonmgr.ui.login.LoginScreen
-import org.wvt.horizonmgr.ui.pacakgemanager.PackageDetailScreen
 import org.wvt.horizonmgr.ui.theme.AndroidHorizonManagerTheme
 import org.wvt.horizonmgr.viewmodel.LoginViewModel
-import org.wvt.horizonmgr.viewmodel.PackageDetailViewModel
 
 private const val TAG = "LoginActivity"
 
@@ -61,8 +58,7 @@ class LoginResultContract : ActivityResultContract<Unit, LoginResult>() {
     }
 }
 
-@AndroidEntryPoint
-class LoginActivity : AppCompatActivity() {
+class LoginActivity : ComponentActivity() {
     companion object {
         const val LOGIN_CANCELED = 0
         const val LOGIN_SUCCEED = 1
@@ -73,7 +69,7 @@ class LoginActivity : AppCompatActivity() {
         const val EXTRA_AVATAR = "avatar"
     }
 
-    private val viewModel by viewModels<LoginViewModel>()
+    private val viewModel by viewModel<LoginViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -105,22 +101,5 @@ class LoginActivity : AppCompatActivity() {
         setResult(LOGIN_SUCCEED, result)
         Log.d(TAG, "Login succeed: $result")
         finish()
-    }
-}
-
-@AndroidEntryPoint
-class PackageDetailActivity : AppCompatActivity() {
-    private val viewModel by viewModels<PackageDetailViewModel>()
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        setContent {
-            AndroidHorizonManagerTheme {
-                Surface(Modifier.fillMaxSize(), color = MaterialTheme.colors.background) {
-                    PackageDetailScreen(viewModel, onCloseClick = ::finish)
-                }
-            }
-        }
     }
 }

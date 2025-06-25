@@ -5,7 +5,6 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.SnackbarHostState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,12 +14,10 @@ import org.wvt.horizonmgr.ui.components.FabState
 import org.wvt.horizonmgr.utils.LocalCache
 import org.wvt.horizonmgr.webapi.NetworkException
 import org.wvt.horizonmgr.webapi.iccn.ICCNModule
-import javax.inject.Inject
 
 private const val TAG = "LoginViewModelLogger"
 
-@HiltViewModel
-class LoginViewModel @Inject constructor(
+class LoginViewModel(
     private val localCache: LocalCache,
     private val iccn: ICCNModule
 ) : ViewModel() {

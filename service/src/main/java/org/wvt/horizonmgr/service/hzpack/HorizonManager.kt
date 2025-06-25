@@ -87,11 +87,11 @@ class HorizonManager constructor(val horizonDir: File) {
         // TODO: 2021/2/20 测试如果没有 graphics 是否能运行
         // 预览图压缩包直接复制改名
         graphicsZip?.copyTo(outDir.resolve(".cached_graphics"))
-        val packageUUID = packageUUID ?: UUID.randomUUID().toString().toLowerCase(Locale.ENGLISH)
+        val packageUUID = packageUUID ?: UUID.randomUUID().toString().lowercase(Locale.ENGLISH)
         outDir.resolve(".installation_info").outputStream().writer().use {
             val jsonStr = InstallationInfo(
                 packageId = packageUUID,
-                internalId = UUID.randomUUID().toString().toLowerCase(Locale.ENGLISH),
+                internalId = UUID.randomUUID().toString().lowercase(Locale.ENGLISH),
                 timeStamp = Date().time,
                 customName = customName
             ).toJson()

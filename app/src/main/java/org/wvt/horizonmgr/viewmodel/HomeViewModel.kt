@@ -3,18 +3,15 @@ package org.wvt.horizonmgr.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import org.wvt.horizonmgr.webapi.news.MgrArticleModule
 import java.text.SimpleDateFormat
-import javax.inject.Inject
 
 private const val TAG = "NewsViewModel"
 
-@HiltViewModel
-class HomeViewModel @Inject constructor(
+class HomeViewModel(
     private val articleModule: MgrArticleModule
 ) : ViewModel() {
     sealed class ContentResource {

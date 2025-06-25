@@ -9,13 +9,10 @@ import org.wvt.horizonmgr.BuildConfig
 import org.wvt.horizonmgr.utils.LocalCache
 import org.wvt.horizonmgr.webapi.NetworkException
 import org.wvt.horizonmgr.webapi.mgrinfo.MgrInfoModule
-import javax.inject.Inject
-import javax.inject.Singleton
 
 private const val TAG = "RootViewModel"
 
-@Singleton
-class RootViewModel @Inject constructor(
+class RootViewModel(
     private val localCache: LocalCache,
     private val mgrInfo: MgrInfoModule
 ) {

@@ -5,10 +5,12 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import org.wvt.horizonmgr.service.hzpack.HorizonManager
 import org.wvt.horizonmgr.service.hzpack.PackageManifest
 import org.wvt.horizonmgr.service.hzpack.PackageManifestWrapper
@@ -18,12 +20,10 @@ import org.wvt.horizonmgr.utils.OfficialCDNPackageDownloader
 import org.wvt.horizonmgr.webapi.NetworkException
 import org.wvt.horizonmgr.webapi.pack.OfficialCDNPackage
 import org.wvt.horizonmgr.webapi.pack.OfficialPackageCDNRepository
-import javax.inject.Inject
 
 private const val TAG = "InstallPackageVM"
 
-@HiltViewModel
-class InstallPackageViewModel @Inject constructor(
+class InstallPackageViewModel(
     private val packRepository: OfficialPackageCDNRepository,
     private val downloader: OfficialCDNPackageDownloader,
     private val mgr: HorizonManager

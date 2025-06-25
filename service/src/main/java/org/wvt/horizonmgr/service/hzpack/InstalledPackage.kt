@@ -147,7 +147,7 @@ class InstalledPackage private constructor(val packageDirectory: File) {
 
         val newInfo = oldInfo.copy(
             customName = newName,
-            internalId = UUID.randomUUID().toString().toLowerCase(Locale.ROOT)
+            internalId = UUID.randomUUID().toString().lowercase(Locale.ROOT)
         )
         targetDir.resolve(".installation_info").writeText(newInfo.toJson())
         return@withContext newInfo

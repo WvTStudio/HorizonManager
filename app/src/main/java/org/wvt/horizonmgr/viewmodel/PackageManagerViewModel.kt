@@ -7,7 +7,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,7 +15,12 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.lingala.zip4j.ZipFile
-import org.wvt.horizonmgr.service.hzpack.*
+import org.wvt.horizonmgr.service.hzpack.HorizonManager
+import org.wvt.horizonmgr.service.hzpack.InstallationInfo
+import org.wvt.horizonmgr.service.hzpack.InstalledPackage
+import org.wvt.horizonmgr.service.hzpack.PackageManifest
+import org.wvt.horizonmgr.service.hzpack.ZipPackage
+import org.wvt.horizonmgr.service.hzpack.recommendDescription
 import org.wvt.horizonmgr.ui.components.InputDialogHostState
 import org.wvt.horizonmgr.ui.components.ProgressDialogState
 import org.wvt.horizonmgr.ui.pacakgemanager.ConfirmDeleteDialogHostState
@@ -25,16 +29,14 @@ import org.wvt.horizonmgr.utils.LocalCache
 import org.wvt.horizonmgr.webapi.pack.OfficialPackageCDNRepository
 import java.io.File
 import java.text.SimpleDateFormat
-import java.util.*
-import javax.inject.Inject
+import java.util.Date
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 private const val TAG = "PackageManagerVM"
 
-@HiltViewModel
-class PackageManagerViewModel @Inject constructor(
+class PackageManagerViewModel(
     private val mgr: HorizonManager,
     private val localCache: LocalCache,
     private val packageCDNRepository: OfficialPackageCDNRepository

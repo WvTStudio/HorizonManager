@@ -3,12 +3,15 @@ package org.wvt.horizonmgr.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.consumeAsFlow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.wvt.horizonmgr.service.hzpack.HorizonManager
 import org.wvt.horizonmgr.service.mod.ZipMod
 import org.wvt.horizonmgr.ui.components.ProgressDialogState
@@ -21,12 +24,10 @@ import org.wvt.horizonmgr.webapi.mod.ChineseMod
 import org.wvt.horizonmgr.webapi.mod.ChineseModRepository
 import org.wvt.horizonmgr.webapi.mod.OfficialMirrorMod
 import org.wvt.horizonmgr.webapi.mod.OfficialModMirrorRepository
-import javax.inject.Inject
 
 private const val TAG = "OnlineModsVM"
 
-@HiltViewModel
-class OnlineModsViewModel @Inject constructor(
+class OnlineModsViewModel(
     private val chineseModRepository: ChineseModRepository,
     private val cdnModRepository: OfficialModMirrorRepository,
     private val modDownloader: ModDownloader,

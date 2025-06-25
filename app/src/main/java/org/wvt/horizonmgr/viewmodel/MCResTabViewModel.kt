@@ -3,11 +3,9 @@ package org.wvt.horizonmgr.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.launch
@@ -16,12 +14,10 @@ import org.wvt.horizonmgr.service.respack.ResourcePackManifest
 import org.wvt.horizonmgr.service.respack.ZipResourcePackage
 import org.wvt.horizonmgr.ui.components.ProgressDialogState
 import java.io.File
-import javax.inject.Inject
 
 private const val TAG = "MCResTabVM"
 
-@HiltViewModel
-class MCResTabViewModel @Inject constructor(
+class MCResTabViewModel(
     private val resManager: ResourcePackManager
 ) : ViewModel() {
 

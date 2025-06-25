@@ -2,6 +2,7 @@ package org.wvt.horizonmgr.ui.onlineinstall
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.*
+import androidx.compose.animation.AnimatedContentTransitionScope.SlideDirection
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -95,14 +96,18 @@ fun OnlineInstallScreen(
                     ContentTransform(
                         targetContentEnter =
                         if (targetState > initialState) fadeIn() + slideIntoContainer(
-                            AnimatedContentScope.SlideDirection.Start
+                            SlideDirection.Start
                         )
-                        else fadeIn() + slideIntoContainer(AnimatedContentScope.SlideDirection.End),
+                        else fadeIn() + slideIntoContainer(
+                            SlideDirection.End
+                        ),
                         initialContentExit =
                         if (targetState > initialState) fadeOut() + slideOutOfContainer(
-                            AnimatedContentScope.SlideDirection.Start
+                            SlideDirection.Start
                         )
-                        else fadeOut() + slideOutOfContainer(AnimatedContentScope.SlideDirection.End)
+                        else fadeOut() + slideOutOfContainer(
+                            SlideDirection.End
+                        )
                     )
                 }
             ) {

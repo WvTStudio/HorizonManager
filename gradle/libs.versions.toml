@@ -1,12 +1,12 @@
 [versions]
-kotlin = "1.6.10"
+kotlin = "2.1.20"
 android = "8.10.1"
-compose = "1.2.0-beta01"
 kotlinxSerializationJson = "1.3.2"
-ksp = "1.6.10-1.0.4"
+ksp = "2.1.20-2.0.1"
 firebaseBom = "26.1.0"
 gms = "4.3.10"
-hilt = "2.44"
+hilt = "2.56.2"
+composeBom = "2025.06.01"
 
 accompanistVersion = "0.17.0"
 activityKtx = "1.4.0"
@@ -17,14 +17,13 @@ hiltNavigationCompose = "1.0.0-rc01"
 hiltLifecycleViewmodel = "1.0.0-alpha03"
 firebaseCrashlyticsKtx = "18.2.6"
 json = "20211205"
-composeBom = "2025.06.01"
 desugar_jdk_libs = "2.1.5"
 activityCompose = "1.4.0"
 argon2kt = "1.4.0"
 constraintlayoutCompose = "1.1.1"
 datastorePreferences = "1.1.7"
 espresso = "3.6.1"
-androidxJunit = "1.1.3"
+androidxJunit = "1.2.1"
 junitJupiter = "5.10.2"
 junit = "4.13.2"
 androidx-lifecycle = "2.9.0"
@@ -102,6 +101,7 @@ androidx-compose-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-
 androidx-compose-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-compose-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended" }
 androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3" }
+androidx-compose-material = { group = "androidx.compose.material", name = "material" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activityCompose" }
 androidx-constraintlayout-compose = { module = "androidx.constraintlayout:constraintlayout-compose", version.ref = "constraintlayoutCompose" }
 constraintlayout-multiplatform = { module = "tech.annexflow.compose:constraintlayout-compose-multiplatform", version.ref = "constraintlayoutMultiplatform" }
@@ -157,20 +157,6 @@ androidx-lifecycle-runtime-compose = { group = "org.jetbrains.androidx.lifecycle
 androidx-lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "androidx-lifecycle-ktx" }
 
 logback = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
-
-compose-compiler = { module = "androidx.compose.compiler:compiler", version.ref = "compose" }
-compose-runtime = { module = "androidx.compose.runtime:runtime", version.ref = "compose" }
-compose-foundation = { module = "androidx.compose.foundation:foundation", version.ref = "compose" }
-compose-animation = { module = "androidx.compose.animation:animation", version.ref = "compose" }
-compose-ui = { module = "androidx.compose.ui:ui", version.ref = "compose" }
-compose-ui-util = { module = "androidx.compose.ui:ui-util", version.ref = "compose" }
-compose-material = { module = "androidx.compose.material:material", version.ref = "compose" }
-compose-material-ripple = { module = "androidx.compose.material:material-ripple", version.ref = "compose" }
-compose-material-icons-core = { module = "androidx.compose.material:material-icons-core", version.ref = "compose" }
-compose-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "compose" }
-compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "compose" }
-compose-ui-test = { module = "androidx.compose.ui:ui-test", version.ref = "compose" }
-
 markwon-core = { module = "io.noties.markwon:core", version.ref = "markwon" }
 markwon-ext-latex = { module = "io.noties.markwon:ext-latex", version.ref = "markwon" }
 markwon-ext-tables = { module = "io.noties.markwon:ext-tables", version.ref = "markwon" }

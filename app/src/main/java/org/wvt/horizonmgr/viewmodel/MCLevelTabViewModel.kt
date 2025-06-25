@@ -3,22 +3,27 @@ package org.wvt.horizonmgr.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.joinAll
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.wvt.horizonmgr.service.hzpack.HorizonManager
 import org.wvt.horizonmgr.service.hzpack.InstalledPackage
-import org.wvt.horizonmgr.service.level.*
+import org.wvt.horizonmgr.service.level.LevelInfo
+import org.wvt.horizonmgr.service.level.LevelTransporter
+import org.wvt.horizonmgr.service.level.MCLevel
+import org.wvt.horizonmgr.service.level.MCLevelManager
+import org.wvt.horizonmgr.service.level.ZipMCLevel
 import org.wvt.horizonmgr.ui.components.InputDialogHostState
 import org.wvt.horizonmgr.ui.components.ProgressDialogState
 import org.wvt.horizonmgr.utils.LocalCache
 import java.io.File
-import javax.inject.Inject
 
 private const val TAG = "MCLevelTabVM"
 
-@HiltViewModel
-class MCLevelTabViewModel @Inject constructor(
+class MCLevelTabViewModel(
     private val levelManager: MCLevelManager,
     private val levelTransporter: LevelTransporter,
     private var manager: HorizonManager,

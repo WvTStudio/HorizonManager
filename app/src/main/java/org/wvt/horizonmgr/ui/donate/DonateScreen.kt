@@ -1,9 +1,30 @@
 package org.wvt.horizonmgr.ui.donate
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.material.Card
+import androidx.compose.material.ContentAlpha
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.SnackbarHost
+import androidx.compose.material.SnackbarHostState
+import androidx.compose.material.Surface
+import androidx.compose.material.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -11,16 +32,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import androidx.hilt.navigation.compose.hiltViewModel
 import coil.annotation.ExperimentalCoilApi
 import coil.compose.rememberImagePainter
+import org.koin.compose.viewmodel.koinViewModel
 import org.wvt.horizonmgr.R
 import org.wvt.horizonmgr.ui.theme.PreviewTheme
 import org.wvt.horizonmgr.viewmodel.DonateViewModel
 
 @Composable
 fun DonateScreen(
-    vm: DonateViewModel = hiltViewModel(),
+    vm: DonateViewModel = koinViewModel(),
     onClose: () -> Unit
 ) {
     val hostState = SnackbarHostState()

@@ -8,22 +8,20 @@ import android.os.Binder
 import androidx.core.app.NotificationChannelCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import org.koin.android.ext.android.inject
 import org.wvt.horizonmgr.R
 import org.wvt.horizonmgr.activity.InstallPackageActivity
 import org.wvt.horizonmgr.service.hzpack.HorizonManager
 import org.wvt.horizonmgr.utils.OfficialCDNPackageDownloader
 import org.wvt.horizonmgr.viewmodel.InstallPackageViewModel
 import org.wvt.horizonmgr.webapi.pack.OfficialPackageCDNRepository
-import javax.inject.Inject
 
 const val CHANNEL_ID = "online_package_install"
 
-@AndroidEntryPoint
 class OnlinePackageInstallService : Service() {
     private var notificationId = 912957293
     private lateinit var notification: Notification
@@ -32,14 +30,11 @@ class OnlinePackageInstallService : Service() {
 
     private val scope = CoroutineScope(Dispatchers.Default)
 
-    @Inject
-    protected lateinit var manager: HorizonManager
+    private val manager: HorizonManager by inject()
 
-    @Inject
-    protected lateinit var packRepository: OfficialPackageCDNRepository
+    private val packRepository: OfficialPackageCDNRepository by inject()
 
-    @Inject
-    protected lateinit var downloader: OfficialCDNPackageDownloader
+    private val downloader: OfficialCDNPackageDownloader by inject()
 
     override fun onBind(intent: Intent): MyBinder {
         return binder
@@ -58,7 +53,7 @@ class OnlinePackageInstallService : Service() {
                     Intent(
                         this@OnlinePackageInstallService.applicationContext,
                         InstallPackageActivity::class.java
-                    ).apply { action = "show_progress" }, 0
+                    ).apply { action = "show_progress" }, PendingIntent.FLAG_IMMUTABLE
                 )
             setContentIntent(intent)
         }.build()
@@ -86,7 +81,7 @@ class OnlinePackageInstallService : Service() {
             Intent(
                 this@OnlinePackageInstallService.applicationContext,
                 InstallPackageActivity::class.java
-            ).apply { action = "show_progress" }, 0
+            ).apply { action = "show_progress" }, PendingIntent.FLAG_IMMUTABLE
         )
 
         val builder = NotificationCompat.Builder(this@OnlinePackageInstallService.applicationContext, CHANNEL_ID).apply {

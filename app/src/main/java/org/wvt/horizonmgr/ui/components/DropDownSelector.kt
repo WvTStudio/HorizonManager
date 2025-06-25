@@ -40,7 +40,7 @@ fun DropDownSelector(
         IconButton(
             modifier = Modifier.indication(
                 sourceInteractionState,
-                rememberRipple(bounded = false, radius = 24.dp)
+                ripple(bounded = false, radius = 24.dp)
             ),
             onClick = { dropDown = true }
         ) { Icon(Icons.Rounded.ArrowDropDown, stringResource(R.string.button_action_expand)) }

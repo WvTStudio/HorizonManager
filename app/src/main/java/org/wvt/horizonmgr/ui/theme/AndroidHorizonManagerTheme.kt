@@ -32,7 +32,6 @@ import kotlinx.coroutines.launch
 import org.wvt.horizonmgr.HorizonManagerApplication
 import org.wvt.horizonmgr.ui.donate.alipayColor
 import org.wvt.horizonmgr.ui.donate.wechatColor
-import javax.inject.Singleton
 
 @Composable
 fun AndroidHorizonManagerTheme(
@@ -231,7 +230,6 @@ private class ConfigurationStorage(context: Context) {
     }
 }
 
-@Singleton
 class AndroidThemeController(
     private val context: Context
 ) : ThemeController {

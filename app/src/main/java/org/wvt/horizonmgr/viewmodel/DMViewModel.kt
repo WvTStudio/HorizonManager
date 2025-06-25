@@ -5,7 +5,6 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -16,10 +15,8 @@ import org.wvt.horizonmgr.ui.components.ProgressDialogState
 import org.wvt.horizonmgr.utils.LocalCache
 import org.wvt.horizonmgr.utils.ModDownloader
 import java.io.File
-import javax.inject.Inject
 
-@HiltViewModel
-class DMViewModel @Inject constructor(
+class DMViewModel(
     private val localCache: LocalCache,
     private val downloader: ModDownloader,
     private val manager: HorizonManager

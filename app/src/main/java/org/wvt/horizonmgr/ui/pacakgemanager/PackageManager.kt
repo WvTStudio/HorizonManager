@@ -1,22 +1,75 @@
 package org.wvt.horizonmgr.ui.pacakgemanager
 
-import androidx.compose.animation.*
-import androidx.compose.animation.core.*
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.core.FastOutLinearInEasing
+import androidx.compose.animation.core.FiniteAnimationSpec
+import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.updateTransition
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.*
+import androidx.compose.material.AlertDialog
+import androidx.compose.material.Card
+import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.ContentAlpha
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.DropdownMenuItem
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.FloatingActionButton
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.LocalContentAlpha
+import androidx.compose.material.LocalContentColor
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.SnackbarHost
+import androidx.compose.material.SnackbarHostState
+import androidx.compose.material.Text
+import androidx.compose.material.TextButton
+import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material.icons.rounded.CheckCircle
+import androidx.compose.material.icons.rounded.CloudDownload
+import androidx.compose.material.icons.rounded.Menu
+import androidx.compose.material.icons.rounded.MoreVert
+import androidx.compose.material.icons.rounded.Storage
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.Stable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -27,7 +80,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.SwipeRefreshIndicator
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
@@ -35,8 +87,14 @@ import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import org.koin.compose.viewmodel.koinViewModel
 import org.wvt.horizonmgr.R
-import org.wvt.horizonmgr.ui.components.*
+import org.wvt.horizonmgr.ui.components.EmptyPage
+import org.wvt.horizonmgr.ui.components.ErrorBanner
+import org.wvt.horizonmgr.ui.components.ErrorPage
+import org.wvt.horizonmgr.ui.components.InputDialogHost
+import org.wvt.horizonmgr.ui.components.InputDialogHostState
+import org.wvt.horizonmgr.ui.components.ProgressDialog
 import org.wvt.horizonmgr.ui.theme.AppBarBackgroundColor
 import org.wvt.horizonmgr.ui.theme.PreviewTheme
 import org.wvt.horizonmgr.viewmodel.PackageManagerViewModel
@@ -59,7 +117,7 @@ fun PackageManagerScreen(
 ) {
     val sharedFileChooserVM = SharedFileChooserViewModel
     val selectedFile by sharedFileChooserVM.selected.collectAsState()
-    val packageVM = hiltViewModel<PackageManagerViewModel>()
+    val packageVM = koinViewModel<PackageManagerViewModel>()
 
     LaunchedEffect(selectedFile) {
         selectedFile?.let {
@@ -142,7 +200,7 @@ fun PackageManager(
                         PackageItem(
                             modifier = Modifier
                                 .padding(16.dp, 8.dp)
-                                .animateItemPlacement(),
+                                .animateItem(),
                             title = item.name,
                             description = item.description,
                             installTime = item.timeStr,
@@ -232,7 +290,7 @@ private fun PackageList(
             )
         }) {
         LazyColumn(modifier = Modifier.fillMaxSize()) {
-            if (packages.isNullOrEmpty()) item {
+            if (packages.isEmpty()) item {
                 Box(Modifier.fillParentMaxSize()) {
                     EmptyPage(Modifier.fillMaxSize()) { Text(stringResource(R.string.pm_screen_tip_empty)) }
                     banner()
@@ -367,7 +425,6 @@ private fun FABEntry(
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun PackageItem(
     title: String,
