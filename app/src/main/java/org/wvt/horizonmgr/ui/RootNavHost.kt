@@ -7,13 +7,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavType
 import androidx.navigation.activity
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import org.koin.compose.viewmodel.koinViewModel
 import org.wvt.horizonmgr.BuildConfig
 import org.wvt.horizonmgr.activity.*
 import org.wvt.horizonmgr.ui.article.ArticleContentScreen
@@ -87,7 +87,7 @@ fun RootNavHost(
             AndroidHorizonManagerTheme(true) {
                 Surface(color = MaterialTheme.colors.background) {
                     LoginScreen(
-                        viewModel = hiltViewModel(),
+                        viewModel = koinViewModel(),
                         onLoginSuccess = { account, avatar, name, uid ->
                             navController.navigateUp()
                         },
@@ -100,7 +100,7 @@ fun RootNavHost(
             AndroidHorizonManagerTheme {
                 Surface(color = MaterialTheme.colors.background) {
                     JoinGroupScreen(
-                        viewModel = hiltViewModel(),
+                        viewModel = koinViewModel(),
                         onClose = { navController.popBackStack() },
                         openURL = requestOpenURL
                     )
@@ -146,7 +146,7 @@ fun RootNavHost(
             AndroidHorizonManagerTheme {
                 Surface(color = MaterialTheme.colors.background) {
                     OnlineInstallScreen(
-                        viewModel = hiltViewModel(),
+                        viewModel = koinViewModel(),
                         onCancel = {
                             // TODO: 2021/5/21
                             navController.navigateUp()
@@ -164,14 +164,14 @@ fun RootNavHost(
         ) {
             AndroidHorizonManagerTheme {
                 Surface(color = MaterialTheme.colors.background) {
-                    PackageDetailScreen(viewModel = hiltViewModel()) {
+                    PackageDetailScreen(viewModel = koinViewModel()) {
                         navController.popBackStack()
                     }
                 }
             }
         }
         composable("article_detail/{id}", listOf(navArgument("id") { type = NavType.StringType })) {
-            val articleDetailViewModel: ArticleContentViewModel = hiltViewModel()
+            val articleDetailViewModel: ArticleContentViewModel = koinViewModel()
             AndroidHorizonManagerTheme {
                 Surface(color = MaterialTheme.colors.background) {
                     ArticleContentScreen(
@@ -189,7 +189,7 @@ fun RootNavHost(
                 Surface(color = MaterialTheme.colors.background) {
                     FileSelector(
                         modifier = Modifier.fillMaxSize(),
-                        viewModel = hiltViewModel(),
+                        viewModel = koinViewModel(),
                         onSelect = {
                             viewModel.setSelected(it)
                             navController.navigateUp()

@@ -2,8 +2,9 @@ package org.wvt.horizonmgr.webapi.mgrinfo
 
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
-import io.ktor.client.features.*
+import io.ktor.client.plugins.HttpResponseValidator
 import io.ktor.client.request.*
+import io.ktor.client.statement.bodyAsText
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
@@ -24,7 +25,7 @@ class VersionChannel internal constructor(
 
     suspend fun latestVersion(): Version {
         val response = try {
-            client.get<String>("https://adodoz.cn/hzmgr/v1/versioninfo.json")
+            client.get("https://adodoz.cn/hzmgr/v1/versioninfo.json").bodyAsText()
         } catch (e: IOException) {
             throw NetworkException("获取版本信息失败", e)
         }
@@ -46,7 +47,7 @@ class VersionChannel internal constructor(
 
     suspend fun getVersions(): List<Version> {
         val response = try {
-            client.get<String>("https://adodoz.cn/hzmgr/v1/changelogs.json")
+            client.get("https://adodoz.cn/hzmgr/v1/changelogs.json").bodyAsText()
         } catch (e: IOException) {
             throw NetworkException("获取更新日志失败", e)
         }
@@ -67,7 +68,7 @@ class VersionChannel internal constructor(
 
     suspend fun getVersion(versionCode: Int): Version? {
         val response = try {
-            client.get<String>("https://adodoz.cn/hzmgr/v1/changelogs.json")
+            client.get("https://adodoz.cn/hzmgr/v1/changelogs.json").bodyAsText()
         } catch (e: IOException) {
             throw NetworkException("获取更新日志失败", e)
         }
@@ -88,7 +89,7 @@ class VersionChannel internal constructor(
 
     suspend fun getVersion(versionName: String): Version? {
         val response = try {
-            client.get<String>("https://adodoz.cn/hzmgr/v1/changelogs.json")
+            client.get("https://adodoz.cn/hzmgr/v1/changelogs.json").bodyAsText()
         } catch (e: IOException) {
             throw NetworkException("获取更新日志失败", e)
         }

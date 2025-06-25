@@ -7,6 +7,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -52,8 +53,7 @@ fun Donate(
                     .statusBarsPadding()
                     .weight(1f)
                     .fillMaxWidth(),
-                onClick = onAlipayClicked,
-                indication = null
+                onClick = onAlipayClicked
             ) {
                 Box(Modifier.fillMaxSize()) {
                     Icon(
@@ -72,7 +72,6 @@ fun Donate(
                     .weight(1f)
                     .fillMaxWidth(),
                 onClick = onWechatPayClicked,
-                indication = null
             ) {
                 Box(Modifier.fillMaxSize()) {
                     Icon(
@@ -90,7 +89,7 @@ fun Donate(
                 navigationIcon = {
                     IconButton(onClick = onClose) {
                         Icon(
-                            imageVector = Icons.Rounded.ArrowBack,
+                            imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
                             contentDescription = stringResource(R.string.navigation_action_back)
                         )
                     }

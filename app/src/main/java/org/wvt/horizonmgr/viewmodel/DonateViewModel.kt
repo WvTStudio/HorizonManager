@@ -5,7 +5,6 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -13,13 +12,11 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import org.wvt.horizonmgr.webapi.NetworkException
 import org.wvt.horizonmgr.webapi.mgrinfo.MgrInfoModule
-import javax.inject.Inject
 import kotlin.math.log
 
 private const val TAG = "DonateVMLogger"
 
-@HiltViewModel
-class DonateViewModel @Inject constructor(
+class DonateViewModel(
     private val mgrInfoModule: MgrInfoModule
 ) : ViewModel() {
 

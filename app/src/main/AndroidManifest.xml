@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="org.wvt.horizonmgr"
     android:versionCode="1"
     android:versionName="1">
 
     <queries>
-        <package android:name="com.mojang.minecraft" />
+        <package android:name="com.mojang.minecraftpe" />
         <package android:name="com.zheka.horizon" />
+        <package android:name="com.zheka.horizon64" />
     </queries>
 
     <uses-permission android:name="android.permission.INTERNET" />
@@ -28,8 +28,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.HorizonManagerCompose.NoActionBar"
-        tools:ignore="RtlEnabled"
-        tools:targetApi="donut">
+        tools:ignore="RtlEnabled">
 
         <provider
             android:name="androidx.core.content.FileProvider"
@@ -46,6 +45,7 @@
             android:name=".service.OnlinePackageInstallService"
             android:description="@string/online_package_install_service_description"
             android:enabled="true"
+            android:foregroundServiceType="dataSync"
             android:exported="false" />
 
         <activity

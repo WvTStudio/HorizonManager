@@ -4,18 +4,15 @@ import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import org.wvt.horizonmgr.webapi.NetworkException
 import org.wvt.horizonmgr.webapi.news.MgrArticleModule
-import javax.inject.Inject
 
 private const val TAG = "ArticleContentViewModel"
 
-@HiltViewModel
-class ArticleContentViewModel @Inject constructor(
+class ArticleContentViewModel(
     savedStateHandle: SavedStateHandle,
     private val articleModule: MgrArticleModule
 ) : ViewModel() {

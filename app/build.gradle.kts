@@ -1,22 +1,22 @@
 plugins {
-    id("com.android.application")
-    id("kotlin-android")
-
-    kotlin("kapt")
-    id("dagger.hilt.android.plugin")
-
-    id("com.google.gms.google-services")
-    id("com.google.firebase.crashlytics")
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.ksp)
+//    alias(libs.plugins.hilt)
+//    alias(libs.plugins.gms)
+//    alias(libs.plugins.kotlin.serialization)
+//    alias(libs.plugins.buildkonfig)
 }
 
 android {
-    compileSdk = 31
-    buildToolsVersion = "31.0.0"
+    namespace = "org.wvt.horizonmgr"
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "org.wvt.horizonmgr"
-        minSdk = 21
-        targetSdk = 31
+        minSdk = 25
+        targetSdk = 35
         versionCode = 26
         versionName = "2.1.4"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -29,7 +29,7 @@ android {
                 add(file("proguard-rules.pro"))
             }
 //            isShrinkResources = true
-//            isMinifyEnabled = true
+            isMinifyEnabled = true
         }
         getByName("debug") {
             versionNameSuffix = "-debug"
@@ -51,22 +51,17 @@ android {
     }
     compileOptions {
         isCoreLibraryDesugaringEnabled = true
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.2.0-alpha01"
-    }
-    /*lint {
-        disable("InvalidFragmentVersionForActivityResult")
-    }*/
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "17"
     }
-    packagingOptions {
+    packaging {
         resources {
             pickFirsts.add("META-INF/AL2.0")
             pickFirsts.add("META-INF/LGPL2.1")
@@ -75,82 +70,82 @@ android {
 }
 
 dependencies {
-    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:1.1.5")
+    coreLibraryDesugaring(libs.desugar.jdk.libs)
 
     implementation(kotlin("stdlib"))
 
     implementation(project(":webapi"))
     implementation(project(":service"))
 
-    implementation("androidx.core:core-ktx:1.7.0")
-    implementation("androidx.activity:activity-ktx:1.4.0")
-    implementation("androidx.activity:activity-compose:1.4.0")
+    implementation(project.dependencies.platform(libs.koin.bom))
+    implementation(libs.koin.core)
+    implementation(libs.koin.compose)
+    implementation(libs.koin.compose.viewmodel)
+    implementation(libs.koin.compose.viewmodel.navigation)
 
-    implementation("androidx.appcompat:appcompat:1.4.0")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.0")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.4.0")
-    implementation("com.google.android.material:material:1.4.0")
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.activity.ktx)
+    implementation(libs.androidx.activity.compose)
 
-    implementation("androidx.navigation:navigation-compose:2.4.0-rc01")
+    implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.material)
 
-    implementation("androidx.work:work-runtime-ktx:2.7.1")
+    implementation(libs.navigation.compose)
 
-    val ktorVersion = "1.6.7"
-    implementation("io.ktor:ktor-client-cio:$ktorVersion")
+    implementation(libs.androidx.work.runtime.ktx)
 
-    val hiltVersion = "2.40.5"
-    implementation("com.google.dagger:hilt-android:$hiltVersion")
-    kapt("com.google.dagger:hilt-compiler:$hiltVersion")
+    implementation(libs.ktor.client.cio)
 
-    implementation("androidx.hilt:hilt-navigation-compose:1.0.0-rc01")
-    implementation("androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha03")
+//    implementation(libs.hilt.android)
+//    ksp(libs.hilt.compiler)
 
-    implementation("io.coil-kt:coil-compose:1.3.2")
+//    implementation(libs.androidx.hilt.navigation.compose)
+//    implementation(libs.androidx.hilt.lifecycle.viewmodel)
 
-    val accompanistVersion = "0.17.0"
-    implementation("com.google.accompanist:accompanist-insets:$accompanistVersion")
-    implementation("com.google.accompanist:accompanist-pager:$accompanistVersion")
-    implementation("com.google.accompanist:accompanist-systemuicontroller:$accompanistVersion")
-    implementation("com.google.accompanist:accompanist-swiperefresh:$accompanistVersion")
-    implementation("com.google.accompanist:accompanist-flowlayout:$accompanistVersion")
-    implementation("com.google.accompanist:accompanist-placeholder:$accompanistVersion")
+    implementation(libs.coil.compose)
 
-    val composeVersion = "1.2.0-alpha01"
-    implementation("androidx.compose.compiler:compiler:$composeVersion")
-    implementation("androidx.compose.runtime:runtime:$composeVersion")
-    implementation("androidx.compose.foundation:foundation:$composeVersion")
-    implementation("androidx.compose.animation:animation:$composeVersion")
-    implementation("androidx.compose.ui:ui:$composeVersion")
-    implementation("androidx.compose.ui:ui-util:$composeVersion")
-    implementation("androidx.compose.material:material:$composeVersion")
-    implementation("androidx.compose.material:material-ripple:$composeVersion")
-    implementation("androidx.compose.material:material-icons-core:$composeVersion")
-    implementation("androidx.compose.material:material-icons-extended:$composeVersion")
-    implementation("androidx.compose.ui:ui-tooling:$composeVersion")
-    implementation("androidx.compose.ui:ui-test:$composeVersion")
+    implementation(libs.accompanist.insets)
+    implementation(libs.accompanist.pager)
+    implementation(libs.accompanist.systemuicontroller)
+    implementation(libs.accompanist.swiperefresh)
+    implementation(libs.accompanist.flowlayout)
+    implementation(libs.accompanist.placeholder)
 
-    implementation(platform("com.google.firebase:firebase-bom:26.1.0"))
-    implementation("com.google.firebase:firebase-crashlytics-ktx:18.2.6")
+    implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.compose.runtime)
+    implementation(libs.androidx.compose.foundation)
+    implementation(libs.androidx.compose.animation)
+    implementation(libs.androidx.compose.ui)
+    implementation(libs.androidx.compose.ui.util)
+    implementation(libs.androidx.compose.material)
+//    implementation(libs.androidx.compose.material.ripple)
+//    implementation(libs.androidx.compose.material.icons.core)
+    implementation(libs.androidx.compose.material.icons.extended)
+    implementation(libs.androidx.compose.ui.tooling)
+//    implementation(libs.androidx.compose.ui.test)
 
-    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.3.2")
+//    implementation(platform(libs.firebase.bom))
+//    implementation(libs.firebase.crashlytics.ktx)
 
-    val markwonVersion = "4.6.2"
-    implementation("io.noties.markwon:core:$markwonVersion")
-    implementation("io.noties.markwon:ext-latex:$markwonVersion")
-    implementation("io.noties.markwon:ext-tables:$markwonVersion")
-    implementation("io.noties.markwon:image-coil:$markwonVersion")
-    implementation("io.noties.markwon:syntax-highlight:$markwonVersion")
+    implementation(libs.kotlinx.datetime)
 
-    implementation("net.lingala.zip4j:zip4j:2.9.1")
+    implementation(libs.markwon.core)
+    implementation(libs.markwon.ext.latex)
+    implementation(libs.markwon.ext.tables)
+    implementation(libs.markwon.image.coil)
+    implementation(libs.markwon.syntax.highlight)
 
-    implementation("androidx.test:monitor:1.5.0")
+    implementation(libs.zip4j)
+
+    implementation(libs.androidx.monitor)
 
     testImplementation(kotlin("test-junit5"))
 //    androidTestImplementation(kotlin("test-junit5"))
 
-    testImplementation("org.json:json:20211205")
-    testImplementation("io.ktor:ktor-client-cio:$ktorVersion")
-    androidTestImplementation("junit:junit:4.12")
+    testImplementation(libs.json)
+//    androidTestImplementation("junit:junit:4.12")
 
 //    debugImplementation(kotlin("reflect"))
 }

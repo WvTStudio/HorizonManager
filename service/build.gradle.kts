@@ -1,15 +1,14 @@
 plugins {
-    id("com.android.library")
-    id("kotlin-android")
-    id("kotlinx-serialization")
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.android.library)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
-    compileSdk = 31
+    compileSdk = 35
 
     defaultConfig {
-        minSdk = 21
-        targetSdk = 31
+        minSdk = 25
 //        versionCode = 1
 //        versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -38,19 +37,20 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "17"
     }
+    namespace = "org.wvt.horizonmgr.service"
 }
 
 dependencies {
-    implementation("androidx.core:core-ktx:1.7.0")
-    implementation("androidx.appcompat:appcompat:1.4.0")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.0")
-    testImplementation("junit:junit:4.13.2")
-    androidTestImplementation("androidx.test.ext:junit:1.1.3")
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.kotlinx.coroutines.android)
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.androidx.junit)
 }

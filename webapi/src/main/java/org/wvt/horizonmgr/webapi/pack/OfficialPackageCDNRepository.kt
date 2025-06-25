@@ -1,8 +1,9 @@
 package org.wvt.horizonmgr.webapi.pack
 
-import io.ktor.client.*
-import io.ktor.client.engine.cio.*
-import io.ktor.client.request.*
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.cio.CIO
+import io.ktor.client.request.get
+import io.ktor.client.statement.bodyAsText
 import org.json.JSONException
 import org.json.JSONObject
 import org.wvt.horizonmgr.webapi.JsonParseException
@@ -45,10 +46,9 @@ class OfficialPackageCDNRepository {
      * }
      * ```
      */
-    @OptIn(ExperimentalStdlibApi::class)
     suspend fun getAllPackages(): List<OfficialCDNPackage> {
         val jsonStr = try {
-            httpClient.get<String>("https://cdn.jsdelivr.net/gh/WvTStudio/horizon-cloud-config@master/packs.json")
+            httpClient.get("https://cdn.jsdelivr.net/gh/WvTStudio/horizon-cloud-config@master/packs.json").bodyAsText()
         } catch (e: IOException) {
             throw NetworkException("获取分包信息失败", e)
         }
@@ -64,7 +64,7 @@ class OfficialPackageCDNRepository {
             }
 
             // parse packages
-            json.getJSONArray("packs").forEach<JSONObject> {
+            json.getJSONArray("packs").forEach<JSONObject> { it ->
                 val uuid = it.getString("uuid")
                 val graphicsUrl = it.getString("graphics")
                 val manifestUrl = it.getString("manifest")
@@ -119,7 +119,7 @@ class OfficialCDNPackage internal constructor(
 
     suspend fun getManifest(): String {
         return try {
-            httpClient.get(manifestUrl)
+            httpClient.get(manifestUrl).bodyAsText()
         } catch (e: IOException) {
             throw NetworkException("获取清单失败", e)
         }
@@ -127,7 +127,7 @@ class OfficialCDNPackage internal constructor(
 
     suspend fun getChangeLog(): String {
         return try {
-            httpClient.get(changelogUrl)
+            httpClient.get(changelogUrl).bodyAsText()
         } catch (e: IOException) {
             throw NetworkException("获取更新日志失败", e)
         }

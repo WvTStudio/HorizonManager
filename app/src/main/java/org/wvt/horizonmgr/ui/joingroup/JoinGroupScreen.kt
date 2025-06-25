@@ -3,14 +3,24 @@ package org.wvt.horizonmgr.ui.joingroup
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.*
+import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.SnackbarHost
+import androidx.compose.material.SnackbarHostState
+import androidx.compose.material.Text
+import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.ArrowBack
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.hilt.navigation.compose.hiltViewModel
+import org.koin.compose.viewmodel.koinViewModel
 import org.wvt.horizonmgr.R
 import org.wvt.horizonmgr.ui.components.ErrorPage
 import org.wvt.horizonmgr.ui.theme.AppBarBackgroundColor
@@ -20,7 +30,7 @@ import org.wvt.horizonmgr.viewmodel.JoinGroupViewModel
 fun JoinGroupScreen(
     onClose: () -> Unit,
     openURL: (String) -> Unit,
-    viewModel: JoinGroupViewModel = hiltViewModel()
+    viewModel: JoinGroupViewModel = koinViewModel()
 ) {
 
     val groups by viewModel.groups.collectAsState()
@@ -49,7 +59,7 @@ fun JoinGroupScreen(
                 navigationIcon = {
                     IconButton(onClick = onClose) {
                         Icon(
-                            Icons.Rounded.ArrowBack,
+                            Icons.AutoMirrored.Rounded.ArrowBack,
                             stringResource(R.string.navigation_action_back)
                         )
                     }

@@ -31,10 +31,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.koin.compose.viewmodel.koinViewModel
 import org.wvt.horizonmgr.R
 import org.wvt.horizonmgr.ui.components.NetworkImage
 import org.wvt.horizonmgr.ui.downloaded.DownloadedMods
@@ -50,10 +50,9 @@ enum class Screen {
     HOME, PACKAGE_MANAGE, LOCAL_MANAGE, ONLINE_DOWNLOAD, DOWNLOADED_MOD
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun MainScreen(
-    viewModel: MainViewModel = hiltViewModel(),
+    viewModel: MainViewModel = koinViewModel(),
     requestOpenGame: () -> Unit,
     navigateToLogin: () -> Unit,
     navigateToOnlineInstall: () -> Unit,
@@ -90,7 +89,7 @@ fun MainScreen(
             )
         },
         tabs = {
-            DrawerTabs(screens = remember { Screen.values() }, currentScreen = screen, onChange = {
+            DrawerTabs(screens = remember { Screen.entries.toTypedArray() }, currentScreen = screen, onChange = {
                 scope.launch {
                     delay(100)
                     drawerState.close()
@@ -164,12 +163,12 @@ fun MainScreen(
                     navigateToPackageInfo = navigateToPackageDetail
                 )
                 Screen.ONLINE_DOWNLOAD -> OnlineMods(
-                    viewModel = hiltViewModel(),
+                    viewModel = koinViewModel(),
                     isLogon = userInfo != null,
                     onNavClick = { scope.launch { drawerState.open() } }
                 )
                 Screen.DOWNLOADED_MOD -> DownloadedMods(
-                    vm = hiltViewModel(),
+                    vm = koinViewModel(),
                     onNavClicked = { scope.launch { drawerState.open() } }
                 )
             }

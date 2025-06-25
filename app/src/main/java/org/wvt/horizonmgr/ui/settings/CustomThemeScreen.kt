@@ -1,18 +1,59 @@
 package org.wvt.horizonmgr.ui.settings
 
-import androidx.compose.animation.*
-import androidx.compose.animation.core.*
-import androidx.compose.foundation.*
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.animateIntAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.updateTransition
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.indication
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.Button
+import androidx.compose.material.Checkbox
+import androidx.compose.material.ContentAlpha
+import androidx.compose.material.Divider
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.LocalContentAlpha
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
+import androidx.compose.material.Text
+import androidx.compose.material.TopAppBar
+import androidx.compose.material.darkColors
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.ArrowBack
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Check
-import androidx.compose.material.ripple.rememberRipple
-import androidx.compose.runtime.*
+import androidx.compose.material.lightColors
+import androidx.compose.material.ripple
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -23,7 +64,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import org.wvt.horizonmgr.R
-import org.wvt.horizonmgr.ui.theme.*
+import org.wvt.horizonmgr.ui.theme.AppBarBackgroundColor
+import org.wvt.horizonmgr.ui.theme.LocalThemeConfig
+import org.wvt.horizonmgr.ui.theme.LocalThemeController
+import org.wvt.horizonmgr.ui.theme.MaterialColors
+import org.wvt.horizonmgr.ui.theme.PreviewTheme
 
 private enum class CheckedColorType {
     LIGHT_PRIMARY, LIGHT_PRIMARY_VARIANT,
@@ -50,13 +95,13 @@ fun CustomThemeScreen(requestClose: () -> Unit) {
         mutableStateOf(
             CustomColor(
                 primary = MaterialColors.parseColor(themeConfig.lightColor.primary)
-                    ?: "cyan" to 500,
+                    ?: ("cyan" to 500),
                 primaryVariant = MaterialColors.parseColor(themeConfig.lightColor.primaryVariant)
-                    ?: "cyan" to 700,
+                    ?: ("cyan" to 700),
                 secondary = MaterialColors.parseColor(themeConfig.lightColor.secondary)
-                    ?: "teal" to 500,
+                    ?: ("teal" to 500),
                 secondaryVariant = MaterialColors.parseColor(themeConfig.lightColor.secondaryVariant)
-                    ?: "teal" to 700
+                    ?: ("teal" to 700)
             )
         )
     }
@@ -64,13 +109,14 @@ fun CustomThemeScreen(requestClose: () -> Unit) {
     var darkColor by remember {
         mutableStateOf(
             CustomColor(
-                primary = MaterialColors.parseColor(themeConfig.darkColor.primary) ?: "cyan" to 500,
+                primary = MaterialColors.parseColor(themeConfig.darkColor.primary)
+                    ?: ("cyan" to 500),
                 primaryVariant = MaterialColors.parseColor(themeConfig.darkColor.primaryVariant)
-                    ?: "cyan" to 700,
+                    ?: ("cyan" to 700),
                 secondary = MaterialColors.parseColor(themeConfig.darkColor.secondary)
-                    ?: "teal" to 500,
+                    ?: ("teal" to 500),
                 secondaryVariant = MaterialColors.parseColor(themeConfig.darkColor.secondaryVariant)
-                    ?: "teal" to 700
+                    ?: ("teal" to 700)
             )
         )
     }
@@ -88,7 +134,7 @@ fun CustomThemeScreen(requestClose: () -> Unit) {
                 navigationIcon = {
                     IconButton(onClick = requestClose) {
                         Icon(
-                            imageVector = Icons.Rounded.ArrowBack,
+                            imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
                             stringResource(id = R.string.custom_theme_screen_appbar_back)
                         )
                     }
@@ -105,16 +151,22 @@ fun CustomThemeScreen(requestClose: () -> Unit) {
                     when (checkedColorType) {
                         CheckedColorType.LIGHT_PRIMARY -> lightColor =
                             lightColor.copy(primary = s to i)
+
                         CheckedColorType.LIGHT_PRIMARY_VARIANT -> lightColor =
                             lightColor.copy(primaryVariant = s to i)
+
                         CheckedColorType.LIGHT_SECONDARY -> lightColor =
                             lightColor.copy(secondary = s to i)
+
                         CheckedColorType.LIGHT_SECONDARY_VARIANT -> lightColor =
                             lightColor.copy(secondaryVariant = s to i)
+
                         CheckedColorType.DARK_PRIMARY -> darkColor =
                             darkColor.copy(primary = s to i)
+
                         CheckedColorType.DARK_PRIMARY_VARIANT -> darkColor =
                             darkColor.copy(primaryVariant = s to i)
+
                         CheckedColorType.DARK_SECONDARY -> darkColor =
                             darkColor.copy(secondary = s to i)
                     }
@@ -149,11 +201,13 @@ fun CustomThemeScreen(requestClose: () -> Unit) {
                         .padding(top = 16.dp),
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    SelectColorItem(text = stringResource(id = R.string.custom_theme_screen_color_primary),
+                    SelectColorItem(
+                        text = stringResource(id = R.string.custom_theme_screen_color_primary),
                         color = getColor(lightColor.primary),
                         selected = checkedColorType == CheckedColorType.LIGHT_PRIMARY,
                         onSelect = { checkedColorType = CheckedColorType.LIGHT_PRIMARY })
-                    SelectColorItem(text = stringResource(id = R.string.custom_theme_screen_color_primary_variant),
+                    SelectColorItem(
+                        text = stringResource(id = R.string.custom_theme_screen_color_primary_variant),
                         color = getColor(lightColor.primaryVariant),
                         selected = checkedColorType == CheckedColorType.LIGHT_PRIMARY_VARIANT,
                         onSelect = {
@@ -167,11 +221,13 @@ fun CustomThemeScreen(requestClose: () -> Unit) {
                         .padding(top = 16.dp),
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    SelectColorItem(text = stringResource(id = R.string.custom_theme_screen_color_secondary),
+                    SelectColorItem(
+                        text = stringResource(id = R.string.custom_theme_screen_color_secondary),
                         color = getColor(lightColor.secondary),
                         selected = checkedColorType == CheckedColorType.LIGHT_SECONDARY,
                         onSelect = { checkedColorType = CheckedColorType.LIGHT_SECONDARY })
-                    SelectColorItem(text = stringResource(id = R.string.custom_theme_screen_color_secondary_variant),
+                    SelectColorItem(
+                        text = stringResource(id = R.string.custom_theme_screen_color_secondary_variant),
                         color = getColor(lightColor.secondaryVariant),
                         selected = checkedColorType == CheckedColorType.LIGHT_SECONDARY_VARIANT,
                         onSelect = {
@@ -193,7 +249,7 @@ fun CustomThemeScreen(requestClose: () -> Unit) {
                     Checkbox(
                         modifier = Modifier.indication(
                             interactionSource,
-                            rememberRipple(bounded = false, radius = 24.dp)
+                            ripple(bounded = false, radius = 24.dp)
                         ),
                         checked = accentColor,
                         onCheckedChange = { accentColor = it }
@@ -206,7 +262,8 @@ fun CustomThemeScreen(requestClose: () -> Unit) {
                 Divider(
                     Modifier
                         .padding(vertical = 16.dp)
-                        .fillMaxWidth())
+                        .fillMaxWidth()
+                )
 
                 // DarkTheme Colors
                 Text(
@@ -220,11 +277,13 @@ fun CustomThemeScreen(requestClose: () -> Unit) {
                         .padding(top = 16.dp),
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    SelectColorItem(text = stringResource(id = R.string.custom_theme_screen_color_primary),
+                    SelectColorItem(
+                        text = stringResource(id = R.string.custom_theme_screen_color_primary),
                         color = getColor(darkColor.primary),
                         selected = checkedColorType == CheckedColorType.DARK_PRIMARY,
                         onSelect = { checkedColorType = CheckedColorType.DARK_PRIMARY })
-                    SelectColorItem(text = stringResource(id = R.string.custom_theme_screen_color_primary_variant),
+                    SelectColorItem(
+                        text = stringResource(id = R.string.custom_theme_screen_color_primary_variant),
                         color = getColor(darkColor.primaryVariant),
                         selected = checkedColorType == CheckedColorType.DARK_PRIMARY_VARIANT,
                         onSelect = {
@@ -238,7 +297,8 @@ fun CustomThemeScreen(requestClose: () -> Unit) {
                         .padding(top = 16.dp),
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    SelectColorItem(text = stringResource(id = R.string.custom_theme_screen_color_secondary),
+                    SelectColorItem(
+                        text = stringResource(id = R.string.custom_theme_screen_color_secondary),
                         color = getColor(darkColor.secondary),
                         selected = checkedColorType == CheckedColorType.DARK_SECONDARY,
                         onSelect = { checkedColorType = CheckedColorType.DARK_SECONDARY })
@@ -289,7 +349,6 @@ fun CustomThemeScreen(requestClose: () -> Unit) {
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun SelectColorItem(
     modifier: Modifier = Modifier,
@@ -323,14 +382,16 @@ private fun SelectColorItem(
         Surface(
             modifier = Modifier
                 .size(128.dp, 96.dp)
+                .clickable(
+                    onClick = onSelect,
+                    interactionSource = interactionSource,
+                    indication = null
+                )
                 .padding(top = 8.dp)
                 .graphicsLayer(scaleX = scale, scaleY = scale),
             color = animateColorAsState(color).value,
             elevation = animateDpAsState(if (selected) 8.dp else 0.dp).value,
             shape = RoundedCornerShape(size = 4.dp),
-            onClick = onSelect,
-            interactionSource = interactionSource,
-            indication = null
         ) {}
     }
 }

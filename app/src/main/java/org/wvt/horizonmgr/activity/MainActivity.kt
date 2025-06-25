@@ -2,14 +2,12 @@ package org.wvt.horizonmgr.activity
 
 import android.os.Bundle
 import android.os.PersistableBundle
-import androidx.appcompat.app.AppCompatActivity
+import androidx.activity.ComponentActivity
 import androidx.core.view.WindowCompat
-import dagger.hilt.android.AndroidEntryPoint
 
 private const val TAG = "MainActivity"
 
-@AndroidEntryPoint
-class MainActivity : AppCompatActivity() {
+class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
         super.onCreate(savedInstanceState, persistentState)

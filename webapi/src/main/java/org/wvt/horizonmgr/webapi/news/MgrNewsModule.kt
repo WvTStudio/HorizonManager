@@ -43,7 +43,7 @@ class MgrNewsModule {
      */
     suspend fun getNewsSuggestions(): List<NewsSuggestion> {
         val response = try {
-            client.get<String>("https://adodoz.cn/hzmgr/v1/news.json")
+            client.get("https://adodoz.cn/hzmgr/v1/news.json").bodyAsText()
         } catch (e: IOException) {
             throw NetworkException("获取推荐资讯失败", e)
         }
@@ -93,13 +93,13 @@ class MgrNewsModule {
      */
     suspend fun getNews(id: Int): News? {
         val response = try {
-            client.get<HttpResponse>("https://adodoz.cn/hzmgr/v1/news/${id}.json")
+            client.get("https://adodoz.cn/hzmgr/v1/news/${id}.json")
         } catch (e: IOException) {
             throw NetworkException("获取资讯 $id 失败", e)
         }
         if (response.status == HttpStatusCode.OK) {
             val jsonStr = try {
-                response.readText()
+                response.bodyAsText()
             } catch (e: IOException) {
                 throw NetworkException("接受资讯内容失败", e)
             }
@@ -120,7 +120,7 @@ class MgrNewsModule {
     }
 }
 
-data class NewsSuggestion internal constructor(
+data class NewsSuggestion(
     val newsId: Int,
     val cover: String,
     val title: String,
@@ -130,7 +130,7 @@ data class NewsSuggestion internal constructor(
     val updateTime = Instant.parse(updateISOTime)
 }
 
-data class News internal constructor(
+data class News(
     val id: Int,
     val title: String,
     val brief: String,

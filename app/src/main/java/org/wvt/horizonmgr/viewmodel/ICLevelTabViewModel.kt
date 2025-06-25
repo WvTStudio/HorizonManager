@@ -3,7 +3,6 @@ package org.wvt.horizonmgr.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
@@ -18,12 +17,10 @@ import org.wvt.horizonmgr.ui.components.InputDialogHostState
 import org.wvt.horizonmgr.ui.components.ProgressDialogState
 import org.wvt.horizonmgr.utils.LocalCache
 import java.io.File
-import javax.inject.Inject
 
 private const val TAG = "ICLevelTabVM"
 
-@HiltViewModel
-class ICLevelTabViewModel @Inject constructor(
+class ICLevelTabViewModel(
     private val manager: HorizonManager,
     private val localCache: LocalCache,
     private val levelTransporter: LevelTransporter

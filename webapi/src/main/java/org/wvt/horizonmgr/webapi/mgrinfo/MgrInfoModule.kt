@@ -2,8 +2,9 @@ package org.wvt.horizonmgr.webapi.mgrinfo
 
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
-import io.ktor.client.features.*
+import io.ktor.client.plugins.HttpResponseValidator
 import io.ktor.client.request.*
+import io.ktor.client.statement.bodyAsText
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
@@ -40,7 +41,7 @@ class MgrInfoModule {
      */
     suspend fun getDonateList(): List<DonateRecord> {
         val json = try {
-            client.get<String>("https://adodoz.cn/hzmgr/v2/donates.json")
+            client.get("https://adodoz.cn/hzmgr/v2/donates.json").bodyAsText()
         } catch (e: IOException) {
             throw NetworkException("获取捐赠列表失败", e)
         }
@@ -78,7 +79,7 @@ class MgrInfoModule {
      */
     suspend fun getQQGroupList(): List<QQGroup> {
         val json = try {
-            client.get<String>("https://adodoz.cn/hzmgr/v1/qqgroups.json")
+            client.get("https://adodoz.cn/hzmgr/v1/qqgroups.json").bodyAsText()
         } catch (e: IOException) {
             throw NetworkException("获取群组列表失败", e)
         }
@@ -106,7 +107,7 @@ class MgrInfoModule {
      */
     suspend fun getVersionChannels(): List<VersionChannel> {
         val response = try {
-            client.get<String>("https://adodoz.cn/hzmgr/v1/versioninfo.json")
+            client.get("https://adodoz.cn/hzmgr/v1/versioninfo.json").bodyAsText()
         } catch (e: IOException) {
             throw NetworkException("获取版本信息失败", e)
         }
@@ -128,7 +129,7 @@ class MgrInfoModule {
      */
     suspend fun getChannelByName(channelName: String): VersionChannel? {
         val response = try {
-            client.get<String>("https://adodoz.cn/hzmgr/v1/versioninfo.json")
+            client.get("https://adodoz.cn/hzmgr/v1/versioninfo.json").bodyAsText()
         } catch (e: IOException) {
             throw NetworkException("获取版本信息失败", e)
         }

@@ -4,27 +4,24 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.Settings
+import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
-import dagger.hilt.android.AndroidEntryPoint
+import androidx.core.net.toUri
+import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.wvt.horizonmgr.R
 import org.wvt.horizonmgr.ui.Root
 import org.wvt.horizonmgr.ui.RootNavHostActivity
 import org.wvt.horizonmgr.ui.RootViewModel
 import org.wvt.horizonmgr.viewmodel.JoinGroupViewModel
-import javax.inject.Inject
 
-@AndroidEntryPoint
-class RootActivity : AppCompatActivity() {
+class RootActivity : ComponentActivity() {
 
-    @Inject
-    lateinit var rootVM: RootViewModel
+    val rootVM: RootViewModel by inject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,14 +46,14 @@ class RootActivity : AppCompatActivity() {
 
     private fun openCoolapkURL() {
         val intent =
-            Intent(Intent.ACTION_VIEW, Uri.parse("https://www.coolapk.com/game/com.zheka.horizon"))
+            Intent(Intent.ACTION_VIEW, "https://www.coolapk.com/game/com.zheka.horizon".toUri())
         startActivity(intent)
     }
 
     private fun openMCGooglePlay() {
         val intent = Intent(
             Intent.ACTION_VIEW,
-            Uri.parse("https://play.google.com/store/apps/details?id=com.mojang.minecraftpe")
+            "https://play.google.com/store/apps/details?id=com.mojang.minecraftpe".toUri()
         )
         startActivity(intent)
     }
@@ -81,12 +78,11 @@ class RootActivity : AppCompatActivity() {
         // TODO: 2021/2/8 全都打开失败后提示
     }
 
-    val joinGroupVM by viewModels<JoinGroupViewModel>()
+    val joinGroupVM by viewModel<JoinGroupViewModel>()
 
     private fun openURL(url: String) {
         try {
-            val intent = Intent()
-            intent.data = Uri.parse(url)
+            val intent = Intent(Intent.ACTION_VIEW, url.toUri())
             startActivity(intent)
         } catch (e: Exception) {
             joinGroupVM.startQQFailed()
@@ -124,23 +120,19 @@ class RootActivity : AppCompatActivity() {
         }
     }
 
-    @SuppressLint("QueryPermissionsNeeded", "WrongConstant")
+    @SuppressLint("QueryPermissionsNeeded")
     private fun checkGameInstalled() {
-        val apps = packageManager.getInstalledApplications(PackageManager.GET_ACTIVITIES)
-        var hasMC = false
-        var hasHZ = false
-
-        for (app in apps) {
-            when (app.packageName) {
-                "com.mojang.minecraftpe" -> hasMC = true
-                "com.zheka.horizon" -> hasHZ = true
-            }
+        val packages = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            packageManager.getInstalledApplications(PackageManager.ApplicationInfoFlags.of(0))
+        } else {
+            packageManager.getInstalledApplications(0)
         }
+        val apps = packages.asSequence().map { it.packageName }.toSet()
 
-        if (!hasMC) {
+        if ("com.mojang.minecraftpe" !in apps) {
             rootVM.showGameNotInstallDialog()
         }
-        if (!hasHZ) {
+        if ("com.zheka.horizon" !in apps && "com.zheka.horizon64" !in apps) {
             rootVM.showHZNotInstallDialog()
         }
     }

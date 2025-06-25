@@ -1,0 +1,157 @@
+[versions]
+kotlin = "2.1.21"
+android = "8.10.1"
+kotlinxSerializationJson = "1.8.1"
+ksp = "2.1.21-2.0.2"
+firebaseBom = "33.15.0"
+gms = "4.4.2"
+hilt = "2.56.2"
+composeBom = "2025.06.01"
+
+accompanistVersion = "0.17.0"
+activityKtx = "1.10.1"
+appcompat = "1.7.1"
+coilCompose = "1.3.2"
+coreKtx = "1.16.0"
+hiltNavigationCompose = "1.2.0"
+hiltLifecycleViewmodel = "1.0.0-alpha03"
+firebaseCrashlyticsKtx = "19.4.4"
+json = "20231013"
+desugar_jdk_libs = "2.1.5"
+activityCompose = "1.10.1"
+argon2kt = "1.4.0"
+constraintlayoutCompose = "1.1.1"
+datastorePreferences = "1.1.7"
+espresso = "3.6.1"
+androidxJunit = "1.2.1"
+junitJupiter = "5.10.2"
+junit = "4.13.2"
+androidx-lifecycle = "2.9.0"
+androidx-lifecycle-ktx = "2.9.1"
+kotlinxDatetime = "0.6.2"
+ktor = "3.1.3"
+lifecycleViewmodelKtx = "2.9.1"
+lifecycleViewmodelCompose = "2.9.1"
+material = "1.12.0"
+monitor = "1.7.2"
+navigationCompose = "2.9.0-beta01"
+navigationComposeVersion = "2.9.0"
+sqlite-bundled = "2.5.2"
+room = "2.7.2"
+profileinstallerVersion = "1.4.1"
+accompanistPermisssions = "0.37.2"
+materialMotion = "2.0.1"
+koin-bom = "4.1.0"
+compose-multiplatform = "1.8.2"
+
+constraintlayoutMultiplatform = "0.5.1"
+coroutines = "1.10.2"
+logback = "1.5.18"
+buildkonfig = "0.17.1"
+workRuntimeKtx = "2.10.2"
+markwon = "4.6.2"
+zip4j = "2.9.1"
+
+[plugins]
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+android-application = { id = "com.android.application", version.ref = "android" }
+android-library = { id = "com.android.library", version.ref = "android" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+gms = { id = "com.google.gms.google-services", version.ref = "gms" }
+hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
+firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "firebaseBom" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+
+compose-multiplatform = { id = "org.jetbrains.compose", version.ref = "compose-multiplatform" }
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+buildkonfig = { id = "com.codingfeline.buildkonfig", version.ref = "buildkonfig" }
+
+[libraries]
+accompanist-flowlayout = { module = "com.google.accompanist:accompanist-flowlayout", version.ref = "accompanistVersion" }
+accompanist-pager = { module = "com.google.accompanist:accompanist-pager", version.ref = "accompanistVersion" }
+accompanist-insets = { module = "com.google.accompanist:accompanist-insets", version.ref = "accompanistVersion" }
+accompanist-placeholder = { module = "com.google.accompanist:accompanist-placeholder", version.ref = "accompanistVersion" }
+accompanist-swiperefresh = { module = "com.google.accompanist:accompanist-swiperefresh", version.ref = "accompanistVersion" }
+accompanist-systemuicontroller = { module = "com.google.accompanist:accompanist-systemuicontroller", version.ref = "accompanistVersion" }
+androidx-activity-ktx = { module = "androidx.activity:activity-ktx", version.ref = "activityKtx" }
+androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }
+androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "coreKtx" }
+androidx-hilt-lifecycle-viewmodel = { module = "androidx.hilt:hilt-lifecycle-viewmodel", version.ref = "hiltLifecycleViewmodel" }
+androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
+androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycleViewmodelCompose" }
+androidx-lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "lifecycleViewmodelKtx" }
+androidx-monitor = { module = "androidx.test:monitor", version.ref = "monitor" }
+androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "workRuntimeKtx" }
+coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
+firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
+firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
+androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
+androidx-compose-runtime = { module = "androidx.compose.runtime:runtime" }
+androidx-compose-animation = { module = "androidx.compose.animation:animation" }
+androidx-compose-foundation = { module = "androidx.compose.foundation:foundation" }
+androidx-compose-foundation-layout = { module = "androidx.compose.foundation:foundation-layout" }
+androidx-compose-ui = { group = "androidx.compose.ui", name = "ui" }
+androidx-compose-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
+androidx-compose-ui-util = { group = "androidx.compose.ui", name = "ui-util" }
+androidx-compose-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
+androidx-compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
+androidx-compose-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
+androidx-compose-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
+androidx-compose-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended" }
+androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3" }
+androidx-compose-material = { group = "androidx.compose.material", name = "material" }
+androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activityCompose" }
+androidx-constraintlayout-compose = { module = "androidx.constraintlayout:constraintlayout-compose", version.ref = "constraintlayoutCompose" }
+constraintlayout-multiplatform = { module = "tech.annexflow.compose:constraintlayout-compose-multiplatform", version.ref = "constraintlayoutMultiplatform" }
+androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferences" }
+androidx-espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref = "espresso" }
+androidx-junit = { module = "androidx.test.ext:junit", version.ref = "androidxJunit" }
+androidx-profileinstaller = { module = "androidx.profileinstaller:profileinstaller", version.ref = "profileinstallerVersion" }
+argon2kt = { module = "com.lambdapioneer.argon2kt:argon2kt", version.ref = "argon2kt" }
+desugar_jdk_libs = { module = "com.android.tools:desugar_jdk_libs", version.ref = "desugar_jdk_libs" }
+firebase-crashlytics-ktx = { module = "com.google.firebase:firebase-crashlytics-ktx", version.ref = "firebaseCrashlyticsKtx" }
+hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }
+hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "hilt" }
+json = { module = "org.json:json", version.ref = "json" }
+junit = { module = "junit:junit", version.ref = "junit" }
+junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junitJupiter" }
+kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDatetime" }
+
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
+ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktor" }
+ktor-client-encoding = { module = "io.ktor:ktor-client-encoding", version.ref = "ktor" }
+ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
+ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
+
+androidx-navigation-compose = { module = "org.jetbrains.androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
+kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
+kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
+kotlinx-coroutines-swing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "coroutines" }
+
+material = { module = "com.google.android.material:material", version.ref = "material" }
+navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationComposeVersion" }
+room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
+room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
+room-plugin = { module = "androidx.room:room-gradle-plugin", version.ref = "room" }
+room-testing = { module = "androidx.room:room-testing", version.ref = "room" }
+room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
+androidx-sqlite-bundled = { group = "androidx.sqlite", name = "sqlite-bundled", version.ref = "sqlite-bundled" }
+
+accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanistPermisssions" }
+material-motion = { module = "io.github.fornewid:material-motion-compose-core", version.ref = "materialMotion" }
+koin-bom = { module = "io.insert-koin:koin-bom", version.ref = "koin-bom" }
+koin-core = { module = "io.insert-koin:koin-core" }
+koin-android = { module = "io.insert-koin:koin-android" }
+koin-compose = { module = "io.insert-koin:koin-compose" }
+koin-compose-viewmodel = { module = "io.insert-koin:koin-compose-viewmodel" }
+koin-compose-viewmodel-navigation = { module = "io.insert-koin:koin-compose-viewmodel-navigation" }
+
+logback = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
+markwon-core = { module = "io.noties.markwon:core", version.ref = "markwon" }
+markwon-ext-latex = { module = "io.noties.markwon:ext-latex", version.ref = "markwon" }
+markwon-ext-tables = { module = "io.noties.markwon:ext-tables", version.ref = "markwon" }
+markwon-image-coil = { module = "io.noties.markwon:image-coil", version.ref = "markwon" }
+markwon-syntax-highlight = { module = "io.noties.markwon:syntax-highlight", version.ref = "markwon" }
+zip4j = { module = "net.lingala.zip4j:zip4j", version.ref = "zip4j" }

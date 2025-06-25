@@ -3,6 +3,7 @@ package org.wvt.horizonmgr.webapi.mod
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.request.*
+import io.ktor.client.statement.bodyAsText
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
@@ -61,7 +62,7 @@ class OfficialModMirrorRepository {
      */
     suspend fun getAllMods(): List<OfficialMirrorMod> {
         val jsonStr = try {
-            client.get<String>("https://adodoz.cn/mods/allmodinfo.json")
+            client.get("https://adodoz.cn/mods/allmodinfo.json").bodyAsText()
         } catch (e: Exception) {
             throw NetworkException("Network error: ${e.message}", e)
         }
@@ -107,7 +108,7 @@ class OfficialModMirrorRepository {
  * Mod 的下载地址为：`https://adodoz.cn/mods/` + Mod 的 ID + `.zip`
  * Icon Image 的 URL 为：`https://adodoz.cn/mods/img/` + `icon`
  */
-data class OfficialMirrorMod internal constructor(
+data class OfficialMirrorMod(
     val id: Int,
     val title: String,
     val description: String,
