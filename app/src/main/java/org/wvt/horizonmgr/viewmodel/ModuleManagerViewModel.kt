@@ -11,7 +11,7 @@ class ModuleManagerViewModel : ViewModel() {
     }
 
     @Stable
-    val tabs = Tabs.values().toList()
+    val tabs = Tabs.entries
 
     private val _selectedTab = MutableStateFlow(Tabs.MOD)
     val selectedTab: StateFlow<Tabs> = _selectedTab

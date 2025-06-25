@@ -13,6 +13,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.wvt.horizonmgr.ui.joingroup.JoinGroupScreen
 import org.wvt.horizonmgr.ui.theme.AndroidHorizonManagerTheme
 import org.wvt.horizonmgr.viewmodel.JoinGroupViewModel
+import androidx.core.net.toUri
 
 class JoinGroupActivity : ComponentActivity() {
     private val viewModel: JoinGroupViewModel by viewModel()
@@ -36,7 +37,8 @@ class JoinGroupActivity : ComponentActivity() {
     private fun openURL(url: String) {
         try {
             val intent = Intent()
-            intent.data = Uri.parse(url)
+                .setAction(Intent.ACTION_VIEW)
+                .setData(url.toUri())
             startActivity(intent)
         } catch (e: Exception) {
             viewModel.startQQFailed()

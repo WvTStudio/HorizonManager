@@ -9,6 +9,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.Settings
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import org.koin.android.ext.android.inject
@@ -18,6 +19,7 @@ import org.wvt.horizonmgr.ui.Root
 import org.wvt.horizonmgr.ui.RootNavHostActivity
 import org.wvt.horizonmgr.ui.RootViewModel
 import org.wvt.horizonmgr.viewmodel.JoinGroupViewModel
+import androidx.core.net.toUri
 
 class RootActivity : ComponentActivity() {
 
@@ -46,14 +48,14 @@ class RootActivity : ComponentActivity() {
 
     private fun openCoolapkURL() {
         val intent =
-            Intent(Intent.ACTION_VIEW, Uri.parse("https://www.coolapk.com/game/com.zheka.horizon"))
+            Intent(Intent.ACTION_VIEW, "https://www.coolapk.com/game/com.zheka.horizon".toUri())
         startActivity(intent)
     }
 
     private fun openMCGooglePlay() {
         val intent = Intent(
             Intent.ACTION_VIEW,
-            Uri.parse("https://play.google.com/store/apps/details?id=com.mojang.minecraftpe")
+            "https://play.google.com/store/apps/details?id=com.mojang.minecraftpe".toUri()
         )
         startActivity(intent)
     }
@@ -82,8 +84,7 @@ class RootActivity : ComponentActivity() {
 
     private fun openURL(url: String) {
         try {
-            val intent = Intent()
-            intent.data = Uri.parse(url)
+            val intent = Intent(Intent.ACTION_VIEW, url.toUri())
             startActivity(intent)
         } catch (e: Exception) {
             joinGroupVM.startQQFailed()

@@ -89,7 +89,7 @@ fun MainScreen(
             )
         },
         tabs = {
-            DrawerTabs(screens = remember { Screen.values() }, currentScreen = screen, onChange = {
+            DrawerTabs(screens = remember { Screen.entries.toTypedArray() }, currentScreen = screen, onChange = {
                 scope.launch {
                     delay(100)
                     drawerState.close()
