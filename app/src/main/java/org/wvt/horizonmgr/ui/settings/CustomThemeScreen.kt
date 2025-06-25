@@ -44,7 +44,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.darkColors
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.ArrowBack
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.lightColors
 import androidx.compose.material.ripple
@@ -134,7 +134,7 @@ fun CustomThemeScreen(requestClose: () -> Unit) {
                 navigationIcon = {
                     IconButton(onClick = requestClose) {
                         Icon(
-                            imageVector = Icons.Rounded.ArrowBack,
+                            imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
                             stringResource(id = R.string.custom_theme_screen_appbar_back)
                         )
                     }
@@ -382,14 +382,16 @@ private fun SelectColorItem(
         Surface(
             modifier = Modifier
                 .size(128.dp, 96.dp)
+                .clickable(
+                    onClick = onSelect,
+                    interactionSource = interactionSource,
+                    indication = null
+                )
                 .padding(top = 8.dp)
                 .graphicsLayer(scaleX = scale, scaleY = scale),
             color = animateColorAsState(color).value,
             elevation = animateDpAsState(if (selected) 8.dp else 0.dp).value,
             shape = RoundedCornerShape(size = 4.dp),
-//            onClick = onSelect,
-//            interactionSource = interactionSource,
-//            indication = null
         ) {}
     }
 }
