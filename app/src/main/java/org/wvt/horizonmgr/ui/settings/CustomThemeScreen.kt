@@ -328,9 +328,9 @@ private fun SelectColorItem(
             color = animateColorAsState(color).value,
             elevation = animateDpAsState(if (selected) 8.dp else 0.dp).value,
             shape = RoundedCornerShape(size = 4.dp),
-            onClick = onSelect,
-            interactionSource = interactionSource,
-            indication = null
+//            onClick = onSelect,
+//            interactionSource = interactionSource,
+//            indication = null
         ) {}
     }
 }

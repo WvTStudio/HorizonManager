@@ -10,12 +10,12 @@ plugins {
 
 android {
     namespace = "org.wvt.horizonmgr"
-    compileSdk = 31
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "org.wvt.horizonmgr"
-        minSdk = 21
-        targetSdk = 31
+        minSdk = 25
+        targetSdk = 35
         versionCode = 26
         versionName = "2.1.4"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -82,6 +82,12 @@ dependencies {
     implementation(project(":webapi"))
     implementation(project(":service"))
 
+//    implementation(project.dependencies.platform(libs.koin.bom))
+//    implementation(libs.koin.core)
+//    implementation(libs.koin.compose)
+//    implementation(libs.koin.compose.viewmodel)
+//    implementation(libs.koin.compose.viewmodel.navigation)
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.activity.ktx)
     implementation(libs.androidx.activity.compose)
@@ -99,7 +105,6 @@ dependencies {
 
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
-//    kapt("com.google.dagger:hilt-compiler:$hiltVersion")
 
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.androidx.hilt.lifecycle.viewmodel)

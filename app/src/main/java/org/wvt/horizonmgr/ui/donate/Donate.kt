@@ -52,8 +52,8 @@ fun Donate(
                     .statusBarsPadding()
                     .weight(1f)
                     .fillMaxWidth(),
-                onClick = onAlipayClicked,
-                indication = null
+//                onClick = onAlipayClicked,
+//                indication = null
             ) {
                 Box(Modifier.fillMaxSize()) {
                     Icon(
@@ -71,8 +71,8 @@ fun Donate(
                     .navigationBarsPadding()
                     .weight(1f)
                     .fillMaxWidth(),
-                onClick = onWechatPayClicked,
-                indication = null
+//                onClick = onWechatPayClicked,
+//                indication = null
             ) {
                 Box(Modifier.fillMaxSize()) {
                     Icon(

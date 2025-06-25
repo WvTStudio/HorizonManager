@@ -45,6 +45,7 @@
             android:name=".service.OnlinePackageInstallService"
             android:description="@string/online_package_install_service_description"
             android:enabled="true"
+            android:foregroundServiceType="dataSync"
             android:exported="false" />
 
         <activity

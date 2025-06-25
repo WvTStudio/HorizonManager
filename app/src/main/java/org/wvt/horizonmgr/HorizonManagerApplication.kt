@@ -2,6 +2,7 @@ package org.wvt.horizonmgr
 
 import android.app.Application
 import android.content.Context
+import android.os.Build
 import android.os.Environment
 import dagger.Module
 import dagger.Provides
@@ -9,6 +10,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.HiltAndroidApp
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import dalvik.system.ZipPathValidator
 import org.wvt.horizonmgr.service.hzpack.HorizonManager
 import org.wvt.horizonmgr.service.level.LevelTransporter
 import org.wvt.horizonmgr.service.level.MCLevelManager
@@ -30,6 +32,12 @@ class HorizonManagerApplication : Application() {
     lateinit var themeController: AndroidThemeController
     override fun onCreate() {
         super.onCreate()
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            // Enable Zip path traversal
+            ZipPathValidator.clearCallback()
+        }
+
         themeController = AndroidThemeController(this)
     }
 }

@@ -390,9 +390,9 @@ fun PackageItem(
     Card(
         modifier = modifier,
         elevation = animateDpAsState(if (pressed) 8.dp else 1.dp).value,
-        onClick = onClick,
-        interactionSource = interactionSource,
-        indication = LocalIndication.current
+//        onClick = onClick,
+//        interactionSource = interactionSource,
+//        indication = LocalIndication.current
     ) {
         Column {
             // Body

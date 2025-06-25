@@ -10,6 +10,7 @@ import androidx.compose.material.Surface
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.CreationExtras
 import dagger.hilt.android.AndroidEntryPoint
 import org.wvt.horizonmgr.ui.community.CommunityScreen
 import org.wvt.horizonmgr.ui.theme.AndroidHorizonManagerTheme
@@ -18,7 +19,7 @@ import org.wvt.horizonmgr.viewmodel.ContextFactory
 
 @AndroidEntryPoint
 class CommunityActivity : AppCompatActivity() {
-    private val viewModel by viewModels<CommunityViewModel> {
+    private val viewModel by viewModels<CommunityViewModel>()/* {
         object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 return modelClass.getConstructor(ContextFactory::class.java).newInstance(
@@ -27,7 +28,7 @@ class CommunityActivity : AppCompatActivity() {
                     })
             }
         }
-    }
+    }*/
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
