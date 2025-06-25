@@ -1,24 +1,24 @@
 [versions]
-kotlin = "2.1.20"
+kotlin = "2.1.21"
 android = "8.10.1"
-kotlinxSerializationJson = "1.3.2"
-ksp = "2.1.20-2.0.1"
-firebaseBom = "26.1.0"
-gms = "4.3.10"
+kotlinxSerializationJson = "1.8.1"
+ksp = "2.1.21-2.0.2"
+firebaseBom = "33.15.0"
+gms = "4.4.2"
 hilt = "2.56.2"
 composeBom = "2025.06.01"
 
 accompanistVersion = "0.17.0"
-activityKtx = "1.4.0"
-appcompat = "1.4.0"
+activityKtx = "1.10.1"
+appcompat = "1.7.1"
 coilCompose = "1.3.2"
-coreKtx = "1.7.0"
-hiltNavigationCompose = "1.0.0-rc01"
+coreKtx = "1.16.0"
+hiltNavigationCompose = "1.2.0"
 hiltLifecycleViewmodel = "1.0.0-alpha03"
-firebaseCrashlyticsKtx = "18.2.6"
-json = "20211205"
+firebaseCrashlyticsKtx = "19.4.4"
+json = "20231013"
 desugar_jdk_libs = "2.1.5"
-activityCompose = "1.4.0"
+activityCompose = "1.10.1"
 argon2kt = "1.4.0"
 constraintlayoutCompose = "1.1.1"
 datastorePreferences = "1.1.7"
@@ -28,14 +28,14 @@ junitJupiter = "5.10.2"
 junit = "4.13.2"
 androidx-lifecycle = "2.9.0"
 androidx-lifecycle-ktx = "2.9.1"
-kotlinxDatetime = "0.3.2"
-ktor = "1.6.7"
-lifecycleViewmodelKtx = "2.4.0"
-lifecycleViewmodelCompose = "2.4.0"
-material = "1.4.0"
-monitor = "1.5.0"
+kotlinxDatetime = "0.6.2"
+ktor = "3.2.0"
+lifecycleViewmodelKtx = "2.9.1"
+lifecycleViewmodelCompose = "2.9.1"
+material = "1.12.0"
+monitor = "1.7.2"
 navigationCompose = "2.9.0-beta01"
-navigationComposeVersion = "2.4.0-rc01"
+navigationComposeVersion = "2.9.0"
 sqlite-bundled = "2.5.2"
 room = "2.7.2"
 profileinstallerVersion = "1.4.1"
@@ -45,10 +45,10 @@ koin-bom = "4.1.0"
 compose-multiplatform = "1.8.2"
 
 constraintlayoutMultiplatform = "0.5.1"
-coroutines = "1.6.0"
+coroutines = "1.10.2"
 logback = "1.5.18"
 buildkonfig = "0.17.1"
-workRuntimeKtx = "2.7.1"
+workRuntimeKtx = "2.10.2"
 markwon = "4.6.2"
 zip4j = "2.9.1"
 
@@ -120,12 +120,8 @@ junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "jun
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDatetime" }
 
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
-ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
-ktor-client-java = { module = "io.ktor:ktor-client-java", version.ref = "ktor" }
 ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktor" }
-ktor-client-android = { module = "io.ktor:ktor-client-android", version.ref = "ktor" }
 ktor-client-encoding = { module = "io.ktor:ktor-client-encoding", version.ref = "ktor" }
-ktor-client-serialization = { module = "io.ktor:ktor-client-serialization", version.ref = "ktor" }
 ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
 ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
 
@@ -151,10 +147,6 @@ koin-android = { module = "io.insert-koin:koin-android" }
 koin-compose = { module = "io.insert-koin:koin-compose" }
 koin-compose-viewmodel = { module = "io.insert-koin:koin-compose-viewmodel" }
 koin-compose-viewmodel-navigation = { module = "io.insert-koin:koin-compose-viewmodel-navigation" }
-
-androidx-lifecycle-viewmodel = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-viewmodel", version.ref = "androidx-lifecycle" }
-androidx-lifecycle-runtime-compose = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "androidx-lifecycle" }
-androidx-lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "androidx-lifecycle-ktx" }
 
 logback = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
 markwon-core = { module = "io.noties.markwon:core", version.ref = "markwon" }

@@ -2,17 +2,16 @@ package org.wvt.horizonmgr.webapi.iccn
 
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
-import io.ktor.client.features.*
+import io.ktor.client.plugins.ClientRequestException
 import io.ktor.client.request.*
 import io.ktor.client.request.forms.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.util.*
-import io.ktor.utils.io.errors.*
+import kotlinx.io.IOException
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.*
 import org.wvt.horizonmgr.webapi.*
 
@@ -52,13 +51,13 @@ class ICCNModule {
     suspend fun login(account: String, password: String): UserClient {
         val client = HttpClient(CIO)
         val jsonStr = try {
-            client.submitForm<String>(
+            client.submitForm(
                 url = "https://adodoz.cn/app_login.php",
                 formParameters = Parameters.build {
                     append("username", account)
                     append("password", password)
                 }
-            )
+            ).bodyAsText()
         } catch (e: IOException) {
             throw NetworkException("发送登录数据失败", e)
         } catch (e: Exception) {
@@ -178,7 +177,7 @@ class ICCNModule {
         var token: String? = null
 
         val homePageResponse = try {
-            client.get<HttpResponse>("https://forum.adodoz.cn") {
+            client.get("https://forum.adodoz.cn") {
                 header(HttpHeaders.UserAgent, "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.106 Safari/537.36")
             }
         } catch (e: IOException) {
@@ -210,18 +209,18 @@ class ICCNModule {
 
         // Step 2 - Register
         val regResponse = try {
-            client.post<HttpResponse>("https://forum.adodoz.cn/register") {
+            client.post("https://forum.adodoz.cn/register") {
                 header("referer", "https://adodoz.cn/")
                 header("cookie", session)
                 header("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.106 Safari/537.36")
                 header("x-csrf-token", token)
                 contentType(ContentType.Application.Json)
-                body = Json.encodeToString(RegisterJson(username, email, password))
+                setBody(Json.encodeToString(RegisterJson(username, email, password)))
             }
         } catch (e: IOException) {
             throw NetworkException("发送注册数据失败", e)
         } catch (e: ClientRequestException) {
-            val responseContent = e.response.readText()
+            val responseContent = e.response.bodyAsText()
             // error
             val errors = mutableListOf<RegisterErrorEntry>()
             // see response_reg_422.json
@@ -248,7 +247,7 @@ class ICCNModule {
         }
 
         // Step3 - Parse register result
-        val responseContent = regResponse.readText()
+        val responseContent = regResponse.bodyAsText()
         // succeed
         val json = try {
             Json.parseToJsonElement(responseContent).jsonObject

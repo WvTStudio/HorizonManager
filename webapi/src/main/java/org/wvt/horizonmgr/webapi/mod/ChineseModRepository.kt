@@ -3,6 +3,7 @@ package org.wvt.horizonmgr.webapi.mod
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.request.*
+import io.ktor.client.statement.bodyAsText
 import org.json.JSONException
 import org.json.JSONObject
 import org.wvt.horizonmgr.webapi.JsonParseException
@@ -61,7 +62,7 @@ class ChineseModRepository {
      */
     suspend fun getAllMods(): List<ChineseMod> {
         val jsonStr = try {
-            client.get<String>("https://dev.adodoz.cn/api/mod/list")
+            client.get("https://dev.adodoz.cn/api/mod/list").bodyAsText()
         } catch (e: IOException) {
             throw NetworkException("获取汉化源 Mod 列表失败", e)
         }
@@ -148,7 +149,7 @@ class ChineseMod internal constructor(
      */
     suspend fun getDownloadURL(): DownloadURL {
         val jsonStr = try {
-            httpClient.get<String>("https://dev.adodoz.cn/api/mod/download?id=$id")
+            httpClient.get("https://dev.adodoz.cn/api/mod/download?id=$id").bodyAsText()
         } catch (e: IOException) {
             throw NetworkException()
         }

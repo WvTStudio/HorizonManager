@@ -3,6 +3,7 @@ package org.wvt.horizonmgr.webapi.mod
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.request.*
+import io.ktor.client.statement.bodyAsText
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
@@ -61,7 +62,7 @@ class OfficialModMirrorRepository {
      */
     suspend fun getAllMods(): List<OfficialMirrorMod> {
         val jsonStr = try {
-            client.get<String>("https://adodoz.cn/mods/allmodinfo.json")
+            client.get("https://adodoz.cn/mods/allmodinfo.json").bodyAsText()
         } catch (e: Exception) {
             throw NetworkException("Network error: ${e.message}", e)
         }

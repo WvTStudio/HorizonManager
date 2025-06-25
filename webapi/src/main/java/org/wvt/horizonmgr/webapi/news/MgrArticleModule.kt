@@ -1,12 +1,14 @@
 package org.wvt.horizonmgr.webapi.news
 
 import io.ktor.client.*
+import io.ktor.client.call.body
 import io.ktor.client.engine.cio.*
-import io.ktor.client.features.*
-import io.ktor.client.features.json.*
-import io.ktor.client.features.json.serializer.*
+import io.ktor.client.plugins.ClientRequestException
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.*
+import io.ktor.client.statement.bodyAsText
 import io.ktor.http.*
+import io.ktor.serialization.kotlinx.json.json
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
@@ -17,8 +19,8 @@ import java.io.IOException
 
 class MgrArticleModule {
     private val client = HttpClient(CIO) {
-        install(JsonFeature) {
-            serializer = KotlinxSerializer()
+        install(ContentNegotiation) {
+            json()
         }
     }
 
@@ -39,7 +41,7 @@ class MgrArticleModule {
     @Throws(NetworkException::class, JsonParseException::class)
     suspend fun getRecommendedArticle(): List<RecommendedArticle> {
         return try {
-            client.get<List<RecommendedArticle>>("https://adodoz.cn/hzmgr/v2/recommended_articles.json")
+            client.get("https://adodoz.cn/hzmgr/v2/recommended_articles.json").body<List<RecommendedArticle>>()
         } catch (e: IOException) {
             throw NetworkException("获取推荐文章失败", e)
         } catch (e: SerializationException) {
@@ -57,7 +59,7 @@ class MgrArticleModule {
     @Throws(NetworkException::class, ClientRequestException::class)
     suspend fun getArticle(newsId: String): Article? {
         val brief = try {
-            client.get<ArticleBrief>("https://adodoz.cn/hzmgr/v2/article/info/${newsId}.json")
+            client.get("https://adodoz.cn/hzmgr/v2/article/info/${newsId}.json").body<ArticleBrief>()
         } catch (e: IOException) {
             throw NetworkException("获取文章 $newsId 信息失败", e)
         } catch (e: SerializationException) {
@@ -67,7 +69,7 @@ class MgrArticleModule {
             else throw e
         }
         val content = try {
-            client.get<String>("https://adodoz.cn/hzmgr/v2/article/content/${newsId}.md")
+            client.get("https://adodoz.cn/hzmgr/v2/article/content/${newsId}.md").bodyAsText()
         } catch (e: IOException) {
             throw NetworkException("获取文章 $newsId 内容失败", e)
         }

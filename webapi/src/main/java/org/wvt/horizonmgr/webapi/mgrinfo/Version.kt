@@ -2,8 +2,9 @@ package org.wvt.horizonmgr.webapi.mgrinfo
 
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
-import io.ktor.client.features.*
+import io.ktor.client.plugins.HttpResponseValidator
 import io.ktor.client.request.*
+import io.ktor.client.statement.bodyAsText
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
@@ -27,7 +28,7 @@ class Version internal constructor(
 
     suspend fun getData(): VersionData {
         val response = try {
-            client.get<String>("https://adodoz.cn/hzmgr/v1/changelogs.json")
+            client.get("https://adodoz.cn/hzmgr/v1/changelogs.json").bodyAsText()
         } catch (e: IOException) {
             throw NetworkException("获取更新日志失败", e)
         }
