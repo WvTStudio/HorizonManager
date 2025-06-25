@@ -4,14 +4,13 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.Settings
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.core.net.toUri
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.wvt.horizonmgr.R
@@ -19,7 +18,6 @@ import org.wvt.horizonmgr.ui.Root
 import org.wvt.horizonmgr.ui.RootNavHostActivity
 import org.wvt.horizonmgr.ui.RootViewModel
 import org.wvt.horizonmgr.viewmodel.JoinGroupViewModel
-import androidx.core.net.toUri
 
 class RootActivity : ComponentActivity() {
 
