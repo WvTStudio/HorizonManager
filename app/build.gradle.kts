@@ -1,21 +1,9 @@
 plugins {
-    /*
-    id("com.android.application")
-    id("kotlin-android")
-
-    kotlin("kapt")
-    id("dagger.hilt.android.plugin")
-
-    id("com.google.gms.google-services")
-    id("com.google.firebase.crashlytics")
-    */
-
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.android.application)
     alias(libs.plugins.ksp)
-//    alias(libs.plugins.gms)
     alias(libs.plugins.hilt)
-//    alias(libs.plugins.firebase.crashlytics)
+//    alias(libs.plugins.gms)
 //    alias(libs.plugins.kotlin.serialization)
 //    alias(libs.plugins.buildkonfig)
 }
@@ -23,7 +11,6 @@ plugins {
 android {
     namespace = "org.wvt.horizonmgr"
     compileSdk = 31
-    buildToolsVersion = "31.0.0"
 
     defaultConfig {
         applicationId = "org.wvt.horizonmgr"
@@ -68,6 +55,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.2.0-alpha01"
@@ -78,7 +66,7 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
-    packagingOptions {
+    packaging {
         resources {
             pickFirsts.add("META-INF/AL2.0")
             pickFirsts.add("META-INF/LGPL2.1")
