@@ -1,6 +1,6 @@
 package org.wvt.horizonmgr.webapi.mgrinfo
 
-data class QQGroup internal constructor(
+data class QQGroup(
     val name: String,
     val description: String,
     val avatarUrl: String,

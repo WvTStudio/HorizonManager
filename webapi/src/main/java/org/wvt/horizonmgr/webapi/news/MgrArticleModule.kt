@@ -84,7 +84,7 @@ class MgrArticleModule {
     )
 
     @Serializable
-    data class RecommendedArticle internal constructor(
+    data class RecommendedArticle(
         val id: String,
         val coverImage: String?,
         val title: String,
@@ -95,7 +95,7 @@ class MgrArticleModule {
         val updateTimeInstant = Instant.parse(updateTime)
     }
 
-    data class Article internal constructor(
+    data class Article(
         val id: String,
         val title: String,
         val brief: String,

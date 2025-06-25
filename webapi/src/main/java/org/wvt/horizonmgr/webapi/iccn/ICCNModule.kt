@@ -260,7 +260,7 @@ class ICCNModule {
     }
 }
 
-data class UserClient internal constructor(
+data class UserClient(
     val uid: String,
     val name: String,
     val avatarUrl: String?,

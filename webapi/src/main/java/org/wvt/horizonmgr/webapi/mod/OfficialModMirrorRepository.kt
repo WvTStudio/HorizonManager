@@ -108,7 +108,7 @@ class OfficialModMirrorRepository {
  * Mod 的下载地址为：`https://adodoz.cn/mods/` + Mod 的 ID + `.zip`
  * Icon Image 的 URL 为：`https://adodoz.cn/mods/img/` + `icon`
  */
-data class OfficialMirrorMod internal constructor(
+data class OfficialMirrorMod(
     val id: Int,
     val title: String,
     val description: String,

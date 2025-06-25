@@ -120,7 +120,7 @@ class MgrNewsModule {
     }
 }
 
-data class NewsSuggestion internal constructor(
+data class NewsSuggestion(
     val newsId: Int,
     val cover: String,
     val title: String,
@@ -130,7 +130,7 @@ data class NewsSuggestion internal constructor(
     val updateTime = Instant.parse(updateISOTime)
 }
 
-data class News internal constructor(
+data class News(
     val id: Int,
     val title: String,
     val brief: String,
