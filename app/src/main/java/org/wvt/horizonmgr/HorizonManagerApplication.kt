@@ -34,6 +34,7 @@ import org.wvt.horizonmgr.viewmodel.InstallPackageViewModel
 import org.wvt.horizonmgr.viewmodel.JoinGroupViewModel
 import org.wvt.horizonmgr.viewmodel.LoginViewModel
 import org.wvt.horizonmgr.viewmodel.MCLevelTabViewModel
+import org.wvt.horizonmgr.viewmodel.MCResTabViewModel
 import org.wvt.horizonmgr.viewmodel.MainViewModel
 import org.wvt.horizonmgr.viewmodel.ModTabViewModel
 import org.wvt.horizonmgr.viewmodel.ModuleManagerViewModel
@@ -41,7 +42,6 @@ import org.wvt.horizonmgr.viewmodel.OnlineModDetailViewModel
 import org.wvt.horizonmgr.viewmodel.OnlineModsViewModel
 import org.wvt.horizonmgr.viewmodel.PackageDetailViewModel
 import org.wvt.horizonmgr.viewmodel.PackageManagerViewModel
-import org.wvt.horizonmgr.viewmodel.SharedFileChooserViewModel
 import org.wvt.horizonmgr.webapi.iccn.ICCNModule
 import org.wvt.horizonmgr.webapi.mgrinfo.MgrInfoModule
 import org.wvt.horizonmgr.webapi.mod.ChineseModRepository
@@ -125,6 +125,7 @@ val myAppModules = module {
     viewModelOf(::LoginViewModel)
     viewModelOf(::MainViewModel)
     viewModelOf(::MCLevelTabViewModel)
+    viewModelOf(::MCResTabViewModel)
     viewModelOf(::ModTabViewModel)
     viewModelOf(::ModuleManagerViewModel)
     viewModelOf(::OnlineModDetailViewModel)
